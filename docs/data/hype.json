@@ -289,6 +289,14 @@
       "last_seen": "2026-07-13T16:33:34Z"
     },
     {
+      "artist": "Chaka Khan",
+      "title": "Ain't Nobody",
+      "text": "Chaka Khan — Ain't Nobody",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:05:37Z",
+      "last_seen": "2026-07-13T17:05:37Z"
+    },
+    {
       "artist": "Charlie Puth",
       "title": "Attention",
       "text": "Charlie Puth — Attention",
@@ -777,29 +785,21 @@
       "last_seen": "2026-07-13T15:33:04Z"
     },
     {
+      "artist": "Lauryn Hill",
+      "title": "To Zion (feat. Carlos Santana)",
+      "text": "Lauryn Hill — To Zion (feat. Carlos Santana)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:05:10Z",
+      "last_seen": "2026-07-13T17:05:10Z"
+    },
+    {
       "artist": "Lea Shabat",
       "title": "חתיכת שמיים",
       "text": "Lea Shabat — חתיכת שמיים",
       "play_count": 1,
       "first_seen": "2026-07-13T14:27:37Z",
       "last_seen": "2026-07-13T14:27:37Z"
-    },
-    {
-      "artist": "Leona Lewis",
-      "title": "Bleeding Love",
-      "text": "Leona Lewis — Bleeding Love",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:20:25Z",
-      "last_seen": "2026-07-13T14:20:25Z"
-    },
-    {
-      "artist": "Lipps, Inc.",
-      "title": "Funkytown (Long Version)",
-      "text": "Lipps, Inc. — Funkytown (Long Version)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:45:36Z",
-      "last_seen": "2026-07-13T13:45:36Z"
     }
   ],
-  "updated_at": "2026-07-13T17:04:41Z"
+  "updated_at": "2026-07-13T17:05:39Z"
 }

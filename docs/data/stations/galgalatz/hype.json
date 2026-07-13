@@ -177,6 +177,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Lauryn Hill",
+      "title": "To Zion (feat. Carlos Santana)",
+      "text": "Lauryn Hill — To Zion (feat. Carlos Santana)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:05:10Z",
+      "last_seen": "2026-07-13T17:05:10Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Lea Shabat",
       "title": "חתיכת שמיים",
       "text": "Lea Shabat — חתיכת שמיים",
@@ -430,5 +441,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T17:04:41Z"
+  "updated_at": "2026-07-13T17:05:39Z"
 }

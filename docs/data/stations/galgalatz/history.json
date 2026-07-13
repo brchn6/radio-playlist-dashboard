@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 293,
+      "station_id": 2,
+      "artist": "Lauryn Hill",
+      "title": "To Zion (feat. Carlos Santana)",
+      "text": "Lauryn Hill — To Zion (feat. Carlos Santana)",
+      "url": "https://www.shazam.com/track/10312200/to-zion-feat-carlos-santana",
+      "shazam_key": "10312200",
+      "recognized_at": "2026-07-13T17:05:10Z",
+      "created_at": "2026-07-13 17:05:39",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 283,
       "station_id": 2,
       "artist": "Noam Bettan",
@@ -547,6 +561,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 39,
-  "updated_at": "2026-07-13T17:04:41Z"
+  "total": 40,
+  "updated_at": "2026-07-13T17:05:39Z"
 }
