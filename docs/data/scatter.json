@@ -17,9 +17,18 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Bob Sinclar & Cutee B.",
+      "title": "Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "text": "Bob Sinclar & Cutee B. — Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "recognized_at": "2026-07-13T12:08:04Z",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T12:05:28Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T12:08:28Z"
 }

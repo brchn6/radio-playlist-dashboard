@@ -1,6 +1,16 @@
 {
   "history": [
     {
+      "id": 3,
+      "artist": "Bob Sinclar & Cutee B.",
+      "title": "Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "text": "Bob Sinclar & Cutee B. — Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "url": "https://www.shazam.com/track/44484285/rock-this-party-everybody-dance-now-feat-dollarman",
+      "shazam_key": "44484285",
+      "recognized_at": "2026-07-13T12:08:04Z",
+      "created_at": "2026-07-13 12:08:28"
+    },
+    {
       "id": 2,
       "artist": "September",
       "title": "Cry For You",
@@ -21,7 +31,7 @@
       "created_at": "2026-07-13 12:04:28"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T12:05:28Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T12:08:28Z"
 }

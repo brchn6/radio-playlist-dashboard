@@ -1,6 +1,14 @@
 {
   "tracks": [
     {
+      "artist": "Bob Sinclar & Cutee B.",
+      "title": "Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "text": "Bob Sinclar & Cutee B. — Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:08:04Z",
+      "last_seen": "2026-07-13T12:08:04Z"
+    },
+    {
       "artist": "Ricky Martin",
       "title": "María",
       "text": "Ricky Martin — María",
@@ -17,5 +25,5 @@
       "last_seen": "2026-07-13T12:05:00Z"
     }
   ],
-  "updated_at": "2026-07-13T12:05:28Z"
+  "updated_at": "2026-07-13T12:08:28Z"
 }
