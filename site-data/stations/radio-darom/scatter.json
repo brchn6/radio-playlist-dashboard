@@ -1,0 +1,29 @@
+{
+  "points": [
+    {
+      "artist": "Omer Adam",
+      "title": "חי (שיר הנושא מתוך לשחרר את שולי סאן)",
+      "text": "Omer Adam — חי (שיר הנושא מתוך לשחרר את שולי סאן)",
+      "recognized_at": "2026-07-13T16:33:30Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Israeli Andalusian Orchestra–Ashdod & Patrick Sebag",
+      "title": "שינויי מזג האוויר (feat. בניה ברבי)",
+      "text": "The Israeli Andalusian Orchestra–Ashdod & Patrick Sebag — שינויי מזג האוויר (feat. בניה ברבי)",
+      "recognized_at": "2026-07-13T16:42:44Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    }
+  ],
+  "total": 2,
+  "returned": 2,
+  "updated_at": "2026-07-13T16:45:30Z"
+}

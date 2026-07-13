@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "slug": "kol-hashfela",
+    "name": "קול השפלה 103FM",
+    "stream_url": "https://radio.streamgates.net/stream/1036kh",
+    "proxy_port": 8761,
+    "color": "#6ae3c1",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://1036kh.com"
+  },
+  {
+    "id": 2,
+    "slug": "galgalatz",
+    "name": "גלגלצ",
+    "stream_url": "https://glzwizzlv.bynetcdn.com/glglz_mp3",
+    "proxy_port": 8762,
+    "color": "#e36a6a",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://glglz.co.il"
+  },
+  {
+    "id": 3,
+    "slug": "99fm",
+    "name": "99FM",
+    "stream_url": "https://99.livecdn.biz/99fm_aac",
+    "proxy_port": 8763,
+    "color": "#6ab8e3",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://99fm.co.il"
+  },
+  {
+    "id": 4,
+    "slug": "radio-tlv",
+    "name": "רדיו תל אביב 102FM",
+    "stream_url": "https://102.livecdn.biz/102fm_aac",
+    "proxy_port": 8764,
+    "color": "#e3c86a",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://102fm.co.il"
+  },
+  {
+    "id": 5,
+    "slug": "kan-88",
+    "name": "כאן 88",
+    "stream_url": "https://27953.live.streamtheworld.com/KAN_88.mp3",
+    "proxy_port": 8765,
+    "color": "#c86ae3",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://www.kan.org.il/radio/88.aspx"
+  },
+  {
+    "id": 6,
+    "slug": "kan-bet",
+    "name": "כאן ב",
+    "stream_url": "https://27953.live.streamtheworld.com/KAN_BET.mp3",
+    "proxy_port": 8766,
+    "color": "#e38a6a",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": "https://www.kan.org.il/radio/bet.aspx"
+  },
+  {
+    "id": 7,
+    "slug": "galil",
+    "name": "קול הגליל העליון",
+    "stream_url": "https://radio.streamgates.net/stream/galil",
+    "proxy_port": 8767,
+    "color": "#a06ae3",
+    "enabled": 1,
+    "created_at": "2026-07-13 12:46:45",
+    "website": ""
+  },
+  {
+    "id": 8,
+    "slug": "radio-darom",
+    "name": "רדיו דרום 97FM",
+    "stream_url": "https://cdn.cybercdn.live/Darom_97FM/Live/icecast.audio",
+    "proxy_port": 8768,
+    "color": "#e36ac8",
+    "enabled": 1,
+    "created_at": "2026-07-13 14:17:06",
+    "website": "https://www.radiodarom.co.il/"
+  }
+]

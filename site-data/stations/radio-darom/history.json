@@ -1,0 +1,34 @@
+{
+  "history": [
+    {
+      "id": 259,
+      "station_id": 8,
+      "artist": "The Israeli Andalusian Orchestra–Ashdod & Patrick Sebag",
+      "title": "שינויי מזג האוויר (feat. בניה ברבי)",
+      "text": "The Israeli Andalusian Orchestra–Ashdod & Patrick Sebag — שינויי מזג האוויר (feat. בניה ברבי)",
+      "url": "https://www.shazam.com/track/646946431/%D7%A9%D7%99%D7%A0%D7%95%D7%99%D7%99-%D7%9E%D7%96%D7%92-%D7%94%D7%90%D7%95%D7%95%D7%99%D7%A8-feat-%D7%91%D7%A0%D7%99%D7%94-%D7%91%D7%A8%D7%91%D7%99",
+      "shazam_key": "646946431",
+      "recognized_at": "2026-07-13T16:42:44Z",
+      "created_at": "2026-07-13 16:43:00",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    },
+    {
+      "id": 244,
+      "station_id": 8,
+      "artist": "Omer Adam",
+      "title": "חי (שיר הנושא מתוך לשחרר את שולי סאן)",
+      "text": "Omer Adam — חי (שיר הנושא מתוך לשחרר את שולי סאן)",
+      "url": "https://www.shazam.com/track/834340135/%D7%97%D7%99-%D7%A9%D7%99%D7%A8-%D7%94%D7%A0%D7%95%D7%A9%D7%90-%D7%9E%D7%AA%D7%95%D7%9A-%D7%9C%D7%A9%D7%97%D7%A8%D7%A8-%D7%90%D7%AA-%D7%A9%D7%95%D7%9C%D7%99-%D7%A1%D7%90%D7%9F",
+      "shazam_key": "834340135",
+      "recognized_at": "2026-07-13T16:33:30Z",
+      "created_at": "2026-07-13 16:33:30",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    }
+  ],
+  "total": 2,
+  "updated_at": "2026-07-13T16:45:30Z"
+}

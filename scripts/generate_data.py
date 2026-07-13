@@ -15,7 +15,7 @@ from typing import Any
 from db import PlaylistDB, STATIONS_CONFIG
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "docs" / "data"
+DATA_DIR = PROJECT_ROOT / "site-data"
 DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
 
 

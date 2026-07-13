@@ -71,7 +71,7 @@ def git_commit_and_push(message: str) -> None:
     """Commit and push. Uses token from .env, never stored."""
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain", "--", "docs/", "scripts/", ".planning/"],
+            ["git", "status", "--porcelain", "--", "docs/", "site-data/", "scripts/", ".planning/"],
             capture_output=True, text=True, timeout=15,
         )
         if not result.stdout.strip():
@@ -79,7 +79,7 @@ def git_commit_and_push(message: str) -> None:
 
         subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=15)
         subprocess.run(
-            ["git", "commit", "-m", message],
+            ["git", "commit", "-m", f"{message} [skip ci]"],
             check=True, capture_output=True, timeout=15,
         )
         subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True, timeout=30)
@@ -95,7 +95,7 @@ def git_commit_and_push(message: str) -> None:
         else:
             subprocess.run(["git", "push"], check=True, capture_output=True, timeout=60)
 
-        print(f"[updater] Git push: {message}", flush=True)
+        print(f"[updater] Git push: {message} [skip ci]", flush=True)
     except subprocess.TimeoutExpired:
         print("[updater] Git push timed out", flush=True)
     except subprocess.CalledProcessError as exc:
