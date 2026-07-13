@@ -307,9 +307,42 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Arkadi Duchin & Meir Banai",
+      "title": "דומינו",
+      "text": "Arkadi Duchin & Meir Banai — דומינו",
+      "recognized_at": "2026-07-13T12:58:15Z",
+      "station_slug": "kan-bet",
+      "station_color": "#e38a6a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Sash!",
+      "title": "Ecuador (Radio Edit)",
+      "text": "Sash! — Ecuador (Radio Edit)",
+      "recognized_at": "2026-07-13T12:58:25Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Led Zeppelin",
+      "title": "Good Times Bad Times",
+      "text": "Led Zeppelin — Good Times Bad Times",
+      "recognized_at": "2026-07-13T12:58:39Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 28,
-  "returned": 28,
-  "updated_at": "2026-07-13T12:57:42Z"
+  "total": 31,
+  "returned": 31,
+  "updated_at": "2026-07-13T12:58:42Z"
 }

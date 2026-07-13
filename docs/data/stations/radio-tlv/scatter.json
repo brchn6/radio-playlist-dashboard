@@ -43,9 +43,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Sash!",
+      "title": "Ecuador (Radio Edit)",
+      "text": "Sash! — Ecuador (Radio Edit)",
+      "recognized_at": "2026-07-13T12:58:25Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 4,
-  "returned": 4,
-  "updated_at": "2026-07-13T12:57:42Z"
+  "total": 5,
+  "returned": 5,
+  "updated_at": "2026-07-13T12:58:42Z"
 }

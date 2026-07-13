@@ -161,7 +161,7 @@ function timeAgo(s){
   return d.toLocaleString('he-IL',{hour:'2-digit',minute:'2-digit'});
 }
 
-function loadJSON(url){return fetch(url+'_='+Date.now()).then(r=>r.ok?r.json():null)}
+function loadJSON(url){return fetch(url+'?_='+Date.now()).then(r=>r.ok?r.json():null)}
 
 // Station pills
 function renderPills(cur){
@@ -170,7 +170,7 @@ function renderPills(cur){
   let h='<button class="pill active" data-slug="">🇮🇜 הכל <span style=font-size:.72rem;opacity:.6>('+allCount+')</span></button>';
   stations.forEach(s=>{
     const has=cur?cur.find(t=>t.station_slug===s.slug):null;
-    h+='<button class="pill" data-slug="'+s.slug+'"><span class=indicator style=background:'+s.color+'></span> '+esc(s.name)+'</button>';
+    h+='<button class="pill" data-slug="'+s.slug+'"><span class=indicator style="background:'+s.color+'"></span> '+esc(s.name)+'</button>';
   });
   el.innerHTML=h;
   el.onclick=e=>{

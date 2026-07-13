@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 31,
+      "station_id": 6,
+      "artist": "Arkadi Duchin & Meir Banai",
+      "title": "דומינו",
+      "text": "Arkadi Duchin & Meir Banai — דומינו",
+      "url": "https://www.shazam.com/track/89692002/%D7%93%D7%95%D7%9E%D7%99%D7%A0%D7%95",
+      "shazam_key": "89692002",
+      "recognized_at": "2026-07-13T12:58:15Z",
+      "created_at": "2026-07-13 12:58:42",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
+    },
+    {
       "id": 23,
       "station_id": 6,
       "artist": "Stamatis Spanoudakis",
@@ -57,6 +71,6 @@
       "station_color": "#e38a6a"
     }
   ],
-  "total": 4,
-  "updated_at": "2026-07-13T12:57:42Z"
+  "total": 5,
+  "updated_at": "2026-07-13T12:58:42Z"
 }

@@ -1,6 +1,14 @@
 {
   "tracks": [
     {
+      "artist": "Arkadi Duchin & Meir Banai",
+      "title": "דומינו",
+      "text": "Arkadi Duchin & Meir Banai — דומינו",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:58:15Z",
+      "last_seen": "2026-07-13T12:58:15Z"
+    },
+    {
       "artist": "Aviv Geffen & התעויוט",
       "title": "אל תדאג",
       "text": "Aviv Geffen & התעויוט — אל תדאג",
@@ -33,5 +41,5 @@
       "last_seen": "2026-07-13T12:53:46Z"
     }
   ],
-  "updated_at": "2026-07-13T12:57:42Z"
+  "updated_at": "2026-07-13T12:58:42Z"
 }

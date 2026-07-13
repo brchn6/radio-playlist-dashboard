@@ -65,9 +65,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Led Zeppelin",
+      "title": "Good Times Bad Times",
+      "text": "Led Zeppelin — Good Times Bad Times",
+      "recognized_at": "2026-07-13T12:58:39Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 6,
-  "returned": 6,
-  "updated_at": "2026-07-13T12:57:42Z"
+  "total": 7,
+  "returned": 7,
+  "updated_at": "2026-07-13T12:58:42Z"
 }

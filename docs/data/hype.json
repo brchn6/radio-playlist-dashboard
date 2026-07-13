@@ -9,6 +9,14 @@
       "last_seen": "2026-07-13T12:51:30Z"
     },
     {
+      "artist": "Arkadi Duchin & Meir Banai",
+      "title": "דומינו",
+      "text": "Arkadi Duchin & Meir Banai — דומינו",
+      "play_count": 2,
+      "first_seen": "2026-07-13T12:57:07Z",
+      "last_seen": "2026-07-13T12:58:15Z"
+    },
+    {
       "artist": "Blondie",
       "title": "The Tide Is High",
       "text": "Blondie — The Tide Is High",
@@ -33,6 +41,14 @@
       "last_seen": "2026-07-13T12:48:38Z"
     },
     {
+      "artist": "Sash!",
+      "title": "Ecuador (Radio Edit)",
+      "text": "Sash! — Ecuador (Radio Edit)",
+      "play_count": 2,
+      "first_seen": "2026-07-13T12:57:20Z",
+      "last_seen": "2026-07-13T12:58:25Z"
+    },
+    {
       "artist": "Shlomo Artzi & Rita",
       "title": "שניים",
       "text": "Shlomo Artzi & Rita — שניים",
@@ -47,14 +63,6 @@
       "play_count": 2,
       "first_seen": "2026-07-13T12:52:43Z",
       "last_seen": "2026-07-13T12:53:46Z"
-    },
-    {
-      "artist": "Arkadi Duchin & Meir Banai",
-      "title": "דומינו",
-      "text": "Arkadi Duchin & Meir Banai — דומינו",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:57:07Z",
-      "last_seen": "2026-07-13T12:57:07Z"
     },
     {
       "artist": "Bruno Mars",
@@ -105,6 +113,14 @@
       "last_seen": "2026-07-13T12:47:51Z"
     },
     {
+      "artist": "Led Zeppelin",
+      "title": "Good Times Bad Times",
+      "text": "Led Zeppelin — Good Times Bad Times",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:58:39Z",
+      "last_seen": "2026-07-13T12:58:39Z"
+    },
+    {
       "artist": "Madcon",
       "title": "Beggin (Uscar Version)",
       "text": "Madcon — Beggin (Uscar Version)",
@@ -119,14 +135,6 @@
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:56Z",
       "last_seen": "2026-07-13T12:51:56Z"
-    },
-    {
-      "artist": "Sash!",
-      "title": "Ecuador (Radio Edit)",
-      "text": "Sash! — Ecuador (Radio Edit)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:57:20Z",
-      "last_seen": "2026-07-13T12:57:20Z"
     },
     {
       "artist": "Stamatis Spanoudakis",
@@ -169,5 +177,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T12:57:42Z"
+  "updated_at": "2026-07-13T12:58:42Z"
 }
