@@ -62,9 +62,18 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Gina G.",
+      "title": "Just a Little Bit (Motiv8 Extended Vocal Mix)",
+      "text": "Gina G. — Just a Little Bit (Motiv8 Extended Vocal Mix)",
+      "recognized_at": "2026-07-13T12:25:38Z",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T12:22:14Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T12:26:06Z"
 }
