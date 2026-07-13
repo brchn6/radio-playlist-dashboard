@@ -155,6 +155,17 @@
       "station_color": "#6ab8e3"
     },
     {
+      "artist": "Mashina",
+      "title": "Ranny Bepariz (רני בפריז)",
+      "text": "Mashina — Ranny Bepariz (רני בפריז)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:37:44Z",
+      "last_seen": "2026-07-13T16:37:44Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "artist": "Meir Banai",
       "title": "תגידי אש תגידי מים",
       "text": "Meir Banai — תגידי אש תגידי מים",
@@ -287,5 +298,5 @@
       "station_color": "#6ab8e3"
     }
   ],
-  "updated_at": "2026-07-13T16:37:30Z"
+  "updated_at": "2026-07-13T16:38:00Z"
 }

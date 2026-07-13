@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 252,
+      "station_id": 7,
+      "artist": "Sia",
+      "title": "Bird Set Free",
+      "text": "Sia — Bird Set Free",
+      "url": "https://www.shazam.com/track/295451201/bird-set-free",
+      "shazam_key": "295451201",
+      "recognized_at": "2026-07-13T16:37:34Z",
+      "created_at": "2026-07-13 16:38:00",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 248,
       "station_id": 7,
       "artist": "Miley Cyrus",
@@ -393,6 +407,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 28,
-  "updated_at": "2026-07-13T16:37:30Z"
+  "total": 29,
+  "updated_at": "2026-07-13T16:38:00Z"
 }
