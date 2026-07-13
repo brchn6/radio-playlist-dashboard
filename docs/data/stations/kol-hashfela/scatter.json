@@ -604,9 +604,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "recognized_at": "2026-07-13T17:34:41Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 55,
-  "returned": 55,
-  "updated_at": "2026-07-13T17:34:39Z"
+  "total": 56,
+  "returned": 56,
+  "updated_at": "2026-07-13T17:35:09Z"
 }

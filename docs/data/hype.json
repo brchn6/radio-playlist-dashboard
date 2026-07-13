@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T13:51:11Z"
     },
     {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "play_count": 2,
+      "first_seen": "2026-07-13T15:29:37Z",
+      "last_seen": "2026-07-13T17:34:41Z"
+    },
+    {
       "artist": "4 Non Blondes",
       "title": "What's Up?",
       "text": "4 Non Blondes — What's Up?",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:34:11Z",
       "last_seen": "2026-07-13T15:34:11Z"
-    },
-    {
-      "artist": "Jasmin Moallem",
-      "title": "מה יבוא",
-      "text": "Jasmin Moallem — מה יבוא",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:25:49Z",
-      "last_seen": "2026-07-13T15:25:49Z"
     }
   ],
-  "updated_at": "2026-07-13T17:34:39Z"
+  "updated_at": "2026-07-13T17:35:09Z"
 }

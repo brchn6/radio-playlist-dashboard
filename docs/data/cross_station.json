@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "station_count": 2,
+      "station_names": "רדיו תל אביב 102FM,קול השפלה 103FM",
+      "station_slugs": "radio-tlv,kol-hashfela",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T15:29:37Z",
+      "last_seen": "2026-07-13T17:34:41Z"
+    },
+    {
       "artist": "Robin Thicke",
       "title": "Blurred Lines (feat. T.I. & Pharrell)",
       "text": "Robin Thicke — Blurred Lines (feat. T.I. & Pharrell)",
@@ -56,5 +67,5 @@
       "last_seen": "2026-07-13T17:14:19Z"
     }
   ],
-  "updated_at": "2026-07-13T17:34:39Z"
+  "updated_at": "2026-07-13T17:35:09Z"
 }
