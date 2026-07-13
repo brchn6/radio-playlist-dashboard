@@ -305,6 +305,14 @@
       "last_seen": "2026-07-13T14:40:29Z"
     },
     {
+      "artist": "Daniela Spector",
+      "title": "הירושימה",
+      "text": "Daniela Spector — הירושימה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:42:29Z",
+      "last_seen": "2026-07-13T16:42:29Z"
+    },
+    {
       "artist": "David Bowie",
       "title": "Starman",
       "text": "David Bowie — Starman",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:32:04Z",
       "last_seen": "2026-07-13T15:32:04Z"
-    },
-    {
-      "artist": "Måneskin",
-      "title": "Beggin'",
-      "text": "Måneskin — Beggin'",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:08:03Z",
-      "last_seen": "2026-07-13T14:08:03Z"
     }
   ],
-  "updated_at": "2026-07-13T16:42:00Z"
+  "updated_at": "2026-07-13T16:42:30Z"
 }

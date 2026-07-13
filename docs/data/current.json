@@ -56,15 +56,15 @@
     "station_color": "#e3c86a"
   },
   {
-    "id": 253,
+    "id": 258,
     "station_id": 5,
-    "artist": "Jamie xx",
-    "title": "Loud Places (feat. Romy)",
-    "text": "Jamie xx — Loud Places (feat. Romy)",
-    "url": "https://www.shazam.com/track/267042196/loud-places-feat-romy",
-    "shazam_key": "267042196",
-    "recognized_at": "2026-07-13T16:38:01Z",
-    "created_at": "2026-07-13 16:38:30",
+    "artist": "Daniela Spector",
+    "title": "הירושימה",
+    "text": "Daniela Spector — הירושימה",
+    "url": "https://www.shazam.com/track/58546159/%D7%94%D7%99%D7%A8%D7%95%D7%A9%D7%99%D7%9E%D7%94",
+    "shazam_key": "58546159",
+    "recognized_at": "2026-07-13T16:42:29Z",
+    "created_at": "2026-07-13 16:42:30",
     "station_slug": "kan-88",
     "station_name": "כאן 88",
     "station_color": "#c86ae3"
