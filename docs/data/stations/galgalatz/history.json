@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 315,
+      "station_id": 2,
+      "artist": "Plan B",
+      "title": "She Said",
+      "text": "Plan B — She Said",
+      "url": "https://www.shazam.com/track/52127768/she-said",
+      "shazam_key": "52127768",
+      "recognized_at": "2026-07-13T17:20:31Z",
+      "created_at": "2026-07-13 17:20:39",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 309,
       "station_id": 2,
       "artist": "Van Morrison",
@@ -603,6 +617,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 43,
-  "updated_at": "2026-07-13T17:20:09Z"
+  "total": 44,
+  "updated_at": "2026-07-13T17:20:39Z"
 }

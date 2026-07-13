@@ -2606,9 +2606,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Plan B",
+      "title": "She Said",
+      "text": "Plan B — She Said",
+      "recognized_at": "2026-07-13T17:20:31Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 237,
-  "returned": 237,
-  "updated_at": "2026-07-13T17:20:09Z"
+  "total": 238,
+  "returned": 238,
+  "updated_at": "2026-07-13T17:20:39Z"
 }
