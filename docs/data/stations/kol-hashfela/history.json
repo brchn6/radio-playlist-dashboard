@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 173,
+      "station_id": 1,
+      "artist": "The Bangles",
+      "title": "Walk Like an Egyptian",
+      "text": "The Bangles — Walk Like an Egyptian",
+      "url": "https://www.shazam.com/track/557059/walk-like-an-egyptian",
+      "shazam_key": "557059",
+      "recognized_at": "2026-07-13T14:46:50Z",
+      "created_at": "2026-07-13 14:47:15",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 168,
       "station_id": 1,
       "artist": "Ariel Zilber",
@@ -309,6 +323,6 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 22,
-  "updated_at": "2026-07-13T14:45:19Z"
+  "total": 23,
+  "updated_at": "2026-07-13T14:47:15Z"
 }
