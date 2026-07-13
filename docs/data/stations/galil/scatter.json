@@ -197,9 +197,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Pretenders",
+      "title": "Human (Tin Tin Out Mix)",
+      "text": "Pretenders — Human (Tin Tin Out Mix)",
+      "recognized_at": "2026-07-13T14:34:35Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 18,
-  "returned": 18,
-  "updated_at": "2026-07-13T14:33:45Z"
+  "total": 19,
+  "returned": 19,
+  "updated_at": "2026-07-13T14:34:45Z"
 }
