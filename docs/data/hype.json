@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T13:36:26Z"
     },
     {
+      "artist": "Altın Gün",
+      "title": "Goca Dünya",
+      "text": "Altın Gün — Goca Dünya",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:50:05Z",
+      "last_seen": "2026-07-13T13:50:05Z"
+    },
+    {
       "artist": "Antenna",
       "title": "Come On Spring",
       "text": "Antenna — Come On Spring",
@@ -217,5 +225,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:48:55Z"
+  "updated_at": "2026-07-13T13:50:05Z"
 }

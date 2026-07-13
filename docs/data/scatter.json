@@ -329,9 +329,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Altın Gün",
+      "title": "Goca Dünya",
+      "text": "Altın Gün — Goca Dünya",
+      "recognized_at": "2026-07-13T13:50:05Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 30,
-  "returned": 30,
-  "updated_at": "2026-07-13T13:48:55Z"
+  "total": 31,
+  "returned": 31,
+  "updated_at": "2026-07-13T13:50:05Z"
 }
