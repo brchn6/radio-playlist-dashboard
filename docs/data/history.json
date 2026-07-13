@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 165,
+      "station_id": 2,
+      "artist": "Jungle",
+      "title": "Carry On",
+      "text": "Jungle — Carry On",
+      "url": "https://www.shazam.com/track/869308214/carry-on",
+      "shazam_key": "869308214",
+      "recognized_at": "2026-07-13T14:39:55Z",
+      "created_at": "2026-07-13 14:40:15",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 164,
       "station_id": 7,
       "artist": "Simple Minds",
@@ -1219,7 +1233,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 87,
-  "returned": 87,
-  "updated_at": "2026-07-13T14:38:45Z"
+  "total": 88,
+  "returned": 88,
+  "updated_at": "2026-07-13T14:40:15Z"
 }

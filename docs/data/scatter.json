@@ -956,9 +956,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Jungle",
+      "title": "Carry On",
+      "text": "Jungle — Carry On",
+      "recognized_at": "2026-07-13T14:39:55Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 87,
-  "returned": 87,
-  "updated_at": "2026-07-13T14:38:45Z"
+  "total": 88,
+  "returned": 88,
+  "updated_at": "2026-07-13T14:40:15Z"
 }

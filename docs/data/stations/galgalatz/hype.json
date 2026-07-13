@@ -56,6 +56,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Jungle",
+      "title": "Carry On",
+      "text": "Jungle — Carry On",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:39:55Z",
+      "last_seen": "2026-07-13T14:39:55Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Lea Shabat",
       "title": "חתיכת שמיים",
       "text": "Lea Shabat — חתיכת שמיים",
@@ -188,5 +199,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T14:38:45Z"
+  "updated_at": "2026-07-13T14:40:15Z"
 }
