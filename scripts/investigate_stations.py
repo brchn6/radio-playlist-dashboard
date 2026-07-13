@@ -206,7 +206,7 @@ def print_report(results: list[StationCandidate]) -> None:
     print()
 
 
-def json_report(results: list[StationCandidate], path: str = "site-data/stations.json") -> None:
+def json_report(results: list[StationCandidate], path: str = "docs/data/stations.json") -> None:
     """Write a JSON report for the dashboard to consume."""
     report = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -227,7 +227,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Investigate Israeli radio station streams")
     parser.add_argument("--url", help="Test a specific stream URL")
     parser.add_argument("--name", help="Station name (with --url)")
-    parser.add_argument("--json", default="site-data/stations.json", help="Output JSON path")
+    parser.add_argument("--json", default="docs/data/stations.json", help="Output JSON path")
     parser.add_argument("--timeout", type=int, default=10, help="Timeout per station in seconds")
     args = parser.parse_args()
 

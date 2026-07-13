@@ -177,6 +177,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Julee Cruise",
+      "title": "Falling",
+      "text": "Julee Cruise — Falling",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:54:47Z",
+      "last_seen": "2026-07-13T16:54:47Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Kate Bush",
       "title": "Babooshka",
       "text": "Kate Bush — Babooshka",
@@ -397,5 +408,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T16:54:21Z"
+  "updated_at": "2026-07-13T16:54:51Z"
 }

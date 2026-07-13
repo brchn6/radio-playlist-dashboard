@@ -12,3 +12,4 @@ venv/
 logs/
 test123.txt
 test.env
+/site-data/
