@@ -641,6 +641,14 @@
       "last_seen": "2026-07-13T16:55:10Z"
     },
     {
+      "artist": "Hatikva 6",
+      "title": "הכל עוד לפניי",
+      "text": "Hatikva 6 — הכל עוד לפניי",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:06:20Z",
+      "last_seen": "2026-07-13T17:06:20Z"
+    },
+    {
       "artist": "Hila Ruach",
       "title": "אולי זה נגמר",
       "text": "Hila Ruach — אולי זה נגמר",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T17:05:10Z",
       "last_seen": "2026-07-13T17:05:10Z"
-    },
-    {
-      "artist": "Lea Shabat",
-      "title": "חתיכת שמיים",
-      "text": "Lea Shabat — חתיכת שמיים",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:27:37Z",
-      "last_seen": "2026-07-13T14:27:37Z"
     }
   ],
-  "updated_at": "2026-07-13T17:06:09Z"
+  "updated_at": "2026-07-13T17:06:39Z"
 }

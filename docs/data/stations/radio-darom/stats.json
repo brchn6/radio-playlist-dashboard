@@ -1,14 +1,14 @@
 {
-  "total_tracks": 5,
-  "unique_tracks": 5,
-  "unique_artists": 5,
+  "total_tracks": 6,
+  "unique_tracks": 6,
+  "unique_artists": 6,
   "first_track_at": "2026-07-13T16:33:30Z",
-  "last_track_at": "2026-07-13T17:01:13Z",
+  "last_track_at": "2026-07-13T17:06:20Z",
   "tracks_by_date": [
     {
       "date": "2026-07-13",
-      "count": 5
+      "count": 6
     }
   ],
-  "updated_at": "2026-07-13T17:06:09Z"
+  "updated_at": "2026-07-13T17:06:39Z"
 }

@@ -11,7 +11,7 @@ database without explicit user confirmation. This rule is ABSOLUTE.**
 | **Repo** | `brchn6/radio-playlist-dashboard` |
 | **Local** | `/home/barc/dev/radio-playlist-dashboard/` |
 | **Dashboard** | `https://brchn6.github.io/radio-playlist-dashboard/` |
-| **Deploy** | Auto via branch-based Pages (`main`/`docs`). Manual option: `gh workflow run "Deploy to Pages"` |
+| **Deploy** | API-triggered every 15 min from updater. Manual: `gh workflow run "Deploy to Pages"` |
 
 ## Running the Services
 
@@ -33,11 +33,11 @@ gh workflow run "Deploy to Pages" --repo brchn6/radio-playlist-dashboard
 
 - **8 proxies** (ports 8761-8768), one per station
 - **Collector** polls all 8 every 30s → SQLite
-- **Git pusher** pushes JSON every 30s to main branch
-- **Data files** in `docs/data/` (inside Pages watch dir) — every push triggers auto-build
-- **Pages deploy** via branch-based auto-build (`main`/`docs`). Manual workflow kept as backup.
+- **Git pusher** pushes JSON every 30s to `main` with `[skip ci]`
+- **Data files** in `docs/data/`
+- **Pages deploy** triggered by updater every 15 min via `gh api -X POST .../pages/builds` (no Actions minutes used)
 - **Now Playing** tab fetches live from local proxies (30s fresh)
-- **Other tabs** load from Pages JSON (auto-updated every 30s)
+- **Other tabs** load from deployed Pages JSON (updated every ~15 min)
 
 ## Critical Bugs Already Fixed
 
@@ -48,7 +48,7 @@ gh workflow run "Deploy to Pages" --repo brchn6/radio-playlist-dashboard
 5. Scatter Y-axis flat → station categories
 6. Pages build collisions → manual deploy only
 7. Collector not pushing → needs `GIT_AUTO_PUSH=1`
-8. **Pages auto-build collapsing** — Every 30s push triggered BOTH Actions workflow AND branch-based Pages build, causing race conditions. **Final fix:** Data stays in `docs/data/`, no `[skip ci]`. Pages auto-build from branch (`main`/`docs`) queues gracefully. Actions workflow stays manual-only.
+8. **Pages auto-build collapsing** — Every 30s push triggered a new Pages build that canceled the previous one (builds take ~1-2 min). **Final fix:** Auto-commits use `[skip ci]` to prevent push-triggered builds. Updater triggers Pages deploy via REST API every 15 min — spaced enough for builds to complete. No Actions minutes consumed. See `scripts/updater.py` → `deploy_pages()` + `DEPLOY_INTERVAL`.
 
 ## Memory File
 Full project memory at `~/.memory/radio-playlist-dashboard.md` — **READ BEFORE making any changes**.
