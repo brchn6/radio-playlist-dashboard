@@ -450,9 +450,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Joe Bonamassa",
+      "title": "I Wonder Who (Live)",
+      "text": "Joe Bonamassa — I Wonder Who (Live)",
+      "recognized_at": "2026-07-13T17:31:46Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 41,
-  "returned": 41,
-  "updated_at": "2026-07-13T17:31:39Z"
+  "total": 42,
+  "returned": 42,
+  "updated_at": "2026-07-13T17:32:09Z"
 }

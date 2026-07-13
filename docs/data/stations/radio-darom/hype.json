@@ -45,6 +45,17 @@
       "station_color": "#e36ac8"
     },
     {
+      "artist": "Portrait",
+      "title": "עד אלייך",
+      "text": "Portrait — עד אלייך",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:32:01Z",
+      "last_seen": "2026-07-13T17:32:01Z",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    },
+    {
       "artist": "Rinat Bar",
       "title": "נופלת לך",
       "text": "Rinat Bar — נופלת לך",
@@ -122,5 +133,5 @@
       "station_color": "#e36ac8"
     }
   ],
-  "updated_at": "2026-07-13T17:31:39Z"
+  "updated_at": "2026-07-13T17:32:09Z"
 }

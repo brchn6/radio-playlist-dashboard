@@ -2760,9 +2760,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Joe Bonamassa",
+      "title": "I Wonder Who (Live)",
+      "text": "Joe Bonamassa — I Wonder Who (Live)",
+      "recognized_at": "2026-07-13T17:31:46Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Portrait",
+      "title": "עד אלייך",
+      "text": "Portrait — עד אלייך",
+      "recognized_at": "2026-07-13T17:32:01Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 251,
-  "returned": 251,
-  "updated_at": "2026-07-13T17:31:39Z"
+  "total": 253,
+  "returned": 253,
+  "updated_at": "2026-07-13T17:32:09Z"
 }

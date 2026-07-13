@@ -188,6 +188,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Joe Bonamassa",
+      "title": "I Wonder Who (Live)",
+      "text": "Joe Bonamassa — I Wonder Who (Live)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:31:46Z",
+      "last_seen": "2026-07-13T17:31:46Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Julee Cruise",
       "title": "Falling",
       "text": "Julee Cruise — Falling",
@@ -452,5 +463,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:31:39Z"
+  "updated_at": "2026-07-13T17:32:09Z"
 }

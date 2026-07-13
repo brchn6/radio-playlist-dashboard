@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 329,
+      "station_id": 5,
+      "artist": "Joe Bonamassa",
+      "title": "I Wonder Who (Live)",
+      "text": "Joe Bonamassa — I Wonder Who (Live)",
+      "url": "https://www.shazam.com/track/866837799/i-wonder-who-live",
+      "shazam_key": "866837799",
+      "recognized_at": "2026-07-13T17:31:46Z",
+      "created_at": "2026-07-13 17:32:09",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 317,
       "station_id": 5,
       "artist": "Aynsley Lister",
@@ -575,6 +589,6 @@
       "station_color": "#c86ae3"
     }
   ],
-  "total": 41,
-  "updated_at": "2026-07-13T17:31:39Z"
+  "total": 42,
+  "updated_at": "2026-07-13T17:32:09Z"
 }

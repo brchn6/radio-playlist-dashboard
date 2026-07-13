@@ -120,9 +120,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Portrait",
+      "title": "עד אלייך",
+      "text": "Portrait — עד אלייך",
+      "recognized_at": "2026-07-13T17:32:01Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 11,
-  "returned": 11,
-  "updated_at": "2026-07-13T17:31:39Z"
+  "total": 12,
+  "returned": 12,
+  "updated_at": "2026-07-13T17:32:09Z"
 }
