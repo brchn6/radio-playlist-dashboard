@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 345,
+      "station_id": 7,
+      "artist": "Dave Matthews Band",
+      "title": "The Best of What's Around",
+      "text": "Dave Matthews Band — The Best of What's Around",
+      "url": "https://www.shazam.com/track/10004273/the-best-of-whats-around",
+      "shazam_key": "10004273",
+      "recognized_at": "2026-07-13T17:42:13Z",
+      "created_at": "2026-07-13 17:42:22",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 337,
       "station_id": 7,
       "artist": "Billy Joel",
@@ -645,6 +659,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 46,
-  "updated_at": "2026-07-13T17:42:02Z"
+  "total": 47,
+  "updated_at": "2026-07-13T17:42:22Z"
 }

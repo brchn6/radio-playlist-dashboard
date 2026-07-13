@@ -505,9 +505,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Dave Matthews Band",
+      "title": "The Best of What's Around",
+      "text": "Dave Matthews Band — The Best of What's Around",
+      "recognized_at": "2026-07-13T17:42:13Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 46,
-  "returned": 46,
-  "updated_at": "2026-07-13T17:42:02Z"
+  "total": 47,
+  "returned": 47,
+  "updated_at": "2026-07-13T17:42:22Z"
 }

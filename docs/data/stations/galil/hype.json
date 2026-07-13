@@ -100,6 +100,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Dave Matthews Band",
+      "title": "The Best of What's Around",
+      "text": "Dave Matthews Band — The Best of What's Around",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:42:13Z",
+      "last_seen": "2026-07-13T17:42:13Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Dire Straits",
       "title": "Walk Of Life",
       "text": "Dire Straits — Walk Of Life",
@@ -507,5 +518,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:42:02Z"
+  "updated_at": "2026-07-13T17:42:22Z"
 }
