@@ -21,9 +21,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ninet Tayeb",
+      "title": "להיות טובה (feat. דאנה איבגי)",
+      "text": "Ninet Tayeb — להיות טובה (feat. דאנה איבגי)",
+      "recognized_at": "2026-07-13T12:51:56Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T12:51:42Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T12:52:12Z"
 }

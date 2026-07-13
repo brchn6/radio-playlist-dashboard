@@ -65,6 +65,14 @@
       "last_seen": "2026-07-13T12:47:53Z"
     },
     {
+      "artist": "Ninet Tayeb",
+      "title": "להיות טובה (feat. דאנה איבגי)",
+      "text": "Ninet Tayeb — להיות טובה (feat. דאנה איבגי)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:51:56Z",
+      "last_seen": "2026-07-13T12:51:56Z"
+    },
+    {
       "artist": "Test Artist",
       "title": "Test Song",
       "text": "Test Artist — Test Song",
@@ -89,5 +97,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T12:51:42Z"
+  "updated_at": "2026-07-13T12:52:12Z"
 }
