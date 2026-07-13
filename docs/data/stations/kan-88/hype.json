@@ -56,6 +56,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Hadag Nahash",
+      "title": "חליפות",
+      "text": "Hadag Nahash — חליפות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:17:39Z",
+      "last_seen": "2026-07-13T13:17:39Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Janis Joplin",
       "title": "To Love Somebody",
       "text": "Janis Joplin — To Love Somebody",
@@ -133,5 +144,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:17:12Z"
+  "updated_at": "2026-07-13T13:17:42Z"
 }

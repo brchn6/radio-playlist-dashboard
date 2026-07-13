@@ -56,15 +56,15 @@
     "station_color": "#e3c86a"
   },
   {
-    "id": 47,
+    "id": 57,
     "station_id": 5,
-    "artist": "Janis Joplin",
-    "title": "To Love Somebody",
-    "text": "Janis Joplin — To Love Somebody",
-    "url": "https://www.shazam.com/track/68364137/to-love-somebody",
-    "shazam_key": "68364137",
-    "recognized_at": "2026-07-13T13:09:49Z",
-    "created_at": "2026-07-13 13:10:12",
+    "artist": "Hadag Nahash",
+    "title": "חליפות",
+    "text": "Hadag Nahash — חליפות",
+    "url": "https://www.shazam.com/track/61244362/%D7%97%D7%9C%D7%99%D7%A4%D7%95%D7%AA",
+    "shazam_key": "61244362",
+    "recognized_at": "2026-07-13T13:17:39Z",
+    "created_at": "2026-07-13 13:17:42",
     "station_slug": "kan-88",
     "station_name": "כאן 88",
     "station_color": "#c86ae3"

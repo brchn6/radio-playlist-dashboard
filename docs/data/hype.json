@@ -177,6 +177,14 @@
       "last_seen": "2026-07-13T12:57:32Z"
     },
     {
+      "artist": "Hadag Nahash",
+      "title": "חליפות",
+      "text": "Hadag Nahash — חליפות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:17:39Z",
+      "last_seen": "2026-07-13T13:17:39Z"
+    },
+    {
       "artist": "Hard-Fi",
       "title": "Move On Now",
       "text": "Hard-Fi — Move On Now",
@@ -321,5 +329,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:17:12Z"
+  "updated_at": "2026-07-13T13:17:42Z"
 }

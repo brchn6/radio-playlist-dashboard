@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 57,
+      "station_id": 5,
+      "artist": "Hadag Nahash",
+      "title": "חליפות",
+      "text": "Hadag Nahash — חליפות",
+      "url": "https://www.shazam.com/track/61244362/%D7%97%D7%9C%D7%99%D7%A4%D7%95%D7%AA",
+      "shazam_key": "61244362",
+      "recognized_at": "2026-07-13T13:17:39Z",
+      "created_at": "2026-07-13 13:17:42",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 56,
       "station_id": 3,
       "artist": "Daft Punk",
@@ -785,7 +799,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 56,
-  "returned": 56,
-  "updated_at": "2026-07-13T13:17:12Z"
+  "total": 57,
+  "returned": 57,
+  "updated_at": "2026-07-13T13:17:42Z"
 }

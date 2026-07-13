@@ -615,9 +615,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Hadag Nahash",
+      "title": "חליפות",
+      "text": "Hadag Nahash — חליפות",
+      "recognized_at": "2026-07-13T13:17:39Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 56,
-  "returned": 56,
-  "updated_at": "2026-07-13T13:17:12Z"
+  "total": 57,
+  "returned": 57,
+  "updated_at": "2026-07-13T13:17:42Z"
 }
