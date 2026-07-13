@@ -208,9 +208,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Simple Minds",
+      "title": "She's a River",
+      "text": "Simple Minds — She's a River",
+      "recognized_at": "2026-07-13T14:38:40Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 19,
-  "returned": 19,
-  "updated_at": "2026-07-13T14:36:45Z"
+  "total": 20,
+  "returned": 20,
+  "updated_at": "2026-07-13T14:38:45Z"
 }

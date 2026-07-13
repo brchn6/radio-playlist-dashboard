@@ -934,9 +934,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Modjo",
+      "title": "Lady (Hear Me Tonight)",
+      "text": "Modjo — Lady (Hear Me Tonight)",
+      "recognized_at": "2026-07-13T14:38:40Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Simple Minds",
+      "title": "She's a River",
+      "text": "Simple Minds — She's a River",
+      "recognized_at": "2026-07-13T14:38:40Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 85,
-  "returned": 85,
-  "updated_at": "2026-07-13T14:36:45Z"
+  "total": 87,
+  "returned": 87,
+  "updated_at": "2026-07-13T14:38:45Z"
 }
