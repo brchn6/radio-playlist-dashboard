@@ -2584,9 +2584,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Michael Jackson",
+      "title": "Don't Stop 'Til You Get Enough",
+      "text": "Michael Jackson — Don't Stop 'Til You Get Enough",
+      "recognized_at": "2026-07-13T17:18:20Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 235,
-  "returned": 235,
-  "updated_at": "2026-07-13T17:18:09Z"
+  "total": 236,
+  "returned": 236,
+  "updated_at": "2026-07-13T17:18:39Z"
 }
