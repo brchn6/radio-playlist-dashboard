@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Bon Iver",
+      "title": "Come Talk to Me",
+      "text": "Bon Iver — Come Talk to Me",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:38:32Z",
+      "last_seen": "2026-07-13T13:38:32Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "ממשיך לנסוע",
       "text": "Ehud Banai — ממשיך לנסוע",
@@ -45,5 +56,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:37:35Z"
+  "updated_at": "2026-07-13T13:38:35Z"
 }

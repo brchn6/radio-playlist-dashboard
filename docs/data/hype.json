@@ -33,6 +33,14 @@
       "last_seen": "2026-07-13T13:36:26Z"
     },
     {
+      "artist": "Bon Iver",
+      "title": "Come Talk to Me",
+      "text": "Bon Iver — Come Talk to Me",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:38:32Z",
+      "last_seen": "2026-07-13T13:38:32Z"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "ממשיך לנסוע",
       "text": "Ehud Banai — ממשיך לנסוע",
@@ -113,5 +121,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:37:35Z"
+  "updated_at": "2026-07-13T13:38:35Z"
 }

@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 95,
+      "station_id": 7,
+      "artist": "Bon Iver",
+      "title": "Come Talk to Me",
+      "text": "Bon Iver — Come Talk to Me",
+      "url": "https://www.shazam.com/track/52328931/come-talk-to-me",
+      "shazam_key": "52328931",
+      "recognized_at": "2026-07-13T13:38:32Z",
+      "created_at": "2026-07-13 13:38:35",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 94,
       "station_id": 2,
       "artist": "Jasmin Moallem",
@@ -239,7 +253,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 17,
-  "returned": 17,
-  "updated_at": "2026-07-13T13:37:35Z"
+  "total": 18,
+  "returned": 18,
+  "updated_at": "2026-07-13T13:38:35Z"
 }
