@@ -1,30 +1,27 @@
-# 🎧 1036 פלייליסט דשבורד — Kol Hashfela Playlist Dashboard
+# 🎧 1036 Playlist Dashboard
 
-> **Automatic playlist tracker for [Radio Kol Hashfela 103.6FM](https://1036kh.com)**  
-> מזהה שירים אוטומטית מהרדיו ושומר היסטוריית השמעה
+> **Multi-station automatic playlist tracker for Israeli radio stations**  
+> מזהה שירים אוטומטית מתחנות רדיו ישראליות ושומר היסטוריית השמעה
 
-A live dashboard that tracks every song played on **Kol Hashfela 103.6FM** (רדיו קול השפלה) using the [ShazamIO Proxy](https://github.com/brchn6/shazamio-proxy). The playback history is updated every 30 seconds and published to **GitHub Pages**.
+A live dashboard that tracks songs played on **7 Israeli radio stations** simultaneously using [ShazamIO](https://github.com/dotX12/shazamio). Each station gets its own recognition proxy. All data flows into a single SQLite database and gets published to **GitHub Pages** every 30 seconds.
 
 ## 🚀 How it works
 
 ```
-┌─────────────────┐     poll /30s     ┌───────────────────┐
-│  ShazamIO Proxy  │ ◄────────────── │  updater.py (local)│
-│  (localhost:8765) │                  │  writes data       │
-└─────────────────┘                  └────────┬──────────┘
-       │                                       │
-       │ Shazam API                             │ playlist.json
-       ▼                                       ▼
-┌─────────────────┐                  ┌───────────────────┐
-│  Kol Hashfela    │                  │  docs/data/        │
-│  103.6FM stream  │                  │  playlist.json     │
-└─────────────────┘                  └────────┬──────────┘
-                                              │ git push
-                                              ▼
-                                     ┌───────────────────┐
-                                     │  GitHub Pages      │
-                                     │  index.html        │
-                                     └───────────────────┘
+7x ShazamIO Proxies (ports 8761-8767)
+  kol-hashfela │ galgalatz │ 99fm │ radio-tlv │ kan-88 │ kan-bet │ galil
+        │
+        ▼  poll all 7 every 30s
+Multi-Station Updater
+        │
+        ▼
+SQLite (single DB, station_id on every track)
+        │
+        ▼
+Data Generator → 41 JSON files (aggregated + per-station)
+        │
+        ▼
+GitHub Pages (auto-push on new tracks)
 ```
 
 ## 📦 Project structure
@@ -32,98 +29,106 @@ A live dashboard that tracks every song played on **Kol Hashfela 103.6FM** (רד
 ```
 1036playlistdashboard/
 ├── docs/                        # GitHub Pages root
-│   ├── index.html               # Dashboard page (RTL Hebrew)
-│   └── data/
-│       └── playlist.json        # Auto-generated playlist data
+│   ├── index.html               # Dashboard (TODO: multi-station UI)
+│   ├── stations.json            # Station metadata
+│   ├── current.json             # Current track per station
+│   ├── history.json             # All tracks
+│   ├── hype.json                # Most played
+│   ├── scatter.json             # Time-based data
+│   ├── stats.json               # Aggregated stats
+│   └── stations/                # Per-station data
+│       ├── kol-hashfela/
+│       ├── galgalatz/
+│       ├── 99fm/
+│       ├── radio-tlv/
+│       ├── kan-88/
+│       ├── kan-bet/
+│       └── galil/
 ├── scripts/
-│   └── updater.py               # Daemon: polls proxy every 30s
-├── .github/workflows/
-│   └── pages.yml                # Deploy to GitHub Pages
+│   ├── updater.py               # Multi-station poller daemon
+│   ├── proxy_manager.py         # Start/stop all 7 proxies
+│   ├── generate_data.py         # SQLite → JSON for Pages
+│   ├── db.py                    # SQLite schema + queries
+│   └── manage.sh                # Service manager
+├── data/
+│   └── playlist.db              # SQLite DB (gitignored)
+├── .planning/
+│   ├── ARCHITECTURE.md          # Full architecture plan
+│   └── TODO.md                  # Implementation tracker
+├── .env                         # GIT_TOKEN (gitignored)
+├── .env.example                 # Token template
 ├── .gitignore
-├── README.md
-└── requirements.txt
+└── README.md
 ```
 
 ## 🛠️ Setup
 
 ### 1. Prerequisites
 
-- **ShazamIO Proxy** — running at `http://localhost:8765`  
-  See [brchn6/shazamio-proxy](https://github.com/brchn6/shazamio-proxy)
-- Python 3.10+ (stdlib only for the updater)
+- **ShazamIO** — `pip install shazamio` or see [dotX12/shazamio](https://github.com/dotX12/shazamio)
+- **FFmpeg** — for audio capture (`sudo dnf install ffmpeg` on Fedora)
+- Python 3.10+
 - Git
 
-### 2. Clone & configure
+### 2. Clone
 
 ```bash
 git clone https://github.com/brchn6/1036playlistdashboard.git
 cd 1036playlistdashboard
 ```
 
-### 3. Run the updater
+### 3. Configure token (for auto-push)
 
 ```bash
-# One-shot test
-python scripts/updater.py --once
-
-# Continuous (polls every 30 seconds)
-python scripts/updater.py
-
-# Custom proxy URL
-PROXY_URL=http://localhost:8765 python scripts/updater.py
+cp .env.example .env
+# Edit .env and add your GitHub token:
+#   GIT_TOKEN=ghp_...
 ```
 
-### 4. Deploy to GitHub Pages
-
-The **GitHub Actions workflow** (`.github/workflows/pages.yml`) handles deployment automatically. Every push to `main` deploys to Pages.
-
-Or manually:
+### 4. Start all services
 
 ```bash
-# Push to main — GHA deploys automatically
-git add -A
-git commit -m "update playlist"
-git push
+# Start all 7 proxies + updater daemon
+bash scripts/manage.sh start
+
+# Check status
+bash scripts/manage.sh status
 ```
 
-### 5. Run the updater as a service (systemd user service)
+### 5. Generate data once (test)
 
 ```bash
-cp scripts/1036updater.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now 1036updater.service
-# Check status:
-systemctl --user status 1036updater.service
-journalctl --user -u 1036updater.service -f
+python scripts/generate_data.py
 ```
 
-## 🔄 Auto-push on each new track
-
-The updater can optionally commit & push to GitHub whenever a new track is detected:
+## 📋 Commands
 
 ```bash
-GIT_PUSH=1 python scripts/updater.py
+bash scripts/manage.sh start       # Start all proxies + updater
+bash scripts/manage.sh stop        # Stop everything
+bash scripts/manage.sh status      # Health check
+bash scripts/manage.sh restart     # Stop + start
+bash scripts/manage.sh generate    # Run data generator
+bash scripts/manage.sh proxy start galgalatz  # Single station
+bash scripts/manage.sh logs        # View logs
 ```
 
-Or add this to the systemd service:
-```
-Environment=GIT_PUSH=1
-```
+## 📻 Stations
 
-## 📊 Dashboard features
+| Station | Stream | Port |
+|---------|--------|------|
+| 🟢 קול השפלה 103FM | `radio.streamgates.net/stream/1036kh` | 8761 |
+| 🔴 גלגלצ | `glzwizzlv.bynetcdn.com/glglz_mp3` | 8762 |
+| 🔵 99FM | `99.livecdn.biz/99fm_aac` | 8763 |
+| 🟡 רדיו תל אביב 102FM | `102.livecdn.biz/102fm_aac` | 8764 |
+| 🟣 כאן 88 | `27953.live.streamtheworld.com/KAN_88.mp3` | 8765 |
+| 🟠 כאן ב | `27953.live.streamtheworld.com/KAN_BET.mp3` | 8766 |
+| 🆕 קול הגליל העליון | `radio.streamgates.net/stream/galil` | 8767 |
 
-- **Now Playing** — current song with artist, title, and Shazam link
-- **Playlist History** — last 200 tracks with timestamps
-- **Stats** — total tracks and unique artists
-- **Auto-refresh** — polls `playlist.json` every 30 seconds
-- **RTL Hebrew UI** — right-to-left layout
-- **Dark theme** — matches the Kol Hashfela app aesthetic
+## 🔗 Related
 
-## 🔗 Related projects
-
-- [brchn6/shazamio-proxy](https://github.com/brchn6/shazamio-proxy) — Local Shazam recognition proxy
+- [dotX12/shazamio](https://github.com/dotX12/shazamio) — Python Shazam API wrapper
 - [brchn6/radio-kol-hashfela](https://github.com/brchn6/radio-kol-hashfela) — Android/iOS app for Kol Hashfela
-- [brchn6/brchn6.github.io](https://github.com/brchn6/brchn6.github.io) — Personal site
 
 ## 📝 License
 
