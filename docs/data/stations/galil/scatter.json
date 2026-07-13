@@ -1,87 +1,10 @@
 {
   "points": [
     {
-      "artist": "The Allman Brothers Band",
-      "title": "In Memory of Elizabeth Reed",
-      "text": "The Allman Brothers Band — In Memory of Elizabeth Reed",
-      "recognized_at": "2026-07-13T12:49:14Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "12",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "The Yardbirds",
-      "title": "Good Morning Little Schoolgirl",
-      "text": "The Yardbirds — Good Morning Little Schoolgirl",
-      "recognized_at": "2026-07-13T12:56:23Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "12",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Hard-Fi",
-      "title": "Move On Now",
-      "text": "Hard-Fi — Move On Now",
-      "recognized_at": "2026-07-13T13:02:31Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "The Smashing Pumpkins",
-      "title": "Luna",
-      "text": "The Smashing Pumpkins — Luna",
-      "recognized_at": "2026-07-13T13:07:38Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "The National",
-      "title": "Slow Show",
-      "text": "The National — Slow Show",
-      "recognized_at": "2026-07-13T13:10:42Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Lucy Dacus & Hozier",
-      "title": "Bullseye",
-      "text": "Lucy Dacus & Hozier — Bullseye",
-      "recognized_at": "2026-07-13T13:14:47Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Nouvelle Vague",
-      "title": "In a Manner of Speaking (feat. Camille)",
-      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
-      "recognized_at": "2026-07-13T13:21:56Z",
-      "station_slug": "galil",
-      "station_color": "#a06ae3",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
       "artist": "FINNEAS",
       "title": "Little Window",
       "text": "FINNEAS — Little Window",
-      "recognized_at": "2026-07-13T13:26:01Z",
+      "recognized_at": "2026-07-13T13:27:37Z",
       "station_slug": "galil",
       "station_color": "#a06ae3",
       "day_of_week": "1",
@@ -89,7 +12,7 @@
       "date": "2026-07-13"
     }
   ],
-  "total": 8,
-  "returned": 8,
-  "updated_at": "2026-07-13T13:27:35Z"
+  "total": 1,
+  "returned": 1,
+  "updated_at": "2026-07-13T13:28:05Z"
 }

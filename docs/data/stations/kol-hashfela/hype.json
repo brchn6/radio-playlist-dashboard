@@ -1,17 +1,6 @@
 {
   "tracks": [
     {
-      "artist": "Benzin",
-      "title": "התחלה חדשה (Remastered)",
-      "text": "Benzin — התחלה חדשה (Remastered)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:07:33Z",
-      "last_seen": "2026-07-13T13:07:33Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
       "artist": "Bomfunk MC's",
       "title": "Freestyler",
       "text": "Bomfunk MC's — Freestyler",
@@ -21,128 +10,7 @@
       "station_slug": "kol-hashfela",
       "station_name": "קול השפלה 103FM",
       "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Britney Spears",
-      "title": "...Baby One More Time",
-      "text": "Britney Spears — ...Baby One More Time",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:23:52Z",
-      "last_seen": "2026-07-13T13:23:52Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "La Bouche",
-      "title": "Be My Lover",
-      "text": "La Bouche — Be My Lover",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:53:15Z",
-      "last_seen": "2026-07-13T12:53:15Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Loft",
-      "title": "Hold On",
-      "text": "Loft — Hold On",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:48:35Z",
-      "last_seen": "2026-07-13T12:48:35Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Rihanna",
-      "title": "Don't Stop The Music",
-      "text": "Rihanna — Don't Stop The Music",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:19:47Z",
-      "last_seen": "2026-07-13T13:19:47Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Sash!",
-      "title": "Ecuador (Radio Edit)",
-      "text": "Sash! — Ecuador (Radio Edit)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:57:20Z",
-      "last_seen": "2026-07-13T12:57:20Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Test Artist",
-      "title": "Test Song",
-      "text": "Test Artist — Test Song",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:00:00Z",
-      "last_seen": "2026-07-13T12:00:00Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "The Clash",
-      "title": "Rock the Casbah",
-      "text": "The Clash — Rock the Casbah",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:04:29Z",
-      "last_seen": "2026-07-13T13:04:29Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "The Jacksons",
-      "title": "Can You Feel It",
-      "text": "The Jacksons — Can You Feel It",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:12:39Z",
-      "last_seen": "2026-07-13T13:12:39Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "The Tamperer",
-      "title": "Feel It (feat. Maya)",
-      "text": "The Tamperer — Feel It (feat. Maya)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:13:40Z",
-      "last_seen": "2026-07-13T13:13:40Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Vengaboys",
-      "title": "We Like To Party! (The Vengabus)",
-      "text": "Vengaboys — We Like To Party! (The Vengabus)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:15:42Z",
-      "last_seen": "2026-07-13T13:15:42Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
-    },
-    {
-      "artist": "Years & Years",
-      "title": "Desire",
-      "text": "Years & Years — Desire",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:50:12Z",
-      "last_seen": "2026-07-13T12:50:12Z",
-      "station_slug": "kol-hashfela",
-      "station_name": "קול השפלה 103FM",
-      "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T13:27:35Z"
+  "updated_at": "2026-07-13T13:28:05Z"
 }

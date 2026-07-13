@@ -1,94 +1,6 @@
 {
   "points": [
     {
-      "artist": "Fleetwood Mac",
-      "title": "Silver Springs (Live)",
-      "text": "Fleetwood Mac — Silver Springs (Live)",
-      "recognized_at": "2026-07-13T12:47:45Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "12",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Bruno Mars",
-      "title": "Cha Cha Cha",
-      "text": "Bruno Mars — Cha Cha Cha",
-      "recognized_at": "2026-07-13T12:51:15Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "12",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Shlomo Artzi & Rita",
-      "title": "שניים",
-      "text": "Shlomo Artzi & Rita — שניים",
-      "recognized_at": "2026-07-13T12:55:22Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "12",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Stardust",
-      "title": "Music Sounds Better with You",
-      "text": "Stardust — Music Sounds Better with You",
-      "recognized_at": "2026-07-13T13:04:40Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Margalit Tzan׳ani",
-      "title": "לשיר ולהנות",
-      "text": "Margalit Tzan׳ani — לשיר ולהנות",
-      "recognized_at": "2026-07-13T13:09:50Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Hadag Nahash",
-      "title": "הכל יסתדר (feat. פלד)",
-      "text": "Hadag Nahash — הכל יסתדר (feat. פלד)",
-      "recognized_at": "2026-07-13T13:13:55Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Led Zeppelin",
-      "title": "Black Dog",
-      "text": "Led Zeppelin — Black Dog",
-      "recognized_at": "2026-07-13T13:19:03Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
-      "artist": "Malcolm Todd",
-      "title": "Earrings",
-      "text": "Malcolm Todd — Earrings",
-      "recognized_at": "2026-07-13T13:23:09Z",
-      "station_slug": "galgalatz",
-      "station_color": "#e36a6a",
-      "day_of_week": "1",
-      "hour": "13",
-      "date": "2026-07-13"
-    },
-    {
       "artist": "Ha'Eivrit",
       "title": "Mesibat Kita",
       "text": "Ha'Eivrit — Mesibat Kita",
@@ -100,7 +12,7 @@
       "date": "2026-07-13"
     }
   ],
-  "total": 9,
-  "returned": 9,
-  "updated_at": "2026-07-13T13:27:35Z"
+  "total": 1,
+  "returned": 1,
+  "updated_at": "2026-07-13T13:28:05Z"
 }
