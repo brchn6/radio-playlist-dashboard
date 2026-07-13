@@ -505,9 +505,20 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ethnix",
+      "title": "קטורנה מסאלה",
+      "text": "Ethnix — קטורנה מסאלה",
+      "recognized_at": "2026-07-13T17:01:00Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 46,
-  "returned": 46,
-  "updated_at": "2026-07-13T17:00:41Z"
+  "total": 47,
+  "returned": 47,
+  "updated_at": "2026-07-13T17:01:11Z"
 }

@@ -166,6 +166,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Ethnix",
+      "title": "קטורנה מסאלה",
+      "text": "Ethnix — קטורנה מסאלה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:01:00Z",
+      "last_seen": "2026-07-13T17:01:00Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "Eurythmics",
       "title": "There Must Be An Angel (Playing With My Heart) [Live]",
       "text": "Eurythmics — There Must Be An Angel (Playing With My Heart) [Live]",
@@ -507,5 +518,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T17:00:41Z"
+  "updated_at": "2026-07-13T17:01:11Z"
 }

@@ -513,6 +513,14 @@
       "last_seen": "2026-07-13T14:14:16Z"
     },
     {
+      "artist": "Ethnix",
+      "title": "קטורנה מסאלה",
+      "text": "Ethnix — קטורנה מסאלה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:01:00Z",
+      "last_seen": "2026-07-13T17:01:00Z"
+    },
+    {
       "artist": "Eurythmics",
       "title": "There Must Be An Angel (Playing With My Heart) [Live]",
       "text": "Eurythmics — There Must Be An Angel (Playing With My Heart) [Live]",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T16:52:53Z",
       "last_seen": "2026-07-13T16:52:53Z"
-    },
-    {
-      "artist": "Los del Río",
-      "title": "Macarena",
-      "text": "Los del Río — Macarena",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:32:32Z",
-      "last_seen": "2026-07-13T14:32:32Z"
     }
   ],
-  "updated_at": "2026-07-13T17:00:41Z"
+  "updated_at": "2026-07-13T17:01:11Z"
 }
