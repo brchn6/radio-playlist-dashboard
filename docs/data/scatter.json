@@ -670,9 +670,42 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Rihanna",
+      "title": "Don't Stop The Music",
+      "text": "Rihanna — Don't Stop The Music",
+      "recognized_at": "2026-07-13T13:21:50Z",
+      "station_slug": "kan-bet",
+      "station_color": "#e38a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "recognized_at": "2026-07-13T13:21:56Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Led Zeppelin",
+      "title": "Black Dog",
+      "text": "Led Zeppelin — Black Dog",
+      "recognized_at": "2026-07-13T13:22:07Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 61,
-  "returned": 61,
-  "updated_at": "2026-07-13T13:21:12Z"
+  "total": 64,
+  "returned": 64,
+  "updated_at": "2026-07-13T13:22:12Z"
 }

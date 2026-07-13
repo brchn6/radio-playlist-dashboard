@@ -23,6 +23,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:21:56Z",
+      "last_seen": "2026-07-13T13:21:56Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "The Allman Brothers Band",
       "title": "In Memory of Elizabeth Reed",
       "text": "The Allman Brothers Band — In Memory of Elizabeth Reed",
@@ -67,5 +78,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:21:12Z"
+  "updated_at": "2026-07-13T13:22:12Z"
 }

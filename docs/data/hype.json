@@ -73,6 +73,14 @@
       "last_seen": "2026-07-13T12:55:17Z"
     },
     {
+      "artist": "Led Zeppelin",
+      "title": "Black Dog",
+      "text": "Led Zeppelin — Black Dog",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:19:03Z",
+      "last_seen": "2026-07-13T13:22:07Z"
+    },
+    {
       "artist": "Loft",
       "title": "Hold On",
       "text": "Loft — Hold On",
@@ -87,6 +95,14 @@
       "play_count": 2,
       "first_seen": "2026-07-13T13:21:07Z",
       "last_seen": "2026-07-13T13:21:09Z"
+    },
+    {
+      "artist": "Rihanna",
+      "title": "Don't Stop The Music",
+      "text": "Rihanna — Don't Stop The Music",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:19:47Z",
+      "last_seen": "2026-07-13T13:21:50Z"
     },
     {
       "artist": "Shlomo Artzi & Rita",
@@ -210,14 +226,6 @@
     },
     {
       "artist": "Led Zeppelin",
-      "title": "Black Dog",
-      "text": "Led Zeppelin — Black Dog",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:19:03Z",
-      "last_seen": "2026-07-13T13:19:03Z"
-    },
-    {
-      "artist": "Led Zeppelin",
       "title": "Good Times Bad Times",
       "text": "Led Zeppelin — Good Times Bad Times",
       "play_count": 1,
@@ -257,20 +265,20 @@
       "last_seen": "2026-07-13T12:51:56Z"
     },
     {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:21:56Z",
+      "last_seen": "2026-07-13T13:21:56Z"
+    },
+    {
       "artist": "Pixies",
       "title": "Where Is My Mind?",
       "text": "Pixies — Where Is My Mind?",
       "play_count": 1,
       "first_seen": "2026-07-13T13:04:57Z",
       "last_seen": "2026-07-13T13:04:57Z"
-    },
-    {
-      "artist": "Rihanna",
-      "title": "Don't Stop The Music",
-      "text": "Rihanna — Don't Stop The Music",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:19:47Z",
-      "last_seen": "2026-07-13T13:19:47Z"
     },
     {
       "artist": "Stamatis Spanoudakis",
@@ -353,5 +361,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:21:12Z"
+  "updated_at": "2026-07-13T13:22:12Z"
 }

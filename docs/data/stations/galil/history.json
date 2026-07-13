@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 64,
+      "station_id": 7,
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "url": "https://www.shazam.com/track/40375820/in-a-manner-of-speaking-feat-camille",
+      "shazam_key": "40375820",
+      "recognized_at": "2026-07-13T13:21:56Z",
+      "created_at": "2026-07-13 13:22:12",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 54,
       "station_id": 7,
       "artist": "Lucy Dacus & Hozier",
@@ -85,6 +99,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 6,
-  "updated_at": "2026-07-13T13:21:12Z"
+  "total": 7,
+  "updated_at": "2026-07-13T13:22:12Z"
 }

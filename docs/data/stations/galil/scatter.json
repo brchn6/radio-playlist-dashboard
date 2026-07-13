@@ -65,9 +65,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "recognized_at": "2026-07-13T13:21:56Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 6,
-  "returned": 6,
-  "updated_at": "2026-07-13T13:21:12Z"
+  "total": 7,
+  "returned": 7,
+  "updated_at": "2026-07-13T13:22:12Z"
 }
