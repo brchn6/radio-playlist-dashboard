@@ -21,8 +21,9 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PID_DIR = PROJECT_ROOT / "data" / "proxies"
 LOG_DIR = PROJECT_ROOT / "logs"
-SHAZAMIO_SCRIPT = Path.home() / "dev" / "shazamio-proxy" / "shazamio_proxy.py"
-VENV_PYTHON = Path.home() / "dev" / "shazamio-proxy" / ".venv" / "bin" / "python"
+SHAZAMIO_SCRIPT = PROJECT_ROOT / "shazamio" / "shazamio_proxy.py"
+SHAZAMIO_DIR = PROJECT_ROOT / "shazamio"
+VENV_PYTHON = SHAZAMIO_DIR / ".venv" / "bin" / "python"
 
 # Import station config from db.py
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
