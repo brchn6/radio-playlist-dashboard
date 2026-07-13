@@ -1,6 +1,16 @@
 {
   "history": [
     {
+      "id": 9,
+      "artist": "Geri Halliwell",
+      "title": "It's Raining Men",
+      "text": "Geri Halliwell — It's Raining Men",
+      "url": "https://www.shazam.com/track/5162125/its-raining-men",
+      "shazam_key": "5162125",
+      "recognized_at": "2026-07-13T12:28:42Z",
+      "created_at": "2026-07-13 12:29:06"
+    },
+    {
       "id": 8,
       "artist": "Gina G.",
       "title": "Just a Little Bit (Motiv8 Extended Vocal Mix)",
@@ -81,7 +91,7 @@
       "created_at": "2026-07-13 12:04:28"
     }
   ],
-  "total": 8,
-  "returned": 8,
-  "updated_at": "2026-07-13T12:26:06Z"
+  "total": 9,
+  "returned": 9,
+  "updated_at": "2026-07-13T12:29:06Z"
 }

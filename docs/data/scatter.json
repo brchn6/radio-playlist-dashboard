@@ -71,9 +71,18 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Geri Halliwell",
+      "title": "It's Raining Men",
+      "text": "Geri Halliwell — It's Raining Men",
+      "recognized_at": "2026-07-13T12:28:42Z",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 8,
-  "returned": 8,
-  "updated_at": "2026-07-13T12:26:06Z"
+  "total": 9,
+  "returned": 9,
+  "updated_at": "2026-07-13T12:29:06Z"
 }
