@@ -177,6 +177,14 @@
       "last_seen": "2026-07-13T13:52:52Z"
     },
     {
+      "artist": "Of Monsters and Men",
+      "title": "Crystals",
+      "text": "Of Monsters and Men — Crystals",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:53:49Z",
+      "last_seen": "2026-07-13T13:53:49Z"
+    },
+    {
       "artist": "Olivia Rodrigo",
       "title": "stupid song",
       "text": "Olivia Rodrigo — stupid song",
@@ -249,5 +257,5 @@
       "last_seen": "2026-07-13T13:52:52Z"
     }
   ],
-  "updated_at": "2026-07-13T13:53:15Z"
+  "updated_at": "2026-07-13T13:53:49Z"
 }

@@ -76,9 +76,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Of Monsters and Men",
+      "title": "Crystals",
+      "text": "Of Monsters and Men — Crystals",
+      "recognized_at": "2026-07-13T13:53:49Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T13:53:15Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T13:53:49Z"
 }

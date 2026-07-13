@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 113,
+      "station_id": 7,
+      "artist": "Of Monsters and Men",
+      "title": "Crystals",
+      "text": "Of Monsters and Men — Crystals",
+      "url": "https://www.shazam.com/track/241511538/crystals",
+      "shazam_key": "241511538",
+      "recognized_at": "2026-07-13T13:53:49Z",
+      "created_at": "2026-07-13 13:53:49",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 107,
       "station_id": 7,
       "artist": "Antenna",
@@ -99,6 +113,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 7,
-  "updated_at": "2026-07-13T13:53:15Z"
+  "total": 8,
+  "updated_at": "2026-07-13T13:53:49Z"
 }
