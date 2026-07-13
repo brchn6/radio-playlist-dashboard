@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 72,
+      "station_id": 7,
+      "artist": "FINNEAS",
+      "title": "Little Window",
+      "text": "FINNEAS — Little Window",
+      "url": "https://www.shazam.com/track/709873749/little-window",
+      "shazam_key": "709873749",
+      "recognized_at": "2026-07-13T13:26:01Z",
+      "created_at": "2026-07-13 13:26:12",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 64,
       "station_id": 7,
       "artist": "Nouvelle Vague",
@@ -99,6 +113,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 7,
-  "updated_at": "2026-07-13T13:25:42Z"
+  "total": 8,
+  "updated_at": "2026-07-13T13:26:12Z"
 }

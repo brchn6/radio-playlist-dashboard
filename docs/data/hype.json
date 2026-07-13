@@ -209,6 +209,14 @@
       "last_seen": "2026-07-13T12:49:19Z"
     },
     {
+      "artist": "FINNEAS",
+      "title": "Little Window",
+      "text": "FINNEAS — Little Window",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:26:01Z",
+      "last_seen": "2026-07-13T13:26:01Z"
+    },
+    {
       "artist": "Fleetwood Mac",
       "title": "Silver Springs (Live)",
       "text": "Fleetwood Mac — Silver Springs (Live)",
@@ -393,5 +401,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:25:42Z"
+  "updated_at": "2026-07-13T13:26:12Z"
 }

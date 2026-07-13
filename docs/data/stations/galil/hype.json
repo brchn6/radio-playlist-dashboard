@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "FINNEAS",
+      "title": "Little Window",
+      "text": "FINNEAS — Little Window",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:26:01Z",
+      "last_seen": "2026-07-13T13:26:01Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Hard-Fi",
       "title": "Move On Now",
       "text": "Hard-Fi — Move On Now",
@@ -78,5 +89,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:25:42Z"
+  "updated_at": "2026-07-13T13:26:12Z"
 }
