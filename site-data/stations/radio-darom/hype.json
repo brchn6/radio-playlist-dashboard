@@ -21,7 +21,18 @@
       "station_slug": "radio-darom",
       "station_name": "רדיו דרום 97FM",
       "station_color": "#e36ac8"
+    },
+    {
+      "artist": "Yehudit Ravitz & Ahuva Ozeri",
+      "title": "האיש ההוא",
+      "text": "Yehudit Ravitz & Ahuva Ozeri — האיש ההוא",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:47:52Z",
+      "last_seen": "2026-07-13T16:47:52Z",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
     }
   ],
-  "updated_at": "2026-07-13T16:47:51Z"
+  "updated_at": "2026-07-13T16:48:21Z"
 }

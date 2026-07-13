@@ -21,9 +21,20 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Yehudit Ravitz & Ahuva Ozeri",
+      "title": "האיש ההוא",
+      "text": "Yehudit Ravitz & Ahuva Ozeri — האיש ההוא",
+      "recognized_at": "2026-07-13T16:47:52Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T16:47:51Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T16:48:21Z"
 }
