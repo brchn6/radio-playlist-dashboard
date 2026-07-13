@@ -227,17 +227,19 @@ def main() -> None:
             )
             new_track_occurred = True
 
-        # ── Generate data & push ──
-        if new_track_occurred or iteration % 5 == 0:
+        # ── Generate data & push (throttled: max once per 5min) ──
+        should_generate = new_track_occurred or iteration % 5 == 0
+        if should_generate:
             generate_static_data()
 
-            if DEFAULT_GIT_AUTO_PUSH and new_track_occurred:
-                # Build commit message with all new stations
+        can_push = DEFAULT_GIT_AUTO_PUSH and (time.time() - last_push_time) >= MIN_PUSH_INTERVAL
+        if can_push:
+            if new_track_occurred:
                 git_commit_and_push(f"auto: multi-station update [{now_iso()}]")
-
-        # ── Periodic keepalive push (every 60 iterations = ~30min) ──
-        if DEFAULT_GIT_AUTO_PUSH and iteration % 60 == 0 and not new_track_occurred:
-            git_commit_and_push(f"auto: keepalive [{now_iso()}]")
+                last_push_time = time.time()
+            elif iteration % 60 == 0:  # keepalive every ~30min
+                git_commit_and_push(f"auto: keepalive [{now_iso()}]")
+                last_push_time = time.time()
 
         # ── Periodic cleanup ──
         if iteration % CLEANUP_INTERVAL == 0:
