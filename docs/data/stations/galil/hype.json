@@ -32,7 +32,18 @@
       "station_slug": "galil",
       "station_name": "קול הגליל העליון",
       "station_color": "#a06ae3"
+    },
+    {
+      "artist": "U2",
+      "title": "All I Want Is You (Songs of Surrender)",
+      "text": "U2 — All I Want Is You (Songs of Surrender)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:34:27Z",
+      "last_seen": "2026-07-13T13:34:27Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:34:05Z"
+  "updated_at": "2026-07-13T13:34:35Z"
 }

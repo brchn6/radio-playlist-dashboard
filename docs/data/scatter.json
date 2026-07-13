@@ -131,9 +131,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "U2",
+      "title": "All I Want Is You (Songs of Surrender)",
+      "text": "U2 — All I Want Is You (Songs of Surrender)",
+      "recognized_at": "2026-07-13T13:34:27Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 12,
-  "returned": 12,
-  "updated_at": "2026-07-13T13:34:05Z"
+  "total": 13,
+  "returned": 13,
+  "updated_at": "2026-07-13T13:34:35Z"
 }

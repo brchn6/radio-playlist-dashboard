@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 90,
+      "station_id": 7,
+      "artist": "U2",
+      "title": "All I Want Is You (Songs of Surrender)",
+      "text": "U2 — All I Want Is You (Songs of Surrender)",
+      "url": "https://www.shazam.com/track/648941009/all-i-want-is-you-songs-of-surrender",
+      "shazam_key": "648941009",
+      "recognized_at": "2026-07-13T13:34:27Z",
+      "created_at": "2026-07-13 13:34:35",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 89,
       "station_id": 7,
       "artist": "Ehud Banai",
@@ -169,7 +183,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 12,
-  "returned": 12,
-  "updated_at": "2026-07-13T13:34:05Z"
+  "total": 13,
+  "returned": 13,
+  "updated_at": "2026-07-13T13:34:35Z"
 }
