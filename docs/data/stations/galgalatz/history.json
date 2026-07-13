@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 157,
+      "station_id": 2,
+      "artist": "Silk City",
+      "title": "Only Can Get Better (Original Mix)",
+      "text": "Silk City — Only Can Get Better (Original Mix)",
+      "url": "https://www.shazam.com/track/423033479/only-can-get-better-original-mix",
+      "shazam_key": "423033479",
+      "recognized_at": "2026-07-13T14:32:45Z",
+      "created_at": "2026-07-13 14:32:45",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 149,
       "station_id": 2,
       "artist": "Lea Shabat",
@@ -211,6 +225,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 15,
-  "updated_at": "2026-07-13T14:32:15Z"
+  "total": 16,
+  "updated_at": "2026-07-13T14:32:45Z"
 }

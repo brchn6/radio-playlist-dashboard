@@ -186,9 +186,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Los del Río",
+      "title": "Macarena",
+      "text": "Los del Río — Macarena",
+      "recognized_at": "2026-07-13T14:32:32Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 17,
-  "returned": 17,
-  "updated_at": "2026-07-13T14:32:15Z"
+  "total": 18,
+  "returned": 18,
+  "updated_at": "2026-07-13T14:32:45Z"
 }

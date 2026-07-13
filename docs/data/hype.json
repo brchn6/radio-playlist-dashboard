@@ -337,6 +337,14 @@
       "last_seen": "2026-07-13T13:45:36Z"
     },
     {
+      "artist": "Los del Río",
+      "title": "Macarena",
+      "text": "Los del Río — Macarena",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:32:32Z",
+      "last_seen": "2026-07-13T14:32:32Z"
+    },
+    {
       "artist": "Margalit Tzan׳ani",
       "title": "לשיר ולהנות",
       "text": "Margalit Tzan׳ani — לשיר ולהנות",
@@ -463,6 +471,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:56:51Z",
       "last_seen": "2026-07-13T13:56:51Z"
+    },
+    {
+      "artist": "Silk City",
+      "title": "Only Can Get Better (Original Mix)",
+      "text": "Silk City — Only Can Get Better (Original Mix)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:32:45Z",
+      "last_seen": "2026-07-13T14:32:45Z"
     },
     {
       "artist": "Sono",
@@ -593,5 +609,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:32:15Z"
+  "updated_at": "2026-07-13T14:32:45Z"
 }

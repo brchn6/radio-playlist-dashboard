@@ -164,9 +164,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Silk City",
+      "title": "Only Can Get Better (Original Mix)",
+      "text": "Silk City — Only Can Get Better (Original Mix)",
+      "recognized_at": "2026-07-13T14:32:45Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 15,
-  "returned": 15,
-  "updated_at": "2026-07-13T14:32:15Z"
+  "total": 16,
+  "returned": 16,
+  "updated_at": "2026-07-13T14:32:45Z"
 }

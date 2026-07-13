@@ -857,9 +857,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Los del Río",
+      "title": "Macarena",
+      "text": "Los del Río — Macarena",
+      "recognized_at": "2026-07-13T14:32:32Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Silk City",
+      "title": "Only Can Get Better (Original Mix)",
+      "text": "Silk City — Only Can Get Better (Original Mix)",
+      "recognized_at": "2026-07-13T14:32:45Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 78,
-  "returned": 78,
-  "updated_at": "2026-07-13T14:32:15Z"
+  "total": 80,
+  "returned": 80,
+  "updated_at": "2026-07-13T14:32:45Z"
 }
