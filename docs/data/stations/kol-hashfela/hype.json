@@ -210,6 +210,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Greg Kihn",
+      "title": "Jeopardy",
+      "text": "Greg Kihn — Jeopardy",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:14:15Z",
+      "last_seen": "2026-07-13T17:14:15Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "Kylie Minogue",
       "title": "Some Kind of Bliss",
       "text": "Kylie Minogue — Some Kind of Bliss",
@@ -540,5 +551,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T17:14:09Z"
+  "updated_at": "2026-07-13T17:14:39Z"
 }

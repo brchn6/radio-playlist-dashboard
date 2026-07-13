@@ -2507,9 +2507,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Greg Kihn",
+      "title": "Jeopardy",
+      "text": "Greg Kihn — Jeopardy",
+      "recognized_at": "2026-07-13T17:14:15Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Benson Boone",
+      "title": "Mystical Magical",
+      "text": "Benson Boone — Mystical Magical",
+      "recognized_at": "2026-07-13T17:14:19Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 228,
-  "returned": 228,
-  "updated_at": "2026-07-13T17:14:09Z"
+  "total": 230,
+  "returned": 230,
+  "updated_at": "2026-07-13T17:14:39Z"
 }

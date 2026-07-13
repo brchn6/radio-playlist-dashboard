@@ -43,7 +43,18 @@
       "total_plays": 2,
       "first_seen": "2026-07-13T13:27:34Z",
       "last_seen": "2026-07-13T13:27:34Z"
+    },
+    {
+      "artist": "Benson Boone",
+      "title": "Mystical Magical",
+      "text": "Benson Boone — Mystical Magical",
+      "station_count": 2,
+      "station_names": "קול השפלה 103FM,99FM",
+      "station_slugs": "kol-hashfela,99fm",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T14:33:33Z",
+      "last_seen": "2026-07-13T17:14:19Z"
     }
   ],
-  "updated_at": "2026-07-13T17:14:09Z"
+  "updated_at": "2026-07-13T17:14:39Z"
 }
