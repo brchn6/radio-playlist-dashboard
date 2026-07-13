@@ -375,6 +375,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Syl Johnson",
+      "title": "Is It Because I'm Black",
+      "text": "Syl Johnson — Is It Because I'm Black",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:14:56Z",
+      "last_seen": "2026-07-13T17:14:56Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Talking Heads",
       "title": "Once In a Lifetime",
       "text": "Talking Heads — Once In a Lifetime",
@@ -430,5 +441,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:14:39Z"
+  "updated_at": "2026-07-13T17:15:09Z"
 }

@@ -428,9 +428,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Syl Johnson",
+      "title": "Is It Because I'm Black",
+      "text": "Syl Johnson — Is It Because I'm Black",
+      "recognized_at": "2026-07-13T17:14:56Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 39,
-  "returned": 39,
-  "updated_at": "2026-07-13T17:14:39Z"
+  "total": 40,
+  "returned": 40,
+  "updated_at": "2026-07-13T17:15:09Z"
 }
