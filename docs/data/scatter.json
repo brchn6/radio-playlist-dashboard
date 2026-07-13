@@ -1341,9 +1341,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Up, Bustle & Out",
+      "title": "Emerald Alley (Indian Morning Theme)",
+      "text": "Up, Bustle & Out — Emerald Alley (Indian Morning Theme)",
+      "recognized_at": "2026-07-13T15:08:16Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 122,
-  "returned": 122,
-  "updated_at": "2026-07-13T15:08:15Z"
+  "total": 123,
+  "returned": 123,
+  "updated_at": "2026-07-13T15:08:19Z"
 }

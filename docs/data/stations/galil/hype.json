@@ -265,6 +265,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Up, Bustle & Out",
+      "title": "Emerald Alley (Indian Morning Theme)",
+      "text": "Up, Bustle & Out — Emerald Alley (Indian Morning Theme)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:08:16Z",
+      "last_seen": "2026-07-13T15:08:16Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Whitesnake",
       "title": "Here I Go Again ('87)",
       "text": "Whitesnake — Here I Go Again ('87)",
@@ -276,5 +287,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T15:08:15Z"
+  "updated_at": "2026-07-13T15:08:19Z"
 }
