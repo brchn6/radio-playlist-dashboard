@@ -20,6 +20,22 @@ public claims about named radio stations. The numbers in
 `.planning/REDUNDANCY_FEATURE.md` ("kol-hashfela 1 repeat, everyone else 0%")
 are the old bug's fingerprint, not a finding — do not trust them.
 
+## ⚠️ NEVER restart all proxies simultaneously
+
+`proxy_manager.py restart` staggers startup now, but the underlying hazard is
+permanent: N proxies starting together fire N simultaneous Shazam calls from
+one IP. Shazam's response to too many calls is **not** an HTTP 429 — it simply
+stops answering. On 2026-07-13 that hung all 8 proxies for 11 minutes
+(`recognize()` had no timeout, so it held the lock forever) while
+`proxy_manager health` still reported them "ok" — health only checks that HTTP
+responds, **not** that recognition works. To tell a live proxy from a dead one,
+check `/current` for `running=true` with a stale `last_started_at` and a null
+`last_finished_at`.
+
+Guards now in place: 45s recognize timeout, exponential backoff w/ jitter,
+startup stagger, and `SHAZAMIO_INTERVAL=60s`. **Raise the interval before
+adding stations** — it is the main lever on call volume.
+
 ## ISRC
 Tracks carry an `isrc` (global recording id) from Shazam as of the epoch above;
 it is the reliable key for matching to Spotify. Rows older than that have
