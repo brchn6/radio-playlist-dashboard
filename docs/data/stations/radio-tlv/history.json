@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 46,
+      "station_id": 4,
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "url": "https://www.shazam.com/track/68364137/to-love-somebody",
+      "shazam_key": "68364137",
+      "recognized_at": "2026-07-13T13:09:47Z",
+      "created_at": "2026-07-13 13:10:12",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "id": 43,
       "station_id": 4,
       "artist": "Gal De Paz",
@@ -85,6 +99,6 @@
       "station_color": "#e3c86a"
     }
   ],
-  "total": 6,
-  "updated_at": "2026-07-13T13:09:12Z"
+  "total": 7,
+  "updated_at": "2026-07-13T13:10:12Z"
 }

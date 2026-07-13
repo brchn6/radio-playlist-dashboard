@@ -49,6 +49,14 @@
       "last_seen": "2026-07-13T13:08:39Z"
     },
     {
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:09:47Z",
+      "last_seen": "2026-07-13T13:09:49Z"
+    },
+    {
       "artist": "La Bouche",
       "title": "Be My Lover",
       "text": "La Bouche — Be My Lover",
@@ -177,6 +185,14 @@
       "last_seen": "2026-07-13T12:47:53Z"
     },
     {
+      "artist": "Margalit Tzan׳ani",
+      "title": "לשיר ולהנות",
+      "text": "Margalit Tzan׳ani — לשיר ולהנות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:09:50Z",
+      "last_seen": "2026-07-13T13:09:50Z"
+    },
+    {
       "artist": "Ninet Tayeb",
       "title": "להיות טובה (feat. דאנה איבגי)",
       "text": "Ninet Tayeb — להיות טובה (feat. דאנה איבגי)",
@@ -249,5 +265,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:09:12Z"
+  "updated_at": "2026-07-13T13:10:12Z"
 }

@@ -34,6 +34,17 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:09:47Z",
+      "last_seen": "2026-07-13T13:09:47Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Madcon",
       "title": "Beggin (Uscar Version)",
       "text": "Madcon — Beggin (Uscar Version)",
@@ -67,5 +78,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T13:09:12Z"
+  "updated_at": "2026-07-13T13:10:12Z"
 }

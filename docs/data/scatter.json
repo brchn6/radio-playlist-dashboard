@@ -483,9 +483,42 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "recognized_at": "2026-07-13T13:09:47Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "recognized_at": "2026-07-13T13:09:49Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Margalit Tzan׳ani",
+      "title": "לשיר ולהנות",
+      "text": "Margalit Tzan׳ani — לשיר ולהנות",
+      "recognized_at": "2026-07-13T13:09:50Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 44,
-  "returned": 44,
-  "updated_at": "2026-07-13T13:09:12Z"
+  "total": 47,
+  "returned": 47,
+  "updated_at": "2026-07-13T13:10:12Z"
 }

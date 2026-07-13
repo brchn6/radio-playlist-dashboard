@@ -120,9 +120,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Janis Joplin",
+      "title": "To Love Somebody",
+      "text": "Janis Joplin — To Love Somebody",
+      "recognized_at": "2026-07-13T13:09:49Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 11,
-  "returned": 11,
-  "updated_at": "2026-07-13T13:09:12Z"
+  "total": 12,
+  "returned": 12,
+  "updated_at": "2026-07-13T13:10:12Z"
 }

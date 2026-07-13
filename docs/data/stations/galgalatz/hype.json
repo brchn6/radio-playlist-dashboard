@@ -23,6 +23,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Margalit Tzan׳ani",
+      "title": "לשיר ולהנות",
+      "text": "Margalit Tzan׳ani — לשיר ולהנות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:09:50Z",
+      "last_seen": "2026-07-13T13:09:50Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Shlomo Artzi & Rita",
       "title": "שניים",
       "text": "Shlomo Artzi & Rita — שניים",
@@ -45,5 +56,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:09:12Z"
+  "updated_at": "2026-07-13T13:10:12Z"
 }
