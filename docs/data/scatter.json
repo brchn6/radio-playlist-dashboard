@@ -1231,9 +1231,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Scraps Orchestra",
+      "title": "Mondonuovo",
+      "text": "Scraps Orchestra — Mondonuovo",
+      "recognized_at": "2026-07-13T15:00:27Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "David Bowie",
+      "title": "Ziggy Stardust",
+      "text": "David Bowie — Ziggy Stardust",
+      "recognized_at": "2026-07-13T15:00:41Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 112,
-  "returned": 112,
-  "updated_at": "2026-07-13T14:58:15Z"
+  "total": 114,
+  "returned": 114,
+  "updated_at": "2026-07-13T15:00:45Z"
 }

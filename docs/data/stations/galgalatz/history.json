@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 190,
+      "station_id": 2,
+      "artist": "Scraps Orchestra",
+      "title": "Mondonuovo",
+      "text": "Scraps Orchestra — Mondonuovo",
+      "url": "https://www.shazam.com/track/274997326/mondonuovo",
+      "shazam_key": "274997326",
+      "recognized_at": "2026-07-13T15:00:27Z",
+      "created_at": "2026-07-13 15:00:45",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 184,
       "station_id": 2,
       "artist": "Prince",
@@ -323,6 +337,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 23,
-  "updated_at": "2026-07-13T14:58:15Z"
+  "total": 24,
+  "updated_at": "2026-07-13T15:00:45Z"
 }

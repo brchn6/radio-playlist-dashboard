@@ -217,6 +217,14 @@
       "last_seen": "2026-07-13T14:40:29Z"
     },
     {
+      "artist": "David Bowie",
+      "title": "Ziggy Stardust",
+      "text": "David Bowie — Ziggy Stardust",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:00:41Z",
+      "last_seen": "2026-07-13T15:00:41Z"
+    },
+    {
       "artist": "Dire Straits",
       "title": "Sultans Of Swing",
       "text": "Dire Straits — Sultans Of Swing",
@@ -641,6 +649,14 @@
       "last_seen": "2026-07-13T14:11:12Z"
     },
     {
+      "artist": "Scraps Orchestra",
+      "title": "Mondonuovo",
+      "text": "Scraps Orchestra — Mondonuovo",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:00:27Z",
+      "last_seen": "2026-07-13T15:00:27Z"
+    },
+    {
       "artist": "Shalom Hanoch",
       "title": "ככה וככה",
       "text": "Shalom Hanoch — ככה וככה",
@@ -783,23 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:36:50Z",
       "last_seen": "2026-07-13T13:36:50Z"
-    },
-    {
-      "artist": "The End Of Eternity",
-      "title": "Inhibitions for Electric Guitar",
-      "text": "The End Of Eternity — Inhibitions for Electric Guitar",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:09:50Z",
-      "last_seen": "2026-07-13T14:09:50Z"
-    },
-    {
-      "artist": "The New Mastersounds",
-      "title": "Your Love Is Mine",
-      "text": "The New Mastersounds — Your Love Is Mine",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:57:54Z",
-      "last_seen": "2026-07-13T13:57:54Z"
     }
   ],
-  "updated_at": "2026-07-13T14:58:15Z"
+  "updated_at": "2026-07-13T15:00:45Z"
 }

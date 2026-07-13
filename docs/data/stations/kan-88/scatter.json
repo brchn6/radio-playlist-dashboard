@@ -230,9 +230,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "David Bowie",
+      "title": "Ziggy Stardust",
+      "text": "David Bowie — Ziggy Stardust",
+      "recognized_at": "2026-07-13T15:00:41Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 21,
-  "returned": 21,
-  "updated_at": "2026-07-13T14:58:15Z"
+  "total": 22,
+  "returned": 22,
+  "updated_at": "2026-07-13T15:00:45Z"
 }

@@ -188,6 +188,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Scraps Orchestra",
+      "title": "Mondonuovo",
+      "text": "Scraps Orchestra — Mondonuovo",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:00:27Z",
+      "last_seen": "2026-07-13T15:00:27Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Sheygets",
       "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
       "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
@@ -254,5 +265,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T14:58:15Z"
+  "updated_at": "2026-07-13T15:00:45Z"
 }

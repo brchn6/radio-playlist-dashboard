@@ -67,6 +67,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "David Bowie",
+      "title": "Ziggy Stardust",
+      "text": "David Bowie — Ziggy Stardust",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:00:41Z",
+      "last_seen": "2026-07-13T15:00:41Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "טיפ טיפה",
       "text": "Ehud Banai — טיפ טיפה",
@@ -232,5 +243,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:58:15Z"
+  "updated_at": "2026-07-13T15:00:45Z"
 }
