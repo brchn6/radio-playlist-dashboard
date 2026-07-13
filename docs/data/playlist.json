@@ -1,13 +1,29 @@
 {
   "current": {
-    "artist": "Take That",
-    "title": "It Only Takes a Minute",
-    "text": "Take That — It Only Takes a Minute",
-    "url": "https://www.shazam.com/track/5165269/it-only-takes-a-minute",
-    "shazam_key": "5165269",
-    "recognized_at": "2026-07-13T11:42:57Z"
+    "artist": "Atomic Kitten",
+    "title": "Be With You",
+    "text": "Atomic Kitten — Be With You",
+    "url": "https://www.shazam.com/track/11230937/be-with-you",
+    "shazam_key": "11230937",
+    "recognized_at": "2026-07-13T11:47:25Z"
   },
   "history": [
+    {
+      "artist": "Atomic Kitten",
+      "title": "Be With You",
+      "text": "Atomic Kitten — Be With You",
+      "url": "https://www.shazam.com/track/11230937/be-with-you",
+      "shazam_key": "11230937",
+      "recognized_at": "2026-07-13T11:47:25Z"
+    },
+    {
+      "artist": "Vengaboys",
+      "title": "Boom, Boom, Boom, Boom!!",
+      "text": "Vengaboys — Boom, Boom, Boom, Boom!!",
+      "url": "https://www.shazam.com/track/5193320/boom-boom-boom-boom",
+      "shazam_key": "5193320",
+      "recognized_at": "2026-07-13T11:45:50Z"
+    },
     {
       "artist": "Take That",
       "title": "It Only Takes a Minute",
@@ -29,20 +45,20 @@
     "running": false,
     "stream_url": "https://radio.streamgates.net/stream/1036kh",
     "sample_seconds": 15,
-    "interval_seconds": 60,
-    "last_started_at": "2026-07-13T11:42:56Z",
-    "last_finished_at": "2026-07-13T11:42:57Z",
+    "interval_seconds": 300,
+    "last_started_at": "2026-07-13T11:47:25Z",
+    "last_finished_at": "2026-07-13T11:47:25Z",
     "last_error": null,
     "last_result": {
       "found": true,
-      "artist": "Take That",
-      "title": "It Only Takes a Minute",
-      "text": "Take That — It Only Takes a Minute",
-      "url": "https://www.shazam.com/track/5165269/it-only-takes-a-minute",
-      "shazam_key": "5165269",
-      "recognized_at": "2026-07-13T11:42:57Z"
+      "artist": "Atomic Kitten",
+      "title": "Be With You",
+      "text": "Atomic Kitten — Be With You",
+      "url": "https://www.shazam.com/track/11230937/be-with-you",
+      "shazam_key": "11230937",
+      "recognized_at": "2026-07-13T11:47:25Z"
     }
   },
-  "updated_at": "2026-07-13T11:43:25Z",
-  "total_tracks": 2
+  "updated_at": "2026-07-13T11:47:54Z",
+  "total_tracks": 4
 }

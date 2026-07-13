@@ -29,6 +29,16 @@ case "$cmd" in
       cd "$ROOT"
     fi
 
+    # Wait for ShazamIO proxy to be ready
+    echo "[WAIT] Waiting for ShazamIO proxy..."
+    for i in $(seq 1 15); do
+      if curl -sf http://localhost:8765/health > /dev/null 2>&1; then
+        echo "[OK] ShazamIO proxy ready"
+        break
+      fi
+      sleep 2
+    done
+
     # Server 2: Updater Daemon
     if [ -f "$PID_DIR/updater.pid" ] && kill -0 "$(cat "$PID_DIR/updater.pid")" 2>/dev/null; then
       echo "[SKIP] Updater already running (PID $(cat "$PID_DIR/updater.pid"))"
