@@ -1396,9 +1396,42 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "The Contours",
+      "title": "Do You Love Me",
+      "text": "The Contours — Do You Love Me",
+      "recognized_at": "2026-07-13T15:12:21Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Dominic Fike",
+      "title": "Babydoll",
+      "text": "Dominic Fike — Babydoll",
+      "recognized_at": "2026-07-13T15:12:26Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Justin Timberlake",
+      "title": "Señorita",
+      "text": "Justin Timberlake — Señorita",
+      "recognized_at": "2026-07-13T15:12:43Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 127,
-  "returned": 127,
-  "updated_at": "2026-07-13T15:12:15Z"
+  "total": 130,
+  "returned": 130,
+  "updated_at": "2026-07-13T15:12:45Z"
 }

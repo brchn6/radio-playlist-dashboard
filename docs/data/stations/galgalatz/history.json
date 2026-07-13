@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 206,
+      "station_id": 2,
+      "artist": "Justin Timberlake",
+      "title": "Señorita",
+      "text": "Justin Timberlake — Señorita",
+      "url": "https://www.shazam.com/track/11181389/se%C3%B1orita",
+      "shazam_key": "11181389",
+      "recognized_at": "2026-07-13T15:12:43Z",
+      "created_at": "2026-07-13 15:12:45",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 204,
       "station_id": 2,
       "artist": "Asulin & Anna Zak",
@@ -365,6 +379,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 26,
-  "updated_at": "2026-07-13T15:12:15Z"
+  "total": 27,
+  "updated_at": "2026-07-13T15:12:45Z"
 }

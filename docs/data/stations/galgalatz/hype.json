@@ -89,6 +89,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Justin Timberlake",
+      "title": "Señorita",
+      "text": "Justin Timberlake — Señorita",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:12:43Z",
+      "last_seen": "2026-07-13T15:12:43Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Knesiyat Hasechel",
       "title": "ידיים למעלה",
       "text": "Knesiyat Hasechel — ידיים למעלה",
@@ -287,5 +298,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T15:12:15Z"
+  "updated_at": "2026-07-13T15:12:45Z"
 }

@@ -287,6 +287,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "The Contours",
+      "title": "Do You Love Me",
+      "text": "The Contours — Do You Love Me",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:12:21Z",
+      "last_seen": "2026-07-13T15:12:21Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "TLC",
       "title": "No Scrubs",
       "text": "TLC — No Scrubs",
@@ -309,5 +320,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T15:12:15Z"
+  "updated_at": "2026-07-13T15:12:45Z"
 }

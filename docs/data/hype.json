@@ -265,6 +265,14 @@
       "last_seen": "2026-07-13T14:11:06Z"
     },
     {
+      "artist": "Dominic Fike",
+      "title": "Babydoll",
+      "text": "Dominic Fike — Babydoll",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:12:26Z",
+      "last_seen": "2026-07-13T15:12:26Z"
+    },
+    {
       "artist": "Eden Ben Zaken",
       "title": "ברחובות של תל אביב",
       "text": "Eden Ben Zaken — ברחובות של תל אביב",
@@ -431,6 +439,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:39:55Z",
       "last_seen": "2026-07-13T14:39:55Z"
+    },
+    {
+      "artist": "Justin Timberlake",
+      "title": "Señorita",
+      "text": "Justin Timberlake — Señorita",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:12:43Z",
+      "last_seen": "2026-07-13T15:12:43Z"
     },
     {
       "artist": "Knesiyat Hasechel",
@@ -783,23 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:02:24Z",
       "last_seen": "2026-07-13T14:02:24Z"
-    },
-    {
-      "artist": "Spice Girls",
-      "title": "Who Do You Think You Are",
-      "text": "Spice Girls — Who Do You Think You Are",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:08:15Z",
-      "last_seen": "2026-07-13T15:08:15Z"
-    },
-    {
-      "artist": "Spooks",
-      "title": "Things I've Seen",
-      "text": "Spooks — Things I've Seen",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:57:02Z",
-      "last_seen": "2026-07-13T14:57:02Z"
     }
   ],
-  "updated_at": "2026-07-13T15:12:15Z"
+  "updated_at": "2026-07-13T15:12:45Z"
 }

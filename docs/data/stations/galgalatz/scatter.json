@@ -285,9 +285,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Justin Timberlake",
+      "title": "Señorita",
+      "text": "Justin Timberlake — Señorita",
+      "recognized_at": "2026-07-13T15:12:43Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 26,
-  "returned": 26,
-  "updated_at": "2026-07-13T15:12:15Z"
+  "total": 27,
+  "returned": 27,
+  "updated_at": "2026-07-13T15:12:45Z"
 }

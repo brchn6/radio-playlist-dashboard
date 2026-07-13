@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Dominic Fike",
+      "title": "Babydoll",
+      "text": "Dominic Fike — Babydoll",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:12:26Z",
+      "last_seen": "2026-07-13T15:12:26Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Eden Ben Zaken",
       "title": "ברחובות של תל אביב",
       "text": "Eden Ben Zaken — ברחובות של תל אביב",
@@ -56,5 +67,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T15:12:15Z"
+  "updated_at": "2026-07-13T15:12:45Z"
 }
