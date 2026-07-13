@@ -129,6 +129,14 @@
       "last_seen": "2026-07-13T13:37:28Z"
     },
     {
+      "artist": "Lipps, Inc.",
+      "title": "Funkytown (Long Version)",
+      "text": "Lipps, Inc. — Funkytown (Long Version)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:45:36Z",
+      "last_seen": "2026-07-13T13:45:36Z"
+    },
+    {
       "artist": "Olivia Rodrigo",
       "title": "vampire",
       "text": "Olivia Rodrigo — vampire",
@@ -177,5 +185,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:44:55Z"
+  "updated_at": "2026-07-13T13:45:55Z"
 }
