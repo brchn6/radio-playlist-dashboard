@@ -140,7 +140,7 @@
 </div>
 
 <div class=tab-content id=tab-history>
-  <div class=card><div class=card-title>📋 Play History</div><div id=historyList>Loading...</div></div>
+  <div class=card><div class=card-title style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">📋 Play History<button id=exportCsvBtn style="font-size:.7rem;padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--accent);cursor:pointer;font-family:var(--font);transition:all .15s" onclick="exportCSV()">⬇ Export CSV</button></div><div id=historyList>Loading...</div></div>
 </div>
 
 <div class=tab-content id=tab-hype>
@@ -281,6 +281,7 @@ function renderHistory(hist){
   const el=document.getElementById('historyList');
   if(!hist||!hist.history){el.innerHTML='<div style=text-align:center;padding:24px;color:var(--muted)>No data</div>';return}
   const d=hist.history;
+  el._data=d;
   if(!d.length){el.innerHTML='<div style=text-align:center;padding:24px;color:var(--muted)>No data for this station</div>';return}
   el.innerHTML=d.slice(0,150).map(t=>
     '<div class=history-item>'+
@@ -388,6 +389,25 @@ function renderTopArtists(hist){
       '<div style=font-size:.82rem;font-weight:700;color:var(--accent)>'+t.count+'×</div>'+
     '</div>'
   ).join('');
+}
+
+function exportCSV(){
+  const el=document.getElementById('historyList');
+  if(!el||!el._data||!el._data.length){alert('No data to export');return;}
+  const data=el._data;
+  const headers=['Station','Artist','Title','Recognized At'];
+  const rows=data.map(t=>[
+    (t.station_name||'').replace(/,/g,' '),
+    (t.artist||'').replace(/,/g,' '),
+    (t.title||'').replace(/,/g,' '),
+    t.recognized_at||''
+  ]);
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const d=new Date().toISOString().slice(0,10);
+  a.download='radio-playlist-'+d+'.csv';
+  a.click();URL.revokeObjectURL(a.href);
 }
 
 async function fetchAll(){
