@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 328,
+      "station_id": 7,
+      "artist": "Bob Dylan",
+      "title": "Knockin' On Heaven's Door",
+      "text": "Bob Dylan — Knockin' On Heaven's Door",
+      "url": "https://www.shazam.com/track/5316192/knockin-on-heavens-door",
+      "shazam_key": "5316192",
+      "recognized_at": "2026-07-13T17:29:40Z",
+      "created_at": "2026-07-13 17:30:09",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 327,
       "station_id": 8,
       "artist": "Sarit Hadad",
@@ -3501,7 +3515,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 250,
-  "returned": 250,
-  "updated_at": "2026-07-13T17:29:39Z"
+  "total": 251,
+  "returned": 251,
+  "updated_at": "2026-07-13T17:30:09Z"
 }

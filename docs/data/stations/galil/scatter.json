@@ -472,9 +472,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Bob Dylan",
+      "title": "Knockin' On Heaven's Door",
+      "text": "Bob Dylan — Knockin' On Heaven's Door",
+      "recognized_at": "2026-07-13T17:29:40Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 43,
-  "returned": 43,
-  "updated_at": "2026-07-13T17:29:39Z"
+  "total": 44,
+  "returned": 44,
+  "updated_at": "2026-07-13T17:30:09Z"
 }

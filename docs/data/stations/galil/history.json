@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 328,
+      "station_id": 7,
+      "artist": "Bob Dylan",
+      "title": "Knockin' On Heaven's Door",
+      "text": "Bob Dylan — Knockin' On Heaven's Door",
+      "url": "https://www.shazam.com/track/5316192/knockin-on-heavens-door",
+      "shazam_key": "5316192",
+      "recognized_at": "2026-07-13T17:29:40Z",
+      "created_at": "2026-07-13 17:30:09",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 324,
       "station_id": 7,
       "artist": "John Mayer",
@@ -603,6 +617,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 43,
-  "updated_at": "2026-07-13T17:29:39Z"
+  "total": 44,
+  "updated_at": "2026-07-13T17:30:09Z"
 }

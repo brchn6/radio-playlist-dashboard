@@ -23,6 +23,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Bob Dylan",
+      "title": "Knockin' On Heaven's Door",
+      "text": "Bob Dylan — Knockin' On Heaven's Door",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:29:40Z",
+      "last_seen": "2026-07-13T17:29:40Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Bon Iver",
       "title": "Come Talk to Me",
       "text": "Bon Iver — Come Talk to Me",
@@ -474,5 +485,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:29:39Z"
+  "updated_at": "2026-07-13T17:30:09Z"
 }

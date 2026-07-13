@@ -233,6 +233,14 @@
       "last_seen": "2026-07-13T13:55:48Z"
     },
     {
+      "artist": "Bob Dylan",
+      "title": "Knockin' On Heaven's Door",
+      "text": "Bob Dylan — Knockin' On Heaven's Door",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:29:40Z",
+      "last_seen": "2026-07-13T17:29:40Z"
+    },
+    {
       "artist": "Bon Iver",
       "title": "Come Talk to Me",
       "text": "Bon Iver — Come Talk to Me",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:13:11Z",
       "last_seen": "2026-07-13T14:13:11Z"
-    },
-    {
-      "artist": "John Mayer",
-      "title": "All I Want Is to Be With You",
-      "text": "John Mayer — All I Want Is to Be With You",
-      "play_count": 1,
-      "first_seen": "2026-07-13T17:26:36Z",
-      "last_seen": "2026-07-13T17:26:36Z"
     }
   ],
-  "updated_at": "2026-07-13T17:29:39Z"
+  "updated_at": "2026-07-13T17:30:09Z"
 }
