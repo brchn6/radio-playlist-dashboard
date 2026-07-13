@@ -923,9 +923,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "meja",
+      "title": "All 'Bout the Money (Hector's Radio Mix)",
+      "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
+      "recognized_at": "2026-07-13T14:36:37Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 84,
-  "returned": 84,
-  "updated_at": "2026-07-13T14:36:15Z"
+  "total": 85,
+  "returned": 85,
+  "updated_at": "2026-07-13T14:36:45Z"
 }
