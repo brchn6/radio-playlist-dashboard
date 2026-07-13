@@ -30,7 +30,7 @@ from db import PlaylistDB, STATIONS_CONFIG, STATIONS_BY_PORT  # noqa: E402
 DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
 
 # ── defaults ───────────────────────────────────────────────────────────
-DEFAULT_INTERVAL = 30
+DEFAULT_INTERVAL = 20
 DEFAULT_GIT_AUTO_PUSH = os.environ.get("GIT_AUTO_PUSH", "").lower() in ("1", "true", "yes")
 RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
 CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll

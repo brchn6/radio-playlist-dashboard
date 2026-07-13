@@ -28,7 +28,7 @@ VENV_PYTHON = Path.home() / "dev" / "shazamio-proxy" / ".venv" / "bin" / "python
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 from db import STATIONS_CONFIG, PlaylistDB  # noqa: E402
 
-INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL", "60"))
+INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL", "20"))
 
 
 def _pid_file(slug: str) -> Path:
@@ -90,6 +90,7 @@ def start_one(slug: str) -> dict[str, Any]:
     env["RADIO_STREAM_URL"] = stream_url
     env["SHAZAMIO_SAMPLE_SECONDS"] = "15"
     env["SHAZAMIO_INTERVAL_SECONDS"] = str(INTERVAL)
+    env["SHAZAMIO_RETRY_DELAY"] = "5"
     env["SHAZAMIO_WORK_DIR"] = f"/tmp/1036-proxy-{slug}"
 
     try:
