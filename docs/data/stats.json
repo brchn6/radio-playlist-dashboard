@@ -24,8 +24,8 @@
       "station_name": "רדיו תל אביב 102FM",
       "station_slug": "radio-tlv",
       "event_count": 5,
-      "total_seconds": 79.99996840953827,
-      "last_event_at": "2026-07-13T17:41:22Z"
+      "total_seconds": 99.99998062849045,
+      "last_event_at": "2026-07-13T17:42:02Z"
     },
     {
       "station_id": 5,
@@ -40,17 +40,17 @@
       "station_name": "כאן ב",
       "station_slug": "kan-bet",
       "event_count": 5,
-      "total_seconds": 79.99996840953827,
-      "last_event_at": "2026-07-13T17:41:22Z"
+      "total_seconds": 99.99998062849045,
+      "last_event_at": "2026-07-13T17:42:02Z"
     },
     {
       "station_id": 7,
       "station_name": "קול הגליל העליון",
       "station_slug": "galil",
       "event_count": 3,
-      "total_seconds": 39.999984204769135,
-      "last_event_at": "2026-07-13T17:41:22Z"
+      "total_seconds": 59.99999642372131,
+      "last_event_at": "2026-07-13T17:42:02Z"
     }
   ],
-  "updated_at": "2026-07-13T17:41:42Z"
+  "updated_at": "2026-07-13T17:42:02Z"
 }
