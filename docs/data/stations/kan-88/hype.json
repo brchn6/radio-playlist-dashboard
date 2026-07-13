@@ -188,6 +188,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Sheryl Crow",
+      "title": "Strong Enough",
+      "text": "Sheryl Crow — Strong Enough",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:53:56Z",
+      "last_seen": "2026-07-13T14:53:56Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Soundgarden",
       "title": "Black Hole Sun",
       "text": "Soundgarden — Black Hole Sun",
@@ -210,5 +221,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:52:49Z"
+  "updated_at": "2026-07-13T14:54:15Z"
 }

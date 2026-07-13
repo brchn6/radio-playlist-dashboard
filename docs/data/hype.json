@@ -337,6 +337,14 @@
       "last_seen": "2026-07-13T14:13:11Z"
     },
     {
+      "artist": "Johnny Hates Jazz",
+      "title": "Shattered Dreams",
+      "text": "Johnny Hates Jazz — Shattered Dreams",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:53:58Z",
+      "last_seen": "2026-07-13T14:53:58Z"
+    },
+    {
       "artist": "Jungle",
       "title": "All of the Time (DJ Streaks Remix)",
       "text": "Jungle — All of the Time (DJ Streaks Remix)",
@@ -601,6 +609,14 @@
       "last_seen": "2026-07-13T14:19:13Z"
     },
     {
+      "artist": "Sheryl Crow",
+      "title": "Strong Enough",
+      "text": "Sheryl Crow — Strong Enough",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:53:56Z",
+      "last_seen": "2026-07-13T14:53:56Z"
+    },
+    {
       "artist": "Sheygets",
       "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
       "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
@@ -639,6 +655,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:02:24Z",
       "last_seen": "2026-07-13T14:02:24Z"
+    },
+    {
+      "artist": "Stevie Wonder",
+      "title": "Sir Duke",
+      "text": "Stevie Wonder — Sir Duke",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:53:58Z",
+      "last_seen": "2026-07-13T14:53:58Z"
     },
     {
       "artist": "Talking Heads",
@@ -775,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:52:52Z",
       "last_seen": "2026-07-13T13:52:52Z"
-    },
-    {
-      "artist": "Youssou N'Dour",
-      "title": "7 Seconds (feat. Neneh Cherry)",
-      "text": "Youssou N'Dour — 7 Seconds (feat. Neneh Cherry)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:05:04Z",
-      "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:52:49Z"
+  "updated_at": "2026-07-13T14:54:15Z"
 }

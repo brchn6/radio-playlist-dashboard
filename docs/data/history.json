@@ -1,6 +1,48 @@
 {
   "history": [
     {
+      "id": 182,
+      "station_id": 7,
+      "artist": "Johnny Hates Jazz",
+      "title": "Shattered Dreams",
+      "text": "Johnny Hates Jazz — Shattered Dreams",
+      "url": "https://www.shazam.com/track/20145074/shattered-dreams",
+      "shazam_key": "20145074",
+      "recognized_at": "2026-07-13T14:53:58Z",
+      "created_at": "2026-07-13 14:54:15",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
+      "id": 180,
+      "station_id": 3,
+      "artist": "Stevie Wonder",
+      "title": "Sir Duke",
+      "text": "Stevie Wonder — Sir Duke",
+      "url": "https://www.shazam.com/track/5168423/sir-duke",
+      "shazam_key": "5168423",
+      "recognized_at": "2026-07-13T14:53:58Z",
+      "created_at": "2026-07-13 14:54:15",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 181,
+      "station_id": 5,
+      "artist": "Sheryl Crow",
+      "title": "Strong Enough",
+      "text": "Sheryl Crow — Strong Enough",
+      "url": "https://www.shazam.com/track/20129493/strong-enough",
+      "shazam_key": "20129493",
+      "recognized_at": "2026-07-13T14:53:56Z",
+      "created_at": "2026-07-13 14:54:15",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 179,
       "station_id": 4,
       "artist": "The Rolling Stones",
@@ -1429,7 +1471,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 102,
-  "returned": 102,
-  "updated_at": "2026-07-13T14:52:49Z"
+  "total": 105,
+  "returned": 105,
+  "updated_at": "2026-07-13T14:54:15Z"
 }
