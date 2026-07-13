@@ -78,6 +78,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Jimbo J, Orit Tashoma & אברהם לגסה",
+      "title": "במקום בו אני גר",
+      "text": "Jimbo J, Orit Tashoma & אברהם לגסה — במקום בו אני גר",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:25:28Z",
+      "last_seen": "2026-07-13T13:25:28Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "La Bouche",
       "title": "Be My Lover",
       "text": "La Bouche — Be My Lover",
@@ -166,5 +177,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:25:12Z"
+  "updated_at": "2026-07-13T13:25:42Z"
 }

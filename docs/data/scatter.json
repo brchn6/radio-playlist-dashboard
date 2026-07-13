@@ -758,9 +758,31 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ariel Zilber",
+      "title": "תן לי כח",
+      "text": "Ariel Zilber — תן לי כח",
+      "recognized_at": "2026-07-13T13:25:27Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Jimbo J, Orit Tashoma & אברהם לגסה",
+      "title": "במקום בו אני גר",
+      "text": "Jimbo J, Orit Tashoma & אברהם לגסה — במקום בו אני גר",
+      "recognized_at": "2026-07-13T13:25:28Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 69,
-  "returned": 69,
-  "updated_at": "2026-07-13T13:25:12Z"
+  "total": 71,
+  "returned": 71,
+  "updated_at": "2026-07-13T13:25:42Z"
 }
