@@ -14,15 +14,15 @@
     "station_color": "#6ae3c1"
   },
   {
-    "id": 178,
+    "id": 183,
     "station_id": 2,
-    "artist": "The Cardigans",
-    "title": "My Favourite Game",
-    "text": "The Cardigans — My Favourite Game",
-    "url": "https://www.shazam.com/track/247855/my-favourite-game",
-    "shazam_key": "247855",
-    "recognized_at": "2026-07-13T14:51:13Z",
-    "created_at": "2026-07-13 14:51:15",
+    "artist": "Aretha Franklin",
+    "title": "Chain of Fools",
+    "text": "Aretha Franklin — Chain of Fools",
+    "url": "https://www.shazam.com/track/2906435/chain-of-fools",
+    "shazam_key": "2906435",
+    "recognized_at": "2026-07-13T14:54:17Z",
+    "created_at": "2026-07-13 14:54:19",
     "station_slug": "galgalatz",
     "station_name": "גלגלצ",
     "station_color": "#e36a6a"

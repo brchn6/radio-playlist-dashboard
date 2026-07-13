@@ -1154,9 +1154,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Aretha Franklin",
+      "title": "Chain of Fools",
+      "text": "Aretha Franklin — Chain of Fools",
+      "recognized_at": "2026-07-13T14:54:17Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 105,
-  "returned": 105,
-  "updated_at": "2026-07-13T14:54:15Z"
+  "total": 106,
+  "returned": 106,
+  "updated_at": "2026-07-13T14:54:19Z"
 }

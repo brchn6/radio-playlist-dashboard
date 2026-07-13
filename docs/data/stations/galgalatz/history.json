@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 183,
+      "station_id": 2,
+      "artist": "Aretha Franklin",
+      "title": "Chain of Fools",
+      "text": "Aretha Franklin — Chain of Fools",
+      "url": "https://www.shazam.com/track/2906435/chain-of-fools",
+      "shazam_key": "2906435",
+      "recognized_at": "2026-07-13T14:54:17Z",
+      "created_at": "2026-07-13 14:54:19",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 178,
       "station_id": 2,
       "artist": "The Cardigans",
@@ -295,6 +309,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 21,
-  "updated_at": "2026-07-13T14:54:15Z"
+  "total": 22,
+  "updated_at": "2026-07-13T14:54:19Z"
 }

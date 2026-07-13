@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Aretha Franklin",
+      "title": "Chain of Fools",
+      "text": "Aretha Franklin — Chain of Fools",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:54:17Z",
+      "last_seen": "2026-07-13T14:54:17Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Carakukly & Liad Meir",
       "title": "פבלו אסקובר",
       "text": "Carakukly & Liad Meir — פבלו אסקובר",
@@ -232,5 +243,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T14:54:15Z"
+  "updated_at": "2026-07-13T14:54:19Z"
 }
