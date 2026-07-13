@@ -1385,9 +1385,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Asulin & Anna Zak",
+      "title": "תזמני (עם אנה זק)",
+      "text": "Asulin & Anna Zak — תזמני (עם אנה זק)",
+      "recognized_at": "2026-07-13T15:10:41Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 126,
-  "returned": 126,
-  "updated_at": "2026-07-13T15:10:15Z"
+  "total": 127,
+  "returned": 127,
+  "updated_at": "2026-07-13T15:10:45Z"
 }

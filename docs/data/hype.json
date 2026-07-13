@@ -105,6 +105,14 @@
       "last_seen": "2026-07-13T13:41:09Z"
     },
     {
+      "artist": "Asulin & Anna Zak",
+      "title": "תזמני (עם אנה זק)",
+      "text": "Asulin & Anna Zak — תזמני (עם אנה זק)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:10:41Z",
+      "last_seen": "2026-07-13T15:10:41Z"
+    },
+    {
       "artist": "Avalanche",
       "title": "Johnny, Johnny Come Home (Remix '89)",
       "text": "Avalanche — Johnny, Johnny Come Home (Remix '89)",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:57:02Z",
       "last_seen": "2026-07-13T14:57:02Z"
-    },
-    {
-      "artist": "Stevie Wonder",
-      "title": "Part-Time Lover",
-      "text": "Stevie Wonder — Part-Time Lover",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:01:07Z",
-      "last_seen": "2026-07-13T15:01:07Z"
     }
   ],
-  "updated_at": "2026-07-13T15:10:15Z"
+  "updated_at": "2026-07-13T15:10:45Z"
 }
