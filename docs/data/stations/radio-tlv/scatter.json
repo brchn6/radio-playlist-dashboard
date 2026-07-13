@@ -54,9 +54,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Gal De Paz",
+      "title": "Can’t Die from Love",
+      "text": "Gal De Paz — Can’t Die from Love",
+      "recognized_at": "2026-07-13T13:08:39Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 5,
-  "returned": 5,
-  "updated_at": "2026-07-13T13:08:12Z"
+  "total": 6,
+  "returned": 6,
+  "updated_at": "2026-07-13T13:08:42Z"
 }

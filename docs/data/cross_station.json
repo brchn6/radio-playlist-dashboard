@@ -67,6 +67,17 @@
       "last_seen": "2026-07-13T12:55:17Z"
     },
     {
+      "artist": "Gal De Paz",
+      "title": "Can’t Die from Love",
+      "text": "Gal De Paz — Can’t Die from Love",
+      "station_count": 2,
+      "station_names": "כאן 88,רדיו תל אביב 102FM",
+      "station_slugs": "kan-88,radio-tlv",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T13:06:28Z",
+      "last_seen": "2026-07-13T13:08:39Z"
+    },
+    {
       "artist": "Blondie",
       "title": "The Tide Is High",
       "text": "Blondie — The Tide Is High",
@@ -100,5 +111,5 @@
       "last_seen": "2026-07-13T12:58:15Z"
     }
   ],
-  "updated_at": "2026-07-13T13:08:12Z"
+  "updated_at": "2026-07-13T13:08:42Z"
 }

@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T12:54:53Z"
     },
     {
+      "artist": "Gal De Paz",
+      "title": "Can’t Die from Love",
+      "text": "Gal De Paz — Can’t Die from Love",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:06:28Z",
+      "last_seen": "2026-07-13T13:08:39Z"
+    },
+    {
       "artist": "La Bouche",
       "title": "Be My Lover",
       "text": "La Bouche — Be My Lover",
@@ -119,14 +127,6 @@
       "play_count": 1,
       "first_seen": "2026-07-13T12:49:42Z",
       "last_seen": "2026-07-13T12:49:42Z"
-    },
-    {
-      "artist": "Gal De Paz",
-      "title": "Can’t Die from Love",
-      "text": "Gal De Paz — Can’t Die from Love",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:06:28Z",
-      "last_seen": "2026-07-13T13:06:28Z"
     },
     {
       "artist": "Hachaverim Shel Natasha",
@@ -249,5 +249,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:08:12Z"
+  "updated_at": "2026-07-13T13:08:42Z"
 }
