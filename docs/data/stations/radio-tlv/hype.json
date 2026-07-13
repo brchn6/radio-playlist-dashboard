@@ -6,7 +6,10 @@
       "text": "Aviv Geffen & התעויוט — אל תדאג",
       "play_count": 1,
       "first_seen": "2026-07-13T12:50:27Z",
-      "last_seen": "2026-07-13T12:50:27Z"
+      "last_seen": "2026-07-13T12:50:27Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
     },
     {
       "artist": "Dominic Fike",
@@ -14,7 +17,10 @@
       "text": "Dominic Fike — Babydoll",
       "play_count": 1,
       "first_seen": "2026-07-13T12:49:19Z",
-      "last_seen": "2026-07-13T12:49:19Z"
+      "last_seen": "2026-07-13T12:49:19Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
     },
     {
       "artist": "Madcon",
@@ -22,7 +28,10 @@
       "text": "Madcon — Beggin (Uscar Version)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:47:53Z",
-      "last_seen": "2026-07-13T12:47:53Z"
+      "last_seen": "2026-07-13T12:47:53Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
     },
     {
       "artist": "Sash!",
@@ -30,7 +39,10 @@
       "text": "Sash! — Ecuador (Radio Edit)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:58:25Z",
-      "last_seen": "2026-07-13T12:58:25Z"
+      "last_seen": "2026-07-13T12:58:25Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
     },
     {
       "artist": "SZA",
@@ -38,8 +50,11 @@
       "text": "SZA — Kill Bill",
       "play_count": 1,
       "first_seen": "2026-07-13T12:52:43Z",
-      "last_seen": "2026-07-13T12:52:43Z"
+      "last_seen": "2026-07-13T12:52:43Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

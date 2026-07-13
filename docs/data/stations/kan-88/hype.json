@@ -6,7 +6,10 @@
       "text": "Björk — It's Oh so Quiet",
       "play_count": 1,
       "first_seen": "2026-07-13T13:01:59Z",
-      "last_seen": "2026-07-13T13:01:59Z"
+      "last_seen": "2026-07-13T13:01:59Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Free",
@@ -14,7 +17,10 @@
       "text": "Free — All Right Now",
       "play_count": 1,
       "first_seen": "2026-07-13T12:49:42Z",
-      "last_seen": "2026-07-13T12:49:42Z"
+      "last_seen": "2026-07-13T12:49:42Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Hachaverim Shel Natasha",
@@ -22,7 +28,10 @@
       "text": "Hachaverim Shel Natasha — עשי לי את המוות",
       "play_count": 1,
       "first_seen": "2026-07-13T12:57:32Z",
-      "last_seen": "2026-07-13T12:57:32Z"
+      "last_seen": "2026-07-13T12:57:32Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "La Bouche",
@@ -30,7 +39,10 @@
       "text": "La Bouche — Be My Lover",
       "play_count": 1,
       "first_seen": "2026-07-13T12:55:17Z",
-      "last_seen": "2026-07-13T12:55:17Z"
+      "last_seen": "2026-07-13T12:55:17Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Led Zeppelin",
@@ -38,7 +50,10 @@
       "text": "Led Zeppelin — Good Times Bad Times",
       "play_count": 1,
       "first_seen": "2026-07-13T12:58:39Z",
-      "last_seen": "2026-07-13T12:58:39Z"
+      "last_seen": "2026-07-13T12:58:39Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Loft",
@@ -46,7 +61,10 @@
       "text": "Loft — Hold On",
       "play_count": 1,
       "first_seen": "2026-07-13T12:48:38Z",
-      "last_seen": "2026-07-13T12:48:38Z"
+      "last_seen": "2026-07-13T12:48:38Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Ninet Tayeb",
@@ -54,7 +72,10 @@
       "text": "Ninet Tayeb — להיות טובה (feat. דאנה איבגי)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:56Z",
-      "last_seen": "2026-07-13T12:51:56Z"
+      "last_seen": "2026-07-13T12:51:56Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     },
     {
       "artist": "Shlomo Artzi & Rita",
@@ -62,8 +83,11 @@
       "text": "Shlomo Artzi & Rita — שניים",
       "play_count": 1,
       "first_seen": "2026-07-13T12:56:25Z",
-      "last_seen": "2026-07-13T12:56:25Z"
+      "last_seen": "2026-07-13T12:56:25Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

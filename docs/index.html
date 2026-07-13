@@ -125,6 +125,7 @@
   <div class=stat-row id=statsDetailRow></div>
   <div class=card><div style="font-weight:600;margin-bottom:6px">שירים לפי תאריך</div><div class=chart-box><canvas id=dateChart></canvas></div></div>
   <div class=card><div style="font-weight:600;margin-bottom:6px">האמנים המושמעים ביותר</div><div id=topArtistsList></div></div>
+  <div class=card><div style="font-weight:600;margin-bottom:6px">🔄 תזמון צולב — שירים שמושמעים ביותר מתחנה אחת</div><div id=crossStationList>טוען...</div></div>
 </div>
 
 <footer>
@@ -334,23 +335,37 @@ function renderTopArtists(hist){
 // Multi-fetch
 async function fetchAll(){
   try{
-    const[stationsJSON,cur,hist,hype,scatter,stat]=await Promise.all([
+    // Always fetch: stations, current, stats, scatter, cross-station
+    const[stationsJSON,cur,scatter,stat,cross]=await Promise.all([
       loadJSON(BASE+'stations.json'),
       loadJSON(BASE+'current.json'),
-      loadJSON(BASE+'history.json'),
-      loadJSON(BASE+'hype.json'),
       loadJSON(BASE+'scatter.json'),
       loadJSON(BASE+'stats.json'),
+      loadJSON(BASE+'cross_station.json'),
     ]);
     if(stationsJSON)stations=stationsJSON;
     renderPills(cur);
     renderNowPlaying(cur);
     renderStats(stat);
-    renderHistory(hist);
-    renderHype(hype);
     renderScatter(scatter);
     renderDateChart(stat);
-    renderTopArtists(hist);
+    renderCrossStation(cross);
+
+    // Fetch history + hype — use per-station URL when filtered
+    let histUrl=BASE+'history.json';
+    let hypeUrl=BASE+'hype.json';
+    if(activeStation){
+      histUrl=BASE+'stations/'+activeStation+'/history.json';
+      hypeUrl=BASE+'stations/'+activeStation+'/hype.json';
+    }
+    const[hist,hype]=await Promise.all([
+      loadJSON(histUrl),
+      loadJSON(hypeUrl),
+    ]);
+    renderHistory(hist);
+    renderHype(hype);
+    renderTopArtists(hist||{history:[]});
+
     document.getElementById('statusDot').className='dot on';
     document.getElementById('statusText').textContent='מחובר';
     document.getElementById('lastUpdate').textContent=timeAgo(stat?.updated_at)||'-';

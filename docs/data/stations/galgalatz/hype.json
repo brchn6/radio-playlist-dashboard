@@ -6,7 +6,10 @@
       "text": "Bruno Mars — Cha Cha Cha",
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:15Z",
-      "last_seen": "2026-07-13T12:51:15Z"
+      "last_seen": "2026-07-13T12:51:15Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
     },
     {
       "artist": "Fleetwood Mac",
@@ -14,7 +17,10 @@
       "text": "Fleetwood Mac — Silver Springs (Live)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:47:45Z",
-      "last_seen": "2026-07-13T12:47:45Z"
+      "last_seen": "2026-07-13T12:47:45Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
     },
     {
       "artist": "Shlomo Artzi & Rita",
@@ -22,8 +28,11 @@
       "text": "Shlomo Artzi & Rita — שניים",
       "play_count": 1,
       "first_seen": "2026-07-13T12:55:22Z",
-      "last_seen": "2026-07-13T12:55:22Z"
+      "last_seen": "2026-07-13T12:55:22Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

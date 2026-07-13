@@ -250,27 +250,50 @@ class PlaylistDB:
         """Most frequently played tracks, optionally by station."""
         if station_id:
             cur = self.conn.execute(
-                """SELECT artist, title, text, COUNT(*) as play_count,
-                          MIN(recognized_at) as first_seen,
-                          MAX(recognized_at) as last_seen
-                   FROM tracks
-                   WHERE station_id = ?
-                   GROUP BY LOWER(artist), LOWER(title)
+                """SELECT t.artist, t.title, t.text, COUNT(*) as play_count,
+                          MIN(t.recognized_at) as first_seen,
+                          MAX(t.recognized_at) as last_seen,
+                          s.slug as station_slug, s.name as station_name, s.color as station_color
+                   FROM tracks t
+                   JOIN stations s ON s.id = t.station_id
+                   WHERE t.station_id = ?
+                   GROUP BY LOWER(t.artist), LOWER(t.title)
                    HAVING play_count >= ?
                    ORDER BY play_count DESC LIMIT ?""",
                 (station_id, min_count, limit),
             )
         else:
             cur = self.conn.execute(
-                """SELECT artist, title, text, COUNT(*) as play_count,
-                          MIN(recognized_at) as first_seen,
-                          MAX(recognized_at) as last_seen
-                   FROM tracks
-                   GROUP BY LOWER(artist), LOWER(title)
+                """SELECT t.artist, t.title, t.text, COUNT(*) as play_count,
+                          MIN(t.recognized_at) as first_seen,
+                          MAX(t.recognized_at) as last_seen
+                   FROM tracks t
+                   GROUP BY LOWER(t.artist), LOWER(t.title)
                    HAVING play_count >= ?
                    ORDER BY play_count DESC LIMIT ?""",
                 (min_count, limit),
             )
+        return [dict(r) for r in cur.fetchall()]
+
+    def get_cross_station_tracks(self, min_stations: int = 2, limit: int = 30
+                                  ) -> list[dict[str, Any]]:
+        """Tracks that played on multiple stations (correlation)."""
+        cur = self.conn.execute(
+            """SELECT t.artist, t.title, t.text,
+                      COUNT(DISTINCT t.station_id) as station_count,
+                      GROUP_CONCAT(DISTINCT s.name, ' | ') as station_names,
+                      GROUP_CONCAT(DISTINCT s.slug, ',') as station_slugs,
+                      COUNT(*) as total_plays,
+                      MIN(t.recognized_at) as first_seen,
+                      MAX(t.recognized_at) as last_seen
+               FROM tracks t
+               JOIN stations s ON s.id = t.station_id
+               GROUP BY LOWER(t.artist), LOWER(t.title)
+               HAVING station_count >= ?
+               ORDER BY station_count DESC, total_plays DESC
+               LIMIT ?""",
+            (min_stations, limit),
+        )
         return [dict(r) for r in cur.fetchall()]
 
     def get_scatter_data(self, station_id: int | None = None

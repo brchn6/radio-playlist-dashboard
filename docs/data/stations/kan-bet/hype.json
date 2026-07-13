@@ -6,7 +6,10 @@
       "text": "Arkadi Duchin & Meir Banai — דומינו",
       "play_count": 1,
       "first_seen": "2026-07-13T12:58:15Z",
-      "last_seen": "2026-07-13T12:58:15Z"
+      "last_seen": "2026-07-13T12:58:15Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     },
     {
       "artist": "Aviv Geffen & התעויוט",
@@ -14,7 +17,10 @@
       "text": "Aviv Geffen & התעויוט — אל תדאג",
       "play_count": 1,
       "first_seen": "2026-07-13T12:50:26Z",
-      "last_seen": "2026-07-13T12:50:26Z"
+      "last_seen": "2026-07-13T12:50:26Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     },
     {
       "artist": "Blondie",
@@ -22,7 +28,10 @@
       "text": "Blondie — The Tide Is High",
       "play_count": 1,
       "first_seen": "2026-07-13T12:54:53Z",
-      "last_seen": "2026-07-13T12:54:53Z"
+      "last_seen": "2026-07-13T12:54:53Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     },
     {
       "artist": "Sash!",
@@ -30,7 +39,10 @@
       "text": "Sash! — Ecuador (Radio Edit)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:59:22Z",
-      "last_seen": "2026-07-13T12:59:22Z"
+      "last_seen": "2026-07-13T12:59:22Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     },
     {
       "artist": "Stamatis Spanoudakis",
@@ -38,7 +50,10 @@
       "text": "Stamatis Spanoudakis — Zi Ke Vasilevi",
       "play_count": 1,
       "first_seen": "2026-07-13T12:56:01Z",
-      "last_seen": "2026-07-13T12:56:01Z"
+      "last_seen": "2026-07-13T12:56:01Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     },
     {
       "artist": "SZA",
@@ -46,8 +61,11 @@
       "text": "SZA — Kill Bill",
       "play_count": 1,
       "first_seen": "2026-07-13T12:53:46Z",
-      "last_seen": "2026-07-13T12:53:46Z"
+      "last_seen": "2026-07-13T12:53:46Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

@@ -373,9 +373,31 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "The Clash",
+      "title": "Rock the Casbah",
+      "text": "The Clash — Rock the Casbah",
+      "recognized_at": "2026-07-13T13:04:29Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Stardust",
+      "title": "Music Sounds Better with You",
+      "text": "Stardust — Music Sounds Better with You",
+      "recognized_at": "2026-07-13T13:04:40Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 34,
-  "returned": 34,
-  "updated_at": "2026-07-13T13:02:42Z"
+  "total": 36,
+  "returned": 36,
+  "updated_at": "2026-07-13T13:04:42Z"
 }

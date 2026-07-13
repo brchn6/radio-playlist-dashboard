@@ -6,7 +6,10 @@
       "text": "La Bouche — Be My Lover",
       "play_count": 1,
       "first_seen": "2026-07-13T12:53:15Z",
-      "last_seen": "2026-07-13T12:53:15Z"
+      "last_seen": "2026-07-13T12:53:15Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
     },
     {
       "artist": "Loft",
@@ -14,7 +17,10 @@
       "text": "Loft — Hold On",
       "play_count": 1,
       "first_seen": "2026-07-13T12:48:35Z",
-      "last_seen": "2026-07-13T12:48:35Z"
+      "last_seen": "2026-07-13T12:48:35Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
     },
     {
       "artist": "Sash!",
@@ -22,7 +28,10 @@
       "text": "Sash! — Ecuador (Radio Edit)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:57:20Z",
-      "last_seen": "2026-07-13T12:57:20Z"
+      "last_seen": "2026-07-13T12:57:20Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
     },
     {
       "artist": "Test Artist",
@@ -30,7 +39,10 @@
       "text": "Test Artist — Test Song",
       "play_count": 1,
       "first_seen": "2026-07-13T12:00:00Z",
-      "last_seen": "2026-07-13T12:00:00Z"
+      "last_seen": "2026-07-13T12:00:00Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
     },
     {
       "artist": "Years & Years",
@@ -38,8 +50,11 @@
       "text": "Years & Years — Desire",
       "play_count": 1,
       "first_seen": "2026-07-13T12:50:12Z",
-      "last_seen": "2026-07-13T12:50:12Z"
+      "last_seen": "2026-07-13T12:50:12Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

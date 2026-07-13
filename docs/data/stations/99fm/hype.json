@@ -6,7 +6,10 @@
       "text": "Arkadi Duchin & Meir Banai — דומינו",
       "play_count": 1,
       "first_seen": "2026-07-13T12:57:07Z",
-      "last_seen": "2026-07-13T12:57:07Z"
+      "last_seen": "2026-07-13T12:57:07Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
     },
     {
       "artist": "Aviv Geffen & התעויוט",
@@ -14,7 +17,10 @@
       "text": "Aviv Geffen & התעויוט — אל תדאג",
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:30Z",
-      "last_seen": "2026-07-13T12:51:30Z"
+      "last_seen": "2026-07-13T12:51:30Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
     },
     {
       "artist": "Blondie",
@@ -22,7 +28,10 @@
       "text": "Blondie — The Tide Is High",
       "play_count": 1,
       "first_seen": "2026-07-13T12:53:49Z",
-      "last_seen": "2026-07-13T12:53:49Z"
+      "last_seen": "2026-07-13T12:53:49Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
     },
     {
       "artist": "JAŸ-Z",
@@ -30,8 +39,11 @@
       "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
       "play_count": 1,
       "first_seen": "2026-07-13T12:47:51Z",
-      "last_seen": "2026-07-13T12:47:51Z"
+      "last_seen": "2026-07-13T12:47:51Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
     }
   ],
-  "updated_at": "2026-07-13T13:02:42Z"
+  "updated_at": "2026-07-13T13:03:42Z"
 }

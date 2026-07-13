@@ -92,6 +92,14 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     )
     sizes["stats.json"] = (output_dir / "stats.json").stat().st_size
 
+    # ── cross_station.json — tracks heard on multiple stations ──
+    cross = safe_json(db.get_cross_station_tracks())
+    (output_dir / "cross_station.json").write_text(
+        json.dumps({"tracks": cross, "updated_at": now_iso()},
+                   ensure_ascii=False, indent=2) + "\n", "utf-8"
+    )
+    sizes["cross_station.json"] = (output_dir / "cross_station.json").stat().st_size
+
     # ── per-station JSON ──
     stations_dir = output_dir / "stations"
     stations_dir.mkdir(exist_ok=True)
