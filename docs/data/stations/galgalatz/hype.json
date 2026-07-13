@@ -265,6 +265,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Teapacks",
+      "title": "בתוך נייר עיתון",
+      "text": "Teapacks — בתוך נייר עיתון",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:18:48Z",
+      "last_seen": "2026-07-13T15:18:48Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "The Cardigans",
       "title": "My Favourite Game",
       "text": "The Cardigans — My Favourite Game",
@@ -298,5 +309,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T15:14:43Z"
+  "updated_at": "2026-07-13T15:21:13Z"
 }

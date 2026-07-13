@@ -593,7 +593,26 @@ async function fetchAll(){
     ]);
     if(stationsJSON)stations=stationsJSON;
     document.getElementById('stationCount').textContent=stations.length;
-    renderPills(cur);renderNowPlaying(cur);renderStats(stat);
+    // LIVE from local proxies (30s fresh, falls back to Pages)
+    let curLive=null;
+    if(stations&&stations.length){
+      const results=await Promise.allSettled(
+        stations.map(s=>fetch('http://127.0.0.1:'+s.proxy_port+'/current?_='+Date.now()).then(r=>r.json()).then(d=>{
+          const r=(d.last_result||{});
+          if(r.found){
+            return{
+              station_id:s.id,station_slug:s.slug,station_name:s.name,station_color:s.color,
+              artist:r.artist||'',title:r.title||'',text:r.text||'',
+              url:r.url||'',recognized_at:r.recognized_at||''
+            };
+          }
+          return null;
+        }).catch(()=>null))
+      );
+      curLive=results.filter(r=>r.status==='fulfilled'&&r.value).map(r=>r.value);
+    }
+    const curData=curLive&&curLive.length?curLive:cur;
+    renderPills(curData);renderNowPlaying(curData);renderStats(stat);
     renderTimeline(scatter);renderHeatmap(scatter);renderHourChart(scatter);renderCrossStation(cross);
 
     let histUrl=BASE+'history.json';

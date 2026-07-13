@@ -329,9 +329,31 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Teach In",
+      "title": "Ding - A - Dong (English Version) [Remastered]",
+      "text": "Teach In — Ding - A - Dong (English Version) [Remastered]",
+      "recognized_at": "2026-07-13T15:17:46Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Mashina",
+      "title": "Achake Lach Basadot (אחכה לך בשדות)",
+      "text": "Mashina — Achake Lach Basadot (אחכה לך בשדות)",
+      "recognized_at": "2026-07-13T15:20:50Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 30,
-  "returned": 30,
-  "updated_at": "2026-07-13T15:14:43Z"
+  "total": 32,
+  "returned": 32,
+  "updated_at": "2026-07-13T15:21:13Z"
 }

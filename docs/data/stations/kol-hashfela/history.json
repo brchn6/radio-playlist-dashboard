@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 214,
+      "station_id": 1,
+      "artist": "Mashina",
+      "title": "Achake Lach Basadot (אחכה לך בשדות)",
+      "text": "Mashina — Achake Lach Basadot (אחכה לך בשדות)",
+      "url": "https://www.shazam.com/track/200837337/achake-lach-basadot-%D7%90%D7%97%D7%9B%D7%94-%D7%9C%D7%9A-%D7%91%D7%A9%D7%93%D7%95%D7%AA",
+      "shazam_key": "200837337",
+      "recognized_at": "2026-07-13T15:20:50Z",
+      "created_at": "2026-07-13 15:21:13",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
+      "id": 211,
+      "station_id": 1,
+      "artist": "Teach In",
+      "title": "Ding - A - Dong (English Version) [Remastered]",
+      "text": "Teach In — Ding - A - Dong (English Version) [Remastered]",
+      "url": "https://www.shazam.com/track/566282567/ding-a-dong-english-version-remastered",
+      "shazam_key": "566282567",
+      "recognized_at": "2026-07-13T15:17:46Z",
+      "created_at": "2026-07-13 15:18:13",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 210,
       "station_id": 1,
       "artist": "Yehuda Poliker",
@@ -421,6 +449,6 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 30,
-  "updated_at": "2026-07-13T15:14:43Z"
+  "total": 32,
+  "updated_at": "2026-07-13T15:21:13Z"
 }

@@ -12,6 +12,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Anat Moshkovski",
+      "title": "דינה",
+      "text": "Anat Moshkovski — דינה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:18:11Z",
+      "last_seen": "2026-07-13T15:18:11Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Asha Puthli & Say She She",
       "title": "Pawa!",
       "text": "Asha Puthli & Say She She — Pawa!",
@@ -276,5 +287,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T15:14:43Z"
+  "updated_at": "2026-07-13T15:21:13Z"
 }

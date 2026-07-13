@@ -296,9 +296,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Teapacks",
+      "title": "בתוך נייר עיתון",
+      "text": "Teapacks — בתוך נייר עיתון",
+      "recognized_at": "2026-07-13T15:18:48Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 27,
-  "returned": 27,
-  "updated_at": "2026-07-13T15:14:43Z"
+  "total": 28,
+  "returned": 28,
+  "updated_at": "2026-07-13T15:21:13Z"
 }

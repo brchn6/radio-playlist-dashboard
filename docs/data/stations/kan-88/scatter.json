@@ -274,9 +274,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Anat Moshkovski",
+      "title": "דינה",
+      "text": "Anat Moshkovski — דינה",
+      "recognized_at": "2026-07-13T15:18:11Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 25,
-  "returned": 25,
-  "updated_at": "2026-07-13T15:14:43Z"
+  "total": 26,
+  "returned": 26,
+  "updated_at": "2026-07-13T15:21:13Z"
 }

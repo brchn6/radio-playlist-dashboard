@@ -155,6 +155,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Mashina",
+      "title": "Achake Lach Basadot (אחכה לך בשדות)",
+      "text": "Mashina — Achake Lach Basadot (אחכה לך בשדות)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:20:50Z",
+      "last_seen": "2026-07-13T15:20:50Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "meja",
       "title": "All 'Bout the Money (Hector's Radio Mix)",
       "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
@@ -276,6 +287,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Teach In",
+      "title": "Ding - A - Dong (English Version) [Remastered]",
+      "text": "Teach In — Ding - A - Dong (English Version) [Remastered]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:17:46Z",
+      "last_seen": "2026-07-13T15:17:46Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "The Bangles",
       "title": "Walk Like an Egyptian",
       "text": "The Bangles — Walk Like an Egyptian",
@@ -331,5 +353,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T15:14:43Z"
+  "updated_at": "2026-07-13T15:21:13Z"
 }
