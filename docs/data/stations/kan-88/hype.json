@@ -1,6 +1,14 @@
 {
   "tracks": [
     {
+      "artist": "Björk",
+      "title": "It's Oh so Quiet",
+      "text": "Björk — It's Oh so Quiet",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:01:59Z",
+      "last_seen": "2026-07-13T13:01:59Z"
+    },
+    {
       "artist": "Free",
       "title": "All Right Now",
       "text": "Free — All Right Now",
@@ -57,5 +65,5 @@
       "last_seen": "2026-07-13T12:56:25Z"
     }
   ],
-  "updated_at": "2026-07-13T12:59:42Z"
+  "updated_at": "2026-07-13T13:02:12Z"
 }
