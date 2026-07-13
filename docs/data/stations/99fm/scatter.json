@@ -208,9 +208,64 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Garbage",
+      "title": "I Think I'm Paranoid",
+      "text": "Garbage — I Think I'm Paranoid",
+      "recognized_at": "2026-07-13T15:21:29Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "מה יבוא",
+      "text": "Jasmin Moallem — מה יבוא",
+      "recognized_at": "2026-07-13T15:25:49Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "David Bowie",
+      "title": "Starman",
+      "text": "David Bowie — Starman",
+      "recognized_at": "2026-07-13T15:27:59Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Monica Sex",
+      "title": "מכה אפורה",
+      "text": "Monica Sex — מכה אפורה",
+      "recognized_at": "2026-07-13T15:32:04Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Coldplay",
+      "title": "The Scientist",
+      "text": "Coldplay — The Scientist",
+      "recognized_at": "2026-07-13T15:35:14Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 19,
-  "returned": 19,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 24,
+  "returned": 24,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

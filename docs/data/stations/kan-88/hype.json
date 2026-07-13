@@ -100,6 +100,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Depeche Mode",
+      "title": "It's No Good",
+      "text": "Depeche Mode — It's No Good",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:30:31Z",
+      "last_seen": "2026-07-13T15:30:31Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "טיפ טיפה",
       "text": "Ehud Banai — טיפ טיפה",
@@ -139,6 +150,17 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:24:49Z",
       "last_seen": "2026-07-13T14:24:49Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
+      "artist": "Kate Bush",
+      "title": "Babooshka",
+      "text": "Kate Bush — Babooshka",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:32Z",
+      "last_seen": "2026-07-13T15:21:32Z",
       "station_slug": "kan-88",
       "station_name": "כאן 88",
       "station_color": "#c86ae3"
@@ -276,6 +298,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "The Pierces",
+      "title": "Space & Time",
+      "text": "The Pierces — Space & Time",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:24:54Z",
+      "last_seen": "2026-07-13T15:24:54Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "The Rolling Stones",
       "title": "Jealous Lover",
       "text": "The Rolling Stones — Jealous Lover",
@@ -287,5 +320,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

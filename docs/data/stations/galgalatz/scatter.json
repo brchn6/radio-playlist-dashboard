@@ -307,9 +307,42 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Omer Adam & Richie Loop",
+      "title": "טמפרטורה",
+      "text": "Omer Adam & Richie Loop — טמפרטורה",
+      "recognized_at": "2026-07-13T15:21:53Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Shakira & Burna Boy",
+      "title": "Dai Dai",
+      "text": "Shakira & Burna Boy — Dai Dai",
+      "recognized_at": "2026-07-13T15:25:58Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Pitbull",
+      "title": "We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "text": "Pitbull — We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "recognized_at": "2026-07-13T15:29:02Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 28,
-  "returned": 28,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 31,
+  "returned": 31,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

@@ -351,9 +351,42 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "RAYE",
+      "title": "WHERE IS MY HUSBAND!",
+      "text": "RAYE — WHERE IS MY HUSBAND!",
+      "recognized_at": "2026-07-13T15:23:53Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Eurythmics",
+      "title": "There Must Be An Angel (Playing With My Heart) [Live]",
+      "text": "Eurythmics — There Must Be An Angel (Playing With My Heart) [Live]",
+      "recognized_at": "2026-07-13T15:27:58Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Kylie Minogue",
+      "title": "Some Kind of Bliss",
+      "text": "Kylie Minogue — Some Kind of Bliss",
+      "recognized_at": "2026-07-13T15:33:04Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 32,
-  "returned": 32,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 35,
+  "returned": 35,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

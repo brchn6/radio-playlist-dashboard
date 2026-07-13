@@ -209,6 +209,14 @@
       "last_seen": "2026-07-13T14:08:01Z"
     },
     {
+      "artist": "Coldplay",
+      "title": "The Scientist",
+      "text": "Coldplay — The Scientist",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:35:14Z",
+      "last_seen": "2026-07-13T15:35:14Z"
+    },
+    {
       "artist": "Coldplay & BTS",
       "title": "My Universe",
       "text": "Coldplay & BTS — My Universe",
@@ -250,11 +258,27 @@
     },
     {
       "artist": "David Bowie",
+      "title": "Starman",
+      "text": "David Bowie — Starman",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:27:59Z",
+      "last_seen": "2026-07-13T15:27:59Z"
+    },
+    {
+      "artist": "David Bowie",
       "title": "Ziggy Stardust",
       "text": "David Bowie — Ziggy Stardust",
       "play_count": 1,
       "first_seen": "2026-07-13T15:00:41Z",
       "last_seen": "2026-07-13T15:00:41Z"
+    },
+    {
+      "artist": "Depeche Mode",
+      "title": "It's No Good",
+      "text": "Depeche Mode — It's No Good",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:30:31Z",
+      "last_seen": "2026-07-13T15:30:31Z"
     },
     {
       "artist": "Dire Straits",
@@ -353,6 +377,14 @@
       "last_seen": "2026-07-13T14:14:16Z"
     },
     {
+      "artist": "Eurythmics",
+      "title": "There Must Be An Angel (Playing With My Heart) [Live]",
+      "text": "Eurythmics — There Must Be An Angel (Playing With My Heart) [Live]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:27:58Z",
+      "last_seen": "2026-07-13T15:27:58Z"
+    },
+    {
       "artist": "Eve",
       "title": "Who's That Girl?",
       "text": "Eve — Who's That Girl?",
@@ -394,11 +426,27 @@
     },
     {
       "artist": "Garbage",
+      "title": "I Think I'm Paranoid",
+      "text": "Garbage — I Think I'm Paranoid",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:29Z",
+      "last_seen": "2026-07-13T15:21:29Z"
+    },
+    {
+      "artist": "Garbage",
       "title": "You Look so Fine (2018 Remaster)",
       "text": "Garbage — You Look so Fine (2018 Remaster)",
       "play_count": 1,
       "first_seen": "2026-07-13T13:30:41Z",
       "last_seen": "2026-07-13T13:30:41Z"
+    },
+    {
+      "artist": "Glenn Medeiros",
+      "title": "Nothing's Gonna Change My Love for You",
+      "text": "Glenn Medeiros — Nothing's Gonna Change My Love for You",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:26:13Z",
+      "last_seen": "2026-07-13T15:26:13Z"
     },
     {
       "artist": "Ha'Eivrit",
@@ -415,6 +463,30 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:24:49Z",
       "last_seen": "2026-07-13T14:24:49Z"
+    },
+    {
+      "artist": "Ishay Levi",
+      "title": "Isha Neemana",
+      "text": "Ishay Levi — Isha Neemana",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:40Z",
+      "last_seen": "2026-07-13T15:21:40Z"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "יהיה טוב",
+      "text": "Jasmin Moallem — יהיה טוב",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:34:11Z",
+      "last_seen": "2026-07-13T15:34:11Z"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "מה יבוא",
+      "text": "Jasmin Moallem — מה יבוא",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:25:49Z",
+      "last_seen": "2026-07-13T15:25:49Z"
     },
     {
       "artist": "Jasmin Moallem",
@@ -465,12 +537,28 @@
       "last_seen": "2026-07-13T15:12:43Z"
     },
     {
+      "artist": "Kate Bush",
+      "title": "Babooshka",
+      "text": "Kate Bush — Babooshka",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:32Z",
+      "last_seen": "2026-07-13T15:21:32Z"
+    },
+    {
       "artist": "Knesiyat Hasechel",
       "title": "ידיים למעלה",
       "text": "Knesiyat Hasechel — ידיים למעלה",
       "play_count": 1,
       "first_seen": "2026-07-13T14:43:00Z",
       "last_seen": "2026-07-13T14:43:00Z"
+    },
+    {
+      "artist": "Kylie Minogue",
+      "title": "Some Kind of Bliss",
+      "text": "Kylie Minogue — Some Kind of Bliss",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:33:04Z",
+      "last_seen": "2026-07-13T15:33:04Z"
     },
     {
       "artist": "Lea Shabat",
@@ -585,6 +673,14 @@
       "last_seen": "2026-07-13T14:38:40Z"
     },
     {
+      "artist": "Monica Sex",
+      "title": "מכה אפורה",
+      "text": "Monica Sex — מכה אפורה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:32:04Z",
+      "last_seen": "2026-07-13T15:32:04Z"
+    },
+    {
       "artist": "Måneskin",
       "title": "Beggin'",
       "text": "Måneskin — Beggin'",
@@ -633,6 +729,14 @@
       "last_seen": "2026-07-13T13:32:57Z"
     },
     {
+      "artist": "Omer Adam & Richie Loop",
+      "title": "טמפרטורה",
+      "text": "Omer Adam & Richie Loop — טמפרטורה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:53Z",
+      "last_seen": "2026-07-13T15:21:53Z"
+    },
+    {
       "artist": "Paradisio",
       "title": "Bailando",
       "text": "Paradisio — Bailando",
@@ -673,6 +777,14 @@
       "last_seen": "2026-07-13T14:27:27Z"
     },
     {
+      "artist": "Pitbull",
+      "title": "We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "text": "Pitbull — We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:29:02Z",
+      "last_seen": "2026-07-13T15:29:02Z"
+    },
+    {
       "artist": "Pretenders",
       "title": "Don't Get Me Wrong",
       "text": "Pretenders — Don't Get Me Wrong",
@@ -687,119 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:34:35Z",
       "last_seen": "2026-07-13T14:34:35Z"
-    },
-    {
-      "artist": "Prince",
-      "title": "Nothing Compares 2 U",
-      "text": "Prince — Nothing Compares 2 U",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:55:18Z",
-      "last_seen": "2026-07-13T14:55:18Z"
-    },
-    {
-      "artist": "Queen",
-      "title": "I Want To Break Free",
-      "text": "Queen — I Want To Break Free",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:25:24Z",
-      "last_seen": "2026-07-13T14:25:24Z"
-    },
-    {
-      "artist": "Queen",
-      "title": "The Show Must Go On",
-      "text": "Queen — The Show Must Go On",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:19:18Z",
-      "last_seen": "2026-07-13T14:19:18Z"
-    },
-    {
-      "artist": "Queen & David Bowie",
-      "title": "Under Pressure",
-      "text": "Queen & David Bowie — Under Pressure",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:01:07Z",
-      "last_seen": "2026-07-13T15:01:07Z"
-    },
-    {
-      "artist": "Ran Danker",
-      "title": "בית משוגעים",
-      "text": "Ran Danker — בית משוגעים",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:04:59Z",
-      "last_seen": "2026-07-13T14:04:59Z"
-    },
-    {
-      "artist": "Red Hot Chili Peppers",
-      "title": "Give It Away",
-      "text": "Red Hot Chili Peppers — Give It Away",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:03:44Z",
-      "last_seen": "2026-07-13T15:03:44Z"
-    },
-    {
-      "artist": "Rihanna",
-      "title": "Where Have You Been",
-      "text": "Rihanna — Where Have You Been",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:48:46Z",
-      "last_seen": "2026-07-13T13:48:46Z"
-    },
-    {
-      "artist": "Roei Adam",
-      "title": "אבי הטחול",
-      "text": "Roei Adam — אבי הטחול",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:11:12Z",
-      "last_seen": "2026-07-13T14:11:12Z"
-    },
-    {
-      "artist": "Rona Kenan",
-      "title": "Ata Mitorer",
-      "text": "Rona Kenan — Ata Mitorer",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:14:06Z",
-      "last_seen": "2026-07-13T15:14:06Z"
-    },
-    {
-      "artist": "Scraps Orchestra",
-      "title": "Mondonuovo",
-      "text": "Scraps Orchestra — Mondonuovo",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:00:27Z",
-      "last_seen": "2026-07-13T15:00:27Z"
-    },
-    {
-      "artist": "Shalom Hanoch",
-      "title": "ככה וככה",
-      "text": "Shalom Hanoch — ככה וככה",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:44:59Z",
-      "last_seen": "2026-07-13T14:44:59Z"
-    },
-    {
-      "artist": "Sharon Roter",
-      "title": "Arutz Elecha",
-      "text": "Sharon Roter — Arutz Elecha",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:19:13Z",
-      "last_seen": "2026-07-13T14:19:13Z"
-    },
-    {
-      "artist": "Sheryl Crow",
-      "title": "Strong Enough",
-      "text": "Sheryl Crow — Strong Enough",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:53:56Z",
-      "last_seen": "2026-07-13T14:53:56Z"
-    },
-    {
-      "artist": "Sheygets",
-      "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
-      "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:56:51Z",
-      "last_seen": "2026-07-13T13:56:51Z"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

@@ -285,9 +285,42 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Kate Bush",
+      "title": "Babooshka",
+      "text": "Kate Bush — Babooshka",
+      "recognized_at": "2026-07-13T15:21:32Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Pierces",
+      "title": "Space & Time",
+      "text": "The Pierces — Space & Time",
+      "recognized_at": "2026-07-13T15:24:54Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Depeche Mode",
+      "title": "It's No Good",
+      "text": "Depeche Mode — It's No Good",
+      "recognized_at": "2026-07-13T15:30:31Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 26,
-  "returned": 26,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 29,
+  "returned": 29,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

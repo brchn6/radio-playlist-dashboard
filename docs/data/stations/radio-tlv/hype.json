@@ -34,6 +34,28 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Glenn Medeiros",
+      "title": "Nothing's Gonna Change My Love for You",
+      "text": "Glenn Medeiros — Nothing's Gonna Change My Love for You",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:26:13Z",
+      "last_seen": "2026-07-13T15:26:13Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
+      "artist": "Ishay Levi",
+      "title": "Isha Neemana",
+      "text": "Ishay Levi — Isha Neemana",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:40Z",
+      "last_seen": "2026-07-13T15:21:40Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Margalit Tzan׳ani",
       "title": "לשיר ולהנות",
       "text": "Margalit Tzan׳ani — לשיר ולהנות",
@@ -56,6 +78,17 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:29:37Z",
+      "last_seen": "2026-07-13T15:29:37Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "The Rolling Stones",
       "title": "Hit Me In The Head",
       "text": "The Rolling Stones — Hit Me In The Head",
@@ -67,5 +100,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

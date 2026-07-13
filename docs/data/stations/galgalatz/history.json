@@ -1,6 +1,48 @@
 {
   "history": [
     {
+      "id": 226,
+      "station_id": 2,
+      "artist": "Pitbull",
+      "title": "We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "text": "Pitbull — We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "url": "https://www.shazam.com/track/111046929/we-are-one-ole-ola-the-official-2014-fifa-world-cup",
+      "shazam_key": "111046929",
+      "recognized_at": "2026-07-13T15:29:02Z",
+      "created_at": "2026-07-13 15:29:08",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
+      "id": 221,
+      "station_id": 2,
+      "artist": "Shakira & Burna Boy",
+      "title": "Dai Dai",
+      "text": "Shakira & Burna Boy — Dai Dai",
+      "url": "https://www.shazam.com/track/877960196/dai-dai",
+      "shazam_key": "877960196",
+      "recognized_at": "2026-07-13T15:25:58Z",
+      "created_at": "2026-07-13 15:26:13",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
+      "id": 218,
+      "station_id": 2,
+      "artist": "Omer Adam & Richie Loop",
+      "title": "טמפרטורה",
+      "text": "Omer Adam & Richie Loop — טמפרטורה",
+      "url": "https://www.shazam.com/track/469497338/%D7%98%D7%9E%D7%A4%D7%A8%D7%98%D7%95%D7%A8%D7%94",
+      "shazam_key": "469497338",
+      "recognized_at": "2026-07-13T15:21:53Z",
+      "created_at": "2026-07-13 15:22:13",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 213,
       "station_id": 2,
       "artist": "Teapacks",
@@ -393,6 +435,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 28,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 31,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

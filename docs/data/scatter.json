@@ -1506,9 +1506,207 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Garbage",
+      "title": "I Think I'm Paranoid",
+      "text": "Garbage — I Think I'm Paranoid",
+      "recognized_at": "2026-07-13T15:21:29Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Kate Bush",
+      "title": "Babooshka",
+      "text": "Kate Bush — Babooshka",
+      "recognized_at": "2026-07-13T15:21:32Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Ishay Levi",
+      "title": "Isha Neemana",
+      "text": "Ishay Levi — Isha Neemana",
+      "recognized_at": "2026-07-13T15:21:40Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Omer Adam & Richie Loop",
+      "title": "טמפרטורה",
+      "text": "Omer Adam & Richie Loop — טמפרטורה",
+      "recognized_at": "2026-07-13T15:21:53Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "RAYE",
+      "title": "WHERE IS MY HUSBAND!",
+      "text": "RAYE — WHERE IS MY HUSBAND!",
+      "recognized_at": "2026-07-13T15:23:53Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Pierces",
+      "title": "Space & Time",
+      "text": "The Pierces — Space & Time",
+      "recognized_at": "2026-07-13T15:24:54Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "מה יבוא",
+      "text": "Jasmin Moallem — מה יבוא",
+      "recognized_at": "2026-07-13T15:25:49Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Shakira & Burna Boy",
+      "title": "Dai Dai",
+      "text": "Shakira & Burna Boy — Dai Dai",
+      "recognized_at": "2026-07-13T15:25:58Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Glenn Medeiros",
+      "title": "Nothing's Gonna Change My Love for You",
+      "text": "Glenn Medeiros — Nothing's Gonna Change My Love for You",
+      "recognized_at": "2026-07-13T15:26:13Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Eurythmics",
+      "title": "There Must Be An Angel (Playing With My Heart) [Live]",
+      "text": "Eurythmics — There Must Be An Angel (Playing With My Heart) [Live]",
+      "recognized_at": "2026-07-13T15:27:58Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "David Bowie",
+      "title": "Starman",
+      "text": "David Bowie — Starman",
+      "recognized_at": "2026-07-13T15:27:59Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Pitbull",
+      "title": "We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "text": "Pitbull — We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "recognized_at": "2026-07-13T15:29:02Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "recognized_at": "2026-07-13T15:29:37Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Depeche Mode",
+      "title": "It's No Good",
+      "text": "Depeche Mode — It's No Good",
+      "recognized_at": "2026-07-13T15:30:31Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Monica Sex",
+      "title": "מכה אפורה",
+      "text": "Monica Sex — מכה אפורה",
+      "recognized_at": "2026-07-13T15:32:04Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Kylie Minogue",
+      "title": "Some Kind of Bliss",
+      "text": "Kylie Minogue — Some Kind of Bliss",
+      "recognized_at": "2026-07-13T15:33:04Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "יהיה טוב",
+      "text": "Jasmin Moallem — יהיה טוב",
+      "recognized_at": "2026-07-13T15:34:11Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Coldplay",
+      "title": "The Scientist",
+      "text": "Coldplay — The Scientist",
+      "recognized_at": "2026-07-13T15:35:14Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 137,
-  "returned": 137,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 155,
+  "returned": 155,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

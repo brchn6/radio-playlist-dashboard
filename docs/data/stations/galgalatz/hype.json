@@ -177,12 +177,34 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Omer Adam & Richie Loop",
+      "title": "טמפרטורה",
+      "text": "Omer Adam & Richie Loop — טמפרטורה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:53Z",
+      "last_seen": "2026-07-13T15:21:53Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Paradisio",
       "title": "Bailando",
       "text": "Paradisio — Bailando",
       "play_count": 1,
       "first_seen": "2026-07-13T13:43:39Z",
       "last_seen": "2026-07-13T13:43:39Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
+      "artist": "Pitbull",
+      "title": "We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "text": "Pitbull — We Are One (Ole Ola) [feat. Jennifer Lopez & Claudia Leitte] [The Official 2014 FIFA World Cup Song]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:29:02Z",
+      "last_seen": "2026-07-13T15:29:02Z",
       "station_slug": "galgalatz",
       "station_name": "גלגלצ",
       "station_color": "#e36a6a"
@@ -227,6 +249,17 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:00:27Z",
       "last_seen": "2026-07-13T15:00:27Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
+      "artist": "Shakira & Burna Boy",
+      "title": "Dai Dai",
+      "text": "Shakira & Burna Boy — Dai Dai",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:25:58Z",
+      "last_seen": "2026-07-13T15:25:58Z",
       "station_slug": "galgalatz",
       "station_name": "גלגלצ",
       "station_color": "#e36a6a"
@@ -309,5 +342,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

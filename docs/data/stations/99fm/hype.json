@@ -34,6 +34,17 @@
       "station_color": "#6ab8e3"
     },
     {
+      "artist": "Coldplay",
+      "title": "The Scientist",
+      "text": "Coldplay — The Scientist",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:35:14Z",
+      "last_seen": "2026-07-13T15:35:14Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "artist": "Corinne Allal",
       "title": "ארץ קטנה עם שפם",
       "text": "Corinne Allal — ארץ קטנה עם שפם",
@@ -51,6 +62,17 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:02:26Z",
       "last_seen": "2026-07-13T14:02:26Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "artist": "David Bowie",
+      "title": "Starman",
+      "text": "David Bowie — Starman",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:27:59Z",
+      "last_seen": "2026-07-13T15:27:59Z",
       "station_slug": "99fm",
       "station_name": "99FM",
       "station_color": "#6ab8e3"
@@ -100,12 +122,45 @@
       "station_color": "#6ab8e3"
     },
     {
+      "artist": "Garbage",
+      "title": "I Think I'm Paranoid",
+      "text": "Garbage — I Think I'm Paranoid",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:21:29Z",
+      "last_seen": "2026-07-13T15:21:29Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "מה יבוא",
+      "text": "Jasmin Moallem — מה יבוא",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:25:49Z",
+      "last_seen": "2026-07-13T15:25:49Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "artist": "Meir Banai",
       "title": "תגידי אש תגידי מים",
       "text": "Meir Banai — תגידי אש תגידי מים",
       "play_count": 1,
       "first_seen": "2026-07-13T15:09:07Z",
       "last_seen": "2026-07-13T15:09:07Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "artist": "Monica Sex",
+      "title": "מכה אפורה",
+      "text": "Monica Sex — מכה אפורה",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:32:04Z",
+      "last_seen": "2026-07-13T15:32:04Z",
       "station_slug": "99fm",
       "station_name": "99FM",
       "station_color": "#6ab8e3"
@@ -210,5 +265,5 @@
       "station_color": "#6ab8e3"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

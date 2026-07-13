@@ -285,9 +285,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Jasmin Moallem",
+      "title": "יהיה טוב",
+      "text": "Jasmin Moallem — יהיה טוב",
+      "recognized_at": "2026-07-13T15:34:11Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 26,
-  "returned": 26,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 27,
+  "returned": 27,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

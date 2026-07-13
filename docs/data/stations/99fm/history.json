@@ -1,6 +1,76 @@
 {
   "history": [
     {
+      "id": 232,
+      "station_id": 3,
+      "artist": "Coldplay",
+      "title": "The Scientist",
+      "text": "Coldplay — The Scientist",
+      "url": "https://www.shazam.com/track/11153160/the-scientist",
+      "shazam_key": "11153160",
+      "recognized_at": "2026-07-13T15:35:14Z",
+      "created_at": "2026-07-13 15:35:33",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 229,
+      "station_id": 3,
+      "artist": "Monica Sex",
+      "title": "מכה אפורה",
+      "text": "Monica Sex — מכה אפורה",
+      "url": "https://www.shazam.com/track/56148359/%D7%9E%D7%9B%D7%94-%D7%90%D7%A4%D7%95%D7%A8%D7%94",
+      "shazam_key": "56148359",
+      "recognized_at": "2026-07-13T15:32:04Z",
+      "created_at": "2026-07-13 15:32:33",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 225,
+      "station_id": 3,
+      "artist": "David Bowie",
+      "title": "Starman",
+      "text": "David Bowie — Starman",
+      "url": "https://www.shazam.com/track/228575/starman",
+      "shazam_key": "228575",
+      "recognized_at": "2026-07-13T15:27:59Z",
+      "created_at": "2026-07-13 15:28:08",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 222,
+      "station_id": 3,
+      "artist": "Jasmin Moallem",
+      "title": "מה יבוא",
+      "text": "Jasmin Moallem — מה יבוא",
+      "url": "https://www.shazam.com/track/827397942/%D7%9E%D7%94-%D7%99%D7%91%D7%95%D7%90",
+      "shazam_key": "827397942",
+      "recognized_at": "2026-07-13T15:25:49Z",
+      "created_at": "2026-07-13 15:26:13",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 215,
+      "station_id": 3,
+      "artist": "Garbage",
+      "title": "I Think I'm Paranoid",
+      "text": "Garbage — I Think I'm Paranoid",
+      "url": "https://www.shazam.com/track/249631/i-think-im-paranoid",
+      "shazam_key": "249631",
+      "recognized_at": "2026-07-13T15:21:29Z",
+      "created_at": "2026-07-13 15:21:43",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "id": 208,
       "station_id": 3,
       "artist": "Capital Cities",
@@ -267,6 +337,6 @@
       "station_color": "#6ab8e3"
     }
   ],
-  "total": 19,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 24,
+  "updated_at": "2026-07-13T15:36:03Z"
 }

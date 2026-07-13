@@ -111,6 +111,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Jasmin Moallem",
+      "title": "יהיה טוב",
+      "text": "Jasmin Moallem — יהיה טוב",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:34:11Z",
+      "last_seen": "2026-07-13T15:34:11Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "John Lennon & The Plastic Ono Band",
       "title": "Instant Karma! (We All Shine On) [2003 Remastered Version]",
       "text": "John Lennon & The Plastic Ono Band — Instant Karma! (We All Shine On) [2003 Remastered Version]",
@@ -287,5 +298,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T15:21:13Z"
+  "updated_at": "2026-07-13T15:36:03Z"
 }

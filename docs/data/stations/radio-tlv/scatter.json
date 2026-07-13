@@ -65,9 +65,42 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ishay Levi",
+      "title": "Isha Neemana",
+      "text": "Ishay Levi — Isha Neemana",
+      "recognized_at": "2026-07-13T15:21:40Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Glenn Medeiros",
+      "title": "Nothing's Gonna Change My Love for You",
+      "text": "Glenn Medeiros — Nothing's Gonna Change My Love for You",
+      "recognized_at": "2026-07-13T15:26:13Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Tame Impala",
+      "title": "Dracula",
+      "text": "Tame Impala — Dracula",
+      "recognized_at": "2026-07-13T15:29:37Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 6,
-  "returned": 6,
-  "updated_at": "2026-07-13T15:21:13Z"
+  "total": 9,
+  "returned": 9,
+  "updated_at": "2026-07-13T15:36:03Z"
 }
