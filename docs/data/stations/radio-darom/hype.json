@@ -34,6 +34,17 @@
       "station_color": "#e36ac8"
     },
     {
+      "artist": "Osher Cohen",
+      "title": "מקבל על עצמי",
+      "text": "Osher Cohen — מקבל על עצמי",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:25:51Z",
+      "last_seen": "2026-07-13T17:25:51Z",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    },
+    {
       "artist": "Rinat Bar",
       "title": "נופלת לך",
       "text": "Rinat Bar — נופלת לך",
@@ -100,5 +111,5 @@
       "station_color": "#e36ac8"
     }
   ],
-  "updated_at": "2026-07-13T17:25:39Z"
+  "updated_at": "2026-07-13T17:26:09Z"
 }

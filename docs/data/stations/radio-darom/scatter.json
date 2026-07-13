@@ -98,9 +98,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Osher Cohen",
+      "title": "מקבל על עצמי",
+      "text": "Osher Cohen — מקבל על עצמי",
+      "recognized_at": "2026-07-13T17:25:51Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 9,
-  "returned": 9,
-  "updated_at": "2026-07-13T17:25:39Z"
+  "total": 10,
+  "returned": 10,
+  "updated_at": "2026-07-13T17:26:09Z"
 }
