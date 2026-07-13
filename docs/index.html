@@ -127,11 +127,11 @@
 <div class=station-pills id=pills></div>
 
 <div class=tabs id=tabBar>
-  <button class="tab-btn active" data-tab=np>Now Playing</button>
-  <button class=tab-btn data-tab=history>History</button>
-  <button class=tab-btn data-tab=hype>Most Played</button>
-  <button class=tab-btn data-tab=scatter>Timeline</button>
-  <button class=tab-btn data-tab=stats>Statistics</button>
+  <button class="tab-btn active" data-tab=np>🎵 Now Playing</button>
+  <button class=tab-btn data-tab=history>📋 History</button>
+  <button class=tab-btn data-tab=hype>🔥 Most Played</button>
+  <button class=tab-btn data-tab=scatter>📊 Timeline</button>
+  <button class=tab-btn data-tab=stats>📈 Statistics</button>
 </div>
 
 <div class="tab-content active" id=tab-np>
@@ -140,16 +140,16 @@
 </div>
 
 <div class=tab-content id=tab-history>
-  <div class=card><div class=card-title>Play History</div><div id=historyList>Loading...</div></div>
+  <div class=card><div class=card-title>📋 Play History</div><div id=historyList>Loading...</div></div>
 </div>
 
 <div class=tab-content id=tab-hype>
-  <div class=card><div class=card-title>Most Played Tracks</div><div id=hypeList>Loading...</div></div>
+  <div class=card><div class=card-title>🔥 Most Played Tracks</div><div id=hypeList>Loading...</div></div>
 </div>
 
 <div class=tab-content id=tab-scatter>
   <div class=card>
-    <div class=card-title>Tracks Over Time</div>
+    <div class=card-title>📊 Tracks Over Time</div>
     <div style="font-size:.76rem;color:var(--muted);margin-bottom:8px">X = hour of day · Y = date · Color = station</div>
     <div class=chart-wrap><canvas id=scatterChart></canvas></div>
     <div id=scatterLegend></div>
@@ -158,9 +158,9 @@
 
 <div class=tab-content id=tab-stats>
   <div class=stat-row id=statsDetailRow></div>
-  <div class=card><div class=card-title>Tracks by Date</div><div class=chart-wrap><canvas id=dateChart></canvas></div></div>
-  <div class=card><div class=card-title>Top Artists</div><div id=topArtistsList></div></div>
-  <div class=card><div class=card-title>Cross-Station — Same track on multiple stations</div><div id=crossStationList>Loading...</div></div>
+  <div class=card><div class=card-title>📈 Tracks by Date</div><div class=chart-wrap><canvas id=dateChart></canvas></div></div>
+  <div class=card><div class=card-title>🎤 Top Artists</div><div id=topArtistsList></div></div>
+  <div class=card><div class=card-title>🔄 Cross-Station — Same track on multiple stations</div><div id=crossStationList>Loading...</div></div>
 </div>
 
 <footer>
@@ -256,8 +256,8 @@ function renderNowPlaying(cur){
   el.innerHTML=data.map(t=>{
     const c=t.station_color||'#5ddbb5',slug=t.station_slug||'';
     const web=STATION_WEBSITES[slug],stream=STATION_STREAMS[slug];
-    const listen=web?`<a href="${web}" target=_blank class=np-btn style="color:${c};border-color:${c}33" title=">🔊 Site</a>`:'';
-    const direct=stream?`<a href="${stream}" target=_blank class=np-btn style="color:${c};border-color:${c}33" title=">📡 Stream</a>`:'';
+    const listen=web?`<a href="${web}" target=_blank class=np-btn style="color:${c};border-color:${c}33" title="Listen live">🔊 Site</a>`:'';
+    const direct=stream?`<a href="${stream}" target=_blank class=np-btn style="color:${c};border-color:${c}33" title="Direct stream">📡 Stream</a>`:'';
     const shazam=t.url?`<a href="${esc(t.url)}" target=_blank class=np-btn style="color:${c};border-color:${c}33">🔍 Shazam</a>`:'';
     return '<div class="np-card card" style="border-color:'+c+'55;background:linear-gradient(180deg,'+c+'18,var(--card))">'+
       '<div class=ns style=color:'+c+'>'+esc(t.station_name||'')+'</div>'+
