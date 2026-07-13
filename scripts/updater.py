@@ -233,8 +233,8 @@ def main() -> None:
                 # Build commit message with all new stations
                 git_commit_and_push(f"auto: multi-station update [{now_iso()}]")
 
-        # ── Periodic keepalive push ──
-        if DEFAULT_GIT_AUTO_PUSH and iteration % 20 == 0 and not new_track_occurred:
+        # ── Periodic keepalive push (every 60 iterations = ~30min) ──
+        if DEFAULT_GIT_AUTO_PUSH and iteration % 60 == 0 and not new_track_occurred:
             git_commit_and_push(f"auto: keepalive [{now_iso()}]")
 
         # ── Periodic cleanup ──
