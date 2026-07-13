@@ -78,6 +78,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Sheygets",
+      "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
+      "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:56:51Z",
+      "last_seen": "2026-07-13T13:56:51Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "The Pointer Sisters",
       "title": "I'm So Excited",
       "text": "The Pointer Sisters — I'm So Excited",
@@ -89,5 +100,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:55:49Z"
+  "updated_at": "2026-07-13T13:57:15Z"
 }

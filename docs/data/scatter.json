@@ -417,9 +417,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Sheygets",
+      "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
+      "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
+      "recognized_at": "2026-07-13T13:56:51Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 38,
-  "returned": 38,
-  "updated_at": "2026-07-13T13:55:49Z"
+  "total": 39,
+  "returned": 39,
+  "updated_at": "2026-07-13T13:57:15Z"
 }
