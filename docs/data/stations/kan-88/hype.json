@@ -276,6 +276,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Procol Harum",
+      "title": "A Whiter Shade of Pale (Original Single Version)",
+      "text": "Procol Harum — A Whiter Shade of Pale (Original Single Version)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:44:43Z",
+      "last_seen": "2026-07-13T16:44:43Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Robin Thicke",
       "title": "Blurred Lines (feat. T.I. & Pharrell)",
       "text": "Robin Thicke — Blurred Lines (feat. T.I. & Pharrell)",
@@ -375,5 +386,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T16:44:30Z"
+  "updated_at": "2026-07-13T16:45:00Z"
 }

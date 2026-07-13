@@ -111,6 +111,17 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Shuli Rand",
+      "title": "לב לבן",
+      "text": "Shuli Rand — לב לבן",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:44:56Z",
+      "last_seen": "2026-07-13T16:44:56Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Tame Impala",
       "title": "Dracula",
       "text": "Tame Impala — Dracula",
@@ -133,5 +144,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T16:44:30Z"
+  "updated_at": "2026-07-13T16:45:00Z"
 }
