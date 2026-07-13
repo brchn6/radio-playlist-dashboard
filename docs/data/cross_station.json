@@ -23,6 +23,17 @@
       "last_seen": "2026-07-13T12:51:30Z"
     },
     {
+      "artist": "The Smashing Pumpkins",
+      "title": "Luna",
+      "text": "The Smashing Pumpkins — Luna",
+      "station_count": 2,
+      "station_names": "קול הגליל העליון,כאן 88",
+      "station_slugs": "galil,kan-88",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T13:07:38Z",
+      "last_seen": "2026-07-13T13:08:42Z"
+    },
+    {
       "artist": "SZA",
       "title": "Kill Bill",
       "text": "SZA — Kill Bill",
@@ -111,5 +122,5 @@
       "last_seen": "2026-07-13T12:58:15Z"
     }
   ],
-  "updated_at": "2026-07-13T13:08:42Z"
+  "updated_at": "2026-07-13T13:09:12Z"
 }

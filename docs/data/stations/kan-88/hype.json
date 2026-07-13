@@ -109,7 +109,18 @@
       "station_slug": "kan-88",
       "station_name": "כאן 88",
       "station_color": "#c86ae3"
+    },
+    {
+      "artist": "The Smashing Pumpkins",
+      "title": "Luna",
+      "text": "The Smashing Pumpkins — Luna",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:08:42Z",
+      "last_seen": "2026-07-13T13:08:42Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:08:42Z"
+  "updated_at": "2026-07-13T13:09:12Z"
 }

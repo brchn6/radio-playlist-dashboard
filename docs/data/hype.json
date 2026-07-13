@@ -81,6 +81,14 @@
       "last_seen": "2026-07-13T12:53:46Z"
     },
     {
+      "artist": "The Smashing Pumpkins",
+      "title": "Luna",
+      "text": "The Smashing Pumpkins — Luna",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:07:38Z",
+      "last_seen": "2026-07-13T13:08:42Z"
+    },
+    {
       "artist": "Berry Sakharof",
       "title": "Kama Yossi",
       "text": "Berry Sakharof — Kama Yossi",
@@ -225,14 +233,6 @@
       "last_seen": "2026-07-13T13:04:29Z"
     },
     {
-      "artist": "The Smashing Pumpkins",
-      "title": "Luna",
-      "text": "The Smashing Pumpkins — Luna",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:07:38Z",
-      "last_seen": "2026-07-13T13:07:38Z"
-    },
-    {
       "artist": "The Yardbirds",
       "title": "Good Morning Little Schoolgirl",
       "text": "The Yardbirds — Good Morning Little Schoolgirl",
@@ -249,5 +249,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:08:42Z"
+  "updated_at": "2026-07-13T13:09:12Z"
 }
