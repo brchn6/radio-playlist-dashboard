@@ -370,6 +370,14 @@
     },
     {
       "artist": "Queen",
+      "title": "I Want To Break Free",
+      "text": "Queen — I Want To Break Free",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:25:24Z",
+      "last_seen": "2026-07-13T14:25:24Z"
+    },
+    {
+      "artist": "Queen",
       "title": "The Show Must Go On",
       "text": "Queen — The Show Must Go On",
       "play_count": 1,
@@ -529,5 +537,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:24:49Z"
+  "updated_at": "2026-07-13T14:25:45Z"
 }

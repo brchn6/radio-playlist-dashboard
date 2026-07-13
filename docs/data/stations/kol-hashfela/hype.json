@@ -122,6 +122,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Queen",
+      "title": "I Want To Break Free",
+      "text": "Queen — I Want To Break Free",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:25:24Z",
+      "last_seen": "2026-07-13T14:25:24Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "Ran Danker",
       "title": "בית משוגעים",
       "text": "Ran Danker — בית משוגעים",
@@ -166,5 +177,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T14:24:49Z"
+  "updated_at": "2026-07-13T14:25:45Z"
 }

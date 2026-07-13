@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 148,
+      "station_id": 1,
+      "artist": "Queen",
+      "title": "I Want To Break Free",
+      "text": "Queen — I Want To Break Free",
+      "url": "https://www.shazam.com/track/54412660/i-want-to-break-free",
+      "shazam_key": "54412660",
+      "recognized_at": "2026-07-13T14:25:24Z",
+      "created_at": "2026-07-13 14:25:45",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 147,
       "station_id": 5,
       "artist": "Hila Ruach",
@@ -981,7 +995,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 70,
-  "returned": 70,
-  "updated_at": "2026-07-13T14:24:49Z"
+  "total": 71,
+  "returned": 71,
+  "updated_at": "2026-07-13T14:25:45Z"
 }

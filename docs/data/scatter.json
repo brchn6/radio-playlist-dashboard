@@ -769,9 +769,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Queen",
+      "title": "I Want To Break Free",
+      "text": "Queen — I Want To Break Free",
+      "recognized_at": "2026-07-13T14:25:24Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 70,
-  "returned": 70,
-  "updated_at": "2026-07-13T14:24:49Z"
+  "total": 71,
+  "returned": 71,
+  "updated_at": "2026-07-13T14:25:45Z"
 }
