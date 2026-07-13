@@ -4,6 +4,27 @@
 **Never run DELETE, DROP, TRUNCATE, or any destructive operation on the
 database without explicit user confirmation. This rule is ABSOLUTE.**
 
+## ⚠️ REPEAT-DATA EPOCH — read before touching any repetition metric
+
+`REPEAT_DATA_EPOCH = 2026-07-13T18:05:00Z` (in `scripts/generate_data.py`).
+
+Before that moment the collector deduped each song against **all of history**,
+so a song replayed later on the same station was silently dropped. Every track
+older than the epoch therefore has its repeats stripped: play counts are really
+"how many stations played it", not "how often".
+
+**Any redundancy / "this station repeats itself" metric MUST filter through
+`repeat_safe()` and MUST NOT be displayed until `stats.repeat_data.ready` is
+true.** Publishing scores computed over pre-epoch data would mean making false
+public claims about named radio stations. The numbers in
+`.planning/REDUNDANCY_FEATURE.md` ("kol-hashfela 1 repeat, everyone else 0%")
+are the old bug's fingerprint, not a finding — do not trust them.
+
+## ISRC
+Tracks carry an `isrc` (global recording id) from Shazam as of the epoch above;
+it is the reliable key for matching to Spotify. Rows older than that have
+`isrc = NULL` and **cannot be backfilled** without re-recognising.
+
 ## Quick Reference
 
 | Item | Value |
