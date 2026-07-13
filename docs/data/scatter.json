@@ -417,9 +417,42 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Benzin",
+      "title": "התחלה חדשה (Remastered)",
+      "text": "Benzin — התחלה חדשה (Remastered)",
+      "recognized_at": "2026-07-13T13:07:33Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Benzin",
+      "title": "התחלה חדשה (Remastered)",
+      "text": "Benzin — התחלה חדשה (Remastered)",
+      "recognized_at": "2026-07-13T13:07:35Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Smashing Pumpkins",
+      "title": "Luna",
+      "text": "The Smashing Pumpkins — Luna",
+      "recognized_at": "2026-07-13T13:07:38Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 38,
-  "returned": 38,
-  "updated_at": "2026-07-13T13:06:42Z"
+  "total": 41,
+  "returned": 41,
+  "updated_at": "2026-07-13T13:07:42Z"
 }

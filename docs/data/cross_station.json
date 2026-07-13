@@ -78,6 +78,17 @@
       "last_seen": "2026-07-13T12:54:53Z"
     },
     {
+      "artist": "Benzin",
+      "title": "התחלה חדשה (Remastered)",
+      "text": "Benzin — התחלה חדשה (Remastered)",
+      "station_count": 2,
+      "station_names": "קול השפלה 103FM,כאן 88",
+      "station_slugs": "kol-hashfela,kan-88",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T13:07:33Z",
+      "last_seen": "2026-07-13T13:07:35Z"
+    },
+    {
       "artist": "Arkadi Duchin & Meir Banai",
       "title": "דומינו",
       "text": "Arkadi Duchin & Meir Banai — דומינו",
@@ -89,5 +100,5 @@
       "last_seen": "2026-07-13T12:58:15Z"
     }
   ],
-  "updated_at": "2026-07-13T13:06:42Z"
+  "updated_at": "2026-07-13T13:07:42Z"
 }

@@ -23,6 +23,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "The Smashing Pumpkins",
+      "title": "Luna",
+      "text": "The Smashing Pumpkins — Luna",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:07:38Z",
+      "last_seen": "2026-07-13T13:07:38Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "The Yardbirds",
       "title": "Good Morning Little Schoolgirl",
       "text": "The Yardbirds — Good Morning Little Schoolgirl",
@@ -34,5 +45,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:06:42Z"
+  "updated_at": "2026-07-13T13:07:42Z"
 }
