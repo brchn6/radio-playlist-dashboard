@@ -2485,9 +2485,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Shlomi Shaban",
+      "title": "כולם אומרים",
+      "text": "Shlomi Shaban — כולם אומרים",
+      "recognized_at": "2026-07-13T17:13:22Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Rinat Bar",
+      "title": "נופלת לך",
+      "text": "Rinat Bar — נופלת לך",
+      "recognized_at": "2026-07-13T17:13:32Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 226,
-  "returned": 226,
-  "updated_at": "2026-07-13T17:13:09Z"
+  "total": 228,
+  "returned": 228,
+  "updated_at": "2026-07-13T17:13:39Z"
 }

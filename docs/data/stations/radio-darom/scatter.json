@@ -76,9 +76,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Rinat Bar",
+      "title": "נופלת לך",
+      "text": "Rinat Bar — נופלת לך",
+      "recognized_at": "2026-07-13T17:13:32Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T17:13:09Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T17:13:39Z"
 }

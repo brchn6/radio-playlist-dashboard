@@ -450,9 +450,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Shlomi Shaban",
+      "title": "כולם אומרים",
+      "text": "Shlomi Shaban — כולם אומרים",
+      "recognized_at": "2026-07-13T17:13:22Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 41,
-  "returned": 41,
-  "updated_at": "2026-07-13T17:13:09Z"
+  "total": 42,
+  "returned": 42,
+  "updated_at": "2026-07-13T17:13:39Z"
 }

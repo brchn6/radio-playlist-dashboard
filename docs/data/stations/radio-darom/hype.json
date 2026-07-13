@@ -34,6 +34,17 @@
       "station_color": "#e36ac8"
     },
     {
+      "artist": "Rinat Bar",
+      "title": "נופלת לך",
+      "text": "Rinat Bar — נופלת לך",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:13:32Z",
+      "last_seen": "2026-07-13T17:13:32Z",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    },
+    {
       "artist": "Shir Levi",
       "title": "יום אחד תבקשי",
       "text": "Shir Levi — יום אחד תבקשי",
@@ -78,5 +89,5 @@
       "station_color": "#e36ac8"
     }
   ],
-  "updated_at": "2026-07-13T17:13:09Z"
+  "updated_at": "2026-07-13T17:13:39Z"
 }

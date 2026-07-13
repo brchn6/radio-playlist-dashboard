@@ -375,6 +375,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Shlomi Shaban",
+      "title": "כולם אומרים",
+      "text": "Shlomi Shaban — כולם אומרים",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:13:22Z",
+      "last_seen": "2026-07-13T17:13:22Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Silk City",
       "title": "Only Can Get Better (Original Mix)",
       "text": "Silk City — Only Can Get Better (Original Mix)",
@@ -452,5 +463,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T17:13:09Z"
+  "updated_at": "2026-07-13T17:13:39Z"
 }
