@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 48,
+      "station_id": 7,
+      "artist": "The National",
+      "title": "Slow Show",
+      "text": "The National — Slow Show",
+      "url": "https://www.shazam.com/track/45143663/slow-show",
+      "shazam_key": "45143663",
+      "recognized_at": "2026-07-13T13:10:42Z",
+      "created_at": "2026-07-13 13:11:12",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 41,
       "station_id": 7,
       "artist": "The Smashing Pumpkins",
@@ -57,6 +71,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 4,
-  "updated_at": "2026-07-13T13:10:12Z"
+  "total": 5,
+  "updated_at": "2026-07-13T13:11:12Z"
 }

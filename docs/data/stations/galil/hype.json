@@ -23,6 +23,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "The National",
+      "title": "Slow Show",
+      "text": "The National — Slow Show",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:10:42Z",
+      "last_seen": "2026-07-13T13:10:42Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "The Smashing Pumpkins",
       "title": "Luna",
       "text": "The Smashing Pumpkins — Luna",
@@ -45,5 +56,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:10:12Z"
+  "updated_at": "2026-07-13T13:11:12Z"
 }

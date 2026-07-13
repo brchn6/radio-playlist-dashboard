@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 48,
+      "station_id": 7,
+      "artist": "The National",
+      "title": "Slow Show",
+      "text": "The National — Slow Show",
+      "url": "https://www.shazam.com/track/45143663/slow-show",
+      "shazam_key": "45143663",
+      "recognized_at": "2026-07-13T13:10:42Z",
+      "created_at": "2026-07-13 13:11:12",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 45,
       "station_id": 2,
       "artist": "Margalit Tzan׳ani",
@@ -659,7 +673,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 47,
-  "returned": 47,
-  "updated_at": "2026-07-13T13:10:12Z"
+  "total": 48,
+  "returned": 48,
+  "updated_at": "2026-07-13T13:11:12Z"
 }
