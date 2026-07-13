@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 144,
+      "station_id": 7,
+      "artist": "Fiction Factory",
+      "title": "(Feels Like) Heaven",
+      "text": "Fiction Factory — (Feels Like) Heaven",
+      "url": "https://www.shazam.com/track/5210843/feels-like-heaven",
+      "shazam_key": "5210843",
+      "recognized_at": "2026-07-13T14:23:23Z",
+      "created_at": "2026-07-13 14:23:45",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 143,
       "station_id": 1,
       "artist": "Ethnix",
@@ -925,7 +939,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 66,
-  "returned": 66,
-  "updated_at": "2026-07-13T14:22:49Z"
+  "total": 67,
+  "returned": 67,
+  "updated_at": "2026-07-13T14:23:45Z"
 }

@@ -45,6 +45,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Fiction Factory",
+      "title": "(Feels Like) Heaven",
+      "text": "Fiction Factory — (Feels Like) Heaven",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:23:23Z",
+      "last_seen": "2026-07-13T14:23:23Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "FINNEAS",
       "title": "Little Window",
       "text": "FINNEAS — Little Window",
@@ -166,5 +177,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:22:49Z"
+  "updated_at": "2026-07-13T14:23:45Z"
 }

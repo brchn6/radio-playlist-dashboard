@@ -725,9 +725,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Fiction Factory",
+      "title": "(Feels Like) Heaven",
+      "text": "Fiction Factory — (Feels Like) Heaven",
+      "recognized_at": "2026-07-13T14:23:23Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 66,
-  "returned": 66,
-  "updated_at": "2026-07-13T14:22:49Z"
+  "total": 67,
+  "returned": 67,
+  "updated_at": "2026-07-13T14:23:45Z"
 }
