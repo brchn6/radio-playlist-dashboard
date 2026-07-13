@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 317,
+      "station_id": 5,
+      "artist": "Aynsley Lister",
+      "title": "Need Her So Bad",
+      "text": "Aynsley Lister — Need Her So Bad",
+      "url": "https://www.shazam.com/track/298867/need-her-so-bad",
+      "shazam_key": "298867",
+      "recognized_at": "2026-07-13T17:21:40Z",
+      "created_at": "2026-07-13 17:22:09",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 308,
       "station_id": 5,
       "artist": "Syl Johnson",
@@ -561,6 +575,6 @@
       "station_color": "#c86ae3"
     }
   ],
-  "total": 40,
-  "updated_at": "2026-07-13T17:21:39Z"
+  "total": 41,
+  "updated_at": "2026-07-13T17:22:09Z"
 }

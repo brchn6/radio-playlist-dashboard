@@ -177,6 +177,14 @@
       "last_seen": "2026-07-13T14:18:15Z"
     },
     {
+      "artist": "Aynsley Lister",
+      "title": "Need Her So Bad",
+      "text": "Aynsley Lister — Need Her So Bad",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:21:40Z",
+      "last_seen": "2026-07-13T17:21:40Z"
+    },
+    {
       "artist": "B.o.B",
       "title": "Airplanes (feat. Hayley Williams of Paramore)",
       "text": "B.o.B — Airplanes (feat. Hayley Williams of Paramore)",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:12:43Z",
       "last_seen": "2026-07-13T15:12:43Z"
-    },
-    {
-      "artist": "Kanye West",
-      "title": "Love Lockdown",
-      "text": "Kanye West — Love Lockdown",
-      "play_count": 1,
-      "first_seen": "2026-07-13T16:41:57Z",
-      "last_seen": "2026-07-13T16:41:57Z"
     }
   ],
-  "updated_at": "2026-07-13T17:21:39Z"
+  "updated_at": "2026-07-13T17:22:09Z"
 }
