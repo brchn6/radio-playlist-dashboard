@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 65,
+      "station_id": 2,
+      "artist": "Malcolm Todd",
+      "title": "Earrings",
+      "text": "Malcolm Todd — Earrings",
+      "url": "https://www.shazam.com/track/696256989/earrings",
+      "shazam_key": "696256989",
+      "recognized_at": "2026-07-13T13:23:09Z",
+      "created_at": "2026-07-13 13:23:12",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
+      "id": 66,
+      "station_id": 6,
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "url": "https://www.shazam.com/track/40375820/in-a-manner-of-speaking-feat-camille",
+      "shazam_key": "40375820",
+      "recognized_at": "2026-07-13T13:22:57Z",
+      "created_at": "2026-07-13 13:23:12",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
+    },
+    {
       "id": 62,
       "station_id": 5,
       "artist": "Led Zeppelin",
@@ -897,7 +925,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 64,
-  "returned": 64,
-  "updated_at": "2026-07-13T13:22:12Z"
+  "total": 66,
+  "returned": 66,
+  "updated_at": "2026-07-13T13:23:12Z"
 }

@@ -45,6 +45,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Malcolm Todd",
+      "title": "Earrings",
+      "text": "Malcolm Todd — Earrings",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:23:09Z",
+      "last_seen": "2026-07-13T13:23:09Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Margalit Tzan׳ani",
       "title": "לשיר ולהנות",
       "text": "Margalit Tzan׳ani — לשיר ולהנות",
@@ -78,5 +89,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:22:12Z"
+  "updated_at": "2026-07-13T13:23:12Z"
 }

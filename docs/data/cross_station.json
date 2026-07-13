@@ -78,6 +78,17 @@
       "last_seen": "2026-07-13T13:21:50Z"
     },
     {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "station_count": 2,
+      "station_names": "קול הגליל העליון,כאן ב",
+      "station_slugs": "galil,kan-bet",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T13:21:56Z",
+      "last_seen": "2026-07-13T13:22:57Z"
+    },
+    {
       "artist": "Michael Jackson",
       "title": "Beat It",
       "text": "Michael Jackson — Beat It",
@@ -188,5 +199,5 @@
       "last_seen": "2026-07-13T12:58:15Z"
     }
   ],
-  "updated_at": "2026-07-13T13:22:12Z"
+  "updated_at": "2026-07-13T13:23:12Z"
 }

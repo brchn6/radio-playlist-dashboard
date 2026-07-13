@@ -97,6 +97,14 @@
       "last_seen": "2026-07-13T13:21:09Z"
     },
     {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:21:56Z",
+      "last_seen": "2026-07-13T13:22:57Z"
+    },
+    {
       "artist": "Rihanna",
       "title": "Don't Stop The Music",
       "text": "Rihanna — Don't Stop The Music",
@@ -249,6 +257,14 @@
       "last_seen": "2026-07-13T12:47:53Z"
     },
     {
+      "artist": "Malcolm Todd",
+      "title": "Earrings",
+      "text": "Malcolm Todd — Earrings",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:23:09Z",
+      "last_seen": "2026-07-13T13:23:09Z"
+    },
+    {
       "artist": "Margalit Tzan׳ani",
       "title": "לשיר ולהנות",
       "text": "Margalit Tzan׳ani — לשיר ולהנות",
@@ -263,14 +279,6 @@
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:56Z",
       "last_seen": "2026-07-13T12:51:56Z"
-    },
-    {
-      "artist": "Nouvelle Vague",
-      "title": "In a Manner of Speaking (feat. Camille)",
-      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:21:56Z",
-      "last_seen": "2026-07-13T13:21:56Z"
     },
     {
       "artist": "Pixies",
@@ -361,5 +369,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:22:12Z"
+  "updated_at": "2026-07-13T13:23:12Z"
 }

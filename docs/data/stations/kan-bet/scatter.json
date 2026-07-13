@@ -98,9 +98,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Nouvelle Vague",
+      "title": "In a Manner of Speaking (feat. Camille)",
+      "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
+      "recognized_at": "2026-07-13T13:22:57Z",
+      "station_slug": "kan-bet",
+      "station_color": "#e38a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 9,
-  "returned": 9,
-  "updated_at": "2026-07-13T13:22:12Z"
+  "total": 10,
+  "returned": 10,
+  "updated_at": "2026-07-13T13:23:12Z"
 }
