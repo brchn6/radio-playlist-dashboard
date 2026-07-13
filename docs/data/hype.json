@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T13:36:26Z"
     },
     {
+      "artist": "Antenna",
+      "title": "Come On Spring",
+      "text": "Antenna — Come On Spring",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:48:45Z",
+      "last_seen": "2026-07-13T13:48:45Z"
+    },
+    {
       "artist": "Asha Puthli & Say She She",
       "title": "Pawa!",
       "text": "Asha Puthli & Say She She — Pawa!",
@@ -161,6 +169,14 @@
       "last_seen": "2026-07-13T13:43:39Z"
     },
     {
+      "artist": "Rihanna",
+      "title": "Where Have You Been",
+      "text": "Rihanna — Where Have You Been",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:48:46Z",
+      "last_seen": "2026-07-13T13:48:46Z"
+    },
+    {
       "artist": "Robin Thicke",
       "title": "Blurred Lines (feat. T.I. & Pharrell)",
       "text": "Robin Thicke — Blurred Lines (feat. T.I. & Pharrell)",
@@ -201,5 +217,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:47:55Z"
+  "updated_at": "2026-07-13T13:48:55Z"
 }

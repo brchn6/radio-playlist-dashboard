@@ -307,9 +307,31 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Antenna",
+      "title": "Come On Spring",
+      "text": "Antenna — Come On Spring",
+      "recognized_at": "2026-07-13T13:48:45Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Rihanna",
+      "title": "Where Have You Been",
+      "text": "Rihanna — Where Have You Been",
+      "recognized_at": "2026-07-13T13:48:46Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 28,
-  "returned": 28,
-  "updated_at": "2026-07-13T13:47:55Z"
+  "total": 30,
+  "returned": 30,
+  "updated_at": "2026-07-13T13:48:55Z"
 }

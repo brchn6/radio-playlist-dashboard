@@ -56,6 +56,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Rihanna",
+      "title": "Where Have You Been",
+      "text": "Rihanna — Where Have You Been",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:48:46Z",
+      "last_seen": "2026-07-13T13:48:46Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "The Pointer Sisters",
       "title": "I'm So Excited",
       "text": "The Pointer Sisters — I'm So Excited",
@@ -67,5 +78,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:47:55Z"
+  "updated_at": "2026-07-13T13:48:55Z"
 }

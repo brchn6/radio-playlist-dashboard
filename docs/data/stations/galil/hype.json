@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Antenna",
+      "title": "Come On Spring",
+      "text": "Antenna — Come On Spring",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:48:45Z",
+      "last_seen": "2026-07-13T13:48:45Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Bon Iver",
       "title": "Come Talk to Me",
       "text": "Bon Iver — Come Talk to Me",
@@ -67,5 +78,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:47:55Z"
+  "updated_at": "2026-07-13T13:48:55Z"
 }
