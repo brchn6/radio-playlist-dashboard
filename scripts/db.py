@@ -180,24 +180,50 @@ class PlaylistDB:
         self.conn.commit()
         return cur.lastrowid
 
-    def track_exists(self, station_id: int, shazam_key: str,
-                     artist: str, title: str) -> bool:
-        """Check if a track was already recorded for this station.
+    def last_played_at(self, station_id: int, shazam_key: str,
+                       artist: str, title: str) -> datetime | None:
+        """When this song was last recorded for this station, or None.
         Matches by shazam_key first, falls back to artist+title."""
+        row = None
         if shazam_key:
-            cur = self.conn.execute(
-                "SELECT 1 FROM tracks WHERE station_id = ? AND shazam_key = ? LIMIT 1",
+            row = self.conn.execute(
+                """SELECT MAX(recognized_at) AS last FROM tracks
+                   WHERE station_id = ? AND shazam_key = ?""",
                 (station_id, shazam_key),
-            )
-            if cur.fetchone():
-                return True
-        cur = self.conn.execute(
-            """SELECT 1 FROM tracks
-               WHERE station_id = ? AND LOWER(artist) = LOWER(?) AND LOWER(title) = LOWER(?)
-               LIMIT 1""",
-            (station_id, artist.strip(), title.strip()),
-        )
-        return cur.fetchone() is not None
+            ).fetchone()
+        if not row or not row["last"]:
+            row = self.conn.execute(
+                """SELECT MAX(recognized_at) AS last FROM tracks
+                   WHERE station_id = ?
+                     AND LOWER(artist) = LOWER(?) AND LOWER(title) = LOWER(?)""",
+                (station_id, artist.strip(), title.strip()),
+            ).fetchone()
+        if not row or not row["last"]:
+            return None
+        try:
+            return datetime.fromisoformat(
+                row["last"].replace("Z", "+00:00")).astimezone(timezone.utc)
+        except ValueError:
+            return None
+
+    def track_exists(self, station_id: int, shazam_key: str,
+                     artist: str, title: str,
+                     within_minutes: int | None = None) -> bool:
+        """Has this song already been recorded for this station?
+
+        A single play is sampled by the proxy every ~40s, so the same song
+        recurs across several polls and must be deduped. But radio genuinely
+        replays songs — with within_minutes set, only plays inside that window
+        suppress a new row, so a later replay is recorded as its own play.
+        Without it, the check is all-time (kept for callers that want that).
+        """
+        last = self.last_played_at(station_id, shazam_key, artist, title)
+        if last is None:
+            return False
+        if within_minutes is None:
+            return True
+        age_min = (datetime.now(timezone.utc) - last).total_seconds() / 60
+        return age_min < within_minutes
 
     def get_latest_track(self, station_id: int | None = None
                          ) -> dict[str, Any] | None:

@@ -35,6 +35,10 @@ DEFAULT_GIT_AUTO_PUSH = os.environ.get("GIT_AUTO_PUSH", "").lower() in ("1", "tr
 RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
 CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll
 PUSH_EVERY_SECONDS = int(os.environ.get("PUSH_EVERY_SECONDS", "120"))  # min gap between pushes
+# A song longer than this window would be logged twice; a replay sooner than it
+# would be missed. 30 min clears the longest tracks and is well under how soon
+# radio repeats a hit.
+DEDUPE_WINDOW_MINUTES = int(os.environ.get("DEDUPE_WINDOW_MINUTES", "30"))
 
 running = True
 
@@ -208,14 +212,16 @@ def main() -> None:
             # Song detected — close any open non-music interval
             db.end_non_music_event(station_id)
 
-            # Check if this is a new track for this station
+            # Same song across consecutive samples of one play → one row.
+            # The same song hours later is a genuine replay → its own row.
             if db.track_exists(
                 station_id=station_id,
                 shazam_key=track.get("shazam_key", ""),
                 artist=track["artist"],
                 title=track["title"],
+                within_minutes=DEDUPE_WINDOW_MINUTES,
             ):
-                continue  # already recorded
+                continue  # still the same play
 
             # New track!
             print(json.dumps({
