@@ -252,9 +252,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Maroon 5",
+      "title": "Sugar",
+      "text": "Maroon 5 — Sugar",
+      "recognized_at": "2026-07-13T14:49:53Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 23,
-  "returned": 23,
-  "updated_at": "2026-07-13T14:48:45Z"
+  "total": 24,
+  "returned": 24,
+  "updated_at": "2026-07-13T14:50:15Z"
 }

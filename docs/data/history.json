@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 177,
+      "station_id": 7,
+      "artist": "Pretenders",
+      "title": "Don't Get Me Wrong",
+      "text": "Pretenders — Don't Get Me Wrong",
+      "url": "https://www.shazam.com/track/5162148/dont-get-me-wrong",
+      "shazam_key": "5162148",
+      "recognized_at": "2026-07-13T14:49:54Z",
+      "created_at": "2026-07-13 14:50:15",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
+      "id": 176,
+      "station_id": 1,
+      "artist": "Maroon 5",
+      "title": "Sugar",
+      "text": "Maroon 5 — Sugar",
+      "url": "https://www.shazam.com/track/273536255/sugar",
+      "shazam_key": "273536255",
+      "recognized_at": "2026-07-13T14:49:53Z",
+      "created_at": "2026-07-13 14:50:15",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 175,
       "station_id": 5,
       "artist": "Paul Simon",
@@ -1373,7 +1401,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 98,
-  "returned": 98,
-  "updated_at": "2026-07-13T14:48:45Z"
+  "total": 100,
+  "returned": 100,
+  "updated_at": "2026-07-13T14:50:15Z"
 }

@@ -144,6 +144,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Maroon 5",
+      "title": "Sugar",
+      "text": "Maroon 5 — Sugar",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:49:53Z",
+      "last_seen": "2026-07-13T14:49:53Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "meja",
       "title": "All 'Bout the Money (Hector's Radio Mix)",
       "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
@@ -254,5 +265,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T14:48:45Z"
+  "updated_at": "2026-07-13T14:50:15Z"
 }

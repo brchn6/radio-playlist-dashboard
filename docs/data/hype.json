@@ -401,6 +401,14 @@
       "last_seen": "2026-07-13T13:52:52Z"
     },
     {
+      "artist": "Maroon 5",
+      "title": "Sugar",
+      "text": "Maroon 5 — Sugar",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:49:53Z",
+      "last_seen": "2026-07-13T14:49:53Z"
+    },
+    {
       "artist": "meja",
       "title": "All 'Bout the Money (Hector's Radio Mix)",
       "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
@@ -519,6 +527,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:27:27Z",
       "last_seen": "2026-07-13T14:27:27Z"
+    },
+    {
+      "artist": "Pretenders",
+      "title": "Don't Get Me Wrong",
+      "text": "Pretenders — Don't Get Me Wrong",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:49:54Z",
+      "last_seen": "2026-07-13T14:49:54Z"
     },
     {
       "artist": "Pretenders",
@@ -753,5 +769,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:48:45Z"
+  "updated_at": "2026-07-13T14:50:15Z"
 }

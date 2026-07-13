@@ -145,6 +145,17 @@
     },
     {
       "artist": "Pretenders",
+      "title": "Don't Get Me Wrong",
+      "text": "Pretenders — Don't Get Me Wrong",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:49:54Z",
+      "last_seen": "2026-07-13T14:49:54Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
+      "artist": "Pretenders",
       "title": "Human (Tin Tin Out Mix)",
       "text": "Pretenders — Human (Tin Tin Out Mix)",
       "play_count": 1,
@@ -232,5 +243,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:48:45Z"
+  "updated_at": "2026-07-13T14:50:15Z"
 }
