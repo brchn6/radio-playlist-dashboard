@@ -177,6 +177,14 @@
       "last_seen": "2026-07-13T13:44:35Z"
     },
     {
+      "artist": "Capital Cities",
+      "title": "Safe and Sound",
+      "text": "Capital Cities — Safe and Sound",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:13:27Z",
+      "last_seen": "2026-07-13T15:13:27Z"
+    },
+    {
       "artist": "Carakukly & Liad Meir",
       "title": "פבלו אסקובר",
       "text": "Carakukly & Liad Meir — פבלו אסקובר",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:15:11Z",
       "last_seen": "2026-07-13T14:15:11Z"
-    },
-    {
-      "artist": "Soundgarden",
-      "title": "Black Hole Sun",
-      "text": "Soundgarden — Black Hole Sun",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:02:24Z",
-      "last_seen": "2026-07-13T14:02:24Z"
     }
   ],
-  "updated_at": "2026-07-13T15:12:49Z"
+  "updated_at": "2026-07-13T15:13:45Z"
 }

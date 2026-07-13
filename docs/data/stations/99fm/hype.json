@@ -23,6 +23,17 @@
       "station_color": "#6ab8e3"
     },
     {
+      "artist": "Capital Cities",
+      "title": "Safe and Sound",
+      "text": "Capital Cities — Safe and Sound",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:13:27Z",
+      "last_seen": "2026-07-13T15:13:27Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "artist": "Corinne Allal",
       "title": "ארץ קטנה עם שפם",
       "text": "Corinne Allal — ארץ קטנה עם שפם",
@@ -199,5 +210,5 @@
       "station_color": "#6ab8e3"
     }
   ],
-  "updated_at": "2026-07-13T15:12:49Z"
+  "updated_at": "2026-07-13T15:13:45Z"
 }
