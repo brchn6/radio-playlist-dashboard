@@ -68,5 +68,15 @@
     "color": "#a06ae3",
     "enabled": 1,
     "created_at": "2026-07-13 12:46:45"
+  },
+  {
+    "id": 8,
+    "slug": "radio-darom",
+    "name": "רדיו דרום 97FM",
+    "stream_url": "https://cdn.cybercdn.live/Darom_97FM/Live/icecast.audio",
+    "proxy_port": 8768,
+    "color": "#e36ac8",
+    "enabled": 1,
+    "created_at": "2026-07-13 14:17:06"
   }
 ]
