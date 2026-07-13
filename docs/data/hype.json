@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T13:36:26Z"
     },
     {
+      "artist": "Asha Puthli & Say She She",
+      "title": "Pawa!",
+      "text": "Asha Puthli & Say She She — Pawa!",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:41:09Z",
+      "last_seen": "2026-07-13T13:41:09Z"
+    },
+    {
       "artist": "Bon Iver",
       "title": "Come Talk to Me",
       "text": "Bon Iver — Come Talk to Me",
@@ -55,6 +63,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:40:32Z",
       "last_seen": "2026-07-13T13:40:32Z"
+    },
+    {
+      "artist": "Dire Straits",
+      "title": "Sultans Of Swing",
+      "text": "Dire Straits — Sultans Of Swing",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:41:07Z",
+      "last_seen": "2026-07-13T13:41:07Z"
     },
     {
       "artist": "Ehud Banai",
@@ -137,5 +153,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:40:35Z"
+  "updated_at": "2026-07-13T13:41:25Z"
 }

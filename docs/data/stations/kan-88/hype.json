@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Asha Puthli & Say She She",
+      "title": "Pawa!",
+      "text": "Asha Puthli & Say She She — Pawa!",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:41:09Z",
+      "last_seen": "2026-07-13T13:41:09Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Bomfunk MC's",
       "title": "Freestyler",
       "text": "Bomfunk MC's — Freestyler",
@@ -45,5 +56,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:40:35Z"
+  "updated_at": "2026-07-13T13:41:25Z"
 }
