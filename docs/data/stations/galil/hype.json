@@ -177,6 +177,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "John Mayer",
+      "title": "All I Want Is to Be With You",
+      "text": "John Mayer — All I Want Is to Be With You",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:26:36Z",
+      "last_seen": "2026-07-13T17:26:36Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Johnny Hates Jazz",
       "title": "Shattered Dreams",
       "text": "Johnny Hates Jazz — Shattered Dreams",
@@ -463,5 +474,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:26:09Z"
+  "updated_at": "2026-07-13T17:26:39Z"
 }

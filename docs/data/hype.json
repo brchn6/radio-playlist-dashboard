@@ -537,6 +537,14 @@
       "last_seen": "2026-07-13T14:40:41Z"
     },
     {
+      "artist": "Eruption",
+      "title": "One Way Ticket",
+      "text": "Eruption — One Way Ticket",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:26:31Z",
+      "last_seen": "2026-07-13T17:26:31Z"
+    },
+    {
       "artist": "Ethnix",
       "title": "היא לא תשוב",
       "text": "Ethnix — היא לא תשוב",
@@ -777,29 +785,21 @@
       "last_seen": "2026-07-13T14:13:11Z"
     },
     {
+      "artist": "John Mayer",
+      "title": "All I Want Is to Be With You",
+      "text": "John Mayer — All I Want Is to Be With You",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:26:36Z",
+      "last_seen": "2026-07-13T17:26:36Z"
+    },
+    {
       "artist": "Johnny Hates Jazz",
       "title": "Shattered Dreams",
       "text": "Johnny Hates Jazz — Shattered Dreams",
       "play_count": 1,
       "first_seen": "2026-07-13T14:53:58Z",
       "last_seen": "2026-07-13T14:53:58Z"
-    },
-    {
-      "artist": "Julee Cruise",
-      "title": "Falling",
-      "text": "Julee Cruise — Falling",
-      "play_count": 1,
-      "first_seen": "2026-07-13T16:54:47Z",
-      "last_seen": "2026-07-13T16:54:47Z"
-    },
-    {
-      "artist": "Jungle",
-      "title": "All of the Time (DJ Streaks Remix)",
-      "text": "Jungle — All of the Time (DJ Streaks Remix)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:47:44Z",
-      "last_seen": "2026-07-13T13:47:44Z"
     }
   ],
-  "updated_at": "2026-07-13T17:26:09Z"
+  "updated_at": "2026-07-13T17:26:39Z"
 }

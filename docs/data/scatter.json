@@ -2694,9 +2694,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Eruption",
+      "title": "One Way Ticket",
+      "text": "Eruption — One Way Ticket",
+      "recognized_at": "2026-07-13T17:26:31Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "John Mayer",
+      "title": "All I Want Is to Be With You",
+      "text": "John Mayer — All I Want Is to Be With You",
+      "recognized_at": "2026-07-13T17:26:36Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 245,
-  "returned": 245,
-  "updated_at": "2026-07-13T17:26:09Z"
+  "total": 247,
+  "returned": 247,
+  "updated_at": "2026-07-13T17:26:39Z"
 }

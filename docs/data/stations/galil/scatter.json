@@ -461,9 +461,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "John Mayer",
+      "title": "All I Want Is to Be With You",
+      "text": "John Mayer — All I Want Is to Be With You",
+      "recognized_at": "2026-07-13T17:26:36Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 42,
-  "returned": 42,
-  "updated_at": "2026-07-13T17:26:09Z"
+  "total": 43,
+  "returned": 43,
+  "updated_at": "2026-07-13T17:26:39Z"
 }

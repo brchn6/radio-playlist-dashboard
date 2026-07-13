@@ -582,9 +582,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Eruption",
+      "title": "One Way Ticket",
+      "text": "Eruption — One Way Ticket",
+      "recognized_at": "2026-07-13T17:26:31Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 53,
-  "returned": 53,
-  "updated_at": "2026-07-13T17:26:09Z"
+  "total": 54,
+  "returned": 54,
+  "updated_at": "2026-07-13T17:26:39Z"
 }
