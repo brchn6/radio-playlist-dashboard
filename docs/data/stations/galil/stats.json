@@ -10,6 +10,15 @@
       "count": 46
     }
   ],
-  "non_music": [],
-  "updated_at": "2026-07-13T17:40:02Z"
+  "non_music": [
+    {
+      "station_id": 7,
+      "station_name": "קול הגליל העליון",
+      "station_slug": "galil",
+      "event_count": 1,
+      "total_seconds": 0,
+      "last_event_at": null
+    }
+  ],
+  "updated_at": "2026-07-13T17:40:22Z"
 }

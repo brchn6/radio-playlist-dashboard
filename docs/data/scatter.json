@@ -2892,9 +2892,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Alon Oleartchik",
+      "title": "כל דבר קט",
+      "text": "Alon Oleartchik — כל דבר קט",
+      "recognized_at": "2026-07-13T17:40:18Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 263,
-  "returned": 263,
-  "updated_at": "2026-07-13T17:40:02Z"
+  "total": 264,
+  "returned": 264,
+  "updated_at": "2026-07-13T17:40:22Z"
 }

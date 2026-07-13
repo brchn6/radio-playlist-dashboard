@@ -15,10 +15,10 @@
       "station_id": 6,
       "station_name": "כאן ב",
       "station_slug": "kan-bet",
-      "event_count": 2,
+      "event_count": 3,
       "total_seconds": 39.999984204769135,
       "last_event_at": "2026-07-13T17:40:02Z"
     }
   ],
-  "updated_at": "2026-07-13T17:40:02Z"
+  "updated_at": "2026-07-13T17:40:22Z"
 }

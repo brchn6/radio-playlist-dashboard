@@ -97,6 +97,14 @@
       "last_seen": "2026-07-13T17:16:22Z"
     },
     {
+      "artist": "Alon Oleartchik",
+      "title": "כל דבר קט",
+      "text": "Alon Oleartchik — כל דבר קט",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:40:18Z",
+      "last_seen": "2026-07-13T17:40:18Z"
+    },
+    {
       "artist": "Altın Gün",
       "title": "Goca Dünya",
       "text": "Altın Gün — Goca Dünya",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T16:46:10Z",
       "last_seen": "2026-07-13T16:46:10Z"
-    },
-    {
-      "artist": "Ishay Levi",
-      "title": "Isha Neemana",
-      "text": "Ishay Levi — Isha Neemana",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:21:40Z",
-      "last_seen": "2026-07-13T15:21:40Z"
     }
   ],
-  "updated_at": "2026-07-13T17:40:02Z"
+  "updated_at": "2026-07-13T17:40:22Z"
 }

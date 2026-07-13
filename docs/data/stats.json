@@ -1,13 +1,13 @@
 {
-  "total_tracks": 263,
-  "unique_tracks": 257,
-  "unique_artists": 226,
+  "total_tracks": 264,
+  "unique_tracks": 258,
+  "unique_artists": 227,
   "first_track_at": "2026-07-13T13:27:34Z",
-  "last_track_at": "2026-07-13T17:39:09Z",
+  "last_track_at": "2026-07-13T17:40:18Z",
   "tracks_by_date": [
     {
       "date": "2026-07-13",
-      "count": 263
+      "count": 264
     }
   ],
   "non_music": [
@@ -15,7 +15,7 @@
       "station_id": 4,
       "station_name": "רדיו תל אביב 102FM",
       "station_slug": "radio-tlv",
-      "event_count": 2,
+      "event_count": 3,
       "total_seconds": 39.999984204769135,
       "last_event_at": "2026-07-13T17:40:02Z"
     },
@@ -31,10 +31,18 @@
       "station_id": 6,
       "station_name": "כאן ב",
       "station_slug": "kan-bet",
-      "event_count": 2,
+      "event_count": 3,
       "total_seconds": 39.999984204769135,
       "last_event_at": "2026-07-13T17:40:02Z"
+    },
+    {
+      "station_id": 7,
+      "station_name": "קול הגליל העליון",
+      "station_slug": "galil",
+      "event_count": 1,
+      "total_seconds": 0,
+      "last_event_at": null
     }
   ],
-  "updated_at": "2026-07-13T17:40:02Z"
+  "updated_at": "2026-07-13T17:40:22Z"
 }
