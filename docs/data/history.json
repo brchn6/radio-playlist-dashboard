@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 188,
+      "station_id": 5,
+      "artist": "boygenius",
+      "title": "Not Strong Enough",
+      "text": "boygenius — Not Strong Enough",
+      "url": "https://www.shazam.com/track/649755401/not-strong-enough",
+      "shazam_key": "649755401",
+      "recognized_at": "2026-07-13T14:57:18Z",
+      "created_at": "2026-07-13 14:57:19",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 187,
       "station_id": 7,
       "artist": "Bon Jovi",
@@ -1541,7 +1555,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 110,
-  "returned": 110,
-  "updated_at": "2026-07-13T14:57:15Z"
+  "total": 111,
+  "returned": 111,
+  "updated_at": "2026-07-13T14:57:19Z"
 }
