@@ -1253,9 +1253,31 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Stevie Wonder",
+      "title": "Part-Time Lover",
+      "text": "Stevie Wonder — Part-Time Lover",
+      "recognized_at": "2026-07-13T15:01:07Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Queen & David Bowie",
+      "title": "Under Pressure",
+      "text": "Queen & David Bowie — Under Pressure",
+      "recognized_at": "2026-07-13T15:01:07Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 114,
-  "returned": 114,
-  "updated_at": "2026-07-13T15:00:45Z"
+  "total": 116,
+  "returned": 116,
+  "updated_at": "2026-07-13T15:01:15Z"
 }

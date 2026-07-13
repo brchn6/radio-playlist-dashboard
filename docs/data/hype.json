@@ -625,6 +625,14 @@
       "last_seen": "2026-07-13T14:19:18Z"
     },
     {
+      "artist": "Queen & David Bowie",
+      "title": "Under Pressure",
+      "text": "Queen & David Bowie — Under Pressure",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:01:07Z",
+      "last_seen": "2026-07-13T15:01:07Z"
+    },
+    {
       "artist": "Ran Danker",
       "title": "בית משוגעים",
       "text": "Ran Danker — בית משוגעים",
@@ -730,6 +738,14 @@
     },
     {
       "artist": "Stevie Wonder",
+      "title": "Part-Time Lover",
+      "text": "Stevie Wonder — Part-Time Lover",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:01:07Z",
+      "last_seen": "2026-07-13T15:01:07Z"
+    },
+    {
+      "artist": "Stevie Wonder",
       "title": "Sir Duke",
       "text": "Stevie Wonder — Sir Duke",
       "play_count": 1,
@@ -783,23 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:32:00Z",
       "last_seen": "2026-07-13T14:32:00Z"
-    },
-    {
-      "artist": "The Cardigans",
-      "title": "My Favourite Game",
-      "text": "The Cardigans — My Favourite Game",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:51:13Z",
-      "last_seen": "2026-07-13T14:51:13Z"
-    },
-    {
-      "artist": "The Corrs",
-      "title": "Radio ( MTV Unplugged Version )",
-      "text": "The Corrs — Radio ( MTV Unplugged Version )",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:36:50Z",
-      "last_seen": "2026-07-13T13:36:50Z"
     }
   ],
-  "updated_at": "2026-07-13T15:00:45Z"
+  "updated_at": "2026-07-13T15:01:15Z"
 }
