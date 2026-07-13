@@ -626,9 +626,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "John Lennon & The Plastic Ono Band",
+      "title": "Instant Karma! (We All Shine On) [2003 Remastered Version]",
+      "text": "John Lennon & The Plastic Ono Band — Instant Karma! (We All Shine On) [2003 Remastered Version]",
+      "recognized_at": "2026-07-13T14:13:11Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 57,
-  "returned": 57,
-  "updated_at": "2026-07-13T14:12:49Z"
+  "total": 58,
+  "returned": 58,
+  "updated_at": "2026-07-13T14:13:15Z"
 }
