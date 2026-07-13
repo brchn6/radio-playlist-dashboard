@@ -377,6 +377,14 @@
       "last_seen": "2026-07-13T14:08:03Z"
     },
     {
+      "artist": "New Order",
+      "title": "Regret",
+      "text": "New Order — Regret",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:34:53Z",
+      "last_seen": "2026-07-13T14:34:53Z"
+    },
+    {
       "artist": "Of Monsters and Men",
       "title": "Crystals",
       "text": "Of Monsters and Men — Crystals",
@@ -625,5 +633,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:34:45Z"
+  "updated_at": "2026-07-13T14:35:15Z"
 }

@@ -56,15 +56,15 @@
     "station_color": "#e3c86a"
   },
   {
-    "id": 153,
+    "id": 160,
     "station_id": 5,
-    "artist": "Talking Heads",
-    "title": "Once In a Lifetime",
-    "text": "Talking Heads — Once In a Lifetime",
-    "url": "https://www.shazam.com/track/46660853/once-in-a-lifetime",
-    "shazam_key": "46660853",
-    "recognized_at": "2026-07-13T14:30:25Z",
-    "created_at": "2026-07-13 14:30:45",
+    "artist": "New Order",
+    "title": "Regret",
+    "text": "New Order — Regret",
+    "url": "https://www.shazam.com/track/11204925/regret",
+    "shazam_key": "11204925",
+    "recognized_at": "2026-07-13T14:34:53Z",
+    "created_at": "2026-07-13 14:35:15",
     "station_slug": "kan-88",
     "station_name": "כאן 88",
     "station_color": "#c86ae3"

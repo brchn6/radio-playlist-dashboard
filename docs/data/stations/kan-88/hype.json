@@ -111,6 +111,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "New Order",
+      "title": "Regret",
+      "text": "New Order — Regret",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:34:53Z",
+      "last_seen": "2026-07-13T14:34:53Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Pearl Jam",
       "title": "Sirens",
       "text": "Pearl Jam — Sirens",
@@ -166,5 +177,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:34:45Z"
+  "updated_at": "2026-07-13T14:35:15Z"
 }
