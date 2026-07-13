@@ -32,9 +32,20 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Harel Skaat",
+      "title": "משהו ממני",
+      "text": "Harel Skaat — משהו ממני",
+      "recognized_at": "2026-07-13T16:51:59Z",
+      "station_slug": "radio-darom",
+      "station_color": "#e36ac8",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 3,
-  "returned": 3,
-  "updated_at": "2026-07-13T16:51:51Z"
+  "total": 4,
+  "returned": 4,
+  "updated_at": "2026-07-13T16:52:21Z"
 }

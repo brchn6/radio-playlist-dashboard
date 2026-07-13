@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Harel Skaat",
+      "title": "משהו ממני",
+      "text": "Harel Skaat — משהו ממני",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:51:59Z",
+      "last_seen": "2026-07-13T16:51:59Z",
+      "station_slug": "radio-darom",
+      "station_name": "רדיו דרום 97FM",
+      "station_color": "#e36ac8"
+    },
+    {
       "artist": "Omer Adam",
       "title": "חי (שיר הנושא מתוך לשחרר את שולי סאן)",
       "text": "Omer Adam — חי (שיר הנושא מתוך לשחרר את שולי סאן)",
@@ -34,5 +45,5 @@
       "station_color": "#e36ac8"
     }
   ],
-  "updated_at": "2026-07-13T16:51:51Z"
+  "updated_at": "2026-07-13T16:52:21Z"
 }
