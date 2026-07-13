@@ -364,6 +364,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Rory Gallagher",
+      "title": "Too Much Alcohol (Live)",
+      "text": "Rory Gallagher — Too Much Alcohol (Live)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:39:09Z",
+      "last_seen": "2026-07-13T17:39:09Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Sharon Roter",
       "title": "Arutz Elecha",
       "text": "Sharon Roter — Arutz Elecha",
@@ -463,5 +474,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:39:02Z"
+  "updated_at": "2026-07-13T17:39:22Z"
 }

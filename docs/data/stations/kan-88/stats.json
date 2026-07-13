@@ -1,13 +1,13 @@
 {
-  "total_tracks": 42,
-  "unique_tracks": 42,
-  "unique_artists": 42,
+  "total_tracks": 43,
+  "unique_tracks": 43,
+  "unique_artists": 43,
   "first_track_at": "2026-07-13T13:27:34Z",
-  "last_track_at": "2026-07-13T17:31:46Z",
+  "last_track_at": "2026-07-13T17:39:09Z",
   "tracks_by_date": [
     {
       "date": "2026-07-13",
-      "count": 42
+      "count": 43
     }
   ],
   "non_music": [
@@ -16,9 +16,9 @@
       "station_name": "כאן 88",
       "station_slug": "kan-88",
       "event_count": 1,
-      "total_seconds": 0,
-      "last_event_at": null
+      "total_seconds": 20.00001221895218,
+      "last_event_at": "2026-07-13T17:39:22Z"
     }
   ],
-  "updated_at": "2026-07-13T17:39:02Z"
+  "updated_at": "2026-07-13T17:39:22Z"
 }

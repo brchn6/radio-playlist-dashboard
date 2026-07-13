@@ -2881,9 +2881,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Rory Gallagher",
+      "title": "Too Much Alcohol (Live)",
+      "text": "Rory Gallagher — Too Much Alcohol (Live)",
+      "recognized_at": "2026-07-13T17:39:09Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 262,
-  "returned": 262,
-  "updated_at": "2026-07-13T17:39:02Z"
+  "total": 263,
+  "returned": 263,
+  "updated_at": "2026-07-13T17:39:22Z"
 }

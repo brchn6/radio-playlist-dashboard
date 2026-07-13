@@ -16,9 +16,9 @@
       "station_name": "רדיו תל אביב 102FM",
       "station_slug": "radio-tlv",
       "event_count": 1,
-      "total_seconds": 0,
-      "last_event_at": null
+      "total_seconds": 20.00001221895218,
+      "last_event_at": "2026-07-13T17:39:22Z"
     }
   ],
-  "updated_at": "2026-07-13T17:39:02Z"
+  "updated_at": "2026-07-13T17:39:22Z"
 }

@@ -1,13 +1,13 @@
 {
-  "total_tracks": 262,
-  "unique_tracks": 256,
-  "unique_artists": 225,
+  "total_tracks": 263,
+  "unique_tracks": 257,
+  "unique_artists": 226,
   "first_track_at": "2026-07-13T13:27:34Z",
-  "last_track_at": "2026-07-13T17:37:49Z",
+  "last_track_at": "2026-07-13T17:39:09Z",
   "tracks_by_date": [
     {
       "date": "2026-07-13",
-      "count": 262
+      "count": 263
     }
   ],
   "non_music": [
@@ -16,25 +16,25 @@
       "station_name": "רדיו תל אביב 102FM",
       "station_slug": "radio-tlv",
       "event_count": 1,
-      "total_seconds": 0,
-      "last_event_at": null
+      "total_seconds": 20.00001221895218,
+      "last_event_at": "2026-07-13T17:39:22Z"
     },
     {
       "station_id": 5,
       "station_name": "כאן 88",
       "station_slug": "kan-88",
       "event_count": 1,
-      "total_seconds": 0,
-      "last_event_at": null
+      "total_seconds": 20.00001221895218,
+      "last_event_at": "2026-07-13T17:39:22Z"
     },
     {
       "station_id": 6,
       "station_name": "כאן ב",
       "station_slug": "kan-bet",
       "event_count": 1,
-      "total_seconds": 0,
-      "last_event_at": null
+      "total_seconds": 20.00001221895218,
+      "last_event_at": "2026-07-13T17:39:22Z"
     }
   ],
-  "updated_at": "2026-07-13T17:39:02Z"
+  "updated_at": "2026-07-13T17:39:22Z"
 }
