@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 24,
+      "station_id": 5,
+      "artist": "Shlomo Artzi & Rita",
+      "title": "שניים",
+      "text": "Shlomo Artzi & Rita — שניים",
+      "url": "https://www.shazam.com/track/280799668/%D7%A9%D7%A0%D7%99%D7%99%D7%9D",
+      "shazam_key": "280799668",
+      "recognized_at": "2026-07-13T12:56:25Z",
+      "created_at": "2026-07-13 12:56:42",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 22,
       "station_id": 5,
       "artist": "La Bouche",
@@ -57,6 +71,6 @@
       "station_color": "#c86ae3"
     }
   ],
-  "total": 4,
-  "updated_at": "2026-07-13T12:56:12Z"
+  "total": 5,
+  "updated_at": "2026-07-13T12:56:42Z"
 }

@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 24,
+      "station_id": 5,
+      "artist": "Shlomo Artzi & Rita",
+      "title": "שניים",
+      "text": "Shlomo Artzi & Rita — שניים",
+      "url": "https://www.shazam.com/track/280799668/%D7%A9%D7%A0%D7%99%D7%99%D7%9D",
+      "shazam_key": "280799668",
+      "recognized_at": "2026-07-13T12:56:25Z",
+      "created_at": "2026-07-13 12:56:42",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
+      "id": 25,
+      "station_id": 7,
+      "artist": "The Yardbirds",
+      "title": "Good Morning Little Schoolgirl",
+      "text": "The Yardbirds — Good Morning Little Schoolgirl",
+      "url": "https://www.shazam.com/track/10246515/good-morning-little-schoolgirl",
+      "shazam_key": "10246515",
+      "recognized_at": "2026-07-13T12:56:23Z",
+      "created_at": "2026-07-13 12:56:42",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 23,
       "station_id": 6,
       "artist": "Stamatis Spanoudakis",
@@ -323,7 +351,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 23,
-  "returned": 23,
-  "updated_at": "2026-07-13T12:56:12Z"
+  "total": 25,
+  "returned": 25,
+  "updated_at": "2026-07-13T12:56:42Z"
 }

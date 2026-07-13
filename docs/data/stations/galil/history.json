@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 25,
+      "station_id": 7,
+      "artist": "The Yardbirds",
+      "title": "Good Morning Little Schoolgirl",
+      "text": "The Yardbirds — Good Morning Little Schoolgirl",
+      "url": "https://www.shazam.com/track/10246515/good-morning-little-schoolgirl",
+      "shazam_key": "10246515",
+      "recognized_at": "2026-07-13T12:56:23Z",
+      "created_at": "2026-07-13 12:56:42",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 8,
       "station_id": 7,
       "artist": "The Allman Brothers Band",
@@ -15,6 +29,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 1,
-  "updated_at": "2026-07-13T12:56:12Z"
+  "total": 2,
+  "updated_at": "2026-07-13T12:56:42Z"
 }

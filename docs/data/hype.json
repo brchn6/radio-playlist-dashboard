@@ -33,6 +33,14 @@
       "last_seen": "2026-07-13T12:48:38Z"
     },
     {
+      "artist": "Shlomo Artzi & Rita",
+      "title": "שניים",
+      "text": "Shlomo Artzi & Rita — שניים",
+      "play_count": 2,
+      "first_seen": "2026-07-13T12:55:22Z",
+      "last_seen": "2026-07-13T12:56:25Z"
+    },
+    {
       "artist": "SZA",
       "title": "Kill Bill",
       "text": "SZA — Kill Bill",
@@ -97,14 +105,6 @@
       "last_seen": "2026-07-13T12:51:56Z"
     },
     {
-      "artist": "Shlomo Artzi & Rita",
-      "title": "שניים",
-      "text": "Shlomo Artzi & Rita — שניים",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:55:22Z",
-      "last_seen": "2026-07-13T12:55:22Z"
-    },
-    {
       "artist": "Stamatis Spanoudakis",
       "title": "Zi Ke Vasilevi",
       "text": "Stamatis Spanoudakis — Zi Ke Vasilevi",
@@ -129,6 +129,14 @@
       "last_seen": "2026-07-13T12:49:14Z"
     },
     {
+      "artist": "The Yardbirds",
+      "title": "Good Morning Little Schoolgirl",
+      "text": "The Yardbirds — Good Morning Little Schoolgirl",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:56:23Z",
+      "last_seen": "2026-07-13T12:56:23Z"
+    },
+    {
       "artist": "Years & Years",
       "title": "Desire",
       "text": "Years & Years — Desire",
@@ -137,5 +145,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T12:56:12Z"
+  "updated_at": "2026-07-13T12:56:42Z"
 }
