@@ -516,9 +516,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Deep Blue Something",
+      "title": "Breakfast At Tiffany's",
+      "text": "Deep Blue Something — Breakfast At Tiffany's",
+      "recognized_at": "2026-07-13T17:44:00Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 47,
-  "returned": 47,
-  "updated_at": "2026-07-13T17:43:42Z"
+  "total": 48,
+  "returned": 48,
+  "updated_at": "2026-07-13T17:44:02Z"
 }

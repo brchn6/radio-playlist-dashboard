@@ -111,6 +111,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Deep Blue Something",
+      "title": "Breakfast At Tiffany's",
+      "text": "Deep Blue Something — Breakfast At Tiffany's",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:44:00Z",
+      "last_seen": "2026-07-13T17:44:00Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Dire Straits",
       "title": "Walk Of Life",
       "text": "Dire Straits — Walk Of Life",
@@ -518,5 +529,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:43:42Z"
+  "updated_at": "2026-07-13T17:44:02Z"
 }

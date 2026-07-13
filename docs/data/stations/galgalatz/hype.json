@@ -100,6 +100,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Eden Hason, Ofek Adanek & Agam Buhbut",
+      "title": "איך שהיא רוקדת",
+      "text": "Eden Hason, Ofek Adanek & Agam Buhbut — איך שהיא רוקדת",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:43:59Z",
+      "last_seen": "2026-07-13T17:43:59Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Ethnix",
       "title": "מתי לחזור",
       "text": "Ethnix — מתי לחזור",
@@ -529,5 +540,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T17:43:42Z"
+  "updated_at": "2026-07-13T17:44:02Z"
 }

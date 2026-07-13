@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 347,
+      "station_id": 7,
+      "artist": "Deep Blue Something",
+      "title": "Breakfast At Tiffany's",
+      "text": "Deep Blue Something — Breakfast At Tiffany's",
+      "url": "https://www.shazam.com/track/5904055/breakfast-at-tiffanys",
+      "shazam_key": "5904055",
+      "recognized_at": "2026-07-13T17:44:00Z",
+      "created_at": "2026-07-13 17:44:02",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 345,
       "station_id": 7,
       "artist": "Dave Matthews Band",
@@ -659,6 +673,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 47,
-  "updated_at": "2026-07-13T17:43:42Z"
+  "total": 48,
+  "updated_at": "2026-07-13T17:44:02Z"
 }
