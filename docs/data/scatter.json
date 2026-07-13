@@ -2661,9 +2661,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ethnix",
+      "title": "כתם הפרי",
+      "text": "Ethnix — כתם הפרי",
+      "recognized_at": "2026-07-13T17:24:09Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Liam Hachmon & ATAR MAYNER",
+      "title": "בלילות",
+      "text": "Liam Hachmon & ATAR MAYNER — בלילות",
+      "recognized_at": "2026-07-13T17:24:37Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 242,
-  "returned": 242,
-  "updated_at": "2026-07-13T17:24:09Z"
+  "total": 244,
+  "returned": 244,
+  "updated_at": "2026-07-13T17:24:39Z"
 }

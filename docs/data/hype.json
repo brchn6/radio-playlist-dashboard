@@ -546,6 +546,14 @@
     },
     {
       "artist": "Ethnix",
+      "title": "כתם הפרי",
+      "text": "Ethnix — כתם הפרי",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:24:09Z",
+      "last_seen": "2026-07-13T17:24:09Z"
+    },
+    {
+      "artist": "Ethnix",
       "title": "מתי לחזור",
       "text": "Ethnix — מתי לחזור",
       "play_count": 1,
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:47:44Z",
       "last_seen": "2026-07-13T13:47:44Z"
-    },
-    {
-      "artist": "Jungle",
-      "title": "Carry On",
-      "text": "Jungle — Carry On",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:39:55Z",
-      "last_seen": "2026-07-13T14:39:55Z"
     }
   ],
-  "updated_at": "2026-07-13T17:24:09Z"
+  "updated_at": "2026-07-13T17:24:39Z"
 }

@@ -155,6 +155,17 @@
       "station_color": "#6ab8e3"
     },
     {
+      "artist": "Ethnix",
+      "title": "כתם הפרי",
+      "text": "Ethnix — כתם הפרי",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:24:09Z",
+      "last_seen": "2026-07-13T17:24:09Z",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
       "artist": "Eve",
       "title": "Who's That Girl?",
       "text": "Eve — Who's That Girl?",
@@ -386,5 +397,5 @@
       "station_color": "#6ab8e3"
     }
   ],
-  "updated_at": "2026-07-13T17:24:09Z"
+  "updated_at": "2026-07-13T17:24:39Z"
 }

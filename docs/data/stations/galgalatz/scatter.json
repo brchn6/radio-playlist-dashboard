@@ -483,9 +483,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Liam Hachmon & ATAR MAYNER",
+      "title": "בלילות",
+      "text": "Liam Hachmon & ATAR MAYNER — בלילות",
+      "recognized_at": "2026-07-13T17:24:37Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 44,
-  "returned": 44,
-  "updated_at": "2026-07-13T17:24:09Z"
+  "total": 45,
+  "returned": 45,
+  "updated_at": "2026-07-13T17:24:39Z"
 }

@@ -384,9 +384,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ethnix",
+      "title": "כתם הפרי",
+      "text": "Ethnix — כתם הפרי",
+      "recognized_at": "2026-07-13T17:24:09Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 35,
-  "returned": 35,
-  "updated_at": "2026-07-13T17:24:09Z"
+  "total": 36,
+  "returned": 36,
+  "updated_at": "2026-07-13T17:24:39Z"
 }

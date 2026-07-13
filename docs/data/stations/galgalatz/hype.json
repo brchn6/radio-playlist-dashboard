@@ -221,6 +221,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Liam Hachmon & ATAR MAYNER",
+      "title": "בלילות",
+      "text": "Liam Hachmon & ATAR MAYNER — בלילות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:24:37Z",
+      "last_seen": "2026-07-13T17:24:37Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Madonna",
       "title": "Express Yourself",
       "text": "Madonna — Express Yourself",
@@ -485,5 +496,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T17:24:09Z"
+  "updated_at": "2026-07-13T17:24:39Z"
 }
