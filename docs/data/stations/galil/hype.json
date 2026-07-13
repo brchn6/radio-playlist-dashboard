@@ -155,6 +155,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Miley Cyrus",
+      "title": "Don't Let the Sun Go Down On Me",
+      "text": "Miley Cyrus — Don't Let the Sun Go Down On Me",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:35:32Z",
+      "last_seen": "2026-07-13T16:35:32Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Of Monsters and Men",
       "title": "Crystals",
       "text": "Of Monsters and Men — Crystals",
@@ -298,5 +309,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T16:35:30Z"
+  "updated_at": "2026-07-13T16:36:00Z"
 }

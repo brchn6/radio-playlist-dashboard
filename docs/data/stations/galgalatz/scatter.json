@@ -362,9 +362,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "David Broza",
+      "title": "האשה שאיתי",
+      "text": "David Broza — האשה שאיתי",
+      "recognized_at": "2026-07-13T16:35:30Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 33,
-  "returned": 33,
-  "updated_at": "2026-07-13T16:35:30Z"
+  "total": 34,
+  "returned": 34,
+  "updated_at": "2026-07-13T16:36:00Z"
 }

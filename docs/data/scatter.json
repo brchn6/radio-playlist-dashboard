@@ -1858,9 +1858,31 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "David Broza",
+      "title": "האשה שאיתי",
+      "text": "David Broza — האשה שאיתי",
+      "recognized_at": "2026-07-13T16:35:30Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Miley Cyrus",
+      "title": "Don't Let the Sun Go Down On Me",
+      "text": "Miley Cyrus — Don't Let the Sun Go Down On Me",
+      "recognized_at": "2026-07-13T16:35:32Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 169,
-  "returned": 169,
-  "updated_at": "2026-07-13T16:35:30Z"
+  "total": 171,
+  "returned": 171,
+  "updated_at": "2026-07-13T16:36:00Z"
 }

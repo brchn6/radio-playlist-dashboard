@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 247,
+      "station_id": 2,
+      "artist": "David Broza",
+      "title": "האשה שאיתי",
+      "text": "David Broza — האשה שאיתי",
+      "url": "https://www.shazam.com/track/77159124/%D7%94%D7%90%D7%A9%D7%94-%D7%A9%D7%90%D7%99%D7%AA%D7%99",
+      "shazam_key": "77159124",
+      "recognized_at": "2026-07-13T16:35:30Z",
+      "created_at": "2026-07-13 16:36:00",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 241,
       "station_id": 2,
       "artist": "Arctic Monkeys",
@@ -463,6 +477,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 33,
-  "updated_at": "2026-07-13T16:35:30Z"
+  "total": 34,
+  "updated_at": "2026-07-13T16:36:00Z"
 }

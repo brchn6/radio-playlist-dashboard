@@ -45,6 +45,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "David Broza",
+      "title": "האשה שאיתי",
+      "text": "David Broza — האשה שאיתי",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:35:30Z",
+      "last_seen": "2026-07-13T16:35:30Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Ethnix",
       "title": "מתי לחזור",
       "text": "Ethnix — מתי לחזור",
@@ -364,5 +375,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T16:35:30Z"
+  "updated_at": "2026-07-13T16:36:00Z"
 }
