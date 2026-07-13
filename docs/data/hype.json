@@ -89,6 +89,14 @@
       "last_seen": "2026-07-13T12:49:42Z"
     },
     {
+      "artist": "Hachaverim Shel Natasha",
+      "title": "עשי לי את המוות",
+      "text": "Hachaverim Shel Natasha — עשי לי את המוות",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:57:32Z",
+      "last_seen": "2026-07-13T12:57:32Z"
+    },
+    {
       "artist": "JAŸ-Z",
       "title": "Empire State Of Mind (feat. Alicia Keys)",
       "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
@@ -111,6 +119,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T12:51:56Z",
       "last_seen": "2026-07-13T12:51:56Z"
+    },
+    {
+      "artist": "Sash!",
+      "title": "Ecuador (Radio Edit)",
+      "text": "Sash! — Ecuador (Radio Edit)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:57:20Z",
+      "last_seen": "2026-07-13T12:57:20Z"
     },
     {
       "artist": "Stamatis Spanoudakis",
@@ -153,5 +169,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T12:57:12Z"
+  "updated_at": "2026-07-13T12:57:42Z"
 }

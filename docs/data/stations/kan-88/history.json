@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 28,
+      "station_id": 5,
+      "artist": "Hachaverim Shel Natasha",
+      "title": "עשי לי את המוות",
+      "text": "Hachaverim Shel Natasha — עשי לי את המוות",
+      "url": "https://www.shazam.com/track/239156314/%D7%A2%D7%A9%D7%99-%D7%9C%D7%99-%D7%90%D7%AA-%D7%94%D7%9E%D7%95%D7%95%D7%AA",
+      "shazam_key": "239156314",
+      "recognized_at": "2026-07-13T12:57:32Z",
+      "created_at": "2026-07-13 12:57:42",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 24,
       "station_id": 5,
       "artist": "Shlomo Artzi & Rita",
@@ -71,6 +85,6 @@
       "station_color": "#c86ae3"
     }
   ],
-  "total": 5,
-  "updated_at": "2026-07-13T12:57:12Z"
+  "total": 6,
+  "updated_at": "2026-07-13T12:57:42Z"
 }

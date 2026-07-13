@@ -54,9 +54,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Hachaverim Shel Natasha",
+      "title": "עשי לי את המוות",
+      "text": "Hachaverim Shel Natasha — עשי לי את המוות",
+      "recognized_at": "2026-07-13T12:57:32Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 5,
-  "returned": 5,
-  "updated_at": "2026-07-13T12:57:12Z"
+  "total": 6,
+  "returned": 6,
+  "updated_at": "2026-07-13T12:57:42Z"
 }
