@@ -361,6 +361,14 @@
       "last_seen": "2026-07-13T14:11:12Z"
     },
     {
+      "artist": "Sharon Roter",
+      "title": "Arutz Elecha",
+      "text": "Sharon Roter — Arutz Elecha",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:19:13Z",
+      "last_seen": "2026-07-13T14:19:13Z"
+    },
+    {
       "artist": "Sheygets",
       "title": "Hamilim Hachi Yafot (המילים הכי יפות)",
       "text": "Sheygets — Hamilim Hachi Yafot (המילים הכי יפות)",
@@ -465,5 +473,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:18:15Z"
+  "updated_at": "2026-07-13T14:19:15Z"
 }

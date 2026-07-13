@@ -122,6 +122,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Sharon Roter",
+      "title": "Arutz Elecha",
+      "text": "Sharon Roter — Arutz Elecha",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:19:13Z",
+      "last_seen": "2026-07-13T14:19:13Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Soundgarden",
       "title": "Black Hole Sun",
       "text": "Soundgarden — Black Hole Sun",
@@ -133,5 +144,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:18:15Z"
+  "updated_at": "2026-07-13T14:19:15Z"
 }
