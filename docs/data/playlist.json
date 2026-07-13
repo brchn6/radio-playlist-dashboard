@@ -1,13 +1,21 @@
 {
   "current": {
-    "artist": "Boomdabash & Eiffel 65",
-    "title": "Heaven",
-    "text": "Boomdabash & Eiffel 65 — Heaven",
-    "url": "https://www.shazam.com/track/643393581/heaven",
-    "shazam_key": "643393581",
-    "recognized_at": "2026-07-13T11:30:26Z"
+    "artist": "Take That",
+    "title": "It Only Takes a Minute",
+    "text": "Take That — It Only Takes a Minute",
+    "url": "https://www.shazam.com/track/5165269/it-only-takes-a-minute",
+    "shazam_key": "5165269",
+    "recognized_at": "2026-07-13T11:41:55Z"
   },
   "history": [
+    {
+      "artist": "Take That",
+      "title": "It Only Takes a Minute",
+      "text": "Take That — It Only Takes a Minute",
+      "url": "https://www.shazam.com/track/5165269/it-only-takes-a-minute",
+      "shazam_key": "5165269",
+      "recognized_at": "2026-07-13T11:41:55Z"
+    },
     {
       "artist": "Boomdabash & Eiffel 65",
       "title": "Heaven",
@@ -21,20 +29,20 @@
     "running": false,
     "stream_url": "https://radio.streamgates.net/stream/1036kh",
     "sample_seconds": 15,
-    "interval_seconds": 300,
-    "last_started_at": "2026-07-13T11:30:26Z",
-    "last_finished_at": "2026-07-13T11:30:26Z",
-    "last_error": "[Errno 32] Broken pipe",
+    "interval_seconds": 60,
+    "last_started_at": "2026-07-13T11:41:55Z",
+    "last_finished_at": "2026-07-13T11:41:55Z",
+    "last_error": null,
     "last_result": {
       "found": true,
-      "artist": "Boomdabash & Eiffel 65",
-      "title": "Heaven",
-      "text": "Boomdabash & Eiffel 65 — Heaven",
-      "url": "https://www.shazam.com/track/643393581/heaven",
-      "shazam_key": "643393581",
-      "recognized_at": "2026-07-13T11:30:26Z"
+      "artist": "Take That",
+      "title": "It Only Takes a Minute",
+      "text": "Take That — It Only Takes a Minute",
+      "url": "https://www.shazam.com/track/5165269/it-only-takes-a-minute",
+      "shazam_key": "5165269",
+      "recognized_at": "2026-07-13T11:41:55Z"
     }
   },
-  "updated_at": "2026-07-13T11:31:04Z",
-  "total_tracks": 1
+  "updated_at": "2026-07-13T11:42:45Z",
+  "total_tracks": 2
 }

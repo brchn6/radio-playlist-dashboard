@@ -11,7 +11,7 @@ Restart=on-failure
 RestartSec=10
 Environment=POLL_INTERVAL=30
 Environment=PROXY_URL=http://localhost:8765
-# Environment=GIT_PUSH=1  # uncomment to auto-commit and push on every new track
+Environment=GIT_AUTO_PUSH=1
 
 [Install]
 WantedBy=default.target

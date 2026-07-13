@@ -1,0 +1,20 @@
+[Unit]
+Description=ShazamIO Proxy — Kol Hashfela 103FM recognition
+Documentation=https://github.com/brchn6/shazamio-proxy
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/dev/shazamio-proxy/.venv/bin/python %h/dev/shazamio-proxy/shazamio_proxy.py
+WorkingDirectory=%h/dev/shazamio-proxy
+Restart=always
+RestartSec=10
+Environment=SHAZAMIO_HOST=127.0.0.1
+Environment=SHAZAMIO_PORT=8765
+Environment=RADIO_STREAM_URL=https://radio.streamgates.net/stream/1036kh
+Environment=SHAZAMIO_SAMPLE_SECONDS=15
+Environment=SHAZAMIO_INTERVAL_SECONDS=60
+
+[Install]
+WantedBy=default.target
