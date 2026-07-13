@@ -753,6 +753,14 @@
       "last_seen": "2026-07-13T14:02:24Z"
     },
     {
+      "artist": "Spice Girls",
+      "title": "Who Do You Think You Are",
+      "text": "Spice Girls — Who Do You Think You Are",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:08:15Z",
+      "last_seen": "2026-07-13T15:08:15Z"
+    },
+    {
       "artist": "Spooks",
       "title": "Things I've Seen",
       "text": "Spooks — Things I've Seen",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:44:41Z",
       "last_seen": "2026-07-13T13:44:41Z"
-    },
-    {
-      "artist": "Taylor Swift",
-      "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
-      "text": "Taylor Swift — I Knew It, I Knew You (From \"Toy Story 5\")",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:24:31Z",
-      "last_seen": "2026-07-13T14:24:31Z"
     }
   ],
-  "updated_at": "2026-07-13T15:07:15Z"
+  "updated_at": "2026-07-13T15:08:15Z"
 }
