@@ -609,6 +609,14 @@
       "last_seen": "2026-07-13T16:51:59Z"
     },
     {
+      "artist": "Harry Styles",
+      "title": "As It Was",
+      "text": "Harry Styles — As It Was",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:55:10Z",
+      "last_seen": "2026-07-13T16:55:10Z"
+    },
+    {
       "artist": "Hila Ruach",
       "title": "אולי זה נגמר",
       "text": "Hila Ruach — אולי זה נגמר",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:05:34Z",
       "last_seen": "2026-07-13T15:05:34Z"
-    },
-    {
-      "artist": "Madonna",
-      "title": "Secret",
-      "text": "Madonna — Secret",
-      "play_count": 1,
-      "first_seen": "2026-07-13T16:36:30Z",
-      "last_seen": "2026-07-13T16:36:30Z"
     }
   ],
-  "updated_at": "2026-07-13T16:54:51Z"
+  "updated_at": "2026-07-13T16:55:41Z"
 }
