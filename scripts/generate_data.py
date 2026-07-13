@@ -2,25 +2,62 @@
 """
 Generate static JSON data from SQLite for GitHub Pages — Multi-station.
 
-Writes per-station and aggregated JSON files to docs/data/.
+All aggregates are precomputed here so the dashboard payload stays bounded
+no matter how large the database grows. Hour-of-day aggregates use Israel
+local time (Asia/Jerusalem); raw timestamps stay UTC ISO.
+
+Files written to docs/data/:
+  stations.json        station registry
+  current.json         latest track per station
+  stats.json           headline stats (only file carrying updated_at)
+  history.json         most recent HISTORY_LIMIT tracks
+  top.json             top artists/songs per time window, with prev-window counts
+  timeline.json        compact points for the last TIMELINE_HOURS
+  heatmap.json         station×hour (7d) and day-of-week×hour (30d) matrices
+  trends.json          daily activity, discovery rate, rising artists
+  cross_station.json   songs heard on 2+ stations
+  stations/<slug>/current.json, history.json
 """
 
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
-from db import PlaylistDB, STATIONS_CONFIG
+from db import PlaylistDB
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
 DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
 
+IL_TZ = ZoneInfo("Asia/Jerusalem")
+
+HISTORY_LIMIT = 1000          # global history entries served to the page
+STATION_HISTORY_LIMIT = 300   # per-station history entries
+TIMELINE_HOURS = 48
+TOP_LIMIT = 50                # per window; client re-ranks for station filter
+TOP_WINDOWS = [("1h", 1), ("24h", 24), ("7d", 168), ("30d", 720), ("all", None)]
+HEATMAP_STATION_DAYS = 7
+HEATMAP_DOW_DAYS = 30
+TRENDS_DAYS = 30
+RISING_MIN_PLAYS = 3
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def parse_utc(ts: str) -> datetime | None:
+    if not ts:
+        return None
+    try:
+        return datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(timezone.utc)
+    except ValueError:
+        return None
 
 
 def safe_json(obj: Any) -> Any:
@@ -33,126 +70,220 @@ def safe_json(obj: Any) -> Any:
     return str(obj)
 
 
+def write_json(path: Path, payload: Any, sizes: dict[str, int], rel: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(safe_json(payload), ensure_ascii=False, separators=(",", ":")) + "\n",
+        "utf-8",
+    )
+    sizes[rel] = path.stat().st_size
+
+
+def song_key(t: dict[str, Any]) -> str:
+    return (t["artist"] or "").lower() + "|" + (t["title"] or "").lower()
+
+
+def build_top(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
+    """Top artists/songs per window with previous-window counts for trend arrows."""
+    windows: dict[str, Any] = {}
+    for name, hours in TOP_WINDOWS:
+        if hours is None:
+            cur = tracks
+            prev: list[dict[str, Any]] = []
+        else:
+            cutoff = now - timedelta(hours=hours)
+            prev_cutoff = now - timedelta(hours=2 * hours)
+            cur = [t for t in tracks if t["_dt"] >= cutoff]
+            prev = [t for t in tracks if prev_cutoff <= t["_dt"] < cutoff]
+
+        def tally(items: list[dict[str, Any]], by_song: bool) -> dict[str, dict[str, Any]]:
+            acc: dict[str, dict[str, Any]] = {}
+            for t in items:
+                key = song_key(t) if by_song else (t["artist"] or "").lower()
+                e = acc.setdefault(key, {
+                    "artist": t["artist"], "count": 0, "stations": defaultdict(int),
+                    **({"title": t["title"]} if by_song else {}),
+                })
+                e["count"] += 1
+                e["stations"][t["station_slug"]] += 1
+            return acc
+
+        cur_a, prev_a = tally(cur, False), tally(prev, False)
+        cur_s, prev_s = tally(cur, True), tally(prev, True)
+
+        def finalize(cur_map, prev_map):
+            out = []
+            for key, e in sorted(cur_map.items(), key=lambda kv: -kv[1]["count"])[:TOP_LIMIT]:
+                e["stations"] = dict(e["stations"])
+                e["prev"] = prev_map.get(key, {}).get("count", 0)
+                out.append(e)
+            return out
+
+        windows[name] = {
+            "artists": finalize(cur_a, prev_a),
+            "songs": finalize(cur_s, prev_s),
+            "total_plays": len(cur),
+        }
+    return windows
+
+
+def build_heatmap(tracks: list[dict[str, Any]], slugs: list[str], now: datetime) -> dict[str, Any]:
+    station_cutoff = now - timedelta(days=HEATMAP_STATION_DAYS)
+    dow_cutoff = now - timedelta(days=HEATMAP_DOW_DAYS)
+
+    station_hour = {s: [0] * 24 for s in slugs}
+    dow_hour = [[0] * 24 for _ in range(7)]  # 0 = Sunday (Israeli week)
+
+    for t in tracks:
+        il = t["_il"]
+        if t["_dt"] >= station_cutoff and t["station_slug"] in station_hour:
+            station_hour[t["station_slug"]][il.hour] += 1
+        if t["_dt"] >= dow_cutoff:
+            dow_hour[(il.weekday() + 1) % 7][il.hour] += 1
+
+    return {
+        "tz": "Asia/Jerusalem",
+        "station_hour": {"days": HEATMAP_STATION_DAYS, "matrix": station_hour},
+        "dow_hour": {"days": HEATMAP_DOW_DAYS, "matrix": dow_hour,
+                     "day_order": "sunday_first"},
+    }
+
+
+def build_trends(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
+    # first-seen date (IL) per song across the whole dataset, for discovery rate
+    first_seen: dict[str, str] = {}
+    for t in sorted(tracks, key=lambda x: x["_dt"]):
+        first_seen.setdefault(song_key(t), t["_il"].strftime("%Y-%m-%d"))
+
+    daily: dict[str, dict[str, Any]] = {}
+    cutoff = now - timedelta(days=TRENDS_DAYS)
+    for t in tracks:
+        if t["_dt"] < cutoff:
+            continue
+        date = t["_il"].strftime("%Y-%m-%d")
+        d = daily.setdefault(date, {"date": date, "total": 0,
+                                    "stations": defaultdict(int), "songs": set(), "new_songs": 0})
+        d["total"] += 1
+        d["stations"][t["station_slug"]] += 1
+        key = song_key(t)
+        if key not in d["songs"]:
+            d["songs"].add(key)
+            if first_seen.get(key) == date:
+                d["new_songs"] += 1
+
+    daily_out = []
+    for date in sorted(daily):
+        d = daily[date]
+        daily_out.append({
+            "date": date, "total": d["total"], "stations": dict(d["stations"]),
+            "unique_songs": len(d["songs"]), "new_songs": d["new_songs"],
+        })
+
+    # rising artists: last 7d vs the 7d before
+    week_ago = now - timedelta(days=7)
+    two_weeks_ago = now - timedelta(days=14)
+    cur_counts: dict[str, dict[str, Any]] = {}
+    prev_counts: dict[str, int] = defaultdict(int)
+    for t in tracks:
+        key = (t["artist"] or "").lower()
+        if t["_dt"] >= week_ago:
+            e = cur_counts.setdefault(key, {"artist": t["artist"], "count": 0})
+            e["count"] += 1
+        elif t["_dt"] >= two_weeks_ago:
+            prev_counts[key] += 1
+
+    rising = []
+    for key, e in cur_counts.items():
+        if e["count"] < RISING_MIN_PLAYS:
+            continue
+        prev = prev_counts.get(key, 0)
+        rising.append({"artist": e["artist"], "count": e["count"], "prev": prev,
+                       "delta": e["count"] - prev})
+    rising.sort(key=lambda r: (-r["delta"], -r["count"]))
+
+    return {"days": TRENDS_DAYS, "daily": daily_out, "rising_artists": rising[:15]}
+
+
 def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     output_dir.mkdir(parents=True, exist_ok=True)
     db = PlaylistDB(DB_PATH)
     stations = db.get_stations()
+    slugs = [s["slug"] for s in stations]
     total_count = db.get_all_tracks_count()
+    now = datetime.now(timezone.utc)
     sizes: dict[str, int] = {}
 
-    # ── stations metadata ──
-    stations_meta = safe_json(stations)
-    (output_dir / "stations.json").write_text(
-        json.dumps(stations_meta, ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["stations.json"] = (output_dir / "stations.json").stat().st_size
+    # one pass over all tracks (newest first), annotated with parsed datetimes
+    tracks = db.get_history(limit=total_count or 1)
+    annotated = []
+    for t in tracks:
+        dt = parse_utc(t["recognized_at"])
+        if dt is None:
+            continue
+        t["_dt"] = dt
+        t["_il"] = dt.astimezone(IL_TZ)
+        annotated.append(t)
+    tracks = annotated
 
-    # ── current.json — latest track per station ──
-    currents = safe_json(db.get_all_current_tracks())
-    (output_dir / "current.json").write_text(
-        json.dumps(currents, ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["current.json"] = (output_dir / "current.json").stat().st_size
+    def public(t: dict[str, Any]) -> dict[str, Any]:
+        return {k: v for k, v in t.items() if not k.startswith("_")}
 
-    # ── history.json — all tracks ──
-    all_history = safe_json(db.get_history(limit=total_count or 20000))
-    (output_dir / "history.json").write_text(
-        json.dumps({
-            "history": all_history,
-            "total": total_count,
-            "returned": len(all_history),
-            "updated_at": now_iso(),
-        }, ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["history.json"] = (output_dir / "history.json").stat().st_size
+    write_json(output_dir / "stations.json", stations, sizes, "stations.json")
+    write_json(output_dir / "current.json", db.get_all_current_tracks(), sizes, "current.json")
 
-    # ── hype.json — most played across all stations ──
-    hype = safe_json(db.get_hype_tracks(limit=100))
-    (output_dir / "hype.json").write_text(
-        json.dumps({"tracks": hype, "updated_at": now_iso()},
-                   ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["hype.json"] = (output_dir / "hype.json").stat().st_size
+    write_json(output_dir / "history.json", {
+        "history": [public(t) for t in tracks[:HISTORY_LIMIT]],
+        "total": total_count,
+        "returned": min(len(tracks), HISTORY_LIMIT),
+    }, sizes, "history.json")
 
-    # ── scatter.json — all points ──
-    scatter = safe_json(db.get_scatter_data())
-    (output_dir / "scatter.json").write_text(
-        json.dumps({"points": scatter, "total": len(scatter), "returned": len(scatter),
-                    "updated_at": now_iso()},
-                   ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["scatter.json"] = (output_dir / "scatter.json").stat().st_size
+    write_json(output_dir / "top.json", {"windows": build_top(tracks, now)}, sizes, "top.json")
 
-    # ── stats.json ──
-    stats = safe_json(db.get_stats())
-    stats["tracks_by_date"] = safe_json(db.get_track_count_by_date())
+    tl_cutoff = now - timedelta(hours=TIMELINE_HOURS)
+    write_json(output_dir / "timeline.json", {
+        "hours": TIMELINE_HOURS,
+        "points": [{"a": t["artist"], "t": t["title"], "s": t["station_slug"],
+                    "ts": t["recognized_at"]}
+                   for t in tracks if t["_dt"] >= tl_cutoff],
+    }, sizes, "timeline.json")
+
+    write_json(output_dir / "heatmap.json", build_heatmap(tracks, slugs, now), sizes, "heatmap.json")
+    write_json(output_dir / "trends.json", build_trends(tracks, now), sizes, "trends.json")
+    write_json(output_dir / "cross_station.json",
+               {"tracks": db.get_cross_station_tracks()}, sizes, "cross_station.json")
+
+    # headline stats — the only file that always changes (updated_at heartbeat)
+    stats = db.get_stats()
+    stats["tracks_by_date"] = db.get_track_count_by_date()
+    today = now.astimezone(IL_TZ).strftime("%Y-%m-%d")
+    today_tracks = [t for t in tracks if t["_il"].strftime("%Y-%m-%d") == today]
+    hour_counts = [0] * 24
+    for t in tracks:
+        hour_counts[t["_il"].hour] += 1
+    station_today = defaultdict(int)
+    for t in today_tracks:
+        station_today[t["station_slug"]] += 1
+    stats["tracks_today"] = len(today_tracks)
+    stats["busiest_hour"] = hour_counts.index(max(hour_counts)) if tracks else None
+    stats["most_active_station_today"] = (
+        max(station_today, key=station_today.get) if station_today else None)
     stats["updated_at"] = now_iso()
-    (output_dir / "stats.json").write_text(
-        json.dumps(stats, ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["stats.json"] = (output_dir / "stats.json").stat().st_size
+    write_json(output_dir / "stats.json", stats, sizes, "stats.json")
 
-    # ── cross_station.json — tracks heard on multiple stations ──
-    cross = safe_json(db.get_cross_station_tracks())
-    (output_dir / "cross_station.json").write_text(
-        json.dumps({"tracks": cross, "updated_at": now_iso()},
-                   ensure_ascii=False, indent=2) + "\n", "utf-8"
-    )
-    sizes["cross_station.json"] = (output_dir / "cross_station.json").stat().st_size
-
-    # ── per-station JSON ──
-    stations_dir = output_dir / "stations"
-    stations_dir.mkdir(exist_ok=True)
-
+    # per-station files
+    by_station: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for t in tracks:
+        by_station[t["station_slug"]].append(t)
     for s in stations:
-        sid = s["id"]
-        slug = s["slug"]
-        sdir = stations_dir / slug
-        sdir.mkdir(exist_ok=True)
-
-        # Station current
-        latest = db.get_latest_track(station_id=sid)
-        (sdir / "current.json").write_text(
-            json.dumps(safe_json(latest), ensure_ascii=False, indent=2) + "\n", "utf-8"
-        )
-        sizes[f"stations/{slug}/current.json"] = (sdir / "current.json").stat().st_size
-
-        # Station history
-        s_history = safe_json(db.get_history(station_id=sid, limit=total_count or 20000))
-        (sdir / "history.json").write_text(
-            json.dumps({
-                "history": s_history,
-                "total": len(s_history),
-                "updated_at": now_iso(),
-            }, ensure_ascii=False, indent=2) + "\n", "utf-8"
-        )
-        sizes[f"stations/{slug}/history.json"] = (sdir / "history.json").stat().st_size
-
-        # Station hype
-        s_hype = safe_json(db.get_hype_tracks(station_id=sid, limit=50))
-        (sdir / "hype.json").write_text(
-            json.dumps({"tracks": s_hype, "updated_at": now_iso()},
-                       ensure_ascii=False, indent=2) + "\n", "utf-8"
-        )
-        sizes[f"stations/{slug}/hype.json"] = (sdir / "hype.json").stat().st_size
-
-        # Station scatter
-        s_scatter = safe_json(db.get_scatter_data(station_id=sid))
-        (sdir / "scatter.json").write_text(
-            json.dumps({"points": s_scatter, "total": len(s_scatter),
-                        "returned": len(s_scatter), "updated_at": now_iso()},
-                       ensure_ascii=False, indent=2) + "\n", "utf-8"
-        )
-        sizes[f"stations/{slug}/scatter.json"] = (sdir / "scatter.json").stat().st_size
-
-        # Station stats
-        s_stats = safe_json(db.get_stats(station_id=sid))
-        s_stats["tracks_by_date"] = safe_json(db.get_track_count_by_date(station_id=sid))
-        s_stats["updated_at"] = now_iso()
-        (sdir / "stats.json").write_text(
-            json.dumps(s_stats, ensure_ascii=False, indent=2) + "\n", "utf-8"
-        )
-        sizes[f"stations/{slug}/stats.json"] = (sdir / "stats.json").stat().st_size
+        sdir = output_dir / "stations" / s["slug"]
+        s_tracks = by_station.get(s["slug"], [])
+        write_json(sdir / "current.json",
+                   public(s_tracks[0]) if s_tracks else None,
+                   sizes, f"stations/{s['slug']}/current.json")
+        write_json(sdir / "history.json", {
+            "history": [public(t) for t in s_tracks[:STATION_HISTORY_LIMIT]],
+            "total": len(s_tracks),
+        }, sizes, f"stations/{s['slug']}/history.json")
 
     db.close()
     return sizes
@@ -160,12 +291,10 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
 
 def main() -> None:
     sizes = generate_all()
-    total = sum(sizes.values())
     print(json.dumps({
         "event": "data_generated",
-        "stations": len([k for k in sizes if k.endswith("current.json")]) - 1,
         "files": len(sizes),
-        "total_bytes": total,
+        "total_bytes": sum(sizes.values()),
     }), flush=True)
 
 
