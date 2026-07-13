@@ -34,6 +34,7 @@ DEFAULT_INTERVAL = 30
 DEFAULT_GIT_AUTO_PUSH = os.environ.get("GIT_AUTO_PUSH", "").lower() in ("1", "true", "yes")
 RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
 CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll
+DEPLOY_INTERVAL = int(os.environ.get("DEPLOY_INTERVAL", "30"))  # every 15 min at 30s poll (30 cycles)
 
 running = True
 
@@ -79,7 +80,7 @@ def git_commit_and_push(message: str) -> None:
 
         subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=15)
         subprocess.run(
-            ["git", "commit", "-m", message],
+            ["git", "commit", "-m", f"{message} [skip ci]"],
             check=True, capture_output=True, timeout=15,
         )
         subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True, timeout=30)
@@ -95,11 +96,27 @@ def git_commit_and_push(message: str) -> None:
         else:
             subprocess.run(["git", "push"], check=True, capture_output=True, timeout=60)
 
-        print(f"[updater] Git push: {message}", flush=True)
+        print(f"[updater] Git push: {message} [skip ci]", flush=True)
     except subprocess.TimeoutExpired:
         print("[updater] Git push timed out", flush=True)
     except subprocess.CalledProcessError as exc:
         print(f"[updater] Git error: {exc}", flush=True)
+
+
+# ── pages deployment ──────────────────────────────────────────────────
+
+DEPLOY_CMD = ["gh", "api", "-X", "POST", "/repos/brchn6/radio-playlist-dashboard/pages/builds"]
+
+def deploy_pages() -> None:
+    """Trigger a GitHub Pages build via the API (no Actions minutes used)."""
+    try:
+        result = subprocess.run(DEPLOY_CMD, capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            print(f"[updater] Pages deploy triggered: {result.stdout.strip()}", flush=True)
+        else:
+            print(f"[updater] Pages deploy failed: {result.stderr.strip()}", flush=True)
+    except Exception as e:
+        print(f"[updater] Pages deploy error: {e}", flush=True)
 
 
 # ── data generation ────────────────────────────────────────────────────
@@ -242,6 +259,10 @@ def main() -> None:
                 generate_static_data()
                 if DEFAULT_GIT_AUTO_PUSH:
                     git_commit_and_push(f"auto: cleanup {deleted} old tracks [{now_iso()}]")
+
+        # ── Periodic Pages deploy ──
+        if iteration % DEPLOY_INTERVAL == 0:
+            deploy_pages()
 
         if args.once:
             break
