@@ -1308,9 +1308,31 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Madonna",
+      "title": "Express Yourself",
+      "text": "Madonna — Express Yourself",
+      "recognized_at": "2026-07-13T15:05:34Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Marvin Gaye & Tammi Terrell",
+      "title": "Ain't No Mountain High Enough",
+      "text": "Marvin Gaye & Tammi Terrell — Ain't No Mountain High Enough",
+      "recognized_at": "2026-07-13T15:05:37Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 119,
-  "returned": 119,
-  "updated_at": "2026-07-13T15:05:15Z"
+  "total": 121,
+  "returned": 121,
+  "updated_at": "2026-07-13T15:05:45Z"
 }

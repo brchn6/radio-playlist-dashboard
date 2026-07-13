@@ -263,9 +263,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Madonna",
+      "title": "Express Yourself",
+      "text": "Madonna — Express Yourself",
+      "recognized_at": "2026-07-13T15:05:34Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 24,
-  "returned": 24,
-  "updated_at": "2026-07-13T15:05:15Z"
+  "total": 25,
+  "returned": 25,
+  "updated_at": "2026-07-13T15:05:45Z"
 }
