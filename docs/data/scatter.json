@@ -2639,9 +2639,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Teapacks",
+      "title": "מה עשית",
+      "text": "Teapacks — מה עשית",
+      "recognized_at": "2026-07-13T17:22:25Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Jacob Banks & Louis The Child",
+      "title": "Diddy Bop",
+      "text": "Jacob Banks & Louis The Child — Diddy Bop",
+      "recognized_at": "2026-07-13T17:22:30Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 240,
-  "returned": 240,
-  "updated_at": "2026-07-13T17:22:09Z"
+  "total": 242,
+  "returned": 242,
+  "updated_at": "2026-07-13T17:22:39Z"
 }

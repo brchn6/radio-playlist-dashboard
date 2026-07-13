@@ -144,6 +144,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Jacob Banks & Louis The Child",
+      "title": "Diddy Bop",
+      "text": "Jacob Banks & Louis The Child — Diddy Bop",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:22:30Z",
+      "last_seen": "2026-07-13T17:22:30Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Jasmin Moallem",
       "title": "יהיה טוב",
       "text": "Jasmin Moallem — יהיה טוב",
@@ -452,5 +463,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:22:09Z"
+  "updated_at": "2026-07-13T17:22:39Z"
 }

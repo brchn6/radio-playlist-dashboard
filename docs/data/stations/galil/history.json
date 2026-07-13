@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 319,
+      "station_id": 7,
+      "artist": "Jacob Banks & Louis The Child",
+      "title": "Diddy Bop",
+      "text": "Jacob Banks & Louis The Child — Diddy Bop",
+      "url": "https://www.shazam.com/track/403467499/diddy-bop",
+      "shazam_key": "403467499",
+      "recognized_at": "2026-07-13T17:22:30Z",
+      "created_at": "2026-07-13 17:22:39",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 314,
       "station_id": 7,
       "artist": "Cat Stevens",
@@ -575,6 +589,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 41,
-  "updated_at": "2026-07-13T17:22:09Z"
+  "total": 42,
+  "updated_at": "2026-07-13T17:22:39Z"
 }
