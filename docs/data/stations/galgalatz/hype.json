@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Arctic Monkeys",
+      "title": "Fluorescent Adolescent",
+      "text": "Arctic Monkeys — Fluorescent Adolescent",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:45:59Z",
+      "last_seen": "2026-07-13T15:45:59Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Aretha Franklin",
       "title": "Chain of Fools",
       "text": "Aretha Franklin — Chain of Fools",
@@ -353,5 +364,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T15:45:55Z"
+  "updated_at": "2026-07-13T15:46:28Z"
 }

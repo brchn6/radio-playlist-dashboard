@@ -97,6 +97,14 @@
       "last_seen": "2026-07-13T14:10:51Z"
     },
     {
+      "artist": "Arctic Monkeys",
+      "title": "Fluorescent Adolescent",
+      "text": "Arctic Monkeys — Fluorescent Adolescent",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:45:59Z",
+      "last_seen": "2026-07-13T15:45:59Z"
+    },
+    {
       "artist": "Aretha Franklin",
       "title": "Chain of Fools",
       "text": "Aretha Franklin — Chain of Fools",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:44:59Z",
       "last_seen": "2026-07-13T14:44:59Z"
-    },
-    {
-      "artist": "Peter Schilling",
-      "title": "Major Tom (Völlig losgelöst)",
-      "text": "Peter Schilling — Major Tom (Völlig losgelöst)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:45:33Z",
-      "last_seen": "2026-07-13T15:45:33Z"
     }
   ],
-  "updated_at": "2026-07-13T15:45:55Z"
+  "updated_at": "2026-07-13T15:46:28Z"
 }
