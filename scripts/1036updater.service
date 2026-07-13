@@ -1,0 +1,17 @@
+[Unit]
+Description=1036 Playlist Dashboard — Updater Daemon
+Documentation=https://github.com/brchn6/1036playlistdashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/dev/1036playlistdashboard/scripts/updater.py
+Restart=on-failure
+RestartSec=10
+Environment=POLL_INTERVAL=30
+Environment=PROXY_URL=http://localhost:8765
+# Environment=GIT_PUSH=1  # uncomment to auto-commit and push on every new track
+
+[Install]
+WantedBy=default.target

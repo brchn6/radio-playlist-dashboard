@@ -1,0 +1,2 @@
+# No extra dependencies needed for the updater (uses stdlib only)
+# The shazamio-proxy has its own requirements.

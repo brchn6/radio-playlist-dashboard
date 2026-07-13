@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="1036 פלייליסט דשבורד — מעקב אחרי הפלייליסט של קול השפלה 103FM" />
+  <title>1036 פלייליסט דשבורד — קול השפלה 103FM</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --fg: #eaeaf0;
+      --muted: #b6b6c8;
+      --accent: #6ae3c1;
+      --accent-dim: #3a8a7a;
+      --card: #181b2e;
+      --card-hover: #1f2440;
+      --border: #262a4a;
+      --error: #e36a6a;
+      --success: #6ae3c1;
+      --font: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: linear-gradient(180deg, #0f1220, #0a0c17);
+      color: var(--fg);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+
+    header {
+      text-align: center;
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+
+    header h1 .accent {
+      color: var(--accent);
+    }
+
+    header h1 .freq {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    header .status-bar {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.online {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .status-dot.offline {
+      background: var(--error);
+      box-shadow: 0 0 8px var(--error);
+      animation: none;
+    }
+
+    .status-dot.stale {
+      background: #e3c86a;
+      box-shadow: 0 0 8px #e3c86a;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .now-playing {
+      margin: 32px 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .now-playing.has-track {
+      border-color: var(--accent-dim);
+      background: linear-gradient(180deg, #1a2e28, var(--card));
+    }
+
+    .now-playing .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .now-playing .track-artist {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .now-playing .track-title {
+      font-size: 1.3rem;
+      color: var(--fg);
+      margin-bottom: 12px;
+    }
+
+    .now-playing .track-time {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .now-playing .empty-state {
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .now-playing .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+
+    .history-section {
+      margin-top: 32px;
+    }
+
+    .history-section h2 {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .history-item:hover {
+      background: var(--card-hover);
+    }
+
+    .history-item .rank {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .history-item .rank.current {
+      background: var(--accent-dim);
+      color: var(--fg);
+    }
+
+    .history-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-item .info .artist {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .history-item .info .title {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .history-item .time {
+      font-size: 0.75rem;
+      color: var(--muted);
+      flex-shrink: 0;
+      direction: ltr;
+    }
+
+    .shazam-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--accent);
+      background: rgba(106, 227, 193, 0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .shazam-link:hover {
+      background: rgba(106, 227, 193, 0.2);
+      text-decoration: none;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .stat-card .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0 24px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.5rem; }
+      .now-playing .track-artist { font-size: 1.3rem; }
+      .now-playing .track-title { font-size: 1.1rem; }
+      .now-playing { padding: 24px 16px; }
+      .history-item { padding: 12px 14px; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎧 <span class="freq">1036</span> פלייליסט דשבורד</h1>
+      <p>מעקב שירים אוטומטי — רדיו קול השפלה 103FM</p>
+      <div class="status-bar">
+        <span class="status-dot offline" id="statusDot"></span>
+        <span id="statusText">מתחבר...</span>
+        <span style="margin:0 8px">·</span>
+        <span>עדכון אחרון:</span>
+        <span id="lastUpdate">-</span>
+      </div>
+    </header>
+
+    <div class="now-playing" id="nowPlaying">
+      <div class="empty-state">
+        <div class="icon">📻</div>
+        <div>ממתין לזיהוי השיר הבא...</div>
+      </div>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="history-section">
+      <h2>📋 היסטוריית השמעה</h2>
+      <div class="history-list" id="historyList">
+        <div style="color:var(--muted); text-align:center; padding:24px;">
+          טוען היסטוריה...
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        מופעל על ידי <a href="https://github.com/brchn6/shazamio-proxy" target="_blank">ShazamIO Proxy</a>
+        · <a href="https://1036kh.com" target="_blank">קול השפלה 103FM</a>
+        · <a href="https://github.com/brchn6/1036playlistdashboard" target="_blank">קוד מקור</a>
+      </p>
+      <p style="margin-top:4px;">🤖 מתעדכן כל 30 שניות</p>
+    </footer>
+  </div>
+
+  <script>
+    const SHAZAMIO_URL = 'http://localhost:8765';
+    const DATA_URL = 'data/playlist.json';
+    const POLL_INTERVAL = 30000;
+
+    function timeAgo(isoStr) {
+      if (!isoStr) return '-';
+      const then = new Date(isoStr + 'Z');
+      const now = new Date();
+      const diffSec = Math.floor((now - then) / 1000);
+      if (diffSec < 5) return 'עכשיו';
+      if (diffSec < 60) return `לפני ${diffSec} שניות`;
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `לפני ${diffMin} דקות`;
+      return then.toLocaleString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatTime(isoStr) {
+      if (!isoStr) return '-';
+      const d = new Date(isoStr + 'Z');
+      return d.toLocaleString('he-IL', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+    }
+
+    function updateStatus(state) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const update = document.getElementById('lastUpdate');
+
+      if (!state) {
+        dot.className = 'status-dot offline';
+        text.textContent = 'לא זמין';
+        update.textContent = '-';
+        return;
+      }
+
+      const now = new Date();
+      const lastFinished = state.last_finished_at ? new Date(state.last_finished_at + 'Z') : null;
+      const diffSec = lastFinished ? (now - lastFinished) / 1000 : Infinity;
+
+      let statusClass = 'online';
+      let statusText = 'מחובר';
+
+      if (state.last_error && (!lastFinished || diffSec > 120)) {
+        statusClass = 'offline';
+        statusText = 'שגיאה';
+      } else if (diffSec > 90) {
+        statusClass = 'stale';
+        statusText = 'ממתין לנתונים';
+      }
+
+      dot.className = 'status-dot ' + statusClass;
+      text.textContent = statusText;
+      update.textContent = lastFinished ? formatTime(state.last_finished_at) : '-';
+    }
+
+    function renderNowPlaying(track) {
+      const el = document.getElementById('nowPlaying');
+      if (!track || (!track.artist && !track.title)) {
+        el.className = 'now-playing';
+        el.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📻</div>
+            <div>ממתין לזיהוי השיר הבא...</div>
+          </div>
+        `;
+        return;
+      }
+
+      let shazamHtml = '';
+      if (track.url) {
+        shazamHtml = `<a href="${escapeHtml(track.url)}" target="_blank" class="shazam-link">🔍 צפה ב-Shazam</a>`;
+      }
+
+      el.className = 'now-playing has-track';
+      el.innerHTML = `
+        <div class="label">🎵 מתנגן עכשיו</div>
+        <div class="track-artist">${escapeHtml(track.artist || '')}</div>
+        <div class="track-title">${escapeHtml(track.title || '')}</div>
+        <div class="track-time">זוהה ${timeAgo(track.recognized_at)}</div>
+        ${shazamHtml}
+      `;
+    }
+
+    function renderStats(history) {
+      const el = document.getElementById('statsRow');
+      if (!history || history.length === 0) {
+        el.innerHTML = '';
+        return;
+      }
+      const uniqueArtists = new Set(history.map(t => t.artist).filter(Boolean));
+      el.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${history.length}</div>
+          <div class="stat-label">שירים שזוהו</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${uniqueArtists.size}</div>
+          <div class="stat-label">אמנים שונים</div>
+        </div>
+      `;
+    }
+
+    function renderHistory(history) {
+      const el = document.getElementById('historyList');
+      if (!history || history.length === 0) {
+        el.innerHTML = '<div style="color:var(--muted); text-align:center; padding:24px;">אין היסטוריה עדיין</div>';
+        return;
+      }
+
+      el.innerHTML = history.map((item, i) => {
+        const isCurrent = i === 0;
+        return `
+          <div class="history-item">
+            <div class="rank ${isCurrent ? 'current' : ''}">${isCurrent ? '♪' : (i + 1)}</div>
+            <div class="info">
+              <div class="artist">${escapeHtml(item.artist || 'לא ידוע')}</div>
+              <div class="title">${escapeHtml(item.title || '')}</div>
+            </div>
+            <div class="time">${timeAgo(item.recognized_at)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function fetchPlaylist() {
+      try {
+        const resp = await fetch(DATA_URL + '?_=' + Date.now());
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        renderNowPlaying(data.current);
+        renderHistory(data.history || []);
+        renderStats(data.history || []);
+        updateStatus(data.proxy_state || null);
+      } catch (err) {
+        console.warn('Failed to fetch playlist.json, trying proxy directly:', err);
+        try {
+          const proxyResp = await fetch(SHAZAMIO_URL + '/current?_=' + Date.now());
+          if (proxyResp.ok) {
+            const proxyData = await proxyResp.json();
+            updateStatus(proxyData);
+            if (proxyData.last_result && proxyData.last_result.found) {
+              renderNowPlaying(proxyData.last_result);
+            }
+          }
+        } catch (e) {
+          document.getElementById('statusDot').className = 'status-dot offline';
+          document.getElementById('statusText').textContent = 'לא מחובר';
+        }
+      }
+    }
+
+    fetchPlaylist();
+    setInterval(fetchPlaylist, POLL_INTERVAL);
+  </script>
+</body>
+</html>
