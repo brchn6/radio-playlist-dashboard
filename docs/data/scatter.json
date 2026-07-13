@@ -2573,9 +2573,20 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Greg Kihn Band",
+      "title": "Jeopardy",
+      "text": "Greg Kihn Band — Jeopardy",
+      "recognized_at": "2026-07-13T17:17:19Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 234,
-  "returned": 234,
-  "updated_at": "2026-07-13T17:17:09Z"
+  "total": 235,
+  "returned": 235,
+  "updated_at": "2026-07-13T17:17:39Z"
 }

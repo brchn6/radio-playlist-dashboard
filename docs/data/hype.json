@@ -641,6 +641,14 @@
       "last_seen": "2026-07-13T17:14:15Z"
     },
     {
+      "artist": "Greg Kihn Band",
+      "title": "Jeopardy",
+      "text": "Greg Kihn Band — Jeopardy",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:17:19Z",
+      "last_seen": "2026-07-13T17:17:19Z"
+    },
+    {
       "artist": "Ha'Eivrit",
       "title": "Mesibat Kita",
       "text": "Ha'Eivrit — Mesibat Kita",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:21:32Z",
       "last_seen": "2026-07-13T15:21:32Z"
-    },
-    {
-      "artist": "Keb' Mo'",
-      "title": "Hand It Over (feat. Soweto Gospel Choir)",
-      "text": "Keb' Mo' — Hand It Over (feat. Soweto Gospel Choir)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T17:03:44Z",
-      "last_seen": "2026-07-13T17:03:44Z"
     }
   ],
-  "updated_at": "2026-07-13T17:17:09Z"
+  "updated_at": "2026-07-13T17:17:39Z"
 }
