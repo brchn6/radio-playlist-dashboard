@@ -736,9 +736,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Taylor Swift",
+      "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+      "text": "Taylor Swift — I Knew It, I Knew You (From \"Toy Story 5\")",
+      "recognized_at": "2026-07-13T14:24:31Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Rolling Stones",
+      "title": "Paint It, Black",
+      "text": "The Rolling Stones — Paint It, Black",
+      "recognized_at": "2026-07-13T14:24:45Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 67,
-  "returned": 67,
-  "updated_at": "2026-07-13T14:23:45Z"
+  "total": 69,
+  "returned": 69,
+  "updated_at": "2026-07-13T14:24:45Z"
 }
