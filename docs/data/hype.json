@@ -497,6 +497,14 @@
       "last_seen": "2026-07-13T13:36:40Z"
     },
     {
+      "artist": "Electric Light Orchestra",
+      "title": "Telephone Line",
+      "text": "Electric Light Orchestra — Telephone Line",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:11:16Z",
+      "last_seen": "2026-07-13T17:11:16Z"
+    },
+    {
       "artist": "Ella Langley",
       "title": "Choosin' Texas",
       "text": "Ella Langley — Choosin' Texas",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:43:00Z",
       "last_seen": "2026-07-13T14:43:00Z"
-    },
-    {
-      "artist": "Kylie Minogue",
-      "title": "Some Kind of Bliss",
-      "text": "Kylie Minogue — Some Kind of Bliss",
-      "play_count": 1,
-      "first_seen": "2026-07-13T15:33:04Z",
-      "last_seen": "2026-07-13T15:33:04Z"
     }
   ],
-  "updated_at": "2026-07-13T17:11:09Z"
+  "updated_at": "2026-07-13T17:11:39Z"
 }

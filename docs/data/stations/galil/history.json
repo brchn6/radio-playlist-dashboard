@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 303,
+      "station_id": 7,
+      "artist": "Electric Light Orchestra",
+      "title": "Telephone Line",
+      "text": "Electric Light Orchestra — Telephone Line",
+      "url": "https://www.shazam.com/track/10762884/telephone-line",
+      "shazam_key": "10762884",
+      "recognized_at": "2026-07-13T17:11:16Z",
+      "created_at": "2026-07-13 17:11:39",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 298,
       "station_id": 7,
       "artist": "Kings of Leon",
@@ -533,6 +547,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 38,
-  "updated_at": "2026-07-13T17:11:09Z"
+  "total": 39,
+  "updated_at": "2026-07-13T17:11:39Z"
 }
