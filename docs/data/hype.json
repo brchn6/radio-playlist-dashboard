@@ -777,6 +777,14 @@
       "last_seen": "2026-07-13T17:03:44Z"
     },
     {
+      "artist": "Kings of Leon",
+      "title": "Find Me",
+      "text": "Kings of Leon — Find Me",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:07:11Z",
+      "last_seen": "2026-07-13T17:07:11Z"
+    },
+    {
       "artist": "Knesiyat Hasechel",
       "title": "ידיים למעלה",
       "text": "Knesiyat Hasechel — ידיים למעלה",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:33:04Z",
       "last_seen": "2026-07-13T15:33:04Z"
-    },
-    {
-      "artist": "Lauryn Hill",
-      "title": "To Zion (feat. Carlos Santana)",
-      "text": "Lauryn Hill — To Zion (feat. Carlos Santana)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T17:05:10Z",
-      "last_seen": "2026-07-13T17:05:10Z"
     }
   ],
-  "updated_at": "2026-07-13T17:07:09Z"
+  "updated_at": "2026-07-13T17:07:39Z"
 }

@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 298,
+      "station_id": 7,
+      "artist": "Kings of Leon",
+      "title": "Find Me",
+      "text": "Kings of Leon — Find Me",
+      "url": "https://www.shazam.com/track/330819725/find-me",
+      "shazam_key": "330819725",
+      "recognized_at": "2026-07-13T17:07:11Z",
+      "created_at": "2026-07-13 17:07:39",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 291,
       "station_id": 7,
       "artist": "The Shins",
@@ -519,6 +533,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 37,
-  "updated_at": "2026-07-13T17:07:09Z"
+  "total": 38,
+  "updated_at": "2026-07-13T17:07:39Z"
 }
