@@ -113,6 +113,14 @@
       "last_seen": "2026-07-13T13:40:32Z"
     },
     {
+      "artist": "Corinne Allal",
+      "title": "ארץ קטנה עם שפם",
+      "text": "Corinne Allal — ארץ קטנה עם שפם",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:06:38Z",
+      "last_seen": "2026-07-13T14:06:38Z"
+    },
+    {
       "artist": "Crowded House",
       "title": "Don't Dream It's Over",
       "text": "Crowded House — Don't Dream It's Over",
@@ -353,5 +361,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:06:15Z"
+  "updated_at": "2026-07-13T14:06:45Z"
 }

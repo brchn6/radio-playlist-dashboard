@@ -527,9 +527,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Corinne Allal",
+      "title": "ארץ קטנה עם שפם",
+      "text": "Corinne Allal — ארץ קטנה עם שפם",
+      "recognized_at": "2026-07-13T14:06:38Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 48,
-  "returned": 48,
-  "updated_at": "2026-07-13T14:06:15Z"
+  "total": 49,
+  "returned": 49,
+  "updated_at": "2026-07-13T14:06:45Z"
 }
