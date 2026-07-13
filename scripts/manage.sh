@@ -44,7 +44,7 @@ case "$cmd" in
       echo "[SKIP] Updater already running (PID $(cat "$PID_DIR/updater.pid"))"
     else
       cd "$ROOT"
-      GIT_AUTO_PUSH=1 nohup python scripts/updater.py > "$UPDATER_LOG" 2>&1 &
+      GIT_AUTO_PUSH=1 RETENTION_DAYS=30 nohup python scripts/updater.py > "$UPDATER_LOG" 2>&1 &
       echo $! > "$PID_DIR/updater.pid"
       echo "[OK] Updater started (PID $(cat "$PID_DIR/updater.pid"))"
     fi

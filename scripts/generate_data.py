@@ -2,8 +2,8 @@
 """
 Generate static JSON data files from SQLite for GitHub Pages.
 
-Reads the SQLite database and writes pre-computed JSON files to docs/data/.
-Run this after updater.py to keep GitHub Pages in sync.
+Reads ALL tracks from the SQLite DB and writes pre-computed JSON files
+to docs/data/. No limits — the dashboard shows everything from the DB.
 """
 
 from __future__ import annotations
@@ -19,11 +19,6 @@ from db import PlaylistDB
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
 DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
-
-# How many entries for each view
-HISTORY_LIMIT = 500
-HYPE_LIMIT = 50
-SCATTER_LIMIT = 2000
 
 
 def now_iso() -> str:
@@ -42,14 +37,15 @@ def safe_json(obj: Any) -> Any:
 
 
 def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
-    """Generate all JSON data files. Returns file sizes."""
+    """Generate ALL data from SQLite → JSON. No limits."""
     output_dir.mkdir(parents=True, exist_ok=True)
     db = PlaylistDB(DB_PATH)
+    total_count = db.get_all_tracks_count()
     stats = db.get_stats()
 
     sizes = {}
 
-    # ── current.json ──
+    # ── current.json — latest track ──
     latest = db.get_latest_track()
     current_data = safe_json(latest) if latest else None
     (output_dir / "current.json").write_text(
@@ -57,11 +53,11 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     )
     sizes["current.json"] = (output_dir / "current.json").stat().st_size
 
-    # ── history.json ──
-    history = safe_json(db.get_history(limit=HISTORY_LIMIT))
+    # ── history.json — ALL tracks, newest first ──
+    history = safe_json(db.get_history(limit=total_count or 10000))
     history_data = {
         "history": history,
-        "total": stats["total_tracks"],
+        "total": total_count,
         "returned": len(history),
         "updated_at": now_iso(),
     }
@@ -70,8 +66,8 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     )
     sizes["history.json"] = (output_dir / "history.json").stat().st_size
 
-    # ── hype.json ──
-    hype = safe_json(db.get_hype_tracks(limit=HYPE_LIMIT))
+    # ── hype.json — all frequently played tracks ──
+    hype = safe_json(db.get_hype_tracks(min_count=1, limit=100))
     hype_data = {
         "tracks": hype,
         "updated_at": now_iso(),
@@ -81,10 +77,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     )
     sizes["hype.json"] = (output_dir / "hype.json").stat().st_size
 
-    # ── scatter.json ──
+    # ── scatter.json — ALL track data for scatterplot ──
     scatter_raw = db.get_scatter_data()
-    # Limit and structure for plotting
-    scatter = safe_json(scatter_raw[-SCATTER_LIMIT:]) if scatter_raw else []
+    scatter = safe_json(scatter_raw) if scatter_raw else []
     scatter_data = {
         "points": scatter,
         "total": len(scatter_raw),
@@ -119,6 +114,7 @@ def main() -> None:
                 "event": "data_generated",
                 "files": sizes,
                 "total_bytes": total,
+                "note": "ALL tracks exported — no limits",
             },
             ensure_ascii=False,
         ),

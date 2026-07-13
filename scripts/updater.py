@@ -169,6 +169,9 @@ def main() -> None:
         flush=True,
     )
 
+    RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "30"))
+    CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "360"))  # every 6 hours
+
     iteration = 0
     while running:
         iteration += 1
@@ -237,7 +240,19 @@ def main() -> None:
             )
             break
 
-        # ── 5. Sleep ──
+        # ── 5. Cleanup old tracks (30-day retention) ──
+        if iteration % CLEANUP_INTERVAL == 0:
+            deleted = db.cleanup_old_tracks(days=RETENTION_DAYS)
+            if deleted:
+                print(
+                    json.dumps({"event": "cleanup", "deleted": deleted, "retention_days": RETENTION_DAYS}),
+                    flush=True,
+                )
+                generate_static_data()
+                if DEFAULT_GIT_AUTO_PUSH:
+                    git_commit_and_push(f"auto: cleanup {deleted} old tracks [{now_iso()}]")
+
+        # ── 6. Sleep ──
         elapsed = time.time() - loop_start
         sleep_time = max(0.5, args.interval - elapsed)
         time.sleep(sleep_time)

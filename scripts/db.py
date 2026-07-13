@@ -160,8 +160,8 @@ class PlaylistDB:
             "last_track_at": row["last"],
         }
 
-    def get_track_count_by_date(self) -> list[dict[str, Any]]:
-        """Group tracks by date."""
+    def get_track_count_by_date(self, days: int = 30) -> list[dict[str, Any]]:
+        """Group tracks by date, limited to last N days."""
         cur = self.conn.execute(
             """
             SELECT strftime('%Y-%m-%d', recognized_at) as date,
@@ -172,6 +172,24 @@ class PlaylistDB:
             """
         )
         return [dict(r) for r in cur.fetchall()]
+
+    def cleanup_old_tracks(self, days: int = 30) -> int:
+        """Delete tracks older than N days. Returns count of deleted rows."""
+        cutoff = (datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
+        cur = self.conn.execute(
+            "DELETE FROM tracks WHERE recognized_at < datetime('now', ?)",
+            (f'-{days} days',),
+        )
+        self.conn.commit()
+        deleted = cur.rowcount
+        if deleted:
+            self.conn.execute("VACUUM")
+        return deleted
+
+    def get_all_tracks_count(self) -> int:
+        """Get total number of tracks in DB."""
+        cur = self.conn.execute("SELECT COUNT(*) as cnt FROM tracks")
+        return cur.fetchone()["cnt"]
 
     def close(self) -> None:
         if self._conn:
