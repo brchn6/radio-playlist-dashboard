@@ -257,6 +257,14 @@
       "last_seen": "2026-07-13T14:11:06Z"
     },
     {
+      "artist": "Eden Ben Zaken",
+      "title": "ברחובות של תל אביב",
+      "text": "Eden Ben Zaken — ברחובות של תל אביב",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:10:10Z",
+      "last_seen": "2026-07-13T15:10:10Z"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "היום",
       "text": "Ehud Banai — היום",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:01:07Z",
       "last_seen": "2026-07-13T15:01:07Z"
-    },
-    {
-      "artist": "Stevie Wonder",
-      "title": "Sir Duke",
-      "text": "Stevie Wonder — Sir Duke",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:53:58Z",
-      "last_seen": "2026-07-13T14:53:58Z"
     }
   ],
-  "updated_at": "2026-07-13T15:09:15Z"
+  "updated_at": "2026-07-13T15:10:15Z"
 }

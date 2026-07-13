@@ -1,6 +1,17 @@
 {
   "tracks": [
     {
+      "artist": "Eden Ben Zaken",
+      "title": "ברחובות של תל אביב",
+      "text": "Eden Ben Zaken — ברחובות של תל אביב",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:10:10Z",
+      "last_seen": "2026-07-13T15:10:10Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "feinsmecker",
       "title": "Come Again",
       "text": "feinsmecker — Come Again",
@@ -45,5 +56,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T15:09:15Z"
+  "updated_at": "2026-07-13T15:10:15Z"
 }
