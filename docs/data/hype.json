@@ -97,6 +97,14 @@
       "last_seen": "2026-07-13T14:18:15Z"
     },
     {
+      "artist": "Benson Boone",
+      "title": "Mystical Magical",
+      "text": "Benson Boone — Mystical Magical",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:33:33Z",
+      "last_seen": "2026-07-13T14:33:33Z"
+    },
+    {
       "artist": "Billy Ocean",
       "title": "Get Outta My Dreams, Get Into My Car",
       "text": "Billy Ocean — Get Outta My Dreams, Get Into My Car",
@@ -609,5 +617,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:32:49Z"
+  "updated_at": "2026-07-13T14:33:45Z"
 }

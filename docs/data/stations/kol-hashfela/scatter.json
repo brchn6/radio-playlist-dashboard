@@ -197,9 +197,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Benson Boone",
+      "title": "Mystical Magical",
+      "text": "Benson Boone — Mystical Magical",
+      "recognized_at": "2026-07-13T14:33:33Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 18,
-  "returned": 18,
-  "updated_at": "2026-07-13T14:32:49Z"
+  "total": 19,
+  "returned": 19,
+  "updated_at": "2026-07-13T14:33:45Z"
 }

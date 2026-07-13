@@ -34,6 +34,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Benson Boone",
+      "title": "Mystical Magical",
+      "text": "Benson Boone — Mystical Magical",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:33:33Z",
+      "last_seen": "2026-07-13T14:33:33Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "Billy Ocean",
       "title": "Get Outta My Dreams, Get Into My Car",
       "text": "Billy Ocean — Get Outta My Dreams, Get Into My Car",
@@ -199,5 +210,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T14:32:49Z"
+  "updated_at": "2026-07-13T14:33:45Z"
 }
