@@ -10,9 +10,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Bruno Mars",
+      "title": "Cha Cha Cha",
+      "text": "Bruno Mars — Cha Cha Cha",
+      "recognized_at": "2026-07-13T12:51:15Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 1,
-  "returned": 1,
-  "updated_at": "2026-07-13T12:50:42Z"
+  "total": 2,
+  "returned": 2,
+  "updated_at": "2026-07-13T12:51:42Z"
 }

@@ -131,9 +131,31 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Bruno Mars",
+      "title": "Cha Cha Cha",
+      "text": "Bruno Mars — Cha Cha Cha",
+      "recognized_at": "2026-07-13T12:51:15Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Aviv Geffen & התעויוט",
+      "title": "אל תדאג",
+      "text": "Aviv Geffen & התעויוט — אל תדאג",
+      "recognized_at": "2026-07-13T12:51:30Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 12,
-  "returned": 12,
-  "updated_at": "2026-07-13T12:50:42Z"
+  "total": 14,
+  "returned": 14,
+  "updated_at": "2026-07-13T12:51:42Z"
 }

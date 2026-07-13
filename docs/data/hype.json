@@ -4,9 +4,9 @@
       "artist": "Aviv Geffen & התעויוט",
       "title": "אל תדאג",
       "text": "Aviv Geffen & התעויוט — אל תדאג",
-      "play_count": 2,
+      "play_count": 3,
       "first_seen": "2026-07-13T12:50:26Z",
-      "last_seen": "2026-07-13T12:50:27Z"
+      "last_seen": "2026-07-13T12:51:30Z"
     },
     {
       "artist": "Loft",
@@ -15,6 +15,14 @@
       "play_count": 2,
       "first_seen": "2026-07-13T12:48:35Z",
       "last_seen": "2026-07-13T12:48:38Z"
+    },
+    {
+      "artist": "Bruno Mars",
+      "title": "Cha Cha Cha",
+      "text": "Bruno Mars — Cha Cha Cha",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:51:15Z",
+      "last_seen": "2026-07-13T12:51:15Z"
     },
     {
       "artist": "Dominic Fike",
@@ -81,5 +89,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T12:50:42Z"
+  "updated_at": "2026-07-13T12:51:42Z"
 }

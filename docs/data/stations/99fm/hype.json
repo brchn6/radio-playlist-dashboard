@@ -1,6 +1,14 @@
 {
   "tracks": [
     {
+      "artist": "Aviv Geffen & התעויוט",
+      "title": "אל תדאג",
+      "text": "Aviv Geffen & התעויוט — אל תדאג",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:51:30Z",
+      "last_seen": "2026-07-13T12:51:30Z"
+    },
+    {
       "artist": "JAŸ-Z",
       "title": "Empire State Of Mind (feat. Alicia Keys)",
       "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
@@ -9,5 +17,5 @@
       "last_seen": "2026-07-13T12:47:51Z"
     }
   ],
-  "updated_at": "2026-07-13T12:50:42Z"
+  "updated_at": "2026-07-13T12:51:42Z"
 }

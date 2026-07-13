@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 14,
+      "station_id": 3,
+      "artist": "Aviv Geffen & התעויוט",
+      "title": "אל תדאג",
+      "text": "Aviv Geffen & התעויוט — אל תדאג",
+      "url": "https://www.shazam.com/track/58195487/%D7%90%D7%9C-%D7%AA%D7%93%D7%90%D7%92",
+      "shazam_key": "58195487",
+      "recognized_at": "2026-07-13T12:51:30Z",
+      "created_at": "2026-07-13 12:51:42",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    },
+    {
+      "id": 13,
+      "station_id": 2,
+      "artist": "Bruno Mars",
+      "title": "Cha Cha Cha",
+      "text": "Bruno Mars — Cha Cha Cha",
+      "url": "https://www.shazam.com/track/856923899/cha-cha-cha",
+      "shazam_key": "856923899",
+      "recognized_at": "2026-07-13T12:51:15Z",
+      "created_at": "2026-07-13 12:51:42",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 11,
       "station_id": 4,
       "artist": "Aviv Geffen & התעויוט",
@@ -169,7 +197,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 12,
-  "returned": 12,
-  "updated_at": "2026-07-13T12:50:42Z"
+  "total": 14,
+  "returned": 14,
+  "updated_at": "2026-07-13T12:51:42Z"
 }
