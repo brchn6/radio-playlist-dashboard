@@ -89,9 +89,18 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Five",
+      "title": "We Will Rock You",
+      "text": "Five — We Will Rock You",
+      "recognized_at": "2026-07-13T12:36:51Z",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 10,
-  "returned": 10,
-  "updated_at": "2026-07-13T12:33:06Z"
+  "total": 11,
+  "returned": 11,
+  "updated_at": "2026-07-13T12:37:06Z"
 }

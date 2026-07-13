@@ -1,0 +1,260 @@
+{
+  "generated_at": "2026-07-13T12:36:58Z",
+  "total_candidates": 15,
+  "reachable": [
+    {
+      "name": "קול השפלה 103FM",
+      "slug": "kol-hashfela",
+      "stream_url": "https://radio.streamgates.net/stream/1036kh",
+      "website": "https://1036kh.com",
+      "genres": [
+        "פופ",
+        "עברי",
+        "לייף סטייל"
+      ],
+      "location": "שפלה",
+      "tested": true,
+      "reachable": true,
+      "content_type": "audio/aacp; charset=UTF-8",
+      "response_time_ms": 285,
+      "error": ""
+    },
+    {
+      "name": "גלגלצ",
+      "slug": "galgalatz",
+      "stream_url": "https://glzwizzlv.bynetcdn.com/glglz_mp3",
+      "website": "https://glglz.co.il",
+      "genres": [
+        "פופ",
+        "להיטים",
+        "צה״ל"
+      ],
+      "location": "ארצי",
+      "tested": true,
+      "reachable": true,
+      "content_type": "audio/mpeg",
+      "response_time_ms": 423,
+      "error": ""
+    },
+    {
+      "name": "רדיו תל אביב 102FM",
+      "slug": "radio-tlv",
+      "stream_url": "https://102.livecdn.biz/102fm_aac",
+      "website": "https://102fm.co.il",
+      "genres": [
+        "פופ",
+        "רוק",
+        "עברי"
+      ],
+      "location": "תל אביב",
+      "tested": true,
+      "reachable": true,
+      "content_type": "audio/aacp",
+      "response_time_ms": 665,
+      "error": ""
+    },
+    {
+      "name": "רדיו 99FM",
+      "slug": "99fm",
+      "stream_url": "https://99.livecdn.biz/99fm_aac",
+      "website": "https://99fm.co.il",
+      "genres": [
+        "פופ",
+        "להיטים"
+      ],
+      "location": "חיפה",
+      "tested": true,
+      "reachable": true,
+      "content_type": "audio/aacp",
+      "response_time_ms": 340,
+      "error": ""
+    }
+  ],
+  "unreachable": [
+    {
+      "name": "כאן 88",
+      "slug": "kan-88",
+      "stream_url": "https://kannlivec01-bc.akamaized.net:443/icecast/kan88/kan88_aac",
+      "website": "https://www.kan.org.il/radio/88.aspx",
+      "genres": [
+        "בין-לאומי",
+        "רוק",
+        "אלטרנטיבי"
+      ],
+      "location": "תל אביב",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "כאן ב",
+      "slug": "kan-bet",
+      "stream_url": "https://kannlivec01-bc.akamaized.net:443/icecast/kan-bet/kan-bet_aac",
+      "website": "https://www.kan.org.il/radio/bet.aspx",
+      "genres": [
+        "אקטואליה",
+        "חדשות",
+        "אזורי"
+      ],
+      "location": "",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "כאן גימל",
+      "slug": "kan-gimel",
+      "stream_url": "https://kannlivec01-bc.akamaized.net:443/icecast/kan-gimel/kan-gimel_aac",
+      "website": "https://www.kan.org.il/radio/gimel.aspx",
+      "genres": [
+        "מוזיקה ישראלית",
+        "עברי"
+      ],
+      "location": "תל אביב",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "אקו 99FM",
+      "slug": "eco99fm",
+      "stream_url": "https://eco99.livecdn.biz/eco99fm_aac",
+      "website": "https://eco99fm.co.il",
+      "genres": [
+        "ג'ז",
+        "בלוז",
+        "סול",
+        "רגוע"
+      ],
+      "location": "תל אביב",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו חיפה",
+      "slug": "radio-haifa",
+      "stream_url": "https://haifa.livecdn.biz/haifa_aac",
+      "website": "https://radiohaifa.co.il",
+      "genres": [
+        "פופ",
+        "עברי",
+        "ים תיכוני"
+      ],
+      "location": "חיפה",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו דרום",
+      "slug": "radio-darom",
+      "stream_url": "https://darom.livecdn.biz/darom_aac",
+      "website": "https://radiodarom.co.il",
+      "genres": [
+        "פופ",
+        "עברי",
+        "ים תיכוני"
+      ],
+      "location": "דרום",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו ירושלים",
+      "slug": "radio-jlem",
+      "stream_url": "https://jerusalem.livecdn.biz/jerusalem_aac",
+      "website": "https://www.radiojerusalem.co.il",
+      "genres": [
+        "פופ",
+        "עברי",
+        "ים תיכוני"
+      ],
+      "location": "ירושלים",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו קול רגע",
+      "slug": "kol-rega",
+      "stream_url": "https://rega.livecdn.biz/rega_aac",
+      "website": "https://www.1036kh.com",
+      "genres": [
+        "עברי",
+        "שקט",
+        "רגוע"
+      ],
+      "location": "ארצי",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו קול הנגב",
+      "slug": "kol-hanegev",
+      "stream_url": "https://live.radioenegev.co.il:8000/radio.mp3",
+      "website": "https://www.radioenegev.co.il",
+      "genres": [
+        "עברי",
+        "ים תיכוני",
+        "מקומי"
+      ],
+      "location": "באר שבע",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו קול חיפה",
+      "slug": "kol-haifa",
+      "stream_url": "https://radio.haifa-streams.com:9000/kolhaifa",
+      "website": "https://www.1036kh.com",
+      "genres": [
+        "עברי",
+        "מגוון"
+      ],
+      "location": "חיפה",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "<urlopen error [Errno -2] Name or service not known>"
+    },
+    {
+      "name": "רדיו קול המרכז",
+      "slug": "kol-hamerkaz",
+      "stream_url": "https://cdn.cybercdn.live/Kol_HaMerkaz/MP3-128",
+      "website": "https://www.1036kh.com",
+      "genres": [
+        "עברי",
+        "מגוון"
+      ],
+      "location": "מרכז",
+      "tested": true,
+      "reachable": false,
+      "content_type": "",
+      "response_time_ms": 0,
+      "error": "HTTP Error 404: Not Found"
+    }
+  ]
+}
