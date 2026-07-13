@@ -56,6 +56,17 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Michael Jackson",
+      "title": "Beat It",
+      "text": "Michael Jackson — Beat It",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:21:09Z",
+      "last_seen": "2026-07-13T13:21:09Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Sash!",
       "title": "Ecuador (Radio Edit)",
       "text": "Sash! — Ecuador (Radio Edit)",
@@ -78,5 +89,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T13:20:12Z"
+  "updated_at": "2026-07-13T13:21:12Z"
 }

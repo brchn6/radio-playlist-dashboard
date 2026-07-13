@@ -81,6 +81,14 @@
       "last_seen": "2026-07-13T12:48:38Z"
     },
     {
+      "artist": "Michael Jackson",
+      "title": "Beat It",
+      "text": "Michael Jackson — Beat It",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:21:07Z",
+      "last_seen": "2026-07-13T13:21:09Z"
+    },
+    {
       "artist": "Shlomo Artzi & Rita",
       "title": "שניים",
       "text": "Shlomo Artzi & Rita — שניים",
@@ -345,5 +353,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:20:12Z"
+  "updated_at": "2026-07-13T13:21:12Z"
 }
