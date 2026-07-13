@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import random
 import tempfile
 import time
 from pathlib import Path
@@ -22,6 +23,16 @@ STREAM_URL = os.environ.get("RADIO_STREAM_URL", DEFAULT_STREAM_URL)
 SAMPLE_SECONDS = int(os.environ.get("SHAZAMIO_SAMPLE_SECONDS", "15"))
 INTERVAL_SECONDS = int(os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "20"))
 RETRY_DELAY = int(os.environ.get("SHAZAMIO_RETRY_DELAY", "5"))
+# shazam.recognize() has no timeout of its own: when Shazam stalls the
+# connection (its usual response to too many calls from one IP — no HTTP 429,
+# it just never answers) the await never returns, the recognition lock is held
+# forever, and the proxy is dead until restarted. Always bound it.
+RECOGNIZE_TIMEOUT = int(os.environ.get("SHAZAMIO_RECOGNIZE_TIMEOUT", "45"))
+# Back off hard on errors — a stalled Shazam means retrying fast makes it worse.
+ERROR_MAX_DELAY = int(os.environ.get("SHAZAMIO_ERROR_MAX_DELAY", "180"))
+# Stagger the fleet: restarting N proxies at once fires N simultaneous Shazam
+# calls from one IP, which is what gets the IP stalled in the first place.
+STARTUP_STAGGER = int(os.environ.get("SHAZAMIO_STARTUP_STAGGER", "5"))
 WORK_DIR = Path(os.environ.get("SHAZAMIO_WORK_DIR", "/tmp/radio-kol-hashfela-shazamio"))
 
 STATE: dict[str, Any] = {
@@ -108,12 +119,20 @@ async def recognize_file(path: Path) -> dict[str, Any]:
         STATE["last_started_at"] = now_iso()
         STATE["last_error"] = None
         try:
-            raw = await shazam.recognize(str(path))
+            raw = await asyncio.wait_for(
+                shazam.recognize(str(path)), timeout=RECOGNIZE_TIMEOUT
+            )
             result = parse_shazam_result(raw)
             STATE["last_result"] = result
             STATE["last_finished_at"] = now_iso()
             print(json.dumps({"event": "recognized", **result}, ensure_ascii=False), flush=True)
             return result
+        except asyncio.TimeoutError as exc:
+            STATE["last_error"] = f"recognize timed out after {RECOGNIZE_TIMEOUT}s"
+            STATE["last_finished_at"] = now_iso()
+            print(json.dumps({"event": "recognition_timeout",
+                              "timeout_seconds": RECOGNIZE_TIMEOUT}), flush=True)
+            raise
         except Exception as exc:
             STATE["last_error"] = str(exc)
             STATE["last_finished_at"] = now_iso()
@@ -136,7 +155,12 @@ async def station_loop(app: web.Application) -> None:
     On failure (not found or error): retry immediately after RETRY_DELAY seconds,
     so song transitions are caught quickly instead of waiting a full cycle.
     """
-    await asyncio.sleep(1)
+    # Spread the fleet out: without this, restarting all proxies together sends
+    # one simultaneous burst of Shazam calls per cycle, forever.
+    stagger = (PORT % 10) * STARTUP_STAGGER + random.uniform(0, STARTUP_STAGGER)
+    print(json.dumps({"event": "startup_stagger", "seconds": round(stagger, 1)}), flush=True)
+    await asyncio.sleep(1 + stagger)
+
     consecutive_failures = 0
     while True:
         try:
@@ -144,8 +168,10 @@ async def station_loop(app: web.Application) -> None:
             result = await recognize_station_once()
             if result.get("found"):
                 consecutive_failures = 0
-                print(json.dumps({"event": "sleep_next", "seconds": INTERVAL_SECONDS}, ensure_ascii=False), flush=True)
-                await asyncio.sleep(INTERVAL_SECONDS)
+                # jitter keeps the proxies from re-converging into lockstep
+                nap = INTERVAL_SECONDS + random.uniform(0, 5)
+                print(json.dumps({"event": "sleep_next", "seconds": round(nap, 1)}, ensure_ascii=False), flush=True)
+                await asyncio.sleep(nap)
             else:
                 consecutive_failures += 1
                 delay = min(RETRY_DELAY * consecutive_failures, 30)
@@ -158,9 +184,14 @@ async def station_loop(app: web.Application) -> None:
         except Exception as exc:
             consecutive_failures += 1
             STATE["last_error"] = str(exc)
+            # Exponential backoff with jitter. A stalled/rate-limited Shazam is
+            # made worse by fast retries, and a synchronised fleet retrying in
+            # lockstep is worst of all.
+            delay = min(RETRY_DELAY * 2 ** (consecutive_failures - 1), ERROR_MAX_DELAY)
+            delay += random.uniform(0, delay * 0.3)
             print(json.dumps({"event": "station_sample_error", "error": str(exc),
-                              "consecutive_failures": consecutive_failures}, ensure_ascii=False), flush=True)
-            delay = min(RETRY_DELAY * consecutive_failures, 30)
+                              "consecutive_failures": consecutive_failures,
+                              "retry_delay": round(delay, 1)}, ensure_ascii=False), flush=True)
             await asyncio.sleep(delay)
 
 

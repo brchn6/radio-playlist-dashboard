@@ -29,7 +29,12 @@ VENV_PYTHON = SHAZAMIO_DIR / ".venv" / "bin" / "python"
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 from db import STATIONS_CONFIG, PlaylistDB  # noqa: E402
 
-INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL", "20"))
+# Seconds a proxy waits after a successful recognition before sampling again.
+# This is the main lever on Shazam call volume: 8 stations at 20s was ~2k
+# calls/station/day and got the IP stalled (Shazam does not send 429 — it
+# simply stops answering). Songs run 3+ minutes, so 60s still catches every
+# track while cutting call volume ~3x. Raise it further before adding stations.
+INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL", "60"))
 
 
 def _pid_file(slug: str) -> Path:
