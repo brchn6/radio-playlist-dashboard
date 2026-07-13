@@ -120,9 +120,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Men At Work",
+      "title": "Who Can It Be Now?",
+      "text": "Men At Work — Who Can It Be Now?",
+      "recognized_at": "2026-07-13T14:10:08Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 11,
-  "returned": 11,
-  "updated_at": "2026-07-13T14:08:15Z"
+  "total": 12,
+  "returned": 12,
+  "updated_at": "2026-07-13T14:10:15Z"
 }

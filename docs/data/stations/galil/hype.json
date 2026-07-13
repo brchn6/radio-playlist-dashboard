@@ -67,6 +67,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Men At Work",
+      "title": "Who Can It Be Now?",
+      "text": "Men At Work — Who Can It Be Now?",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:10:08Z",
+      "last_seen": "2026-07-13T14:10:08Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Of Monsters and Men",
       "title": "Crystals",
       "text": "Of Monsters and Men — Crystals",
@@ -122,5 +133,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:08:15Z"
+  "updated_at": "2026-07-13T14:10:15Z"
 }

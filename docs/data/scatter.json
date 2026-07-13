@@ -560,9 +560,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "The End Of Eternity",
+      "title": "Inhibitions for Electric Guitar",
+      "text": "The End Of Eternity — Inhibitions for Electric Guitar",
+      "recognized_at": "2026-07-13T14:09:50Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Men At Work",
+      "title": "Who Can It Be Now?",
+      "text": "Men At Work — Who Can It Be Now?",
+      "recognized_at": "2026-07-13T14:10:08Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 51,
-  "returned": 51,
-  "updated_at": "2026-07-13T14:08:15Z"
+  "total": 53,
+  "returned": 53,
+  "updated_at": "2026-07-13T14:10:15Z"
 }
