@@ -1,0 +1,29 @@
+{
+  "points": [
+    {
+      "artist": "Test Artist",
+      "title": "Test Song",
+      "text": "Test Artist — Test Song",
+      "recognized_at": "2026-07-13T12:00:00Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Loft",
+      "title": "Hold On",
+      "text": "Loft — Hold On",
+      "recognized_at": "2026-07-13T12:48:35Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    }
+  ],
+  "total": 2,
+  "returned": 2,
+  "updated_at": "2026-07-13T12:49:42Z"
+}

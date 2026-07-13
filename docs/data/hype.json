@@ -1,101 +1,61 @@
 {
   "tracks": [
     {
-      "artist": "Ace of Base",
-      "title": "Beautiful Life",
-      "text": "Ace of Base — Beautiful Life",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:18:07Z",
-      "last_seen": "2026-07-13T12:18:07Z"
+      "artist": "Loft",
+      "title": "Hold On",
+      "text": "Loft — Hold On",
+      "play_count": 2,
+      "first_seen": "2026-07-13T12:48:35Z",
+      "last_seen": "2026-07-13T12:48:38Z"
     },
     {
-      "artist": "Bob Sinclar & Cutee B.",
-      "title": "Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
-      "text": "Bob Sinclar & Cutee B. — Rock This Party (Everybody Dance Now) [feat. Dollarman, Big Ali & Makedah]",
+      "artist": "Dominic Fike",
+      "title": "Babydoll",
+      "text": "Dominic Fike — Babydoll",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:08:04Z",
-      "last_seen": "2026-07-13T12:08:04Z"
+      "first_seen": "2026-07-13T12:49:19Z",
+      "last_seen": "2026-07-13T12:49:19Z"
     },
     {
-      "artist": "David Guetta",
-      "title": "Titanium (feat. Sia)",
-      "text": "David Guetta — Titanium (feat. Sia)",
+      "artist": "Fleetwood Mac",
+      "title": "Silver Springs (Live)",
+      "text": "Fleetwood Mac — Silver Springs (Live)",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:21:48Z",
-      "last_seen": "2026-07-13T12:21:48Z"
+      "first_seen": "2026-07-13T12:47:45Z",
+      "last_seen": "2026-07-13T12:47:45Z"
     },
     {
-      "artist": "DJ Jazzy Jeff & The Fresh Prince",
-      "title": "Boom! Shake the Room",
-      "text": "DJ Jazzy Jeff & The Fresh Prince — Boom! Shake the Room",
+      "artist": "JAŸ-Z",
+      "title": "Empire State Of Mind (feat. Alicia Keys)",
+      "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:39:55Z",
-      "last_seen": "2026-07-13T12:39:55Z"
+      "first_seen": "2026-07-13T12:47:51Z",
+      "last_seen": "2026-07-13T12:47:51Z"
     },
     {
-      "artist": "Everything But the Girl & Todd Terry",
-      "title": "Missing (Todd Terry Club Mix)",
-      "text": "Everything But the Girl & Todd Terry — Missing (Todd Terry Club Mix)",
+      "artist": "Madcon",
+      "title": "Beggin (Uscar Version)",
+      "text": "Madcon — Beggin (Uscar Version)",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:15:04Z",
-      "last_seen": "2026-07-13T12:15:04Z"
+      "first_seen": "2026-07-13T12:47:53Z",
+      "last_seen": "2026-07-13T12:47:53Z"
     },
     {
-      "artist": "Five",
-      "title": "We Will Rock You",
-      "text": "Five — We Will Rock You",
+      "artist": "Test Artist",
+      "title": "Test Song",
+      "text": "Test Artist — Test Song",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:36:51Z",
-      "last_seen": "2026-07-13T12:36:51Z"
+      "first_seen": "2026-07-13T12:00:00Z",
+      "last_seen": "2026-07-13T12:00:00Z"
     },
     {
-      "artist": "Geri Halliwell",
-      "title": "It's Raining Men",
-      "text": "Geri Halliwell — It's Raining Men",
+      "artist": "The Allman Brothers Band",
+      "title": "In Memory of Elizabeth Reed",
+      "text": "The Allman Brothers Band — In Memory of Elizabeth Reed",
       "play_count": 1,
-      "first_seen": "2026-07-13T12:28:42Z",
-      "last_seen": "2026-07-13T12:28:42Z"
-    },
-    {
-      "artist": "Gina G.",
-      "title": "Just a Little Bit (Motiv8 Extended Vocal Mix)",
-      "text": "Gina G. — Just a Little Bit (Motiv8 Extended Vocal Mix)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:25:38Z",
-      "last_seen": "2026-07-13T12:25:38Z"
-    },
-    {
-      "artist": "Lasgo",
-      "title": "Something",
-      "text": "Lasgo — Something",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:12:00Z",
-      "last_seen": "2026-07-13T12:12:00Z"
-    },
-    {
-      "artist": "Ricky Martin",
-      "title": "María",
-      "text": "Ricky Martin — María",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:03:59Z",
-      "last_seen": "2026-07-13T12:03:59Z"
-    },
-    {
-      "artist": "September",
-      "title": "Cry For You",
-      "text": "September — Cry For You",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:05:00Z",
-      "last_seen": "2026-07-13T12:05:00Z"
-    },
-    {
-      "artist": "Shaggy",
-      "title": "In the Summertime (feat. Rayvon)",
-      "text": "Shaggy — In the Summertime (feat. Rayvon)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T12:32:47Z",
-      "last_seen": "2026-07-13T12:32:47Z"
+      "first_seen": "2026-07-13T12:49:14Z",
+      "last_seen": "2026-07-13T12:49:14Z"
     }
   ],
-  "updated_at": "2026-07-13T12:44:06Z"
+  "updated_at": "2026-07-13T12:49:42Z"
 }

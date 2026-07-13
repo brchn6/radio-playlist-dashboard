@@ -1,0 +1,20 @@
+{
+  "history": [
+    {
+      "id": 4,
+      "station_id": 3,
+      "artist": "JAŸ-Z",
+      "title": "Empire State Of Mind (feat. Alicia Keys)",
+      "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
+      "url": "https://www.shazam.com/track/50185893/empire-state-of-mind-feat-alicia-keys",
+      "shazam_key": "50185893",
+      "recognized_at": "2026-07-13T12:47:51Z",
+      "created_at": "2026-07-13 12:48:40",
+      "station_slug": "99fm",
+      "station_name": "99FM",
+      "station_color": "#6ab8e3"
+    }
+  ],
+  "total": 1,
+  "updated_at": "2026-07-13T12:49:42Z"
+}

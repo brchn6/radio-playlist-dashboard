@@ -1,0 +1,21 @@
+{
+  "tracks": [
+    {
+      "artist": "Loft",
+      "title": "Hold On",
+      "text": "Loft — Hold On",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:48:35Z",
+      "last_seen": "2026-07-13T12:48:35Z"
+    },
+    {
+      "artist": "Test Artist",
+      "title": "Test Song",
+      "text": "Test Artist — Test Song",
+      "play_count": 1,
+      "first_seen": "2026-07-13T12:00:00Z",
+      "last_seen": "2026-07-13T12:00:00Z"
+    }
+  ],
+  "updated_at": "2026-07-13T12:49:42Z"
+}

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-1036 Playlist Dashboard — Playlist updater daemon.
+1036 Playlist Dashboard — Multi-Station Updater Daemon.
 
-Polls the local ShazamIO proxy every 30 seconds, stores new tracks in
-SQLite, generates static JSON data files for GitHub Pages, and optionally
-auto-commits & pushes to GitHub.
+Polls ALL ShazamIO proxy instances every 30 seconds, stores new
+tracks in SQLite (tagged by station_id), generates static JSON for
+GitHub Pages, and optionally auto-commits & pushes.
 """
 
 from __future__ import annotations
@@ -22,27 +22,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# ── project paths ──────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from db import PlaylistDB  # noqa: E402
+from db import PlaylistDB, STATIONS_CONFIG, STATIONS_BY_PORT  # noqa: E402
 
 DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
-DATA_DIR = PROJECT_ROOT / "docs" / "data"
 
 # ── defaults ───────────────────────────────────────────────────────────
-DEFAULT_PROXY_URL = "http://localhost:8765"
-DEFAULT_INTERVAL = 30  # seconds
+DEFAULT_INTERVAL = 30
 DEFAULT_GIT_AUTO_PUSH = os.environ.get("GIT_AUTO_PUSH", "").lower() in ("1", "true", "yes")
+RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
+CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll
 
-# ── state ──────────────────────────────────────────────────────────────
 running = True
 
 
 def handle_signal(signum: int, frame) -> None:
     global running
-    print(f"[updater] Received signal {signum}, shutting down...", flush=True)
+    print(f"[updater] Signal {signum}, shutting down...", flush=True)
     running = False
 
 
@@ -50,10 +48,10 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-# ── helpers ────────────────────────────────────────────────────────────
+# ── env helpers ────────────────────────────────────────────────────────
 
 def load_env() -> dict[str, str]:
-    """Load .env file from project root. Returns dict of key=value pairs."""
+    """Load .env from project root."""
     env_path = PROJECT_ROOT / ".env"
     env_vars: dict[str, str] = {}
     if env_path.exists():
@@ -62,22 +60,22 @@ def load_env() -> dict[str, str]:
             if not line or line.startswith("#"):
                 continue
             if "=" in line:
-                key, _, val = line.partition("=")
-                env_vars[key.strip()] = val.strip().strip("'\"")
+                k, _, v = line.partition("=")
+                env_vars[k.strip()] = v.strip().strip("'\"")
     return env_vars
 
 
+# ── git helpers ────────────────────────────────────────────────────────
+
 def git_commit_and_push(message: str) -> None:
-    """Commit and push changes to the git repo.
-    Reads GIT_TOKEN from .env for authentication — never stored in git config.
-    """
+    """Commit and push. Uses token from .env, never stored."""
     try:
         result = subprocess.run(
-            ["git", "status", "--porcelain", "--", "docs/", "scripts/", "data/"],
+            ["git", "status", "--porcelain", "--", "docs/", "scripts/", ".planning/"],
             capture_output=True, text=True, timeout=15,
         )
         if not result.stdout.strip():
-            return  # nothing to commit
+            return
 
         subprocess.run(["git", "add", "-A"], check=True, capture_output=True, timeout=15)
         subprocess.run(
@@ -86,11 +84,9 @@ def git_commit_and_push(message: str) -> None:
         )
         subprocess.run(["git", "pull", "--rebase"], check=True, capture_output=True, timeout=30)
 
-        # Use token from .env if available (no stored credentials)
         env = load_env()
         token = env.get("GIT_TOKEN") or os.environ.get("GIT_TOKEN", "")
         if token:
-            # Temporarily use token for push (never stored in git config)
             repo_url = f"https://brchn6:{token}@github.com/brchn6/1036playlistdashboard.git"
             subprocess.run(
                 ["git", "push", repo_url, "main"],
@@ -99,43 +95,47 @@ def git_commit_and_push(message: str) -> None:
         else:
             subprocess.run(["git", "push"], check=True, capture_output=True, timeout=60)
 
-        print(f"[updater] Git commit & push: {message}", flush=True)
+        print(f"[updater] Git push: {message}", flush=True)
     except subprocess.TimeoutExpired:
-        print("[updater] Git push timed out (skip)", flush=True)
+        print("[updater] Git push timed out", flush=True)
     except subprocess.CalledProcessError as exc:
-        print(f"[updater] Git error (non-fatal): {exc}", flush=True)
+        print(f"[updater] Git error: {exc}", flush=True)
 
+
+# ── data generation ────────────────────────────────────────────────────
 
 def generate_static_data() -> None:
-    """Run generate_data.py to refresh all static JSON files."""
-    generator = PROJECT_ROOT / "scripts" / "generate_data.py"
+    """Run generate_data.py."""
+    gen = PROJECT_ROOT / "scripts" / "generate_data.py"
     try:
         result = subprocess.run(
-            [sys.executable, str(generator)],
+            [sys.executable, str(gen)],
             capture_output=True, text=True, timeout=30,
         )
         if result.stdout:
             print(result.stdout.strip(), flush=True)
         if result.stderr:
-            print(f"[updater] generate_data stderr: {result.stderr.strip()}", flush=True)
-    except Exception as exc:
-        print(f"[updater] generate_data error: {exc}", flush=True)
+            print(f"[updater] gen stderr: {result.stderr.strip()}", flush=True)
+    except Exception as e:
+        print(f"[updater] gen error: {e}", flush=True)
 
 
-def fetch_proxy_state(proxy_url: str) -> dict[str, Any] | None:
-    """Fetch the /current endpoint from shazamio-proxy."""
-    url = f"{proxy_url.rstrip('/')}/current"
+# ── proxy polling ──────────────────────────────────────────────────────
+
+def fetch_proxy(port: int, timeout: int = 15) -> dict[str, Any] | None:
+    """Fetch /current from a single proxy by port."""
+    url = f"http://127.0.0.1:{port}/current"
     try:
         req = urllib.request.Request(url)
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
-    except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError) as exc:
-        print(f"[updater] Proxy fetch error: {exc}", flush=True)
+    except Exception as e:
+        print(f"[updater] proxy offline port={port}: {e}", flush=True)
         return None
 
 
 def extract_track(state: dict[str, Any] | None) -> dict[str, Any] | None:
-    """Extract the recognized track from proxy state, return None if nothing found."""
+    """Extract recognized track from proxy state."""
     if not state:
         return None
     result = state.get("last_result")
@@ -144,154 +144,116 @@ def extract_track(state: dict[str, Any] | None) -> dict[str, Any] | None:
     if not result.get("found"):
         return None
     return {
-        "artist": result.get("artist", ""),
-        "title": result.get("title", ""),
-        "text": result.get("text", ""),
-        "url": result.get("url"),
-        "shazam_key": result.get("shazam_key"),
+        "artist": (result.get("artist") or "").strip(),
+        "title": (result.get("title") or "").strip(),
+        "text": result.get("text") or "",
+        "url": result.get("url") or "",
+        "shazam_key": result.get("shazam_key") or "",
         "recognized_at": result.get("recognized_at") or now_iso(),
     }
 
 
-# ── main ───────────────────────────────────────────────────────────────
+# ── main loop ──────────────────────────────────────────────────────────
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="1036 Playlist Dashboard — updater daemon"
-    )
-    parser.add_argument(
-        "--proxy-url",
-        default=os.environ.get("PROXY_URL", DEFAULT_PROXY_URL),
-        help=f"ShazamIO proxy URL (default: {DEFAULT_PROXY_URL})",
-    )
-    parser.add_argument(
-        "--interval",
-        type=int,
-        default=int(os.environ.get("POLL_INTERVAL", str(DEFAULT_INTERVAL))),
-        help=f"Poll interval in seconds (default: {DEFAULT_INTERVAL})",
-    )
-    parser.add_argument(
-        "--once",
-        action="store_true",
-        help="Run once and exit (for testing)",
-    )
+    parser = argparse.ArgumentParser(description="Multi-station updater daemon")
+    parser.add_argument("--interval", type=int, default=DEFAULT_INTERVAL)
+    parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
 
-    # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
 
     db = PlaylistDB(DB_PATH)
-    last_track = db.get_latest_track()
-    pending_git = False  # track if we need a git push
+    stations = db.get_stations()
+    station_map = {s["proxy_port"]: s["id"] for s in stations}
+    slug_map = {s["slug"]: s for s in STATIONS_CONFIG}
 
-    print(
-        json.dumps(
-            {
-                "event": "updater_start",
-                "proxy_url": args.proxy_url,
-                "interval": args.interval,
-                "db_path": str(DB_PATH),
-                "total_tracks": db.get_stats()["total_tracks"],
-            },
-            ensure_ascii=False,
-        ),
-        flush=True,
-    )
-
-    RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
-    CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "360"))  # every 6 hours
+    print(json.dumps({
+        "event": "updater_start",
+        "stations": len(stations),
+        "ports": list(station_map.keys()),
+        "interval": args.interval,
+    }), flush=True)
 
     iteration = 0
+    new_track_occurred = False
+
     while running:
         iteration += 1
         loop_start = time.time()
+        new_track_occurred = False
 
-        # ── 1. Fetch proxy state ──
-        proxy_state = fetch_proxy_state(args.proxy_url)
-        track = extract_track(proxy_state)
+        # ── Poll each proxy ──
+        for s in stations:
+            port = s["proxy_port"]
+            station_id = s["id"]
 
-        if track:
-            artist = track["artist"]
-            title = track["title"]
-            shazam_key = track.get("shazam_key", "")
+            proxy_state = fetch_proxy(port)
+            track = extract_track(proxy_state)
 
-            # ── 2. Check if this is a genuinely new track ──
-            if not db.track_exists(shazam_key, artist, title):
-                print(
-                    json.dumps(
-                        {
-                            "event": "new_track",
-                            "artist": artist,
-                            "title": title,
-                            "text": track.get("text", ""),
-                            "iteration": iteration,
-                        },
-                        ensure_ascii=False,
-                    ),
-                    flush=True,
-                )
+            if not track:
+                continue
 
-                db.insert_track(
-                    artist=artist,
-                    title=title,
-                    text=track.get("text", ""),
-                    url=track.get("url", ""),
-                    shazam_key=shazam_key,
-                    recognized_at=track.get("recognized_at", now_iso()),
-                )
-                last_track = track
+            # Check if this is a new track for this station
+            if db.track_exists(
+                station_id=station_id,
+                shazam_key=track.get("shazam_key", ""),
+                artist=track["artist"],
+                title=track["title"],
+            ):
+                continue  # already recorded
 
-                # ── 3. Generate static data ──
-                generate_static_data()
-                pending_git = True
+            # New track!
+            print(json.dumps({
+                "event": "new_track",
+                "station": s["slug"],
+                "artist": track["artist"],
+                "title": track["title"],
+                "text": track.get("text", ""),
+                "port": port,
+            }), flush=True)
 
-                # ── 4. Auto-commit & push ──
-                if DEFAULT_GIT_AUTO_PUSH and pending_git:
-                    track_text = track.get("text", "") or f"{artist} — {title}"
-                    git_commit_and_push(f"auto: {track_text} [{now_iso()}]")
-                    pending_git = False
-        else:
-            # No track detected — still refresh data periodically
-            if iteration % 5 == 0:
-                generate_static_data()
-
-            # Periodic keepalive push
-            if DEFAULT_GIT_AUTO_PUSH and iteration % 20 == 0:
-                git_commit_and_push(f"auto: keepalive [{now_iso()}]")
-
-        if args.once:
-            print(
-                json.dumps(
-                    {"event": "updater_once_complete", "track_found": track is not None},
-                    ensure_ascii=False,
-                ),
-                flush=True,
+            db.insert_track(
+                station_id=station_id,
+                artist=track["artist"],
+                title=track["title"],
+                text=track.get("text", ""),
+                url=track.get("url", ""),
+                shazam_key=track.get("shazam_key", ""),
+                recognized_at=track.get("recognized_at", now_iso()),
             )
-            break
+            new_track_occurred = True
 
-        # ── 5. Cleanup old tracks (30-day retention) ──
+        # ── Generate data & push ──
+        if new_track_occurred or iteration % 5 == 0:
+            generate_static_data()
+
+            if DEFAULT_GIT_AUTO_PUSH and new_track_occurred:
+                # Build commit message with all new stations
+                git_commit_and_push(f"auto: multi-station update [{now_iso()}]")
+
+        # ── Periodic keepalive push ──
+        if DEFAULT_GIT_AUTO_PUSH and iteration % 20 == 0 and not new_track_occurred:
+            git_commit_and_push(f"auto: keepalive [{now_iso()}]")
+
+        # ── Periodic cleanup ──
         if iteration % CLEANUP_INTERVAL == 0:
             deleted = db.cleanup_old_tracks(days=RETENTION_DAYS)
             if deleted:
-                print(
-                    json.dumps({"event": "cleanup", "deleted": deleted, "retention_days": RETENTION_DAYS}),
-                    flush=True,
-                )
+                print(json.dumps({"event": "cleanup", "deleted": deleted}), flush=True)
                 generate_static_data()
                 if DEFAULT_GIT_AUTO_PUSH:
                     git_commit_and_push(f"auto: cleanup {deleted} old tracks [{now_iso()}]")
 
-        # ── 6. Sleep ──
+        if args.once:
+            break
+
         elapsed = time.time() - loop_start
-        sleep_time = max(0.5, args.interval - elapsed)
-        time.sleep(sleep_time)
+        time.sleep(max(0.5, args.interval - elapsed))
 
     db.close()
-    print(
-        json.dumps({"event": "updater_stopped", "total_tracks": db.get_stats()["total_tracks"]}),
-        flush=True,
-    )
+    print(json.dumps({"event": "updater_stopped"}), flush=True)
 
 
 if __name__ == "__main__":

@@ -10,20 +10,20 @@
 - [x] Station investigation — 7 working stations found
 - [x] Architecture plan
 
-## 🔲 Phase 1 — Database
-- [ ] Add `stations` table schema
-- [ ] Add `station_id` column to `tracks`
-- [ ] Migration script (station_id=1 for existing data)
-- [ ] Update `db.py` with station-aware queries
-- [ ] Seed 7 stations from config
+## ✅ Phase 1 — Database
+- [x] Add `stations` table schema
+- [x] Add `station_id` column to `tracks`
+- [x] Migration script (station_id=1 for existing data)
+- [x] Update `db.py` with station-aware queries
+- [x] Seed 7 stations from config
 
-## 🔲 Phase 2 — Multi-Proxy Manager
-- [ ] Create `scripts/proxy_manager.py`
-- [ ] `start_all()` — spawn 7 proxies (ports 8761-8767)
-- [ ] `stop_all()` — kill all proxies
-- [ ] `status()` — health check all ports
-- [ ] `start_one(slug)` / `stop_one(slug)`
-- [ ] Logs per station
+## ✅ Phase 2 — Multi-Proxy Manager
+- [x] Create `scripts/proxy_manager.py`
+- [x] `start_all()` — spawn 7 proxies (ports 8761-8767)
+- [x] `stop_all()` — kill all proxies
+- [x] `status()` — health check all ports
+- [x] `start_one(slug)` / `stop_one(slug)`
+- [x] Logs per station
 
 ## 🔲 Phase 3 — Multi-Station Updater
 - [ ] Rewrite `updater.py` with async polling (all 7 proxies)

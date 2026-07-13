@@ -1,0 +1,18 @@
+{
+  "points": [
+    {
+      "artist": "Loft",
+      "title": "Hold On",
+      "text": "Loft — Hold On",
+      "recognized_at": "2026-07-13T12:48:38Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    }
+  ],
+  "total": 1,
+  "returned": 1,
+  "updated_at": "2026-07-13T12:49:42Z"
+}

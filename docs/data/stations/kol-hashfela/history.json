@@ -1,0 +1,34 @@
+{
+  "history": [
+    {
+      "id": 2,
+      "station_id": 1,
+      "artist": "Loft",
+      "title": "Hold On",
+      "text": "Loft — Hold On",
+      "url": "https://www.shazam.com/track/20085155/hold-on",
+      "shazam_key": "20085155",
+      "recognized_at": "2026-07-13T12:48:35Z",
+      "created_at": "2026-07-13 12:48:40",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
+      "id": 1,
+      "station_id": 1,
+      "artist": "Test Artist",
+      "title": "Test Song",
+      "text": "Test Artist — Test Song",
+      "url": "",
+      "shazam_key": "",
+      "recognized_at": "2026-07-13T12:00:00Z",
+      "created_at": "2026-07-13 12:46:52",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    }
+  ],
+  "total": 2,
+  "updated_at": "2026-07-13T12:49:42Z"
+}

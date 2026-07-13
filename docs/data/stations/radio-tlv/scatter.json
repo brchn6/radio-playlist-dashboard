@@ -1,0 +1,29 @@
+{
+  "points": [
+    {
+      "artist": "Madcon",
+      "title": "Beggin (Uscar Version)",
+      "text": "Madcon — Beggin (Uscar Version)",
+      "recognized_at": "2026-07-13T12:47:53Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Dominic Fike",
+      "title": "Babydoll",
+      "text": "Dominic Fike — Babydoll",
+      "recognized_at": "2026-07-13T12:49:19Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
+    }
+  ],
+  "total": 2,
+  "returned": 2,
+  "updated_at": "2026-07-13T12:49:42Z"
+}

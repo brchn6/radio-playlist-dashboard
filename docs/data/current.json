@@ -1,10 +1,86 @@
-{
-  "id": 12,
-  "artist": "DJ Jazzy Jeff & The Fresh Prince",
-  "title": "Boom! Shake the Room",
-  "text": "DJ Jazzy Jeff & The Fresh Prince — Boom! Shake the Room",
-  "url": "https://www.shazam.com/track/10072820/boom-shake-the-room",
-  "shazam_key": "10072820",
-  "recognized_at": "2026-07-13T12:39:55Z",
-  "created_at": "2026-07-13 12:40:06"
-}
+[
+  {
+    "id": 2,
+    "station_id": 1,
+    "artist": "Loft",
+    "title": "Hold On",
+    "text": "Loft — Hold On",
+    "url": "https://www.shazam.com/track/20085155/hold-on",
+    "shazam_key": "20085155",
+    "recognized_at": "2026-07-13T12:48:35Z",
+    "created_at": "2026-07-13 12:48:40",
+    "station_slug": "kol-hashfela",
+    "station_name": "קול השפלה 103FM",
+    "station_color": "#6ae3c1"
+  },
+  {
+    "id": 3,
+    "station_id": 2,
+    "artist": "Fleetwood Mac",
+    "title": "Silver Springs (Live)",
+    "text": "Fleetwood Mac — Silver Springs (Live)",
+    "url": "https://www.shazam.com/track/265351/silver-springs-live",
+    "shazam_key": "265351",
+    "recognized_at": "2026-07-13T12:47:45Z",
+    "created_at": "2026-07-13 12:48:40",
+    "station_slug": "galgalatz",
+    "station_name": "גלגלצ",
+    "station_color": "#e36a6a"
+  },
+  {
+    "id": 4,
+    "station_id": 3,
+    "artist": "JAŸ-Z",
+    "title": "Empire State Of Mind (feat. Alicia Keys)",
+    "text": "JAŸ-Z — Empire State Of Mind (feat. Alicia Keys)",
+    "url": "https://www.shazam.com/track/50185893/empire-state-of-mind-feat-alicia-keys",
+    "shazam_key": "50185893",
+    "recognized_at": "2026-07-13T12:47:51Z",
+    "created_at": "2026-07-13 12:48:40",
+    "station_slug": "99fm",
+    "station_name": "99FM",
+    "station_color": "#6ab8e3"
+  },
+  {
+    "id": 7,
+    "station_id": 4,
+    "artist": "Dominic Fike",
+    "title": "Babydoll",
+    "text": "Dominic Fike — Babydoll",
+    "url": "https://www.shazam.com/track/442648663/babydoll",
+    "shazam_key": "442648663",
+    "recognized_at": "2026-07-13T12:49:19Z",
+    "created_at": "2026-07-13 12:49:42",
+    "station_slug": "radio-tlv",
+    "station_name": "רדיו תל אביב 102FM",
+    "station_color": "#e3c86a"
+  },
+  {
+    "id": 6,
+    "station_id": 5,
+    "artist": "Loft",
+    "title": "Hold On",
+    "text": "Loft — Hold On",
+    "url": "https://www.shazam.com/track/20085155/hold-on",
+    "shazam_key": "20085155",
+    "recognized_at": "2026-07-13T12:48:38Z",
+    "created_at": "2026-07-13 12:48:40",
+    "station_slug": "kan-88",
+    "station_name": "כאן 88",
+    "station_color": "#c86ae3"
+  },
+  {
+    "id": 8,
+    "station_id": 7,
+    "artist": "The Allman Brothers Band",
+    "title": "In Memory of Elizabeth Reed",
+    "text": "The Allman Brothers Band — In Memory of Elizabeth Reed",
+    "url": "https://www.shazam.com/track/483465/in-memory-of-elizabeth-reed",
+    "shazam_key": "483465",
+    "recognized_at": "2026-07-13T12:49:14Z",
+    "created_at": "2026-07-13 12:49:42",
+    "station_slug": "galil",
+    "station_name": "קול הגליל העליון",
+    "station_color": "#a06ae3"
+  }
+]
