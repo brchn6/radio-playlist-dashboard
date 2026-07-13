@@ -80,9 +80,18 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Shaggy",
+      "title": "In the Summertime (feat. Rayvon)",
+      "text": "Shaggy — In the Summertime (feat. Rayvon)",
+      "recognized_at": "2026-07-13T12:32:47Z",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 9,
-  "returned": 9,
-  "updated_at": "2026-07-13T12:29:06Z"
+  "total": 10,
+  "returned": 10,
+  "updated_at": "2026-07-13T12:33:06Z"
 }
