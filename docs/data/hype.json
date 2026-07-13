@@ -489,6 +489,14 @@
       "last_seen": "2026-07-13T15:05:37Z"
     },
     {
+      "artist": "Meir Banai",
+      "title": "תגידי אש תגידי מים",
+      "text": "Meir Banai — תגידי אש תגידי מים",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:09:07Z",
+      "last_seen": "2026-07-13T15:09:07Z"
+    },
+    {
       "artist": "meja",
       "title": "All 'Bout the Money (Hector's Radio Mix)",
       "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:53:58Z",
       "last_seen": "2026-07-13T14:53:58Z"
-    },
-    {
-      "artist": "Talking Heads",
-      "title": "Once In a Lifetime",
-      "text": "Talking Heads — Once In a Lifetime",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:30:25Z",
-      "last_seen": "2026-07-13T14:30:25Z"
     }
   ],
-  "updated_at": "2026-07-13T15:08:45Z"
+  "updated_at": "2026-07-13T15:09:15Z"
 }
