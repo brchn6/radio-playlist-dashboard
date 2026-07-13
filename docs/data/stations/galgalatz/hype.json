@@ -34,6 +34,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Paradisio",
+      "title": "Bailando",
+      "text": "Paradisio — Bailando",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:43:39Z",
+      "last_seen": "2026-07-13T13:43:39Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "The Pointer Sisters",
       "title": "I'm So Excited",
       "text": "The Pointer Sisters — I'm So Excited",
@@ -45,5 +56,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:41:25Z"
+  "updated_at": "2026-07-13T13:43:55Z"
 }

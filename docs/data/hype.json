@@ -129,6 +129,14 @@
       "last_seen": "2026-07-13T13:32:57Z"
     },
     {
+      "artist": "Paradisio",
+      "title": "Bailando",
+      "text": "Paradisio — Bailando",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:43:39Z",
+      "last_seen": "2026-07-13T13:43:39Z"
+    },
+    {
       "artist": "The Corrs",
       "title": "Radio ( MTV Unplugged Version )",
       "text": "The Corrs — Radio ( MTV Unplugged Version )",
@@ -153,5 +161,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:41:25Z"
+  "updated_at": "2026-07-13T13:43:55Z"
 }
