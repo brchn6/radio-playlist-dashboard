@@ -32,9 +32,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Carakukly & Liad Meir",
+      "title": "פבלו אסקובר",
+      "text": "Carakukly & Liad Meir — פבלו אסקובר",
+      "recognized_at": "2026-07-13T13:40:32Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 3,
-  "returned": 3,
-  "updated_at": "2026-07-13T13:39:35Z"
+  "total": 4,
+  "returned": 4,
+  "updated_at": "2026-07-13T13:40:35Z"
 }
