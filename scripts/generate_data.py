@@ -46,6 +46,22 @@ HEATMAP_DOW_DAYS = 30
 TRENDS_DAYS = 30
 RISING_MIN_PLAYS = 3
 
+# ── Repeat-data epoch ──────────────────────────────────────────────────
+# Until this moment the collector deduped tracks against ALL of history, so a
+# song replayed later on the same station was silently dropped: every track
+# before this timestamp has its repeats stripped. Play counts and any
+# repetition/redundancy metric are therefore MEANINGLESS on earlier rows —
+# computing them would understate repetition and let us publish false claims
+# about real radio stations. Any metric that counts repeats MUST filter with
+# repeat_safe() and MUST NOT be shown before MIN_EPOCH_HOURS of data exist.
+REPEAT_DATA_EPOCH = datetime(2026, 7, 13, 18, 5, 0, tzinfo=timezone.utc)
+MIN_EPOCH_HOURS = 48
+
+
+def repeat_safe(tracks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Only the tracks whose repeat counts can be trusted (see REPEAT_DATA_EPOCH)."""
+    return [t for t in tracks if t["_dt"] >= REPEAT_DATA_EPOCH]
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -292,6 +308,18 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     stats = db.get_stats()
     stats["tracks_by_date"] = db.get_track_count_by_date()
     stats["non_music"] = db.get_non_music_stats()
+
+    # Repeat/redundancy readiness — consumers must check `ready` before showing
+    # any "this station repeats itself" claim. See REPEAT_DATA_EPOCH.
+    trusted = repeat_safe(tracks)
+    hours_collected = (now - REPEAT_DATA_EPOCH).total_seconds() / 3600
+    stats["repeat_data"] = {
+        "epoch": REPEAT_DATA_EPOCH.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "hours_collected": round(max(0.0, hours_collected), 1),
+        "min_hours_required": MIN_EPOCH_HOURS,
+        "trusted_tracks": len(trusted),
+        "ready": hours_collected >= MIN_EPOCH_HOURS and len(trusted) > 0,
+    }
     today = now.astimezone(IL_TZ).strftime("%Y-%m-%d")
     today_tracks = [t for t in tracks if t["_il"].strftime("%Y-%m-%d") == today]
     hour_counts = [0] * 24

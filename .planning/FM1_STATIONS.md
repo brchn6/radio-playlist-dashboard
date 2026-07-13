@@ -1,13 +1,15 @@
-# FM1.co.il — Complete Station Data
+# Israeli radio stations — reference list
 
-Parsed from `https://fm1.co.il/data/data.json` on 2026-07-13
+**Source & credit:** station names and public stream endpoints were compiled from
+[fm1.co.il](https://fm1.co.il/), an online radio directory, on 2026-07-13.
+All credit for assembling this directory goes to them.
 
-**Total categories:** 8
-**Total stations:** 66
+We deliberately do **not** redistribute their dataset: the original
+`data.json` dump was removed from this repo. What remains here is the derived
+list we actually use — station names and their publicly published stream URLs.
+If you need the full directory, get it from fm1.co.il directly.
 
-This data was scraped from [fm1.co.il](https://fm1.co.il/) — an online radio directory. All stream URLs are extracted and ready for integration into the dashboard.
-
-The raw JSON source: `https://fm1.co.il/data/data.json`
+**Categories:** 8 · **Stations listed:** 66
 
 ---
 
