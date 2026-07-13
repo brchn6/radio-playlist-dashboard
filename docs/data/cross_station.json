@@ -34,6 +34,17 @@
       "last_seen": "2026-07-13T13:08:42Z"
     },
     {
+      "artist": "The National",
+      "title": "Slow Show",
+      "text": "The National — Slow Show",
+      "station_count": 2,
+      "station_names": "קול הגליל העליון,כאן ב",
+      "station_slugs": "galil,kan-bet",
+      "total_plays": 2,
+      "first_seen": "2026-07-13T13:10:42Z",
+      "last_seen": "2026-07-13T13:11:44Z"
+    },
+    {
       "artist": "SZA",
       "title": "Kill Bill",
       "text": "SZA — Kill Bill",
@@ -133,5 +144,5 @@
       "last_seen": "2026-07-13T12:58:15Z"
     }
   ],
-  "updated_at": "2026-07-13T13:11:12Z"
+  "updated_at": "2026-07-13T13:12:12Z"
 }
