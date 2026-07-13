@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 287,
+      "station_id": 7,
+      "artist": "Neil Young & Crazy Horse",
+      "title": "Love Earth",
+      "text": "Neil Young & Crazy Horse — Love Earth",
+      "url": "https://www.shazam.com/track/633808377/love-earth",
+      "shazam_key": "633808377",
+      "recognized_at": "2026-07-13T17:00:02Z",
+      "created_at": "2026-07-13 17:00:11",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
+      "id": 286,
+      "station_id": 1,
+      "artist": "Men At Work",
+      "title": "Down Under",
+      "text": "Men At Work — Down Under",
+      "url": "https://www.shazam.com/track/214136844/down-under",
+      "shazam_key": "214136844",
+      "recognized_at": "2026-07-13T16:59:58Z",
+      "created_at": "2026-07-13 17:00:11",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 285,
       "station_id": 7,
       "artist": "Mauro Corbani",
@@ -2913,7 +2941,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 208,
-  "returned": 208,
-  "updated_at": "2026-07-13T16:59:41Z"
+  "total": 210,
+  "returned": 210,
+  "updated_at": "2026-07-13T17:00:11Z"
 }

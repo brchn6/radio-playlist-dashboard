@@ -494,9 +494,20 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Men At Work",
+      "title": "Down Under",
+      "text": "Men At Work — Down Under",
+      "recognized_at": "2026-07-13T16:59:58Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 45,
-  "returned": 45,
-  "updated_at": "2026-07-13T16:59:41Z"
+  "total": 46,
+  "returned": 46,
+  "updated_at": "2026-07-13T17:00:11Z"
 }

@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 287,
+      "station_id": 7,
+      "artist": "Neil Young & Crazy Horse",
+      "title": "Love Earth",
+      "text": "Neil Young & Crazy Horse — Love Earth",
+      "url": "https://www.shazam.com/track/633808377/love-earth",
+      "shazam_key": "633808377",
+      "recognized_at": "2026-07-13T17:00:02Z",
+      "created_at": "2026-07-13 17:00:11",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 285,
       "station_id": 7,
       "artist": "Mauro Corbani",
@@ -491,6 +505,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 35,
-  "updated_at": "2026-07-13T16:59:41Z"
+  "total": 36,
+  "updated_at": "2026-07-13T17:00:11Z"
 }
