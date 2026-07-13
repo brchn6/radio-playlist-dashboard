@@ -617,6 +617,14 @@
       "last_seen": "2026-07-13T14:24:31Z"
     },
     {
+      "artist": "Tears for Fears",
+      "title": "Sowing The Seeds Of Love",
+      "text": "Tears for Fears — Sowing The Seeds Of Love",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:43:47Z",
+      "last_seen": "2026-07-13T14:43:47Z"
+    },
+    {
       "artist": "The Beatles",
       "title": "Eight Days a Week",
       "text": "The Beatles — Eight Days a Week",
@@ -705,5 +713,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:43:15Z"
+  "updated_at": "2026-07-13T14:43:49Z"
 }

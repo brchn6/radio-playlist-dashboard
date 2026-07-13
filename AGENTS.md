@@ -12,9 +12,15 @@ bash scripts/manage.sh logs      # view logs
 ```
 
 ## Architecture
-7 ShazamIO proxies (ports 8761-8767) → Updater (poll 30s) → SQLite → JSON → GitHub Pages.
+8 ShazamIO proxies (ports 8761-8768) → Updater (poll 30s) → SQLite → JSON → GitHub Pages.
 
 Stations defined in `scripts/db.py` (`STATIONS_CONFIG` list).
+
+### About port numbers
+Ports (8761-8768) are **internal only** — each proxy needs a unique port so they
+don't conflict. You never need to touch them day-to-day. `manage.sh` and
+`proxy_manager.py` handle everything. Only matters when debugging a specific
+proxy (e.g. checking if kan-88 on port 8765 is alive).
 
 ## Critical bugs already fixed
 1. **Shared temp dir** — all proxies now use `/tmp/1036-proxy-{slug}/`

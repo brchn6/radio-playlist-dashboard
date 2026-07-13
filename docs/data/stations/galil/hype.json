@@ -188,6 +188,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Tears for Fears",
+      "title": "Sowing The Seeds Of Love",
+      "text": "Tears for Fears — Sowing The Seeds Of Love",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:43:47Z",
+      "last_seen": "2026-07-13T14:43:47Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "The New Mastersounds",
       "title": "Your Love Is Mine",
       "text": "The New Mastersounds — Your Love Is Mine",
@@ -221,5 +232,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:43:15Z"
+  "updated_at": "2026-07-13T14:43:49Z"
 }

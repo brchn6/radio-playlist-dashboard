@@ -1011,9 +1011,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Tears for Fears",
+      "title": "Sowing The Seeds Of Love",
+      "text": "Tears for Fears — Sowing The Seeds Of Love",
+      "recognized_at": "2026-07-13T14:43:47Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 92,
-  "returned": 92,
-  "updated_at": "2026-07-13T14:43:15Z"
+  "total": 93,
+  "returned": 93,
+  "updated_at": "2026-07-13T14:43:49Z"
 }

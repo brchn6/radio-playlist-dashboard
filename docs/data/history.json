@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 170,
+      "station_id": 7,
+      "artist": "Tears for Fears",
+      "title": "Sowing The Seeds Of Love",
+      "text": "Tears for Fears — Sowing The Seeds Of Love",
+      "url": "https://www.shazam.com/track/10098796/sowing-the-seeds-of-love",
+      "shazam_key": "10098796",
+      "recognized_at": "2026-07-13T14:43:47Z",
+      "created_at": "2026-07-13 14:43:49",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 169,
       "station_id": 2,
       "artist": "Knesiyat Hasechel",
@@ -1289,7 +1303,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 92,
-  "returned": 92,
-  "updated_at": "2026-07-13T14:43:15Z"
+  "total": 93,
+  "returned": 93,
+  "updated_at": "2026-07-13T14:43:49Z"
 }

@@ -114,7 +114,7 @@
 <div class=container>
 <header>
   <h1>Radio Playlist Dashboard</h1>
-  <p>Live track monitoring across <span id=stationCount>8</span> Israeli radio stations</p>
+  <p>Live track monitoring across <span id=stationCount>8</span> Israeli radio stations · <span id=collectRange></span></p>
   <div class=status-bar>
     <span class="dot off" id=statusDot></span>
     <span id=statusText>Loading...</span>
@@ -409,6 +409,12 @@ async function fetchAll(){
 
     document.getElementById('statusDot').className='dot on';
     document.getElementById('statusText').textContent='Connected';
+    if(stat&&stat.first_track_at&&stat.last_track_at){
+      const f=new Date(stat.first_track_at.endsWith('Z')?stat.first_track_at:stat.first_track_at+'Z');
+      const l=new Date(stat.last_track_at.endsWith('Z')?stat.last_track_at:stat.last_track_at+'Z');
+      const opts={day:'numeric',month:'short',year:'numeric'};
+      document.getElementById('collectRange').textContent='Collecting since '+f.toLocaleDateString('en-US',opts);
+    }
     document.getElementById('lastUpdate').textContent=timeAgo(stat?.updated_at)||'-';
   }catch(e){
     console.warn(e);
