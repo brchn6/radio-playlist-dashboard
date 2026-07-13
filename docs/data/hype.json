@@ -41,6 +41,14 @@
       "last_seen": "2026-07-13T13:39:30Z"
     },
     {
+      "artist": "Adele",
+      "title": "Water Under the Bridge",
+      "text": "Adele — Water Under the Bridge",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:40:35Z",
+      "last_seen": "2026-07-13T16:40:35Z"
+    },
+    {
       "artist": "Alex Warren",
       "title": "FEVER DREAM",
       "text": "Alex Warren — FEVER DREAM",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:48:09Z",
       "last_seen": "2026-07-13T14:48:09Z"
-    },
-    {
-      "artist": "Of Monsters and Men",
-      "title": "Crystals",
-      "text": "Of Monsters and Men — Crystals",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:53:49Z",
-      "last_seen": "2026-07-13T13:53:49Z"
     }
   ],
-  "updated_at": "2026-07-13T16:40:30Z"
+  "updated_at": "2026-07-13T16:41:00Z"
 }
