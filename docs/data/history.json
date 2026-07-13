@@ -1,6 +1,16 @@
 {
   "history": [
     {
+      "id": 12,
+      "artist": "DJ Jazzy Jeff & The Fresh Prince",
+      "title": "Boom! Shake the Room",
+      "text": "DJ Jazzy Jeff & The Fresh Prince — Boom! Shake the Room",
+      "url": "https://www.shazam.com/track/10072820/boom-shake-the-room",
+      "shazam_key": "10072820",
+      "recognized_at": "2026-07-13T12:39:55Z",
+      "created_at": "2026-07-13 12:40:06"
+    },
+    {
       "id": 11,
       "artist": "Five",
       "title": "We Will Rock You",
@@ -111,7 +121,7 @@
       "created_at": "2026-07-13 12:04:28"
     }
   ],
-  "total": 11,
-  "returned": 11,
-  "updated_at": "2026-07-13T12:37:06Z"
+  "total": 12,
+  "returned": 12,
+  "updated_at": "2026-07-13T12:40:06Z"
 }
