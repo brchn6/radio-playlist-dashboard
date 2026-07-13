@@ -23,6 +23,17 @@
       "station_color": "#e3c86a"
     },
     {
+      "artist": "Bee Gees",
+      "title": "How Deep Is Your Love",
+      "text": "Bee Gees — How Deep Is Your Love",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:47:13Z",
+      "last_seen": "2026-07-13T16:47:13Z",
+      "station_slug": "radio-tlv",
+      "station_name": "רדיו תל אביב 102FM",
+      "station_color": "#e3c86a"
+    },
+    {
       "artist": "Chad Kroeger featuring Josey Scott",
       "title": "Hero (Motion Picture Version) [feat. Josey Scott]",
       "text": "Chad Kroeger featuring Josey Scott — Hero (Motion Picture Version) [feat. Josey Scott]",
@@ -144,5 +155,5 @@
       "station_color": "#e3c86a"
     }
   ],
-  "updated_at": "2026-07-13T16:46:51Z"
+  "updated_at": "2026-07-13T16:47:21Z"
 }
