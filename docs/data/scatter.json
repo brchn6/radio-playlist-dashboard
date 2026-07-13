@@ -1286,9 +1286,31 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "The Rolling Stones",
+      "title": "Jealous Lover",
+      "text": "The Rolling Stones — Jealous Lover",
+      "recognized_at": "2026-07-13T15:05:10Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Vanessa Amorosi",
+      "title": "Absolutely Everybody",
+      "text": "Vanessa Amorosi — Absolutely Everybody",
+      "recognized_at": "2026-07-13T15:05:12Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 117,
-  "returned": 117,
-  "updated_at": "2026-07-13T15:03:45Z"
+  "total": 119,
+  "returned": 119,
+  "updated_at": "2026-07-13T15:05:15Z"
 }

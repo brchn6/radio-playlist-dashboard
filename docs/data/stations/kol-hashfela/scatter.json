@@ -285,9 +285,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Vanessa Amorosi",
+      "title": "Absolutely Everybody",
+      "text": "Vanessa Amorosi — Absolutely Everybody",
+      "recognized_at": "2026-07-13T15:05:12Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 26,
-  "returned": 26,
-  "updated_at": "2026-07-13T15:03:45Z"
+  "total": 27,
+  "returned": 27,
+  "updated_at": "2026-07-13T15:05:15Z"
 }
