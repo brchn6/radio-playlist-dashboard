@@ -265,6 +265,14 @@
       "last_seen": "2026-07-13T16:33:34Z"
     },
     {
+      "artist": "Charlie Puth",
+      "title": "Attention",
+      "text": "Charlie Puth — Attention",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:49:49Z",
+      "last_seen": "2026-07-13T16:49:49Z"
+    },
+    {
       "artist": "Cold War Kids",
       "title": "There Goes The Night",
       "text": "Cold War Kids — There Goes The Night",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T15:09:07Z",
       "last_seen": "2026-07-13T15:09:07Z"
-    },
-    {
-      "artist": "meja",
-      "title": "All 'Bout the Money (Hector's Radio Mix)",
-      "text": "meja — All 'Bout the Money (Hector's Radio Mix)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:36:37Z",
-      "last_seen": "2026-07-13T14:36:37Z"
     }
   ],
-  "updated_at": "2026-07-13T16:49:21Z"
+  "updated_at": "2026-07-13T16:49:51Z"
 }

@@ -2133,9 +2133,31 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Nosei Hamigba'at",
+      "title": "Haba Bator Hu Sus",
+      "text": "Nosei Hamigba'at — Haba Bator Hu Sus",
+      "recognized_at": "2026-07-13T16:49:27Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Charlie Puth",
+      "title": "Attention",
+      "text": "Charlie Puth — Attention",
+      "recognized_at": "2026-07-13T16:49:49Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 194,
-  "returned": 194,
-  "updated_at": "2026-07-13T16:49:21Z"
+  "total": 196,
+  "returned": 196,
+  "updated_at": "2026-07-13T16:49:51Z"
 }

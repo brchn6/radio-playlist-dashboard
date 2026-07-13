@@ -318,9 +318,20 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Nosei Hamigba'at",
+      "title": "Haba Bator Hu Sus",
+      "text": "Nosei Hamigba'at — Haba Bator Hu Sus",
+      "recognized_at": "2026-07-13T16:49:27Z",
+      "station_slug": "99fm",
+      "station_color": "#6ab8e3",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 29,
-  "returned": 29,
-  "updated_at": "2026-07-13T16:49:21Z"
+  "total": 30,
+  "returned": 30,
+  "updated_at": "2026-07-13T16:49:51Z"
 }
