@@ -34,6 +34,17 @@
       "station_color": "#6ae3c1"
     },
     {
+      "artist": "Rihanna",
+      "title": "Don't Stop The Music",
+      "text": "Rihanna — Don't Stop The Music",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:19:47Z",
+      "last_seen": "2026-07-13T13:19:47Z",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "artist": "Sash!",
       "title": "Ecuador (Radio Edit)",
       "text": "Sash! — Ecuador (Radio Edit)",
@@ -111,5 +122,5 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "updated_at": "2026-07-13T13:19:12Z"
+  "updated_at": "2026-07-13T13:20:12Z"
 }

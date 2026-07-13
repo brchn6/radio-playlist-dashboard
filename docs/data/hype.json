@@ -257,6 +257,14 @@
       "last_seen": "2026-07-13T13:04:57Z"
     },
     {
+      "artist": "Rihanna",
+      "title": "Don't Stop The Music",
+      "text": "Rihanna — Don't Stop The Music",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:19:47Z",
+      "last_seen": "2026-07-13T13:19:47Z"
+    },
+    {
       "artist": "Stamatis Spanoudakis",
       "title": "Zi Ke Vasilevi",
       "text": "Stamatis Spanoudakis — Zi Ke Vasilevi",
@@ -337,5 +345,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:19:12Z"
+  "updated_at": "2026-07-13T13:20:12Z"
 }
