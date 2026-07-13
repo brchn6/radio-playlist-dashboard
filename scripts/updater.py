@@ -222,6 +222,9 @@ def main() -> None:
                 last_track = track
                 last_track_key = track.get("shazam_key")
 
+                # Save immediately so git push has fresh data
+                save_history(history, track, proxy_state)
+
                 # Auto-commit & push on new track
                 if DEFAULT_GIT_AUTO_PUSH:
                     track_text = track.get("text", "") or f"{track['artist']} — {track['title']}"
@@ -233,9 +236,10 @@ def main() -> None:
                 
                 # Periodic keepalive commit
                 if DEFAULT_GIT_AUTO_PUSH and iteration % 10 == 0:
+                    save_history(history, track, proxy_state)
                     git_commit_and_push(f"auto: keepalive [{now_iso()}]")
 
-        # Always save (updates timestamps and proxy state)
+        # Always save (updates timestamps and proxy state) — catches untracked changes too
         save_history(history, track or last_track, proxy_state)
 
         if args.once:
