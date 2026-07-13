@@ -55,3 +55,6 @@ Full project memory at `~/.memory/radio-playlist-dashboard.md` — **READ BEFORE
 
 ## Deployment Architecture Decisions
 Full analysis, failed attempts, and final solution documented in `.planning/DEPLOY-ARCHITECTURE.md` — read this before making any changes to the deploy pipeline.
+
+## Spotify Export Feature
+Planned feature to export station track history to Spotify playlists. Full planning session at `.planning/SPOTIFY-EXPORT.md` — covers 4 phases from basic "Open in Spotify" links to full API playlist creation.

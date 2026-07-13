@@ -23,7 +23,7 @@
       "station_id": 4,
       "station_name": "רדיו תל אביב 102FM",
       "station_slug": "radio-tlv",
-      "event_count": 9,
+      "event_count": 10,
       "total_seconds": 179.99994903802872,
       "last_event_at": "2026-07-13T17:44:42Z"
     },
@@ -39,7 +39,7 @@
       "station_id": 6,
       "station_name": "כאן ב",
       "station_slug": "kan-bet",
-      "event_count": 9,
+      "event_count": 10,
       "total_seconds": 179.99994903802872,
       "last_event_at": "2026-07-13T17:44:42Z"
     },
@@ -52,5 +52,5 @@
       "last_event_at": "2026-07-13T17:42:02Z"
     }
   ],
-  "updated_at": "2026-07-13T17:44:42Z"
+  "updated_at": "2026-07-13T17:45:02Z"
 }
