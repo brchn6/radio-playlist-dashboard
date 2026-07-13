@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 87,
+      "station_id": 5,
+      "artist": "Gala",
+      "title": "Let a Boy Cry",
+      "text": "Gala — Let a Boy Cry",
+      "url": "https://www.shazam.com/track/20066196/let-a-boy-cry",
+      "shazam_key": "20066196",
+      "recognized_at": "2026-07-13T13:32:41Z",
+      "created_at": "2026-07-13 13:33:05",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "id": 83,
       "station_id": 5,
       "artist": "Mooki",
@@ -29,6 +43,6 @@
       "station_color": "#c86ae3"
     }
   ],
-  "total": 2,
-  "updated_at": "2026-07-13T13:31:05Z"
+  "total": 3,
+  "updated_at": "2026-07-13T13:33:05Z"
 }

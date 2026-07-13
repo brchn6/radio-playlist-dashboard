@@ -21,9 +21,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Gala",
+      "title": "Let a Boy Cry",
+      "text": "Gala — Let a Boy Cry",
+      "recognized_at": "2026-07-13T13:32:41Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T13:31:05Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T13:33:05Z"
 }

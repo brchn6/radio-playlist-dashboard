@@ -12,6 +12,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Gala",
+      "title": "Let a Boy Cry",
+      "text": "Gala — Let a Boy Cry",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:32:41Z",
+      "last_seen": "2026-07-13T13:32:41Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Mooki",
       "title": "ילדה סוכר",
       "text": "Mooki — ילדה סוכר",
@@ -23,5 +34,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T13:31:05Z"
+  "updated_at": "2026-07-13T13:33:05Z"
 }
