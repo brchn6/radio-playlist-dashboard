@@ -193,6 +193,14 @@
       "last_seen": "2026-07-13T13:36:40Z"
     },
     {
+      "artist": "Ethnix",
+      "title": "מתי לחזור",
+      "text": "Ethnix — מתי לחזור",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:14:16Z",
+      "last_seen": "2026-07-13T14:14:16Z"
+    },
+    {
       "artist": "FINNEAS",
       "title": "Little Window",
       "text": "FINNEAS — Little Window",
@@ -433,5 +441,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:13:15Z"
+  "updated_at": "2026-07-13T14:14:19Z"
 }

@@ -120,9 +120,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Ethnix",
+      "title": "מתי לחזור",
+      "text": "Ethnix — מתי לחזור",
+      "recognized_at": "2026-07-13T14:14:16Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 11,
-  "returned": 11,
-  "updated_at": "2026-07-13T14:13:15Z"
+  "total": 12,
+  "returned": 12,
+  "updated_at": "2026-07-13T14:14:19Z"
 }

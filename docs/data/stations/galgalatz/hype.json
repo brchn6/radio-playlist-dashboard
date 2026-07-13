@@ -12,6 +12,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Ethnix",
+      "title": "מתי לחזור",
+      "text": "Ethnix — מתי לחזור",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:14:16Z",
+      "last_seen": "2026-07-13T14:14:16Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Ha'Eivrit",
       "title": "Mesibat Kita",
       "text": "Ha'Eivrit — Mesibat Kita",
@@ -122,5 +133,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T14:13:15Z"
+  "updated_at": "2026-07-13T14:14:19Z"
 }

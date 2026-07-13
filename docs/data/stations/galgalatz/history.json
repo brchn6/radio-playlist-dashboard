@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 136,
+      "station_id": 2,
+      "artist": "Ethnix",
+      "title": "מתי לחזור",
+      "text": "Ethnix — מתי לחזור",
+      "url": "https://www.shazam.com/track/200451014/%D7%9E%D7%AA%D7%99-%D7%9C%D7%97%D7%96%D7%95%D7%A8",
+      "shazam_key": "200451014",
+      "recognized_at": "2026-07-13T14:14:16Z",
+      "created_at": "2026-07-13 14:14:19",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 132,
       "station_id": 2,
       "artist": "Roei Adam",
@@ -155,6 +169,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 11,
-  "updated_at": "2026-07-13T14:13:15Z"
+  "total": 12,
+  "updated_at": "2026-07-13T14:14:19Z"
 }
