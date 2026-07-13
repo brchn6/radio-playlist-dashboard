@@ -1,5 +1,20 @@
 {
-  "history": [],
-  "total": 0,
-  "updated_at": "2026-07-13T12:50:12Z"
+  "history": [
+    {
+      "id": 12,
+      "station_id": 6,
+      "artist": "Aviv Geffen & התעויוט",
+      "title": "אל תדאג",
+      "text": "Aviv Geffen & התעויוט — אל תדאג",
+      "url": "https://www.shazam.com/track/58195487/%D7%90%D7%9C-%D7%AA%D7%93%D7%90%D7%92",
+      "shazam_key": "58195487",
+      "recognized_at": "2026-07-13T12:50:26Z",
+      "created_at": "2026-07-13 12:50:42",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
+    }
+  ],
+  "total": 1,
+  "updated_at": "2026-07-13T12:50:42Z"
 }

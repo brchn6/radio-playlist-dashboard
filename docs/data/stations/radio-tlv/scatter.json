@@ -21,9 +21,20 @@
       "day_of_week": "1",
       "hour": "12",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Aviv Geffen & התעויוט",
+      "title": "אל תדאג",
+      "text": "Aviv Geffen & התעויוט — אל תדאג",
+      "recognized_at": "2026-07-13T12:50:27Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "12",
+      "date": "2026-07-13"
     }
   ],
-  "total": 2,
-  "returned": 2,
-  "updated_at": "2026-07-13T12:50:12Z"
+  "total": 3,
+  "returned": 3,
+  "updated_at": "2026-07-13T12:50:42Z"
 }

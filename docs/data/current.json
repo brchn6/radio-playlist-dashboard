@@ -1,14 +1,14 @@
 [
   {
-    "id": 2,
+    "id": 10,
     "station_id": 1,
-    "artist": "Loft",
-    "title": "Hold On",
-    "text": "Loft — Hold On",
-    "url": "https://www.shazam.com/track/20085155/hold-on",
-    "shazam_key": "20085155",
-    "recognized_at": "2026-07-13T12:48:35Z",
-    "created_at": "2026-07-13 12:48:40",
+    "artist": "Years & Years",
+    "title": "Desire",
+    "text": "Years & Years — Desire",
+    "url": "https://www.shazam.com/track/153989377/desire",
+    "shazam_key": "153989377",
+    "recognized_at": "2026-07-13T12:50:12Z",
+    "created_at": "2026-07-13 12:50:42",
     "station_slug": "kol-hashfela",
     "station_name": "קול השפלה 103FM",
     "station_color": "#6ae3c1"
@@ -42,15 +42,15 @@
     "station_color": "#6ab8e3"
   },
   {
-    "id": 7,
+    "id": 11,
     "station_id": 4,
-    "artist": "Dominic Fike",
-    "title": "Babydoll",
-    "text": "Dominic Fike — Babydoll",
-    "url": "https://www.shazam.com/track/442648663/babydoll",
-    "shazam_key": "442648663",
-    "recognized_at": "2026-07-13T12:49:19Z",
-    "created_at": "2026-07-13 12:49:42",
+    "artist": "Aviv Geffen & התעויוט",
+    "title": "אל תדאג",
+    "text": "Aviv Geffen & התעויוט — אל תדאג",
+    "url": "https://www.shazam.com/track/58195487/%D7%90%D7%9C-%D7%AA%D7%93%D7%90%D7%92",
+    "shazam_key": "58195487",
+    "recognized_at": "2026-07-13T12:50:27Z",
+    "created_at": "2026-07-13 12:50:42",
     "station_slug": "radio-tlv",
     "station_name": "רדיו תל אביב 102FM",
     "station_color": "#e3c86a"
@@ -68,6 +68,20 @@
     "station_slug": "kan-88",
     "station_name": "כאן 88",
     "station_color": "#c86ae3"
+  },
+  {
+    "id": 12,
+    "station_id": 6,
+    "artist": "Aviv Geffen & התעויוט",
+    "title": "אל תדאג",
+    "text": "Aviv Geffen & התעויוט — אל תדאג",
+    "url": "https://www.shazam.com/track/58195487/%D7%90%D7%9C-%D7%AA%D7%93%D7%90%D7%92",
+    "shazam_key": "58195487",
+    "recognized_at": "2026-07-13T12:50:26Z",
+    "created_at": "2026-07-13 12:50:42",
+    "station_slug": "kan-bet",
+    "station_name": "כאן ב",
+    "station_color": "#e38a6a"
   },
   {
     "id": 8,
