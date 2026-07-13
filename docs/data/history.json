@@ -1,6 +1,34 @@
 {
   "history": [
     {
+      "id": 187,
+      "station_id": 7,
+      "artist": "Bon Jovi",
+      "title": "Livin' On A Prayer",
+      "text": "Bon Jovi — Livin' On A Prayer",
+      "url": "https://www.shazam.com/track/20145089/livin-on-a-prayer",
+      "shazam_key": "20145089",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "created_at": "2026-07-13 14:57:15",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
+      "id": 186,
+      "station_id": 1,
+      "artist": "Spooks",
+      "title": "Things I've Seen",
+      "text": "Spooks — Things I've Seen",
+      "url": "https://www.shazam.com/track/220019/things-ive-seen",
+      "shazam_key": "220019",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "created_at": "2026-07-13 14:57:15",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 185,
       "station_id": 4,
       "artist": "feinsmecker",
@@ -1513,7 +1541,7 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 108,
-  "returned": 108,
-  "updated_at": "2026-07-13T14:56:45Z"
+  "total": 110,
+  "returned": 110,
+  "updated_at": "2026-07-13T14:57:15Z"
 }

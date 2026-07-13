@@ -23,6 +23,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Bon Jovi",
+      "title": "Livin' On A Prayer",
+      "text": "Bon Jovi — Livin' On A Prayer",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:57:02Z",
+      "last_seen": "2026-07-13T14:57:02Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Bryan Adams",
       "title": "Summer Of '69",
       "text": "Bryan Adams — Summer Of '69",
@@ -254,5 +265,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:56:45Z"
+  "updated_at": "2026-07-13T14:57:15Z"
 }

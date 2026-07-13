@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 187,
+      "station_id": 7,
+      "artist": "Bon Jovi",
+      "title": "Livin' On A Prayer",
+      "text": "Bon Jovi — Livin' On A Prayer",
+      "url": "https://www.shazam.com/track/20145089/livin-on-a-prayer",
+      "shazam_key": "20145089",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "created_at": "2026-07-13 14:57:15",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "id": 182,
       "station_id": 7,
       "artist": "Johnny Hates Jazz",
@@ -323,6 +337,6 @@
       "station_color": "#a06ae3"
     }
   ],
-  "total": 23,
-  "updated_at": "2026-07-13T14:56:45Z"
+  "total": 24,
+  "updated_at": "2026-07-13T14:57:15Z"
 }

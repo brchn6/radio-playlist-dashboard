@@ -252,9 +252,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Bon Jovi",
+      "title": "Livin' On A Prayer",
+      "text": "Bon Jovi — Livin' On A Prayer",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 23,
-  "returned": 23,
-  "updated_at": "2026-07-13T14:56:45Z"
+  "total": 24,
+  "returned": 24,
+  "updated_at": "2026-07-13T14:57:15Z"
 }

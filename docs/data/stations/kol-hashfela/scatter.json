@@ -263,9 +263,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Spooks",
+      "title": "Things I've Seen",
+      "text": "Spooks — Things I've Seen",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 24,
-  "returned": 24,
-  "updated_at": "2026-07-13T14:56:45Z"
+  "total": 25,
+  "returned": 25,
+  "updated_at": "2026-07-13T14:57:15Z"
 }

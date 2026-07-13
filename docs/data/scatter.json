@@ -1187,9 +1187,31 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Spooks",
+      "title": "Things I've Seen",
+      "text": "Spooks — Things I've Seen",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Bon Jovi",
+      "title": "Livin' On A Prayer",
+      "text": "Bon Jovi — Livin' On A Prayer",
+      "recognized_at": "2026-07-13T14:57:02Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 108,
-  "returned": 108,
-  "updated_at": "2026-07-13T14:56:45Z"
+  "total": 110,
+  "returned": 110,
+  "updated_at": "2026-07-13T14:57:15Z"
 }
