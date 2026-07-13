@@ -45,6 +45,17 @@
       "station_color": "#e38a6a"
     },
     {
+      "artist": "Malcolm Todd",
+      "title": "Earrings",
+      "text": "Malcolm Todd — Earrings",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:25:11Z",
+      "last_seen": "2026-07-13T13:25:11Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
+    },
+    {
       "artist": "Nouvelle Vague",
       "title": "In a Manner of Speaking (feat. Camille)",
       "text": "Nouvelle Vague — In a Manner of Speaking (feat. Camille)",
@@ -111,5 +122,5 @@
       "station_color": "#e38a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:24:12Z"
+  "updated_at": "2026-07-13T13:25:12Z"
 }
