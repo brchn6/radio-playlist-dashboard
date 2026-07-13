@@ -2331,9 +2331,31 @@
       "day_of_week": "1",
       "hour": "17",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Keb' Mo'",
+      "title": "Hand It Over (feat. Soweto Gospel Choir)",
+      "text": "Keb' Mo' — Hand It Over (feat. Soweto Gospel Choir)",
+      "recognized_at": "2026-07-13T17:03:44Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "The Shins",
+      "title": "New Slang",
+      "text": "The Shins — New Slang",
+      "recognized_at": "2026-07-13T17:04:08Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "17",
+      "date": "2026-07-13"
     }
   ],
-  "total": 212,
-  "returned": 212,
-  "updated_at": "2026-07-13T17:03:41Z"
+  "total": 214,
+  "returned": 214,
+  "updated_at": "2026-07-13T17:04:11Z"
 }

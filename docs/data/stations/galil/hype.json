@@ -353,6 +353,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "The Shins",
+      "title": "New Slang",
+      "text": "The Shins — New Slang",
+      "play_count": 1,
+      "first_seen": "2026-07-13T17:04:08Z",
+      "last_seen": "2026-07-13T17:04:08Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "The Statler Brothers",
       "title": "Flowers On the Wall",
       "text": "The Statler Brothers — Flowers On the Wall",
@@ -397,5 +408,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T17:03:41Z"
+  "updated_at": "2026-07-13T17:04:11Z"
 }
