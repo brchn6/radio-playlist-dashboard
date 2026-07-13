@@ -257,6 +257,14 @@
       "last_seen": "2026-07-13T13:27:35Z"
     },
     {
+      "artist": "Hila Ruach",
+      "title": "אולי זה נגמר",
+      "text": "Hila Ruach — אולי זה נגמר",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:24:49Z",
+      "last_seen": "2026-07-13T14:24:49Z"
+    },
+    {
       "artist": "Jasmin Moallem",
       "title": "תן לי את האששש",
       "text": "Jasmin Moallem — תן לי את האששש",
@@ -521,5 +529,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:24:45Z"
+  "updated_at": "2026-07-13T14:24:49Z"
 }

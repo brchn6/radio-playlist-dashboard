@@ -758,9 +758,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Hila Ruach",
+      "title": "אולי זה נגמר",
+      "text": "Hila Ruach — אולי זה נגמר",
+      "recognized_at": "2026-07-13T14:24:49Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 69,
-  "returned": 69,
-  "updated_at": "2026-07-13T14:24:45Z"
+  "total": 70,
+  "returned": 70,
+  "updated_at": "2026-07-13T14:24:49Z"
 }

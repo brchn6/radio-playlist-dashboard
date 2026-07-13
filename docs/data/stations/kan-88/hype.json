@@ -78,6 +78,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Hila Ruach",
+      "title": "אולי זה נגמר",
+      "text": "Hila Ruach — אולי זה נגמר",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:24:49Z",
+      "last_seen": "2026-07-13T14:24:49Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Lipps, Inc.",
       "title": "Funkytown (Long Version)",
       "text": "Lipps, Inc. — Funkytown (Long Version)",
@@ -144,5 +155,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:24:45Z"
+  "updated_at": "2026-07-13T14:24:49Z"
 }
