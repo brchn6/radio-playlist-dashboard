@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 105,
+      "station_id": 2,
+      "artist": "Jungle",
+      "title": "All of the Time (DJ Streaks Remix)",
+      "text": "Jungle — All of the Time (DJ Streaks Remix)",
+      "url": "https://www.shazam.com/track/585052710/all-of-the-time-dj-streaks-remix",
+      "shazam_key": "585052710",
+      "recognized_at": "2026-07-13T13:47:44Z",
+      "created_at": "2026-07-13 13:47:55",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "id": 100,
       "station_id": 2,
       "artist": "Paradisio",
@@ -71,6 +85,6 @@
       "station_color": "#e36a6a"
     }
   ],
-  "total": 5,
-  "updated_at": "2026-07-13T13:47:05Z"
+  "total": 6,
+  "updated_at": "2026-07-13T13:47:55Z"
 }

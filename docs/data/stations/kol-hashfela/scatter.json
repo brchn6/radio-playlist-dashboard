@@ -65,9 +65,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Robin Thicke",
+      "title": "Blurred Lines (feat. T.I. & Pharrell)",
+      "text": "Robin Thicke — Blurred Lines (feat. T.I. & Pharrell)",
+      "recognized_at": "2026-07-13T13:47:39Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 6,
-  "returned": 6,
-  "updated_at": "2026-07-13T13:47:05Z"
+  "total": 7,
+  "returned": 7,
+  "updated_at": "2026-07-13T13:47:55Z"
 }

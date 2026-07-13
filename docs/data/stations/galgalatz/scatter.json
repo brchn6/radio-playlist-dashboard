@@ -54,9 +54,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Jungle",
+      "title": "All of the Time (DJ Streaks Remix)",
+      "text": "Jungle — All of the Time (DJ Streaks Remix)",
+      "recognized_at": "2026-07-13T13:47:44Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 5,
-  "returned": 5,
-  "updated_at": "2026-07-13T13:47:05Z"
+  "total": 6,
+  "returned": 6,
+  "updated_at": "2026-07-13T13:47:55Z"
 }
