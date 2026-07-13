@@ -34,6 +34,17 @@
       "station_color": "#c86ae3"
     },
     {
+      "artist": "Cold War Kids",
+      "title": "There Goes The Night",
+      "text": "Cold War Kids — There Goes The Night",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:08:01Z",
+      "last_seen": "2026-07-13T14:08:01Z",
+      "station_slug": "kan-88",
+      "station_name": "כאן 88",
+      "station_color": "#c86ae3"
+    },
+    {
       "artist": "Ehud Banai",
       "title": "טיפ טיפה",
       "text": "Ehud Banai — טיפ טיפה",
@@ -111,5 +122,5 @@
       "station_color": "#c86ae3"
     }
   ],
-  "updated_at": "2026-07-13T14:06:45Z"
+  "updated_at": "2026-07-13T14:08:15Z"
 }

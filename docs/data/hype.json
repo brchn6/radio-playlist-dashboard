@@ -113,6 +113,14 @@
       "last_seen": "2026-07-13T13:40:32Z"
     },
     {
+      "artist": "Cold War Kids",
+      "title": "There Goes The Night",
+      "text": "Cold War Kids — There Goes The Night",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:08:01Z",
+      "last_seen": "2026-07-13T14:08:01Z"
+    },
+    {
       "artist": "Corinne Allal",
       "title": "ארץ קטנה עם שפם",
       "text": "Corinne Allal — ארץ קטנה עם שפם",
@@ -223,6 +231,14 @@
       "play_count": 1,
       "first_seen": "2026-07-13T13:52:52Z",
       "last_seen": "2026-07-13T13:52:52Z"
+    },
+    {
+      "artist": "Måneskin",
+      "title": "Beggin'",
+      "text": "Måneskin — Beggin'",
+      "play_count": 1,
+      "first_seen": "2026-07-13T14:08:03Z",
+      "last_seen": "2026-07-13T14:08:03Z"
     },
     {
       "artist": "Of Monsters and Men",
@@ -361,5 +377,5 @@
       "last_seen": "2026-07-13T14:05:04Z"
     }
   ],
-  "updated_at": "2026-07-13T14:06:45Z"
+  "updated_at": "2026-07-13T14:08:15Z"
 }

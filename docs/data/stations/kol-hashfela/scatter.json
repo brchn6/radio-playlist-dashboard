@@ -109,9 +109,20 @@
       "day_of_week": "1",
       "hour": "14",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Måneskin",
+      "title": "Beggin'",
+      "text": "Måneskin — Beggin'",
+      "recognized_at": "2026-07-13T14:08:03Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "14",
+      "date": "2026-07-13"
     }
   ],
-  "total": 10,
-  "returned": 10,
-  "updated_at": "2026-07-13T14:06:45Z"
+  "total": 11,
+  "returned": 11,
+  "updated_at": "2026-07-13T14:08:15Z"
 }
