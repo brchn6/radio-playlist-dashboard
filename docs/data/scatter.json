@@ -1836,9 +1836,31 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Portishead",
+      "title": "Glory Box",
+      "text": "Portishead — Glory Box",
+      "recognized_at": "2026-07-13T16:33:33Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Chad Kroeger featuring Josey Scott",
+      "title": "Hero (Motion Picture Version) [feat. Josey Scott]",
+      "text": "Chad Kroeger featuring Josey Scott — Hero (Motion Picture Version) [feat. Josey Scott]",
+      "recognized_at": "2026-07-13T16:33:34Z",
+      "station_slug": "radio-tlv",
+      "station_color": "#e3c86a",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 167,
-  "returned": 167,
-  "updated_at": "2026-07-13T16:33:30Z"
+  "total": 169,
+  "returned": 169,
+  "updated_at": "2026-07-13T16:34:00Z"
 }

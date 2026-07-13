@@ -225,6 +225,14 @@
       "last_seen": "2026-07-13T13:40:32Z"
     },
     {
+      "artist": "Chad Kroeger featuring Josey Scott",
+      "title": "Hero (Motion Picture Version) [feat. Josey Scott]",
+      "text": "Chad Kroeger featuring Josey Scott — Hero (Motion Picture Version) [feat. Josey Scott]",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:33:34Z",
+      "last_seen": "2026-07-13T16:33:34Z"
+    },
+    {
       "artist": "Cold War Kids",
       "title": "There Goes The Night",
       "text": "Cold War Kids — There Goes The Night",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:48:19Z",
       "last_seen": "2026-07-13T14:48:19Z"
-    },
-    {
-      "artist": "Pearl Jam",
-      "title": "Sirens",
-      "text": "Pearl Jam — Sirens",
-      "play_count": 1,
-      "first_seen": "2026-07-13T14:11:23Z",
-      "last_seen": "2026-07-13T14:11:23Z"
     }
   ],
-  "updated_at": "2026-07-13T16:33:30Z"
+  "updated_at": "2026-07-13T16:34:00Z"
 }
