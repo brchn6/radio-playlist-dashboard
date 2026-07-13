@@ -49,7 +49,11 @@
 - [x] Per-station Stats
 - [x] Comparison scatter (overlay all stations)
 
-## 🔲 Phase 6 — Polish
+## 🔲 Phase 6 — Resilience
+- [ ] **429 (rate limit) handling in proxy** — exponential backoff (1min→2min→4min→…→15max) when Shazam returns 429, instead of aggressive 5s retry
+- [ ] Shared rate limiter across all 8 proxies (stagger API calls so they don't all hit Shazam simultaneously)
+
+## 🔲 Phase 7 — Polish
 - [ ] 99FM and 102FM referer header fix (streams return 403 sometimes)
 - [ ] SystemD template units for proxies
 - [ ] Stress test with all 7 stations running 24h
