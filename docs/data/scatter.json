@@ -1352,9 +1352,20 @@
       "day_of_week": "1",
       "hour": "15",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Creedence Clearwater Revival",
+      "title": "Have You Ever Seen The Rain",
+      "text": "Creedence Clearwater Revival — Have You Ever Seen The Rain",
+      "recognized_at": "2026-07-13T15:08:30Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "15",
+      "date": "2026-07-13"
     }
   ],
-  "total": 123,
-  "returned": 123,
-  "updated_at": "2026-07-13T15:08:19Z"
+  "total": 124,
+  "returned": 124,
+  "updated_at": "2026-07-13T15:08:45Z"
 }

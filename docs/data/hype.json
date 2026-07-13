@@ -201,6 +201,14 @@
       "last_seen": "2026-07-13T14:06:38Z"
     },
     {
+      "artist": "Creedence Clearwater Revival",
+      "title": "Have You Ever Seen The Rain",
+      "text": "Creedence Clearwater Revival — Have You Ever Seen The Rain",
+      "play_count": 1,
+      "first_seen": "2026-07-13T15:08:30Z",
+      "last_seen": "2026-07-13T15:08:30Z"
+    },
+    {
       "artist": "Crowded House",
       "title": "Don't Dream It's Over",
       "text": "Crowded House — Don't Dream It's Over",
@@ -791,15 +799,7 @@
       "play_count": 1,
       "first_seen": "2026-07-13T14:30:25Z",
       "last_seen": "2026-07-13T14:30:25Z"
-    },
-    {
-      "artist": "Taylor Swift",
-      "title": "Fortnight (feat. Post Malone)",
-      "text": "Taylor Swift — Fortnight (feat. Post Malone)",
-      "play_count": 1,
-      "first_seen": "2026-07-13T13:44:41Z",
-      "last_seen": "2026-07-13T13:44:41Z"
     }
   ],
-  "updated_at": "2026-07-13T15:08:19Z"
+  "updated_at": "2026-07-13T15:08:45Z"
 }
