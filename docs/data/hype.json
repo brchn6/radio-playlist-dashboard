@@ -49,6 +49,14 @@
       "last_seen": "2026-07-13T13:08:39Z"
     },
     {
+      "artist": "Hadag Nahash",
+      "title": "הכל יסתדר (feat. פלד)",
+      "text": "Hadag Nahash — הכל יסתדר (feat. פלד)",
+      "play_count": 2,
+      "first_seen": "2026-07-13T13:13:55Z",
+      "last_seen": "2026-07-13T13:13:57Z"
+    },
+    {
       "artist": "Janis Joplin",
       "title": "To Love Somebody",
       "text": "Janis Joplin — To Love Somebody",
@@ -289,5 +297,5 @@
       "last_seen": "2026-07-13T12:50:12Z"
     }
   ],
-  "updated_at": "2026-07-13T13:13:42Z"
+  "updated_at": "2026-07-13T13:14:12Z"
 }

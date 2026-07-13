@@ -76,9 +76,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Hadag Nahash",
+      "title": "הכל יסתדר (feat. פלד)",
+      "text": "Hadag Nahash — הכל יסתדר (feat. פלד)",
+      "recognized_at": "2026-07-13T13:13:57Z",
+      "station_slug": "kan-bet",
+      "station_color": "#e38a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T13:13:42Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T13:14:12Z"
 }

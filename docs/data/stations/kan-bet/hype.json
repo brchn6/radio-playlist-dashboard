@@ -34,6 +34,17 @@
       "station_color": "#e38a6a"
     },
     {
+      "artist": "Hadag Nahash",
+      "title": "הכל יסתדר (feat. פלד)",
+      "text": "Hadag Nahash — הכל יסתדר (feat. פלד)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:13:57Z",
+      "last_seen": "2026-07-13T13:13:57Z",
+      "station_slug": "kan-bet",
+      "station_name": "כאן ב",
+      "station_color": "#e38a6a"
+    },
+    {
       "artist": "Sash!",
       "title": "Ecuador (Radio Edit)",
       "text": "Sash! — Ecuador (Radio Edit)",
@@ -78,5 +89,5 @@
       "station_color": "#e38a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:13:42Z"
+  "updated_at": "2026-07-13T13:14:12Z"
 }

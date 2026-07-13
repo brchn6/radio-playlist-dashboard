@@ -23,6 +23,17 @@
       "station_color": "#e36a6a"
     },
     {
+      "artist": "Hadag Nahash",
+      "title": "הכל יסתדר (feat. פלד)",
+      "text": "Hadag Nahash — הכל יסתדר (feat. פלד)",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:13:55Z",
+      "last_seen": "2026-07-13T13:13:55Z",
+      "station_slug": "galgalatz",
+      "station_name": "גלגלצ",
+      "station_color": "#e36a6a"
+    },
+    {
       "artist": "Margalit Tzan׳ani",
       "title": "לשיר ולהנות",
       "text": "Margalit Tzan׳ani — לשיר ולהנות",
@@ -56,5 +67,5 @@
       "station_color": "#e36a6a"
     }
   ],
-  "updated_at": "2026-07-13T13:13:42Z"
+  "updated_at": "2026-07-13T13:14:12Z"
 }
