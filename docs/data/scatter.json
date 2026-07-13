@@ -43,9 +43,42 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Mooki",
+      "title": "ילדה סוכר",
+      "text": "Mooki — ילדה סוכר",
+      "recognized_at": "2026-07-13T13:30:38Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Mooki",
+      "title": "ילדה סוכר",
+      "text": "Mooki — ילדה סוכר",
+      "recognized_at": "2026-07-13T13:30:38Z",
+      "station_slug": "kan-88",
+      "station_color": "#c86ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Garbage",
+      "title": "You Look so Fine (2018 Remaster)",
+      "text": "Garbage — You Look so Fine (2018 Remaster)",
+      "recognized_at": "2026-07-13T13:30:41Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 4,
-  "returned": 4,
-  "updated_at": "2026-07-13T13:28:05Z"
+  "total": 7,
+  "returned": 7,
+  "updated_at": "2026-07-13T13:31:05Z"
 }
