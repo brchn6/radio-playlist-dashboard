@@ -170,6 +170,14 @@
     },
     {
       "artist": "Olivia Rodrigo",
+      "title": "stupid song",
+      "text": "Olivia Rodrigo — stupid song",
+      "play_count": 1,
+      "first_seen": "2026-07-13T13:52:45Z",
+      "last_seen": "2026-07-13T13:52:45Z"
+    },
+    {
+      "artist": "Olivia Rodrigo",
       "title": "vampire",
       "text": "Olivia Rodrigo — vampire",
       "play_count": 1,
@@ -225,5 +233,5 @@
       "last_seen": "2026-07-13T13:34:27Z"
     }
   ],
-  "updated_at": "2026-07-13T13:51:22Z"
+  "updated_at": "2026-07-13T13:52:45Z"
 }

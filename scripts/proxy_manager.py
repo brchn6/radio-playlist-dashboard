@@ -166,23 +166,30 @@ def start_all() -> list[dict[str, Any]]:
 
 
 def stop_all() -> list[dict[str, Any]]:
-    """Stop all running proxies. Also kills any orphan shazamio processes."""
+    """Stop all proxies. Also kills any process on proxy ports (orphans)."""
     results = []
     for s in STATIONS_CONFIG:
         result = stop_one(s["slug"])
         results.append(result)
     
-    # Kill any remaining shazamio orphan processes (not tracked by PID files)
+    # Nuclear: kill ANY process listening on our proxy ports
     import subprocess
-    try:
-        result = subprocess.run(
-            ["pkill", "-f", "shazamio_proxy.py"],
-            capture_output=True, timeout=5,
-        )
-        if result.returncode == 0:
-            print("[proxy_manager] Killed orphan shazamio processes", flush=True)
-    except Exception:
-        pass
+    for s in STATIONS_CONFIG:
+        port = s["proxy_port"]
+        try:
+            # Find PID listening on the port and kill it
+            result = subprocess.run(
+                ["ss", "-tlnp"], capture_output=True, text=True, timeout=5,
+            )
+            for line in result.stdout.splitlines():
+                if f":{port} " in line and "pid=" in line:
+                    pid = line.split("pid=")[1].split(",")[0]
+                    if pid and pid.isdigit():
+                        os.kill(int(pid), signal.SIGKILL)
+                        print(f"[proxy_manager] Killed orphan PID {pid} on port {port}", flush=True)
+                        time.sleep(0.2)
+        except Exception:
+            pass
     
     return results
 

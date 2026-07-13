@@ -76,9 +76,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Olivia Rodrigo",
+      "title": "stupid song",
+      "text": "Olivia Rodrigo — stupid song",
+      "recognized_at": "2026-07-13T13:52:45Z",
+      "station_slug": "galgalatz",
+      "station_color": "#e36a6a",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T13:51:22Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T13:52:45Z"
 }
