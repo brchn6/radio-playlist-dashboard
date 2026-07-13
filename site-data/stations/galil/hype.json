@@ -232,6 +232,17 @@
       "station_color": "#a06ae3"
     },
     {
+      "artist": "Shuggie Otis",
+      "title": "Aht Uh Mi Hed",
+      "text": "Shuggie Otis — Aht Uh Mi Hed",
+      "play_count": 1,
+      "first_seen": "2026-07-13T16:48:47Z",
+      "last_seen": "2026-07-13T16:48:47Z",
+      "station_slug": "galil",
+      "station_name": "קול הגליל העליון",
+      "station_color": "#a06ae3"
+    },
+    {
       "artist": "Sia",
       "title": "Bird Set Free",
       "text": "Sia — Bird Set Free",
@@ -342,5 +353,5 @@
       "station_color": "#a06ae3"
     }
   ],
-  "updated_at": "2026-07-13T16:48:21Z"
+  "updated_at": "2026-07-13T16:48:51Z"
 }

@@ -2100,9 +2100,31 @@
       "day_of_week": "1",
       "hour": "16",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Gali Atari",
+      "title": "חזקה מהרוח",
+      "text": "Gali Atari — חזקה מהרוח",
+      "recognized_at": "2026-07-13T16:48:45Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
+    },
+    {
+      "artist": "Shuggie Otis",
+      "title": "Aht Uh Mi Hed",
+      "text": "Shuggie Otis — Aht Uh Mi Hed",
+      "recognized_at": "2026-07-13T16:48:47Z",
+      "station_slug": "galil",
+      "station_color": "#a06ae3",
+      "day_of_week": "1",
+      "hour": "16",
+      "date": "2026-07-13"
     }
   ],
-  "total": 191,
-  "returned": 191,
-  "updated_at": "2026-07-13T16:48:21Z"
+  "total": 193,
+  "returned": 193,
+  "updated_at": "2026-07-13T16:48:51Z"
 }
