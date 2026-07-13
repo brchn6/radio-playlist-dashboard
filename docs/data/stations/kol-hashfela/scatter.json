@@ -76,9 +76,20 @@
       "day_of_week": "1",
       "hour": "13",
       "date": "2026-07-13"
+    },
+    {
+      "artist": "Billy Ocean",
+      "title": "Get Outta My Dreams, Get Into My Car",
+      "text": "Billy Ocean — Get Outta My Dreams, Get Into My Car",
+      "recognized_at": "2026-07-13T13:55:48Z",
+      "station_slug": "kol-hashfela",
+      "station_color": "#6ae3c1",
+      "day_of_week": "1",
+      "hour": "13",
+      "date": "2026-07-13"
     }
   ],
-  "total": 7,
-  "returned": 7,
-  "updated_at": "2026-07-13T13:55:45Z"
+  "total": 8,
+  "returned": 8,
+  "updated_at": "2026-07-13T13:55:49Z"
 }
