@@ -1,6 +1,20 @@
 {
   "history": [
     {
+      "id": 50,
+      "station_id": 1,
+      "artist": "The Jacksons",
+      "title": "Can You Feel It",
+      "text": "The Jacksons — Can You Feel It",
+      "url": "https://www.shazam.com/track/10174718/can-you-feel-it",
+      "shazam_key": "10174718",
+      "recognized_at": "2026-07-13T13:12:39Z",
+      "created_at": "2026-07-13 13:12:42",
+      "station_slug": "kol-hashfela",
+      "station_name": "קול השפלה 103FM",
+      "station_color": "#6ae3c1"
+    },
+    {
       "id": 39,
       "station_id": 1,
       "artist": "Benzin",
@@ -99,6 +113,6 @@
       "station_color": "#6ae3c1"
     }
   ],
-  "total": 7,
-  "updated_at": "2026-07-13T13:12:12Z"
+  "total": 8,
+  "updated_at": "2026-07-13T13:12:42Z"
 }
