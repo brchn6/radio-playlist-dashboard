@@ -1086,8 +1086,7 @@ function toggleSelectAll(){
 function copySelectedAsText(){
   const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
   if(!selected.length){alert('לא נבחרו שירים');return}
-  const text=selected.map(t=>((t.artist||'')+' — '+(t.title||'')).trim()).join('
-');
+  const text=selected.map(t=>((t.artist||'')+' — '+(t.title||'')).trim()).join('\n');
   navigator.clipboard.writeText(text).then(()=>{
     alert('הועתקו '+selected.length+' שירים');
   }).catch(()=>{
@@ -1119,8 +1118,7 @@ function exportCSV(){
   const headers=['Station','Artist','Title','Recognized At'];
   const rows=el._data.map(t=>[t.station_name,t.artist,t.title,t.recognized_at]
     .map(v=>(v||'').toString().replace(/,/g,' ')));
-  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('
-');
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
   a.download='radio-playlist-'+new Date().toISOString().slice(0,10)+'.csv';
