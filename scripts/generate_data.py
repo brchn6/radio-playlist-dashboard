@@ -36,7 +36,7 @@ DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
 
 IL_TZ = ZoneInfo("Asia/Jerusalem")
 
-HISTORY_LIMIT = 1000          # global history entries served to the page
+HISTORY_LIMIT = 5000          # global history entries served to the page
 STATION_HISTORY_LIMIT = 300   # per-station history entries
 TIMELINE_HOURS = 48
 TOP_LIMIT = 50                # per window; client re-ranks for station filter
