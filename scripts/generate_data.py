@@ -321,6 +321,28 @@ def build_song_clusters(tracks: list[dict[str, Any]], now: datetime) -> dict[str
     for s in result_songs:
         groups[s["group"]].append(s)
 
+    # Build edges from co-occurrence (deduplicated)
+    seen_edges: set[tuple[int, int]] = set()
+    edges = []
+    for a_idx, (orig_a, sa) in enumerate(filtered):
+        for b_idx, (orig_b, sb) in enumerate(filtered):
+            if a_idx >= b_idx:
+                continue
+            pair = (min(orig_a, orig_b), max(orig_a, orig_b))
+            if pair in seen_edges:
+                continue
+            seen_edges.add(pair)
+            c = cooccur[orig_a].get(orig_b, 0)
+            if c > 0:
+                edges.append({
+                    "source": result_songs[a_idx]["artist"] + "||" + result_songs[a_idx]["title"].lower(),
+                    "target": result_songs[b_idx]["artist"] + "||" + result_songs[b_idx]["title"].lower(),
+                    "count": c,
+                })
+
+    # Sort edges by count desc, keep top connections for visual clarity
+    edges.sort(key=lambda e: -e["count"])
+
     # Sort groups: cross-station first, then by size descending
     group_order = sorted(groups.keys(), key=lambda g: (
         0 if g == "cross-station" else 1, -len(groups[g])))
@@ -330,6 +352,7 @@ def build_song_clusters(tracks: list[dict[str, Any]], now: datetime) -> dict[str
             {"slug": g, "songs": groups[g]}
             for g in group_order
         ],
+        "edges": edges,
         "ready": True,
         "total_songs": len(result_songs),
         "window_hours": CLUSTER_HOURS,
