@@ -200,6 +200,141 @@ def build_non_music(db: PlaylistDB, slugs: list[str], now: datetime) -> dict[str
     }
 
 
+def build_song_clusters(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
+    """Co-occurrence-based song clustering via MDS.
+
+    Two songs co-occur if they:
+    1. Play within 30 min on the same station (sequential programming)
+    2. Play at the same time on different stations (simultaneous)
+
+    MDS projects the distance matrix (1 / (1 + co-occurrences)) to 2D
+    so that songs that frequently co-occur end up close together.
+    """
+    import numpy as np
+    import warnings
+    warnings.filterwarnings('ignore', category=FutureWarning, module='sklearn')
+    from sklearn.manifold import MDS
+    from collections import defaultdict
+
+    # Only use last 48h for bounded computation
+    cutoff = now - timedelta(hours=TIMELINE_HOURS)
+    recent = [t for t in tracks if t["_dt"] >= cutoff]
+
+    # Group by station, sort by time
+    by_station: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for t in recent:
+        by_station[t["station_slug"]].append(t)
+    for slug in by_station:
+        by_station[slug].sort(key=lambda x: x["_dt"])
+
+    # Build song registry and co-occurrence counts
+    song_to_idx: dict[str, int] = {}
+    songs: list[dict[str, Any]] = []
+    def get_or_create(t):
+        key = song_key(t)
+        if key not in song_to_idx:
+            song_to_idx[key] = len(songs)
+            songs.append({"key": key, "artist": t["artist"], "title": t["title"],
+                          "plays": 0, "stations": set()})
+        return song_to_idx[key]
+
+    # First pass: register all songs (count plays once per track)
+    for slug, st in by_station.items():
+        for t in st:
+            idx = get_or_create(t)
+            songs[idx]["plays"] += 1
+            songs[idx]["stations"].add(t["station_slug"])
+
+    # Count co-occurrences (sparse)
+    cooccur: dict[int, dict[int, int]] = defaultdict(lambda: defaultdict(int))
+
+    # 1. Same-station sequential: walk through each station
+    SAME_WIN = 30  # minutes
+    for slug, st in by_station.items():
+        for i in range(len(st)):
+            idx_i = get_or_create(st[i])
+            t_i = st[i]["_dt"]
+            for j in range(i + 1, min(i + 20, len(st))):
+                dt = (st[j]["_dt"] - t_i).total_seconds() / 60
+                if dt > SAME_WIN:
+                    break
+                idx_j = get_or_create(st[j])
+                cooccur[idx_i][idx_j] += 1
+                cooccur[idx_j][idx_i] += 1
+
+    # 2. Cross-station simultaneous: 5-min buckets
+    CROSS_WIN = 5  # minutes
+    bucketed: dict[str, list[int]] = defaultdict(list)
+    for t in recent:
+        bucket_key = t["_il"].strftime("%Y-%m-%dT%H") + "_" + str(t["_il"].minute // CROSS_WIN)
+        bucketed[bucket_key].append(get_or_create(t))
+
+    for bucket, idxs in bucketed.items():
+        if len(idxs) < 2:
+            continue
+        for i in range(len(idxs)):
+            for j in range(i + 1, len(idxs)):
+                cooccur[idxs[i]][idxs[j]] += 1
+                cooccur[idxs[j]][idxs[i]] += 1
+
+    # Filter to songs with >= 2 plays (isolated songs aren't interesting)
+    min_plays = 2
+    filtered = [(i, s) for i, s in enumerate(songs) if s["plays"] >= min_plays]
+    if len(filtered) < 5:
+        return {"songs": [], "ready": False, "n": len(songs)}
+
+    n = len(filtered)
+    orig_indices = [fi[0] for fi in filtered]
+    filtered_songs = [fi[1] for fi in filtered]
+
+    # Build distance matrix
+    eps = 0.001
+    dist = np.ones((n, n)) * 1.0
+    for a in range(n):
+        dist[a][a] = 0.0
+        orig_a = orig_indices[a]
+        for b in range(a + 1, n):
+            orig_b = orig_indices[b]
+            c = max(cooccur[orig_a].get(orig_b, 0), cooccur[orig_b].get(orig_a, 0))
+            if c > 0:
+                d = 1.0 / (1.0 + c) + eps
+            else:
+                d = 1.0
+            dist[a][b] = dist[b][a] = d
+
+    # MDS: 2D
+    mds = MDS(n_components=2, dissimilarity="precomputed",
+              random_state=42, normalized_stress=False, max_iter=100, n_init=1)
+    try:
+        coords = mds.fit_transform(dist)
+    except Exception:
+        return {"songs": [], "ready": False, "n": len(songs)}
+
+    # Build top co-occurrence list for each song (top 5)
+    result_songs = []
+    for i, s in enumerate(filtered_songs):
+        # Top co-occurring songs
+        orig_i = orig_indices[i]
+        neighbors = sorted([
+            (cooccur[orig_i].get(orig_indices[j], 0), filtered_songs[j])
+            for j in range(n) if j != i
+        ], key=lambda x: -x[0])
+        top = [{"artist": ns["artist"], "title": ns["title"], "count": c}
+               for c, ns in neighbors[:5] if c > 0]
+
+        result_songs.append({
+            "artist": s["artist"],
+            "title": s["title"],
+            "x": round(float(coords[i][0]), 3),
+            "y": round(float(coords[i][1]), 3),
+            "plays": s["plays"],
+            "stations": list(s["stations"]),
+            "top": top,
+        })
+
+    return {"songs": result_songs, "ready": True, "n": len(result_songs)}
+
+
 def build_trends(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
     # first-seen date (IL) per song across the whole dataset, for discovery rate
     first_seen: dict[str, str] = {}
@@ -352,6 +487,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     write_json(output_dir / "trends.json", trends, sizes, "trends.json")
     write_json(output_dir / "cross_station.json",
                {"tracks": db.get_cross_station_tracks()}, sizes, "cross_station.json")
+    write_json(output_dir / "clusters.json", build_song_clusters(tracks, now), sizes, "clusters.json")
 
     # headline stats — the only file that always changes (updated_at heartbeat)
     stats = db.get_stats()

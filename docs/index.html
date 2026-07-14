@@ -157,6 +157,7 @@
   <button class=tab-btn data-tab=top>🏆 Top</button>
   <button class=tab-btn data-tab=trends>📈 מגמות</button>
   <button class=tab-btn data-tab=history>📋 היסטוריה</button>
+  <button class=tab-btn data-tab=clusters>🎵 Related</button>
 </div>
 
 <!-- ── Now Playing ── -->
@@ -271,6 +272,16 @@
     </div>
     <div id=historyList>טוען...</div>
     <div style="text-align:center;margin-top:8px"><button class=ctrl-btn id=historyMore style=display:none>הצג עוד</button></div>
+  </div>
+</div>
+
+<!-- ── Clusters ── -->
+<div class=tab-content id=tab-clusters>
+  <div class=card>
+    <div class=card-title>🎵 Song Clusters</div>
+    <div class=card-sub>קרבה = שירים שמופיעים באותה תחנה באותו זמן, או באותו זמן בתחנות שונות · לחץ על נקודה לראות שירים קשורים</div>
+    <div class="chart-wrap tall" id=clusterChartWrap><canvas id=clusterChart></canvas></div>
+    <div id=clusterDetail style=margin-top:8px></div>
   </div>
 </div>
 
@@ -974,6 +985,166 @@ function exportCSV(){
   a.click();URL.revokeObjectURL(a.href);
 }
 
+/* ── Clusters (song co-occurrence scatter) ── */
+let clusterSelectedKey=null;
+
+function renderClusters(){
+  const cl=D.clusters;
+  const el=document.getElementById('clusterDetail');
+  if(!cl||!cl.songs||!cl.songs.length){
+    document.getElementById('clusterChartWrap').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">צריך עוד נתונים</div>';
+    el.innerHTML='';return
+  }
+
+  const data=cl.songs;
+  const wrap=document.querySelector('#tab-clusters .chart-wrap');
+  destroyChart('cluster');
+
+  if(!wrap.querySelector('canvas'))wrap.innerHTML='<canvas id=clusterChart></canvas>';
+
+  // Color by primary station (most frequent)
+  const defColor='#5ddbb5';
+  function songColor(s){
+    const sts=s.stations||[];
+    if(sts.length===1){const st=stationBySlug(sts[0]);return st?st.color:defColor}
+    return sts.length?('#5ddbb5'):defColor;
+  }
+
+  // Build datasets: one per station for legend, but all in one for simplicity
+  // Actually: split by number of stations for meaningful legend
+  const byCat={};
+  data.forEach(s=>{
+    const sts=s.stations||[];
+    const cat=sts.length===1?sts[0]:'multi';
+    if(!byCat[cat])byCat[cat]=[];
+    byCat[cat].push(s);
+  });
+
+  const datasets=[];
+  Object.entries(byCat).forEach(([cat,songs]) => {
+    const col=cat==='multi'?'#5ddbb5':(stationBySlug(cat)?.color||defColor);
+    const lbl=cat==='multi'?'(multiple)'+(songs.length>3?' — '+songs.length:'eclectic'):name(cat);
+    datasets.push({
+      label:lbl,
+      data:songs.map(s=>({
+        x:s.x,y:s.y,artist:s.artist,title:s.title,
+        plays:s.plays,stations:s.stations,
+        matchKey:songMatchKey(s.artist,s.title),
+        r:Math.max(3,Math.min(12,2+Math.sqrt(s.plays)*2)),
+      })),
+      backgroundColor:songs.map(s=>songColor(s)+'cc'),
+      borderColor:songs.map(s=>songColor(s)),
+      borderWidth:1,
+      pointRadius:songs.map(s=>Math.max(3,Math.min(12,2+Math.sqrt(s.plays)*2))),
+      pointHoverRadius:songs.map(s=>Math.max(5,Math.min(16,4+Math.sqrt(s.plays)*2.5))),
+    });
+  });
+
+  charts.cluster=new Chart(document.getElementById('clusterChart'),{
+    type:'scatter',
+    data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,animation:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:ctx=>{
+              const r=ctx.raw;
+              return r.artist+' — '+r.title+' ('+r.plays+'×, '+r.stations.length+' תחנות)';
+            }
+          }
+        }
+      },
+      onClick:(e,items)=>{
+        if(!items.length)return;
+        const idx=items[0].datasetIndex;
+        const pt=items[0].raw;
+        if(!pt||!pt.matchKey)return;
+        clusterSelectedKey=pt.matchKey;
+        // Highlight selected point
+        Chart.getChart('clusterChart').setActiveElements(items);
+        Chart.getChart('clusterChart').draw();
+        // Show details
+        showClusterDetail(pt);
+      },
+      scales:{
+        x:{ticks:{color:MUTED,font:{size:9}},grid:{color:GRID}},
+        y:{ticks:{color:MUTED,font:{size:9}},grid:{color:GRID}},
+      }
+    }
+  });
+
+  // If a song was selected before, restore
+  if(clusterSelectedKey){
+    const found=data.find(s=>songMatchKey(s.artist,s.title)===clusterSelectedKey);
+    if(found)showClusterDetail(found);
+  }
+}
+
+function showClusterDetail(pt){
+  const el=document.getElementById('clusterDetail');
+  const top=pt.top||[];
+  const stNames=(pt.stations||[]).map(slug=>name(slug)).join(', ');
+  let html='<div class=card style="margin-bottom:0;padding:12px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<div><strong>'+esc(pt.artist)+'</strong> — '+esc(pt.title)+'</div>'+
+      '<div style="font-size:.7rem;color:var(--muted)">'+pt.plays+' השמעות · '+esc(stNames)+'</div>'+
+    '</div>';
+  if(top.length){
+    html+='<div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">שירים שמופיעים יחד:</div>'+
+      top.map(t=>'<div style="display:flex;justify-content:space-between;font-size:.78rem;padding:3px 6px;border-radius:4px;cursor:pointer"'+
+        ' onmouseenter="hoverClusterSong(\''+esc(t.artist)+'\',\''+esc(t.title)+'\')"'+
+        ' onmouseleave="hoverClusterSong(null,null)"'+
+        ' onclick="clickClusterSong(\''+esc(t.artist)+'\',\''+esc(t.title)+'\')">'+
+        '<span>'+esc(t.artist)+' — '+esc(t.title)+'</span>'+
+        '<span style=color:var(--accent);font-weight:600>×'+t.count+'</span></div>'
+      ).join('')+'</div>';
+  }else{
+    html+='<div style="font-size:.75rem;color:var(--muted)">אין שירים מקושרים מספיק</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function hoverClusterSong(artist,title){
+  const chart=Chart.getChart('clusterChart');
+  if(!chart)return;
+  if(!artist||!title){
+    chart.setActiveElements([]);
+    chart.draw();
+    return;
+  }
+  const mk=songMatchKey(artist,title);
+  // Find matching elements across all datasets
+  const els=[];
+  chart.data.datasets.forEach((ds,i)=>{
+    ds.data.forEach((pt,j)=>{
+      if(pt.matchKey===mk)els.push({datasetIndex:i,index:j});
+    });
+  });
+  chart.setActiveElements(els);
+  chart.draw();
+}
+
+function clickClusterSong(artist,title){
+  clusterSelectedKey=songMatchKey(artist,title);
+  const data=(D.clusters&&D.clusters.songs)||[];
+  const found=data.find(s=>songMatchKey(s.artist,s.title)===clusterSelectedKey);
+  if(found)showClusterDetail(found);
+  // Highlight in chart
+  const chart=Chart.getChart('clusterChart');
+  if(!chart)return;
+  const els=[];
+  chart.data.datasets.forEach((ds,i)=>{
+    ds.data.forEach((pt,j)=>{
+      if(pt.matchKey===clusterSelectedKey)els.push({datasetIndex:i,index:j});
+    });
+  });
+  chart.setActiveElements(els);
+  chart.draw();
+}
+
 /* ── status ── */
 function renderStatus(){
   const s=D.stats;
@@ -1003,6 +1174,7 @@ function renderAll(){
   if(t==='top'){renderTop();renderCrossStation()}
   if(t==='trends')renderTrends();
   if(t==='history')renderHistory();
+  if(t==='clusters')renderClusters();
 }
 
 async function fetchLive(){
@@ -1022,14 +1194,14 @@ async function fetchLive(){
 
 async function fetchAll(){
   try{
-    const[st,cur,stats,timeline,heatmap,trends,top,cross,hist,nonMusic]=await Promise.all([
+    const[st,cur,stats,timeline,heatmap,trends,top,cross,hist,nonMusic,clusters]=await Promise.all([
       loadJSON(BASE+'stations.json'),loadJSON(BASE+'current.json'),loadJSON(BASE+'stats.json'),
       loadJSON(BASE+'timeline.json'),loadJSON(BASE+'heatmap.json'),loadJSON(BASE+'trends.json'),
       loadJSON(BASE+'top.json'),loadJSON(BASE+'cross_station.json'),loadJSON(BASE+'history.json'),
-      loadJSON(BASE+'non_music.json'),
+      loadJSON(BASE+'non_music.json'),loadJSON(BASE+'clusters.json'),
     ]);
     if(st)stations=st;
-    Object.assign(D,{current:cur,stats,timeline,heatmap,trends,top,cross,history:hist,nonMusic});
+    Object.assign(D,{current:cur,stats,timeline,heatmap,trends,top,cross,history:hist,nonMusic,clusters});
     document.getElementById('stationCount').textContent=stations.length||'8';
     await fetchLive();
     if(!document.getElementById('pills').innerHTML)renderPills();
