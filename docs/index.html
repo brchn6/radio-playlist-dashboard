@@ -157,7 +157,7 @@
   <button class=tab-btn data-tab=top>🏆 Top</button>
   <button class=tab-btn data-tab=trends>📈 מגמות</button>
   <button class=tab-btn data-tab=history>📋 היסטוריה</button>
-  <button class=tab-btn data-tab=clusters>🎵 Related</button>
+  <button class=tab-btn data-tab=clusters>🔗 Clusters</button>
 </div>
 
 <!-- ── Now Playing ── -->
@@ -278,9 +278,10 @@
 <!-- ── Clusters ── -->
 <div class=tab-content id=tab-clusters>
   <div class=card>
-    <div class=card-title>🎵 Song Clusters</div>
-    <div class=card-sub>קרבה = שירים שמופיעים באותה תחנה באותו זמן, או באותו זמן בתחנות שונות · לחץ על נקודה לראות שירים קשורים</div>
+    <div class=card-title>🎵 Song Clusters — איזה שירים מושמעים ביחד?</div>
+    <div class=card-sub>כל נקודה = שיר · קרבה פיזית = השמעות חוזרות באותה תחנה / באותו זמן · גודל הנקודה = כמות השמעות · <strong>לחץ על נקודה</strong> לראות שירים קשורים</div>
     <div class="chart-wrap tall" id=clusterChartWrap><canvas id=clusterChart></canvas></div>
+    <div class=chart-legend id=clusterLegend style=margin-bottom:6px></div>
     <div id=clusterDetail style=margin-top:8px></div>
   </div>
 </div>
@@ -1075,10 +1076,21 @@ function renderClusters(){
     }
   });
 
-  // If a song was selected before, restore
+  // Legend — one entry per station colour + cross-station
+  const legendItems=Object.entries(byCat).map(([cat,songs])=>{
+    const col=cat==='multi'?'#5ddbb5':(stationBySlug(cat)?.color||defColor);
+    const lbl=cat==='multi'?'משותף ל־'+songs.length+' תחנות':name(cat)+' ('+songs.length+')';
+    return{color:col,label:lbl};
+  });
+  document.getElementById('clusterLegend').innerHTML=legendHtml(legendItems);
+
+  // If a song was selected before, restore; else show default hint
   if(clusterSelectedKey){
     const found=data.find(s=>songMatchKey(s.artist,s.title)===clusterSelectedKey);
     if(found)showClusterDetail(found);
+  }else{
+    document.getElementById('clusterDetail').innerHTML=
+      '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">👆 לחץ על נקודה בגרף — תראה איזה שירים מתנגנים ביחד</div>';
   }
 }
 
