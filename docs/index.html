@@ -278,8 +278,8 @@
 <!-- ── Clusters ── -->
 <div class=tab-content id=tab-clusters>
   <div class=card>
-    <div class=card-title>🎵 Song Clusters — איזה שירים מושמעים ביחד?</div>
-    <div class=card-sub>כל נקודה = שיר · קרבה פיזית = השמעות חוזרות באותה תחנה / באותו זמן · גודל הנקודה = כמות השמעות · <strong>לחץ על נקודה</strong> לראות שירים קשורים</div>
+    <div class=card-title>🎵 Song Clusters — What plays together?</div>
+    <div class=card-sub>Each point = a song · Proximity = co-occurrence (same station within 30 min, or same time across stations) · Size = play count · <strong>Last 48 hours</strong></div>
     <div class="chart-wrap tall" id=clusterChartWrap><canvas id=clusterChart></canvas></div>
     <div class=chart-legend id=clusterLegend style=margin-bottom:6px></div>
     <div id=clusterDetail style=margin-top:8px></div>
@@ -993,7 +993,7 @@ function renderClusters(){
   const cl=D.clusters;
   const el=document.getElementById('clusterDetail');
   if(!cl||!cl.songs||!cl.songs.length){
-    document.getElementById('clusterChartWrap').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">צריך עוד נתונים</div>';
+    document.getElementById('clusterChartWrap').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">Need more data — check back soon</div>';
     el.innerHTML='';return
   }
 
@@ -1052,7 +1052,7 @@ function renderClusters(){
           callbacks:{
             label:ctx=>{
               const r=ctx.raw;
-              return r.artist+' — '+r.title+' ('+r.plays+'×, '+r.stations.length+' תחנות)';
+              return r.artist+' — '+r.title+' ('+r.plays+'×, '+r.stations.length+' stations)';
             }
           }
         }
@@ -1079,8 +1079,8 @@ function renderClusters(){
   // Legend — one entry per station colour + cross-station
   const legendItems=Object.entries(byCat).map(([cat,songs])=>{
     const col=cat==='multi'?'#5ddbb5':(stationBySlug(cat)?.color||defColor);
-    const lbl=cat==='multi'?'משותף ל־'+songs.length+' תחנות':name(cat)+' ('+songs.length+')';
-    return{color:col,label:lbl};
+    const label=cat==='multi'?songs.length+' stations':name(cat)+' ('+songs.length+')';
+    return{color:col,label};
   });
   document.getElementById('clusterLegend').innerHTML=legendHtml(legendItems);
 
@@ -1090,7 +1090,7 @@ function renderClusters(){
     if(found)showClusterDetail(found);
   }else{
     document.getElementById('clusterDetail').innerHTML=
-      '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">👆 לחץ על נקודה בגרף — תראה איזה שירים מתנגנים ביחד</div>';
+      '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.82rem">👆 Click a point on the chart to see which songs play together</div>';
   }
 }
 
@@ -1098,22 +1098,23 @@ function showClusterDetail(pt){
   const el=document.getElementById('clusterDetail');
   const top=pt.top||[];
   const stNames=(pt.stations||[]).map(slug=>name(slug)).join(', ');
+  const timeLabel='48h window';
   let html='<div class=card style="margin-bottom:0;padding:12px">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-      '<div><strong>'+esc(pt.artist)+'</strong> — '+esc(pt.title)+'</div>'+
-      '<div style="font-size:.7rem;color:var(--muted)">'+pt.plays+' השמעות · '+esc(stNames)+'</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:12px;flex-wrap:wrap">'+
+      '<div style="font-size:.78rem;color:var(--muted)">Selected: <strong>'+esc(pt.artist)+'</strong> — '+esc(pt.title)+'</div>'+
+      '<div style="font-size:.68rem;color:var(--muted);white-space:nowrap">'+esc(stNames)+' · '+timeLabel+'</div>'+
     '</div>';
   if(top.length){
-    html+='<div style="font-size:.75rem;color:var(--muted);margin-bottom:4px">שירים שמופיעים יחד:</div>'+
-      top.map(t=>'<div style="display:flex;justify-content:space-between;font-size:.78rem;padding:3px 6px;border-radius:4px;cursor:pointer"'+
+    html+='<div style="font-size:.72rem;color:var(--muted);margin-bottom:4px">Also plays with:</div>'+
+      top.map(t=>'<div style="display:flex;justify-content:space-between;font-size:.78rem;padding:3px 6px;border-radius:4px;cursor:pointer;transition:background .1s"'+
         ' onmouseenter="hoverClusterSong(\''+esc(t.artist)+'\',\''+esc(t.title)+'\')"'+
         ' onmouseleave="hoverClusterSong(null,null)"'+
         ' onclick="clickClusterSong(\''+esc(t.artist)+'\',\''+esc(t.title)+'\')">'+
         '<span>'+esc(t.artist)+' — '+esc(t.title)+'</span>'+
-        '<span style=color:var(--accent);font-weight:600>×'+t.count+'</span></div>'
+        '<span style=color:var(--accent);font-weight:600;white-space:nowrap>'+t.count+'× together</span></div>'
       ).join('')+'</div>';
   }else{
-    html+='<div style="font-size:.75rem;color:var(--muted)">אין שירים מקושרים מספיק</div>';
+    html+='<div style="font-size:.75rem;color:var(--muted)">No strong connections yet</div>';
   }
   html+='</div>';
   el.innerHTML=html;
