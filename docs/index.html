@@ -70,6 +70,14 @@
     .np-card .np-actions{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
     .np-card .np-btn{font-size:.7rem;padding:4px 12px;border-radius:14px;border:1px solid;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
     .np-card .np-btn:hover{filter:brightness(1.2)}
+    .spotify-link{font-size:.7rem;padding:2px 8px;border-radius:10px;border:1px solid #1DB95455;color:#1DB954;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .15s;white-space:nowrap;flex-shrink:0;vertical-align:middle}
+    .spotify-link:hover{background:#1DB95422;border-color:#1DB954}
+    .hist-toggle{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
+    .hist-toggle input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
+    .hist-cb{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+    #histSelectAllBtn{white-space:nowrap}
+    #histSpotifyBtn{color:#1DB954;border-color:#1DB95455}
+    #histSpotifyBtn:hover{background:#1DB95422;border-color:#1DB954}
 
     /* Lists */
     .history-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid rgba(37,41,64,.6);font-size:.84rem;transition:background .1s}
@@ -267,8 +275,20 @@
       <span>📋 היסטוריית השמעה <span id=historyCount style="font-weight:400;font-size:.72rem;color:var(--muted)"></span></span>
       <button class=ctrl-btn onclick="exportCSV()">⬇ ייצא CSV</button>
     </div>
+    <div class=controls style="flex-wrap:wrap;gap:6px">
+      <span class=lbl>מתאריך:</span>
+      <input type=date id=histDateFrom class=ctrl-btn onchange=onHistFilterChange()>
+      <span class=lbl>עד:</span>
+      <input type=date id=histDateTo class=ctrl-btn onchange=onHistFilterChange()>
+      <label class=hist-toggle><input type=checkbox id=histReverse onchange=onHistFilterChange()> הפוך (ישן→חדש)</label>
+      <label class=hist-toggle><input type=checkbox id=histDedup checked onchange=onHistFilterChange()> ייחודי</label>
+      <button class=ctrl-btn onclick="copySelectedAsText()" title="העתקת שירים נבחרים כטקסט">📋 העתק טקסט</button>
+      <button class=ctrl-btn id=histSpotifyBtn onclick="openAllInSpotify()" title="פתיחת כל השירים הנבחרים בספוטיפיי">🎵 פתח בספוטיפיי</button>
+      <span id=spotifyAuthStatus style="font-size:.72rem;color:var(--muted);display:none"></span>
+    </div>
     <div class=controls>
-      <input class=search id=historySearch placeholder="חיפוש אמן או שיר..." />
+      <input class=search id=historySearch placeholder="חיפוש אמן או שיר..." oninput=onHistFilterChange() style="flex:1;min-width:160px" />
+      <button class=ctrl-btn id=histSelectAllBtn onclick="toggleSelectAll()">☐ בחר הכל</button>
     </div>
     <div id=historyList>טוען...</div>
     <div style="text-align:center;margin-top:8px"><button class=ctrl-btn id=historyMore style=display:none>הצג עוד</button></div>
@@ -351,6 +371,7 @@ const DOW_NAMES=['ראשון','שני','שלישי','רביעי','חמישי','�
 
 /* ── helpers ── */
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function spotifySearchUrl(artist,title){const q=encodeURIComponent(((artist||'')+' '+(title||'')).trim());return 'https://open.spotify.com/search/'+q}
 /* No cache-buster. The old '?_='+Date.now() forced a full re-download of every
    file on every 30s poll (~750 KB/tab). Supabase serves these gzipped with an
    ETag, so a plain fetch revalidates and gets a cheap 304 when nothing changed. */
@@ -462,12 +483,13 @@ function renderNowPlaying(){
     const listen=web?`<a href="${web}" target=_blank class=np-btn style="color:${c};border-color:${c}33">🔊 Site</a>`:'';
     const direct=stream?`<a href="${stream}" target=_blank class=np-btn style="color:${c};border-color:${c}33">📡 Stream</a>`:'';
     const shazam=t.url?`<a href="${esc(t.url)}" target=_blank class=np-btn style="color:${c};border-color:${c}33">🔍 Shazam</a>`:'';
+    const spotifyBtn='<a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=np-btn style="color:#1DB954;border-color:#1DB95455">🎧 Spotify</a>';
     return '<div class="np-card card" style="border-color:'+c+'55;background:linear-gradient(180deg,'+c+'18,var(--card))">'+
       '<div class=ns style=color:'+c+'>'+esc(t.station_name||name(slug))+'</div>'+
       '<div class=ar>'+esc(t.artist||'')+'</div>'+
       '<div class=tl>'+esc(t.title||'')+'</div>'+
       '<div class=tm>'+timeAgo(t.recognized_at)+'</div>'+
-      '<div class=np-actions>'+listen+direct+shazam+'</div>'+
+      '<div class=np-actions>'+listen+direct+shazam+spotifyBtn+'</div>'+
     '</div>';
   }).join('');
 }
@@ -837,11 +859,13 @@ function renderTop(){
     '<div class=history-item><div class=rank>#'+(i+1)+'</div>'+
     '<div class=hi><div class=ha>'+esc(t.artist)+'</div><div style="font-size:.66rem;color:var(--muted)">'+Object.keys(t.stations||{}).length+' תחנות</div></div>'+
     (activeStation?'':trendHtml(t.count,t.prev))+
+    '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,'')+'" target=_blank class=spotify-link title="חיפוש אמן בספוטיפיי">🎧</a></div>'+
     '<div class=cnt>'+t.shown+'×</div></div>').join('');
   if(!songs.length)emptyMsg(elS);else elS.innerHTML=songs.map((t,i)=>
     '<div class=history-item><div class=rank>#'+(i+1)+'</div>'+
     '<div class=hi><div class=ha>'+esc(t.artist)+'</div><div class=ht>'+esc(t.title)+'</div></div>'+
     (activeStation?'':trendHtml(t.count,t.prev))+
+    '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=spotify-link title="חיפוש בספוטיפיי">🎧</a></div>'+
     '<div class=cnt>'+t.shown+'×</div></div>').join('');
 }
 function renderCrossStation(){
@@ -982,23 +1006,104 @@ function historyData(){
   if(activeStation)d=d.filter(t=>t.station_slug===activeStation);
   return d;
 }
+
+/* ── History filter state ── */
+let histSelectedIndices=new Set();
+let histFilteredData=[];
+
+function onHistFilterChange(){
+  historyShown=100;
+  histSelectedIndices.clear();
+  const btn=document.getElementById('histSelectAllBtn');
+  if(btn)btn.textContent='☐ בחר הכל';
+  renderHistory();
+}
+
 function renderHistory(){
   const el=document.getElementById('historyList');
   const q=(document.getElementById('historySearch').value||'').trim().toLowerCase();
+  const dateFrom=document.getElementById('histDateFrom').value;
+  const dateTo=document.getElementById('histDateTo').value;
+  const reverse=document.getElementById('histReverse').checked;
+  const dedup=document.getElementById('histDedup').checked;
   let d=historyData();
+  // Date filter
+  if(dateFrom||dateTo){
+    d=d.filter(t=>{
+      const ts=t.recognized_at?t.recognized_at.slice(0,10):'';
+      if(dateFrom&&ts<dateFrom)return false;
+      if(dateTo&&ts>dateTo)return false;
+      return true;
+    });
+  }
+  // Search filter
   if(q)d=d.filter(t=>((t.artist||'')+' '+(t.title||'')).toLowerCase().includes(q));
+  // Dedup
+  if(dedup){
+    const seen=new Set();
+    d=d.filter(t=>{const k=songMatchKey(t.artist,t.title);if(seen.has(k))return false;seen.add(k);return true});
+  }
+  // Reverse
+  if(reverse)d=[...d].reverse();
   el._data=d;
+  histFilteredData=d;
   document.getElementById('historyCount').textContent=d.length?'('+d.length+' שירים'+(D.history&&D.history.total>d.length&&!q&&!activeStation?' מתוך '+D.history.total:'')+')':'';
   if(!d.length){emptyMsg(el);document.getElementById('historyMore').style.display='none';return}
-  el.innerHTML=d.slice(0,historyShown).map(t=>
-    '<div class=history-item>'+
+  const slice=d.slice(0,historyShown);
+  el.innerHTML=slice.map((t,i)=>{
+    const checked=histSelectedIndices.has(i)?'checked':'';
+    return '<div class=history-item>'+
+      '<input type=checkbox class=hist-cb data-idx="'+i+'" '+checked+' onchange="histToggleCb(this,'+i+')">'+
       '<div class=hs style=color:'+(t.station_color||'#666')+'>'+esc(t.station_name||'')+'</div>'+
       '<div class=hi><div class=ha>'+esc(t.artist||'')+'</div><div class=ht>'+esc(t.title||'')+'</div></div>'+
+      '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=spotify-link title="חיפוש בספוטיפיי">🎧</a></div>'+
       '<div class=hago>'+timeAgo(t.recognized_at)+'</div>'+
-    '</div>').join('');
+    '</div>';
+  }).join('');
   const more=document.getElementById('historyMore');
   more.style.display=d.length>historyShown?'':'none';
   more.onclick=()=>{historyShown+=100;renderHistory()};
+}
+function histToggleCb(el,idx){
+  if(el.checked)histSelectedIndices.add(idx);
+  else histSelectedIndices.delete(idx);
+  const all=document.querySelectorAll('.hist-cb');
+  const checked=document.querySelectorAll('.hist-cb:checked');
+  document.getElementById('histSelectAllBtn').textContent=
+    checked.length===all.length&&all.length>0?'☑ בטל הכל':'☐ בחר הכל';
+}
+function toggleSelectAll(){
+  const cbs=document.querySelectorAll('.hist-cb');
+  const allChecked=Array.from(cbs).every(cb=>cb.checked);
+  cbs.forEach(cb=>{
+    cb.checked=!allChecked;
+    const idx=+cb.dataset.idx;
+    if(cb.checked)histSelectedIndices.add(idx);
+    else histSelectedIndices.delete(idx);
+  });
+  document.getElementById('histSelectAllBtn').textContent=allChecked?'☐ בחר הכל':'☑ בטל הכל';
+}
+function copySelectedAsText(){
+  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
+  if(!selected.length){alert('לא נבחרו שירים');return}
+  const text=selected.map(t=>((t.artist||'')+' — '+(t.title||'')).trim()).join('
+');
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('הועתקו '+selected.length+' שירים');
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('הועתקו '+selected.length+' שירים');
+  });
+}
+function openAllInSpotify(){
+  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
+  if(!selected.length){alert('לא נבחרו שירים');return}
+  selected.forEach((t,i)=>{
+    setTimeout(()=>window.open(spotifySearchUrl(t.artist,t.title),'_blank'),i*150);
+  });
 }
 async function loadStationHistory(){
   if(!activeStation)return;
@@ -1006,7 +1111,7 @@ async function loadStationHistory(){
   // changed. These files are 27-126 KB each, so it is worth the check.
   const j=await loadTracked('stations/'+activeStation+'/history.json');
   if(j&&j.history)D.stationHistory={slug:activeStation,data:j.history};
-  renderHistory();
+  onHistFilterChange();
 }
 function exportCSV(){
   const el=document.getElementById('historyList');
@@ -1014,13 +1119,76 @@ function exportCSV(){
   const headers=['Station','Artist','Title','Recognized At'];
   const rows=el._data.map(t=>[t.station_name,t.artist,t.title,t.recognized_at]
     .map(v=>(v||'').toString().replace(/,/g,' ')));
-  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('
+');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
   a.download='radio-playlist-'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();URL.revokeObjectURL(a.href);
 }
 
+/* ── Phase 3: Spotify API integration ── */
+const SPOTIFY_API='http://127.0.0.1:9900';
+
+async function initSpotifyAuth(){
+  try{
+    const tokenRes=await fetch(SPOTIFY_API+'/token',{cache:'no-store'});
+    if(tokenRes.ok){
+      const data=await tokenRes.json();
+      if(data.authenticated){updateSpotifyStatus(true);return}
+    }
+  }catch(e){/* service not running */}
+  window.open(SPOTIFY_API+'/auth','spotify-auth','width=600,height=700');
+}
+
+async function checkSpotifyAuth(){
+  try{
+    const r=await fetch(SPOTIFY_API+'/token',{cache:'no-store'});
+    if(r.ok){const data=await r.json();if(data.authenticated){updateSpotifyStatus(true);return true}}
+  }catch(e){}
+  updateSpotifyStatus(false);
+  return false;
+}
+
+function updateSpotifyStatus(authed){
+  const el=document.getElementById('spotifyAuthStatus');
+  if(!el)return;
+  if(authed){
+    el.style.display='';
+    el.innerHTML='✅ Spotify <button class=ctrl-btn onclick="exportToSpotify()" style=font-size:.72rem;padding:2px 8px>➕ Create Playlist</button>';
+  }else{
+    el.style.display='';
+    el.innerHTML='<a href=# onclick="initSpotifyAuth();return false" style=color:#1DB954;text-decoration:none>🎵 Connect to Spotify</a>';
+  }
+}
+
+async function exportToSpotify(){
+  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
+  if(!selected.length){alert('לא נבחרו שירים');return}
+  const stationName=activeStation?name(activeStation):'כל התחנות';
+  const dateStr=new Date().toISOString().slice(0,10);
+  const playlistName=stationName+' — '+dateStr;
+  try{
+    const r=await fetch(SPOTIFY_API+'/create-playlist',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        name:playlistName,
+        description:'נוצר מ-Radio Playlist Dashboard',
+        public:false,
+        tracks:selected.map(t=>({artist:t.artist,title:t.title})),
+      }),
+    });
+    if(!r.ok){const e=await r.text();alert('שגיאה: '+e);return}
+    const data=await r.json();
+    if(data.playlist_url){
+      alert('✅ הפלייליסט נוצר! נוספו '+data.track_count+' שירים'+(data.failed_count?' ('+data.failed_count+' לא נמצאו בספוטיפיי)':'')+'.');
+      window.open(data.playlist_url,'_blank');
+    }
+  }catch(e){
+    alert('שגיאה בחיבור לשרת ספוטיפיי: '+e.message);
+  }
+}
 /* ── Clusters (song co-occurrence scatter) ── */
 let clusterSelectedKey=null;
 
@@ -1266,7 +1434,6 @@ async function fetchAll(){
 }
 fetchAll();setInterval(fetchAll,POLL);
 document.getElementById('topTimeWindow').onchange=renderTop;
-document.getElementById('historySearch').oninput=()=>{historyShown=100;renderHistory()};
 </script>
 </body>
 </html>

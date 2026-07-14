@@ -62,26 +62,27 @@
 ## 🚀 Spotify Export — Take History to Spotify
 See full plan: `.planning/SPOTIFY-EXPORT.md`
 
-### Milestone 1: 🎧 "Open in Spotify" link (Phase 1)
-- [ ] Helper function `spotifySearchUrl()` in dashboard JS
-- [ ] Spotify button in History rows
-- [ ] Spotify button in Now Playing cards
-- [ ] Spotify button in Top Songs/Artists
-- [ ] CSS styling for `.spotify-btn`
+### Milestone 1: 🎧 "Open in Spotify" link (Phase 1) ✅
+- [x] Helper function `spotifySearchUrl()` in dashboard JS
+- [x] Spotify button in History rows
+- [x] Spotify button in Now Playing cards
+- [x] Spotify button in Top Songs/Artists
+- [x] CSS styling for `.spotify-link`
 
-### Milestone 2: 📋 Bulk playlist builder (Phase 2)
-- [ ] Filter bar (station, date range, reverse toggle, dedup toggle)
-- [ ] Checkbox per history row + Select All / Deselect All
-- [ ] Copy selected tracks as formatted text to clipboard
-- [ ] "Open All in Spotify" button
+### Milestone 2: 📋 Bulk playlist builder (Phase 2) ✅
+- [x] Filter bar (date range, reverse toggle, dedup toggle) above History tab
+- [x] Checkbox per history row + Select All / Deselect All
+- [x] Copy selected tracks as formatted text to clipboard
+- [x] "Open All in Spotify" button (opens each in a new tab)
 
-### Milestone 3: 🔌 Full Spotify API integration (Phase 3)
-- [ ] Create `scripts/spotify_api.py` (standalone service, port 8760)
-- [ ] Spotify Developer app → client ID + secret in `.env`
-- [ ] OAuth flow: auth → callback → token storage
-- [ ] Track search/resolve endpoint
-- [ ] Playlist create + populate endpoint
-- [ ] Dashboard JS connected to local API
+### Milestone 3: 🔌 Full Spotify API integration (Phase 3) ✅
+- [x] Create `scripts/spotify_api.py` (standalone service, port 9900)
+- [x] Spotify Developer app → client ID added to `.env`
+- [x] OAuth flow: auth → callback → token storage (in-memory)
+- [x] Track search/resolve via Spotify search API
+- [x] Playlist create + populate endpoint with batch adding (100/batch)
+- [x] Dashboard JS connected to local API
+- [x] `SPOTIFY_CLIENT_SECRET` added to `.env`
 
 ### Milestone 4: 🧠 Smart curation (Phase 4)
 - [ ] Cross-station mix option

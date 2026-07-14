@@ -310,31 +310,32 @@ backend's `meta` table with an expiry timestamp and auto-refresh.
 
 ## Milestone Tracking
 
-### Milestone 1: 🎧 Open in Spotify link
-- [ ] Helper function `spotifySearchUrl()` added to dashboard JS
-- [ ] Spotify button in History rows
-- [ ] Spotify button in Now Playing cards
-- [ ] Spotify button in Top Songs/Artists
-- [ ] CSS styling for `.spotify-btn`
+### Milestone 1: 🎧 Open in Spotify link ✅
+- [x] Helper function `spotifySearchUrl()` added to dashboard JS
+- [x] Spotify button in History rows
+- [x] Spotify button in Now Playing cards
+- [x] Spotify button in Top Songs/Artists
+- [x] CSS styling for `.spotify-link`
 
-### Milestone 2: 📋 Bulk playlist builder
-- [ ] Filter bar (station, date, reverse, dedup) above History tab
-- [ ] Checkbox per track row
-- [ ] Select All / Deselect All
-- [ ] Copy selected tracks as formatted text
-- [ ] "Open All in Spotify" button
+### Milestone 2: 📋 Bulk playlist builder ✅
+- [x] Filter bar (date, reverse, dedup) above History tab
+- [x] Checkbox per track row
+- [x] Select All / Deselect All
+- [x] Copy selected tracks as formatted text to clipboard
+- [x] "Open All in Spotify" button (opens each in a new tab)
 
-### Milestone 3: 🔌 Spotify API integration
-- [ ] Create `scripts/spotify_api.py` (standalone service on port 8760)
-- [ ] Spotify Developer app created → client ID + secret
-- [ ] OAuth flow: auth → callback → token storage
-- [ ] `POST /create-playlist` endpoint
-- [ ] `POST /search` or `/resolve` endpoint for track ID lookup
-- [ ] Update dashboard JS to call local API
-- [ ] Error handling: unmatched tracks, rate limits, token expiry
+### Milestone 3: 🔌 Spotify API integration ✅
+- [x] Create `scripts/spotify_api.py` (standalone service on port 9900)
+- [x] Spotify Developer app created → client ID added to `.env`
+- [x] OAuth flow: auth → callback → token storage (in-memory)
+- [x] `POST /create-playlist` endpoint with batch track resolution
+- [x] Track search/resolve via Spotify search API (built into create-playlist)
+- [x] Dashboard JS calls local API (graceful fallback when service is down)
+- [x] Error handling: unmatched tracks, token expiry with auto-refresh
+- [x] `SPOTIFY_CLIENT_SECRET` added to `.env`
 
 ### Milestone 4: 🧠 Smart curation
-- [ ] Cross-station mix option
+- [ ] Cross-station mix option (already works via "All" station pill)
 - [ ] Auto-playlist by time-of-day pattern
 - [ ] Exclusion rules UI
 - [ ] Scheduled export cron
