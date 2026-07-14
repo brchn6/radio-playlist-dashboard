@@ -1139,23 +1139,33 @@ async function initSpotifyAuth(){
   window.open(SPOTIFY_API+'/auth','spotify-auth','width=600,height=700');
 }
 
+// Check if the Spotify API service is reachable and authenticated.
+// Shows the appropriate status; keeps hidden if service is offline.
 async function checkSpotifyAuth(){
   try{
     const r=await fetch(SPOTIFY_API+'/token',{cache:'no-store'});
-    if(r.ok){const data=await r.json();if(data.authenticated){updateSpotifyStatus(true);return true}}
-  }catch(e){}
-  updateSpotifyStatus(false);
+    if(r.ok){
+      const data=await r.json();
+      updateSpotifyStatus(!!data.authenticated, true);
+      return !!data.authenticated;
+    }
+  }catch(e){
+    // Service not reachable — keep status hidden
+    const el=document.getElementById('spotifyAuthStatus');
+    if(el)el.style.display='none';
+    return false;
+  }
+  updateSpotifyStatus(false, true);
   return false;
 }
 
-function updateSpotifyStatus(authed){
+function updateSpotifyStatus(authed, online){
   const el=document.getElementById('spotifyAuthStatus');
   if(!el)return;
+  el.style.display=online?'':'none';
   if(authed){
-    el.style.display='';
     el.innerHTML='✅ Spotify <button class=ctrl-btn onclick="exportToSpotify()" style=font-size:.72rem;padding:2px 8px>➕ Create Playlist</button>';
   }else{
-    el.style.display='';
     el.innerHTML='<a href=# onclick="initSpotifyAuth();return false" style=color:#1DB954;text-decoration:none>🎵 Connect to Spotify</a>';
   }
 }
@@ -1424,6 +1434,8 @@ async function fetchAll(){
     await fetchLive();
     if(!document.getElementById('pills').innerHTML)renderPills();
     renderAll();
+    // Check Spotify auth status (fires and forgets — updates the UI)
+    checkSpotifyAuth();
   }catch(e){
     console.warn(e);
     document.getElementById('statusDot').className='dot off';
