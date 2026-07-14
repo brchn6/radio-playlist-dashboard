@@ -5,7 +5,7 @@
 
 A live dashboard that tracks songs played on **8 Israeli radio stations** simultaneously, using [ShazamIO](https://github.com/dotX12/shazamio) for audio recognition. Each station has its own recognition proxy, feeding into a single SQLite database that gets published to **GitHub Pages** — the live site refreshes within ~3 minutes.
 
-## 🚀 How it works
+## How it works
 
 ```
 8× ShazamIO Proxies (one per station)
@@ -23,6 +23,22 @@ Data Generator → bounded analytics JSON (top / timeline / heatmap / trends / h
         ▼  git push every 2 min
 GitHub Actions → GitHub Pages deploy (queued, never cancelled, free on public repos)
 ```
+
+## Why it's built this way
+
+Every choice in this architecture exists to keep the cost at **zero dollars**.
+There are no cloud servers, no paid APIs, no database hosts.
+
+| Decision | Why |
+|----------|-----|
+| **Run locally** instead of a VPS | The machine is already on at home. 8 proxies + updater use ~400 MB RAM — no reason to rent a server. |
+| **SQLite** instead of PostgreSQL | Single writer, tiny dataset (~42 MB). No need for a separate database server. |
+| **Precomputed JSON** instead of live APIs | Generate static files every 30s → push to git → serve from Pages. No backend server needed. |
+| **Git as transport** | `git push` is free, authenticates via token, and triggers deploy automatically. No rsync, no S3, no extra infra. |
+| **Public repo** | GitHub Actions minutes are unlimited on public repos. Data is public anyway — it's a live dashboard. |
+| **ShazamIO** instead of a paid API | Free Python wrapper, no API key or subscription needed. |
+
+**Total monthly cost: $0.** No subscription to cancel, no bill that grows, no reason to shut it down.
 
 ## 📦 Project structure
 
@@ -122,4 +138,4 @@ bash scripts/manage.sh logs         # View logs
 
 ## 📝 License
 
-Do whatever you want. Made for the love of radio.
+[MIT](LICENSE). Do whatever you want. Made for the love of radio.
