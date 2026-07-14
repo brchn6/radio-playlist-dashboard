@@ -55,7 +55,7 @@ _load_env()
 
 CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID", "")
 CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET", "")
-REDIRECT_URI = os.environ.get("SPOTIFY_REDIRECT_URI", f"http://127.0.0.1:{PORT}/callback")
+REDIRECT_URI = os.environ.get("SPOTIFY_REDIRECT_URI", f"http://127.0.0.1:{PORT}/")
 
 if not CLIENT_ID or not CLIENT_SECRET:
     print(
@@ -229,10 +229,13 @@ class SpotifyHandler(http.server.BaseHTTPRequestHandler):
         path = parsed.path.rstrip("/")
         query = urllib.parse.parse_qs(parsed.query)
 
-        if path == "/auth":
-            self._handle_auth()
-        elif path == "/callback":
+        # Spotify redirects back to the registered URI with ?code=...
+        # The registered URI is http://127.0.0.1:9900/ (root), so the
+        # callback arrives at path=/ with a "code" query parameter.
+        if (path == "" or path == "/") and query.get("code"):
             self._handle_callback(query)
+        elif path == "/auth":
+            self._handle_auth()
         elif path == "/token":
             self._handle_token()
         elif path == "/test":
