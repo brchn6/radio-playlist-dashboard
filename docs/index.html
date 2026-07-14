@@ -169,7 +169,7 @@
 <div class=tab-content id=tab-timeline>
   <div class=card>
     <div class=card-title>📊 Timeline — מה התנגן בכל תחנה?</div>
-    <div class=card-sub>עוצמת צבע = כמות שירים · תא ריק = דיבור/פרסומות/שקט</div>
+    <div class=card-sub>עוצמת צבע = כמות שירים · לחץ על תא לראות את השירים · לחץ על שיר להדגשת מופעים חוצי־תחנות</div>
     <div class=controls id=timelineDays></div>
     <div class=controls id=timelineZoom></div>
     <div id=timelineGrid style="overflow-x:auto;overflow-y:auto"></div>
@@ -483,6 +483,29 @@ function renderTimelineZoomButtons(){
   };
 }
 
+// deterministic hue from artist name — same artist always same hue, for cross-ref highlighting
+function artistHue(artist){
+  let h=0;
+  const s=artist||'';
+  for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i),h|=0;
+  return ((h%360)+360)%360;
+}
+
+// stable key for song matching across stations/times
+function songMatchKey(a,t){return((a||'')+'||'+(t||'')).toLowerCase()}
+
+// ── Hover highlight system ──
+// When a song is selected in the detail panel, highlight its cells across the grid
+let tlSelectedMatch=null; // the match key currently highlighted
+
+function tlHighlight(matchKey){
+  const all=document.querySelectorAll('[data-tl-match]');
+  all.forEach(el=>{
+    el.style.outline=matchKey&&el.dataset.tlMatch===matchKey?'2px solid #fff':'none';
+    el.style.zIndex=matchKey&&el.dataset.tlMatch===matchKey?'3':'';
+  });
+}
+
 function renderTimeline(){
   renderTimelineDayButtons();
   renderTimelineZoomButtons();
@@ -508,95 +531,182 @@ function renderTimeline(){
     xMin=Math.max(0,now.h*60+now.m-660);xMax=Math.min(1440,now.h*60+now.m+60);
   }
 
-  // ── GitHub-style heatmap grid ──
+  // ── Heatmap grid + drill-down ──
   const range=xMax-xMin;
-  // Bucket size: target ~24-48 columns
+
+  // Adaptive bucket size: target ~24-48 columns
   let bucketMin=30;
   if(range<=60)bucketMin=2;
-  else if(range<=240)bucketMin=5;
-  else if(range<=480)bucketMin=10;
-  else if(range<=960)bucketMin=20;
+  else if(range<=120)bucketMin=5;
+  else if(range<=360)bucketMin=10;
+  else if(range<=720)bucketMin=15;
   const colCount=Math.ceil(range/bucketMin);
 
-  // Count songs per station per bucket
-  const counts={};
-  stations.forEach(s=>{counts[s.slug]=new Array(colCount).fill(0)});
-  const maxVal={v:0,slug:'',idx:0};
+  // Per-station: count per bucket + which songs in each bucket
+  const buckets={}; // stationslug → [{count, songs: [{artist,title,x,matchKey}]}]
+  stations.forEach(s=>{buckets[s.slug]=Array.from({length:colCount},()=>({count:0,songs:[]}))});
+
   pts.forEach(p=>{
     const d=parseTs(p.ts);if(!d)return;
     const il=ilParts(d);
     if(timelineDay&&il.date!==timelineDay)return;
     const x=il.h*60+il.m;
     if(x<xMin||x>xMax)return;
-    if(!counts[p.s])return;
+    if(!buckets[p.s])return;
     const idx=Math.min(colCount-1,Math.floor((x-xMin)/bucketMin));
-    counts[p.s][idx]++;
-    if(counts[p.s][idx]>maxVal.v){maxVal.v=counts[p.s][idx];maxVal.slug=p.s;maxVal.idx=idx}
+    buckets[p.s][idx].count++;
+    const mk=songMatchKey(p.a,p.t);
+    buckets[p.s][idx].songs.push({artist:p.a,title:p.t,x,matchKey:mk});
   });
 
-  // Station order by activity
+  // Station order by total activity
   const stationOrder=[...stations].sort((a,b)=>{
-    const ca=counts[b.slug].reduce((s,v)=>s+v,0);
-    const cb=counts[a.slug].reduce((s,v)=>s+v,0);
-    return ca-cb;
+    const ca=buckets[a.slug].reduce((s,v)=>s+v.count,0);
+    const cb=buckets[b.slug].reduce((s,v)=>s+v.count,0);
+    return cb-ca;
   });
 
-  // Build column labels (show time strings for first of each hour)
-  const colLabels=[];
-  const colW=Math.max(18,Math.min(32,Math.floor(1040/colCount)));
-  for(let i=0;i<colCount;i++){
-    const minute=xMin+i*bucketMin;
-    const hh=String(Math.floor(minute/60)%24).padStart(2,'0');
-    const mm=String(Math.round(minute%60)).padStart(2,'0');
-    const prevMinute=xMin+(i-1)*bucketMin;
-    // Show label if this bucket starts a new hour or is the first/last
-    if(i===0||Math.floor(minute/60)!==Math.floor(prevMinute/60)||i===colCount-1){
-      colLabels.push(hh+':'+mm);
-    }else{
-      colLabels.push('');
-    }
-  }
+  // Global max for color scaling
+  let globalMax=0;
+  stationOrder.forEach(s=>buckets[s.slug].forEach(b=>{if(b.count>globalMax)globalMax=b.count}));
+  globalMax=Math.max(1,globalMax);
 
-  const maxValV=Math.max(1,maxVal.v);
-  const hasData=stationOrder.some(s=>counts[s.slug].reduce((a,b)=>a+b,0)>0);
+  const hasData=stationOrder.some(s=>buckets[s.slug].some(b=>b.count>0));
   if(!hasData){
     el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">אין נתונים ליום/תחנה שנבחרו</div>';
     legend.innerHTML='';
     return;
   }
 
-  // Build the grid: header row + one row per station
-  let html='<table class=hm style="min-width:'+(colCount*colW+100)+'px"><tr><td class=rowlbl></td>';
-  colLabels.forEach((l,i)=>{
-    html+='<td class=hdr style="font-size:'+(l?'.62rem':'0')+';min-width:'+colW+'px;width:'+colW+'px;padding:2px 0">'+esc(l)+'</td>';
-  });
+  // Build column labels
+  const colW=Math.max(18,Math.min(36,Math.floor(1040/colCount)));
+  let html='<table class=hm style="min-width:'+(colCount*colW+100)+'px;direction:ltr"><tr><td class=rowlbl></td>';
+  for(let i=0;i<colCount;i++){
+    const minute=xMin+i*bucketMin;
+    const hh=String(Math.floor(minute/60)%24).padStart(2,'0');
+    const mm=String(Math.round(minute%60)).padStart(2,'0');
+    const prevMinute=xMin+(i-1)*bucketMin;
+    const label=(i===0||Math.floor(minute/60)!==Math.floor(prevMinute/60)||i===colCount-1)?hh+':'+mm:'';
+    html+='<td class=hdr style="font-size:'+(label?'.6rem':'0')+';min-width:'+colW+'px;width:'+colW+'px;padding:2px 0">'+esc(label)+'</td>';
+  }
   html+='</tr>';
 
+  // Accumulate all songs for match-key lookups (across all stations/buckets)
+  const allSongCells=[]; // [{slug, bucketIdx, artist, title, matchKey, count}]
+
   stationOrder.forEach(s=>{
-    const slug=s.slug;
-    const row=counts[slug];
-    const total=row.reduce((a,b)=>a+b,0);
+    const row=buckets[s.slug];
+    const total=row.reduce((s,b)=>s+b.count,0);
     if(!total)return;
     html+='<tr><td class=rowlbl style="font-size:.7rem;padding:3px 6px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis">'+
       '<span class=dot-sm style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+s.color+';margin-left:4px;vertical-align:middle"></span>'+
-      '<span style=vertical-align:middle>'+esc(name(slug).length>12?name(slug).slice(0,11)+'…':name(slug))+'</span>'+
+      '<span style=vertical-align:middle>'+esc(name(s.slug).length>12?name(s.slug).slice(0,11)+'…':name(s.slug))+'</span>'+
       '</td>';
-    row.forEach((v,i)=>{
-      const t=v/maxValV;
-      const titleStr=v+' שירים'+(v?' ('+Math.round(xMin+i*bucketMin)+'—'+Math.round(xMin+(i+1)*bucketMin)+' דק׳)':'');
-      html+='<td style="background:'+heatColor(t)+';color:'+heatText(t)+';min-width:'+colW+'px;width:'+colW+'px;height:'+Math.round(colW*0.7)+'px;padding:0;border-radius:3px;font-size:.6rem;font-weight:'+(v?'600':'400')+'" title="'+esc(name(slug))+': '+titleStr+'">'+(v||'')+'</td>';
+    row.forEach((b,i)=>{
+      const t=b.count/globalMax;
+      const cellId='tlc_'+s.slug+'_'+i;
+      // store song data in a data attr for drill-down
+      const songData=b.songs.map(s=>s.artist+'||'+s.title).join('|');
+      html+='<td id="'+cellId+'" class=tl-cell style="background:'+heatColor(t)+';color:'+heatText(t)+';'+
+        'min-width:'+colW+'px;width:'+colW+'px;height:'+Math.round(colW*0.75)+'px;padding:0;border-radius:3px;'+
+        'font-size:.55rem;font-weight:'+(b.count?'600':'400')+';cursor:'+(b.count?'pointer':'default')+'"'+
+        ' data-slug="'+s.slug+'" data-bidx="'+i+'" data-count="'+b.count+'"'+
+        ' onclick="tlDrill(\''+s.slug+'\','+i+')">'+
+        (b.count||'')+'</td>';
+      // register all songs for match-key lookup
+      b.songs.forEach(song=>{
+        allSongCells.push({slug:s.slug,bucketIdx:i,matchKey:song.matchKey,artist:song.artist,title:song.title,count:b.count});
+      });
     });
     html+='</tr>';
   });
   html+='</table>';
-  el.innerHTML=html;
 
-  // Legend: show stations and total songs in view
+  // Detail panel below the grid
+  html+='<div id=tlDetail style="margin-top:8px;min-height:30px"></div>';
+
+  el.innerHTML=html;
+  el._allSongCells=allSongCells;
+
+  // Legend
   legend.innerHTML=legendHtml(
-    stationOrder.filter(s=>counts[s.slug].reduce((a,b)=>a+b,0)>0)
-      .map(s=>({color:s.color,label:s.name+' ('+counts[s.slug].reduce((a,b)=>a+b,0)+' שירים)'}))
+    stationOrder.filter(s=>buckets[s.slug].some(b=>b.count>0))
+      .map(s=>({color:s.color,label:s.name+' ('+buckets[s.slug].reduce((a,b)=>a+b.count,0)+' שירים)'}))
   );
+
+  tlSelectedMatch=null;
 }
+
+// ── Drill-down: click a heatmap cell → show songs in that bucket ──
+function tlDrill(slug,bucketIdx){
+  const detail=document.getElementById('tlDetail');
+  // Re-read the bucket data from the full song index (stored on the grid element)
+  const grid=document.getElementById('timelineGrid');
+  const allCells=grid._allSongCells||[];
+  const songsInCell=allCells.filter(c=>c.slug===slug&&c.bucketIdx===bucketIdx);
+  if(!songsInCell.length){detail.innerHTML='';return}
+
+  // Also find all occurrences of each song across ALL cells for cross-ref
+  let html='<div class=card style="margin-bottom:0;padding:10px">'+
+    '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">🎵 שירים בקטגוריה זו — לחץ על שיר להדגשת מופעים נוספים</div>';
+
+  // Group by song (matchKey) to show counts across grid
+  const songGroups={};
+  songsInCell.forEach(s=>{
+    const mk=s.matchKey;
+    if(!songGroups[mk]){
+      const totalAcross=allCells.filter(c=>c.matchKey===mk).length;
+      songGroups[mk]={artist:s.artist,title:s.title,matchKey:mk,totalAcross};
+    }
+  });
+
+  Object.values(songGroups).forEach(sg=>{
+    const hue=artistHue(sg.artist);
+    const isActive=tlSelectedMatch===sg.matchKey;
+    html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;'+
+      'border-radius:4px;cursor:pointer;transition:background .15s;'+
+      'background:'+(isActive?'rgba(93,219,181,.15':'transparent')+';"'+
+      ' onmouseenter="tlHighlight(\''+sg.matchKey+'\')"'+
+      ' onmouseleave="tlHighlight(null)"'+
+      ' onclick="tlClickSong(\''+sg.matchKey+'\')">'+
+      '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:hsla('+hue+',60%,55%,0.8);flex-shrink:0"></span>'+
+      '<span style="font-size:.78rem;flex:1"><strong>'+esc(sg.artist)+'</strong> — '+esc(sg.title)+'</span>'+
+      '<span style="font-size:.65rem;color:var(--muted)">'+(sg.totalAcross>1?'🔄 ×'+sg.totalAcross:'')+'</span>'+
+    '</div>';
+  });
+  html+='</div>';
+  detail.innerHTML=html;
+}
+
+// ── Click a song in drill-down → highlight all matching cells across grid ──
+function tlClickSong(matchKey){
+  tlSelectedMatch=(tlSelectedMatch===matchKey)?null:matchKey;
+  // Highlight all cells that contain this song
+  const allCells=document.getElementById('timelineGrid')._allSongCells||[];
+  const matchingCells=allCells.filter(c=>c.matchKey===matchKey);
+
+  // Add/remove highlight class on matching td elements
+  document.querySelectorAll('.tl-cell').forEach(td=>{
+    const slug=td.dataset.slug,bidx=+td.dataset.bidx;
+    const isMatch=matchingCells.some(c=>c.slug===slug&&c.bucketIdx===bidx);
+    if(tlSelectedMatch&&isMatch){
+      td.style.outline='2px solid #5ddbb5';
+      td.style.boxShadow='inset 0 0 8px rgba(93,219,181,.3)';
+    }else{
+      td.style.outline='';
+      td.style.boxShadow='';
+    }
+  });
+
+  // Re-render the detail panel to show active state
+  tlDrill(document.querySelector('.tl-cell[style*="outline"]')?.dataset?.slug||
+    matchingCells[0]?.slug||'',
+    document.querySelector('.tl-cell[style*="outline"]')?.dataset?.bidx||
+    matchingCells[0]?.bucketIdx||0);
+}
+
+// Add a global click-away listener to deselect
+// (handled via onclick on the document body)
 
 /* ── Heatmaps ── */
 function hmTable(rows,colLabels){
