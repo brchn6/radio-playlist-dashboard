@@ -24,7 +24,7 @@ Data Generator → bounded analytics JSON (top / timeline / heatmap / trends / h
 GitHub Actions → GitHub Pages deploy (queued, never cancelled, free on public repos)
 ```
 
-## Why it's built this way
+## 💸 Why it's built this way
 
 Every choice in this architecture exists to keep the cost at **zero dollars**.
 There are no cloud servers, no paid APIs, no database hosts.
@@ -138,4 +138,4 @@ bash scripts/manage.sh logs         # View logs
 
 ## 📝 License
 
-[MIT](LICENSE). Do whatever you want. Made for the love of radio.
+Do whatever you want. Made for the love of radio.
