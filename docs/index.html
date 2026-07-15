@@ -236,10 +236,9 @@
 <!-- ── Timeline ── -->
 <div class=tab-content id=tab-timeline>
   <div class=card>
-    <div class=card-title>📊 Timeline — מה התנגן בכל תחנה?</div>
-    <div class=card-sub>עוצמת צבע = כמות שירים · לחץ על תא לראות את השירים · לחץ על שיר להדגשת מופעים חוצי־תחנות</div>
+    <div class=card-title>📊 Timeline — פילוח לפי שעה</div>
+    <div class=card-sub>בחר יום · כל תא = שירים באותה שעה · לחץ על תא לרשימת השירים</div>
     <div class=controls id=timelineDays></div>
-    <div class=controls id=timelineZoom></div>
     <div id=timelineGrid style="overflow-x:auto;overflow-y:auto"></div>
     <div class=chart-legend id=timelineLegend></div>
   </div>
@@ -439,7 +438,6 @@ let stations=[],activeStation=null;
 let charts={};       // chart.js instances by id
 let D={};            // all loaded data files
 let timelineDay=null; // selected IL date string
-let timelineWindow='6h'; // '2h','6h','12h','24h', or 'hour:N'
 let historyShown=100;
 
 const STATION_WEBSITES={
@@ -622,24 +620,7 @@ function renderTimelineDayButtons(){
   };
 }
 
-function renderTimelineZoomButtons(){
-  const el=document.getElementById('timelineZoom');
-  const isHour=timelineWindow.startsWith('hour:');
-  const selHour=isHour?+timelineWindow.split(':')[1]:null;
-  el.innerHTML=
-    '<span class=lbl>טווח:</span>'+
-    ['2h','6h','12h','24h'].map(w=>
-      '<button class="ctrl-btn'+(timelineWindow===w?' active':'')+'" data-zoom="'+w+'">'+
-        (w==='2h'?'שעתיים':w==='6h'?'6 ש׳':w==='12h'?'12 ש׳':'24 ש׳')+
-      '</button>'
-    ).join('')+
-    '<span style=opacity:.3;margin:0 4px>|</span>'+
-    Array.from({length:24},(_,h)=>'<button class="ctrl-btn'+(selHour===h?' active':'')+'" data-zoom="hour:'+h+'">'+String(h).padStart(2,'0')+':00</button>').join('');
-  el.onclick=e=>{
-    const b=e.target.closest('[data-zoom]');if(!b)return;
-    timelineWindow=b.dataset.zoom;renderTimeline();
-  };
-}
+
 
 // deterministic hue from artist name — same artist always same hue, for cross-ref highlighting
 function artistHue(artist){
@@ -666,55 +647,25 @@ function tlHighlight(matchKey){
 
 function renderTimeline(){
   renderTimelineDayButtons();
-  renderTimelineZoomButtons();
   const el=document.getElementById('timelineGrid');
   const legend=document.getElementById('timelineLegend');
   let pts=(D.timeline&&D.timeline.points)||[];
   if(activeStation)pts=pts.filter(p=>p.s===activeStation);
 
-  // Parse time window bounds
-  const isHour=timelineWindow.startsWith('hour:');
-  let xMin=0,xMax=1440;
-  if(isHour){
-    const h=+timelineWindow.split(':')[1];
-    xMin=h*60;xMax=(h+1)*60;
-  }else if(timelineWindow==='2h'){
-    const now=ilParts(new Date());
-    xMin=Math.max(0,now.h*60+now.m-120);xMax=Math.min(1440,now.h*60+now.m+30);
-  }else if(timelineWindow==='6h'){
-    const now=ilParts(new Date());
-    xMin=Math.max(0,now.h*60+now.m-300);xMax=Math.min(1440,now.h*60+now.m+60);
-  }else if(timelineWindow==='12h'){
-    const now=ilParts(new Date());
-    xMin=Math.max(0,now.h*60+now.m-660);xMax=Math.min(1440,now.h*60+now.m+60);
-  }
-
-  // ── Heatmap grid + drill-down ──
-  const range=xMax-xMin;
-
-  // Adaptive bucket size: target ~24-48 columns
-  let bucketMin=30;
-  if(range<=60)bucketMin=2;
-  else if(range<=120)bucketMin=5;
-  else if(range<=360)bucketMin=10;
-  else if(range<=720)bucketMin=15;
-  const colCount=Math.ceil(range/bucketMin);
-
-  // Per-station: count per bucket + which songs in each bucket
-  const buckets={}; // stationslug → [{count, songs: [{artist,title,x,matchKey}]}]
-  stations.forEach(s=>{buckets[s.slug]=Array.from({length:colCount},()=>({count:0,songs:[]}))});
+  // Always 24 hours, 60-min buckets
+  const colCount=24;
+  const buckets={};
+  stations.forEach(s=>{buckets[s.slug]=Array.from({length:24},()=>({count:0,songs:[]}))});
 
   pts.forEach(p=>{
     const d=parseTs(p.ts);if(!d)return;
     const il=ilParts(d);
     if(timelineDay&&il.date!==timelineDay)return;
-    const x=il.h*60+il.m;
-    if(x<xMin||x>xMax)return;
     if(!buckets[p.s])return;
-    const idx=Math.min(colCount-1,Math.floor((x-xMin)/bucketMin));
-    buckets[p.s][idx].count++;
+    const h=il.h;
+    buckets[p.s][h].count++;
     const mk=songMatchKey(p.a,p.t);
-    buckets[p.s][idx].songs.push({artist:p.a,title:p.t,x,matchKey:mk});
+    buckets[p.s][h].songs.push({artist:p.a,title:p.t,matchKey:mk});
   });
 
   // Station order by total activity
@@ -724,7 +675,6 @@ function renderTimeline(){
     return cb-ca;
   });
 
-  // Global max for color scaling
   let globalMax=0;
   stationOrder.forEach(s=>buckets[s.slug].forEach(b=>{if(b.count>globalMax)globalMax=b.count}));
   globalMax=Math.max(1,globalMax);
@@ -732,83 +682,71 @@ function renderTimeline(){
   const hasData=stationOrder.some(s=>buckets[s.slug].some(b=>b.count>0));
   if(!hasData){
     el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">אין נתונים ליום/תחנה שנבחרו</div>';
-    legend.innerHTML='';
-    return;
+    legend.innerHTML='';return;
   }
 
-  // Build column labels
-  const colW=Math.max(18,Math.min(36,Math.floor(1040/colCount)));
-  let html='<table class=hm style="min-width:'+(colCount*colW+100)+'px;direction:ltr"><tr><td class=rowlbl></td>';
-  for(let i=0;i<colCount;i++){
-    const minute=xMin+i*bucketMin;
-    const hh=String(Math.floor(minute/60)%24).padStart(2,'0');
-    const mm=String(Math.round(minute%60)).padStart(2,'0');
-    const prevMinute=xMin+(i-1)*bucketMin;
-    const label=(i===0||Math.floor(minute/60)!==Math.floor(prevMinute/60)||i===colCount-1)?hh+':'+mm:'';
-    html+='<td class=hdr style="font-size:'+(label?'.6rem':'0')+';min-width:'+colW+'px;width:'+colW+'px;padding:2px 0">'+esc(label)+'</td>';
+  // Column header — 24 hours, station label on the RIGHT side (last column)
+  const colW=32;
+  let html='<table class=hm style="min-width:'+(24*colW+140)+'px;direction:ltr">';
+  html+='<tr>';
+  for(let h=0;h<24;h++){
+    html+='<td class=hdr style="font-size:.6rem;min-width:'+colW+'px;width:'+colW+'px;padding:3px 0">'+
+      String(h).padStart(2,'0')+'</td>';
   }
-  html+='</tr>';
+  html+='<td class=rowlbl style=width:90px;text-align:right;font-size:.65rem>תחנה</td></tr>';
 
-  // Accumulate all songs for match-key lookups (across all stations/buckets)
-  const allSongCells=[]; // [{slug, bucketIdx, artist, title, matchKey, count}]
+  const allSongCells=[];
 
   stationOrder.forEach(s=>{
     const row=buckets[s.slug];
-    const total=row.reduce((s,b)=>s+b.count,0);
+    const total=row.reduce((a,b)=>a+b.count,0);
     if(!total)return;
-    html+='<tr><td class=rowlbl style="font-size:.7rem;padding:3px 6px;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis">'+
-      '<span class=dot-sm style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+s.color+';margin-left:4px;vertical-align:middle"></span>'+
-      '<span style=vertical-align:middle>'+esc(name(s.slug).length>12?name(s.slug).slice(0,11)+'…':name(s.slug))+'</span>'+
-      '</td>';
-    row.forEach((b,i)=>{
+    html+='<tr>';
+    row.forEach((b,h)=>{
       const t=b.count/globalMax;
-      const cellId='tlc_'+s.slug+'_'+i;
-      // store song data in a data attr for drill-down
-      const songData=b.songs.map(s=>s.artist+'||'+s.title).join('|');
-      html+='<td id="'+cellId+'" class=tl-cell style="background:'+heatColor(t)+';color:'+heatText(t)+';'+
-        'min-width:'+colW+'px;width:'+colW+'px;height:'+Math.round(colW*0.75)+'px;padding:0;border-radius:3px;'+
-        'font-size:.55rem;font-weight:'+(b.count?'600':'400')+';cursor:'+(b.count?'pointer':'default')+'"'+
-        ' data-slug="'+s.slug+'" data-bidx="'+i+'" data-count="'+b.count+'"'+
-        ' onclick="tlDrill(\''+s.slug+'\','+i+')">'+
+      html+='<td style="background:'+heatColor(t)+';color:'+heatText(t)+';'+
+        'min-width:'+colW+'px;width:'+colW+'px;height:32px;padding:0;border-radius:3px;'+
+        'font-size:.6rem;font-weight:'+(b.count?'700':'400')+';cursor:'+(b.count?'pointer':'default')+'"'+
+        ' data-slug="'+s.slug+'" data-hour="'+h+'" data-count="'+b.count+'"'+
+        ' onclick="tlDrill(\''+s.slug+'\','+h+')">'+
         (b.count||'')+'</td>';
-      // register all songs for match-key lookup
       b.songs.forEach(song=>{
-        allSongCells.push({slug:s.slug,bucketIdx:i,matchKey:song.matchKey,artist:song.artist,title:song.title,count:b.count});
+        allSongCells.push({slug:s.slug,hour:h,matchKey:song.matchKey,artist:song.artist,title:song.title,count:b.count});
       });
     });
+    // Station label on the RIGHT side (last column in LTR table)
+    html+='<td class=rowlbl style="font-size:.72rem;padding:3px 8px;white-space:nowrap;text-align:right">'+
+      '<span class=dot-sm style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+s.color+';margin-left:4px;vertical-align:middle"></span>'+
+      '<span style=vertical-align:middle>'+esc(name(s.slug))+'</span>'+
+      '<span style=color:var(--muted);font-size:.6rem;margin-right:4px>'+total+'</span>'+
+      '</td>';
     html+='</tr>';
   });
   html+='</table>';
 
-  // Detail panel below the grid
   html+='<div id=tlDetail style="margin-top:8px;min-height:30px"></div>';
 
   el.innerHTML=html;
   el._allSongCells=allSongCells;
 
-  // Legend
-  legend.innerHTML=legendHtml(
-    stationOrder.filter(s=>buckets[s.slug].some(b=>b.count>0))
-      .map(s=>({color:s.color,label:s.name+' ('+buckets[s.slug].reduce((a,b)=>a+b.count,0)+' שירים)'}))
-  );
-
+  // Station totals in footer
+  const footerStations=stationOrder.filter(s=>buckets[s.slug].some(b=>b.count>0))
+    .map(s=>({color:s.color,label:name(s.slug)+' — '+buckets[s.slug].reduce((a,b)=>a+b.count,0)}));
+  legend.innerHTML=legendHtml(footerStations);
   tlSelectedMatch=null;
 }
 
 // ── Drill-down: click a heatmap cell → show songs in that bucket ──
-function tlDrill(slug,bucketIdx){
+function tlDrill(slug,hour){
   const detail=document.getElementById('tlDetail');
-  // Re-read the bucket data from the full song index (stored on the grid element)
   const grid=document.getElementById('timelineGrid');
   const allCells=grid._allSongCells||[];
-  const songsInCell=allCells.filter(c=>c.slug===slug&&c.bucketIdx===bucketIdx);
+  const songsInCell=allCells.filter(c=>c.slug===slug&&c.hour===hour);
   if(!songsInCell.length){detail.innerHTML='';return}
 
-  // Also find all occurrences of each song across ALL cells for cross-ref
   let html='<div class=card style="margin-bottom:0;padding:10px">'+
-    '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">🎵 שירים בקטגוריה זו — לחץ על שיר להדגשת מופעים נוספים</div>';
+    '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">🎵 שירים בשעה '+String(hour).padStart(2,'0')+':00 — לחץ על שיר להדגשה</div>';
 
-  // Group by song (matchKey) to show counts across grid
   const songGroups={};
   songsInCell.forEach(s=>{
     const mk=s.matchKey;
@@ -839,14 +777,12 @@ function tlDrill(slug,bucketIdx){
 // ── Click a song in drill-down → highlight all matching cells across grid ──
 function tlClickSong(matchKey){
   tlSelectedMatch=(tlSelectedMatch===matchKey)?null:matchKey;
-  // Highlight all cells that contain this song
   const allCells=document.getElementById('timelineGrid')._allSongCells||[];
   const matchingCells=allCells.filter(c=>c.matchKey===matchKey);
 
-  // Add/remove highlight class on matching td elements
   document.querySelectorAll('.tl-cell').forEach(td=>{
-    const slug=td.dataset.slug,bidx=+td.dataset.bidx;
-    const isMatch=matchingCells.some(c=>c.slug===slug&&c.bucketIdx===bidx);
+    const slug=td.dataset.slug,hour=+td.dataset.hour;
+    const isMatch=matchingCells.some(c=>c.slug===slug&&c.hour===hour);
     if(tlSelectedMatch&&isMatch){
       td.style.outline='2px solid #5ddbb5';
       td.style.boxShadow='inset 0 0 8px rgba(93,219,181,.3)';
@@ -856,11 +792,11 @@ function tlClickSong(matchKey){
     }
   });
 
-  // Re-render the detail panel to show active state
-  tlDrill(document.querySelector('.tl-cell[style*="outline"]')?.dataset?.slug||
-    matchingCells[0]?.slug||'',
-    document.querySelector('.tl-cell[style*="outline"]')?.dataset?.bidx||
-    matchingCells[0]?.bucketIdx||0);
+  if(matchingCells.length){
+    tlDrill(matchingCells[0].slug,
+      document.querySelector('.tl-cell[style*="outline"]')?.dataset?.hour||
+      matchingCells[0].hour||0);
+  }
 }
 
 // Add a global click-away listener to deselect
