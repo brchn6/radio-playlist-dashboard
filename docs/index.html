@@ -237,7 +237,7 @@
 <div class=tab-content id=tab-timeline>
   <div class=card>
     <div class=card-title>📊 Timeline — פילוח לפי שעה</div>
-    <div class=card-sub>בחר יום · כל תא = סך שירים באותה שעה · לחץ על תא לרשימת השירים</div>
+    <div class=card-sub>בחר יום · כל תא = סך כל הניגונים באותה שעה ביום שנבחר (לא ממוצע) · לחץ על תא לרשימת השירים</div>
     <div class=controls id=timelineDays></div>
     <div id=timelineGrid style="overflow-x:auto;overflow-y:auto"></div>
     <div class=chart-legend id=timelineLegend></div>
@@ -247,13 +247,13 @@
 <!-- ── Heatmap ── -->
 <div class=tab-content id=tab-heatmap>
   <div class=card>
-    <div class=card-title>🔥 תחנה × שעה — ממוצע יומי</div>
-    <div class=card-sub>ממוצע שירים שזוהו בכל שעה, 7 הימים האחרונים · כהה = שקט · בהיר = הרבה מוזיקה</div>
+    <div class=card-title>🔥 תחנה × שעה — ממוצע</div>
+    <div class=card-sub>ממוצע שירים לשעה ב-7 הימים האחרונים · כהה = שקט · בהיר = הרבה מוזיקה</div>
     <div class=hm-scroll id=stationHourHm></div>
   </div>
   <div class=card>
-    <div class=card-title>📅 יום בשבוע × שעה — ממוצע יומי</div>
-    <div class=card-sub>ממוצע שירים בכל יום בשבוע, 30 הימים האחרונים — מתי הרדיו הכי מוזיקלי?</div>
+    <div class=card-title>📅 יום בשבוע × שעה — ממוצע</div>
+    <div class=card-sub>ממוצע שירים לשעה ב-30 הימים האחרונים — מתי הרדיו הכי מוזיקלי?</div>
     <div class=hm-scroll id=dowHourHm></div>
   </div>
   <div class=card id=nonMusicCard style=display:none>
@@ -860,7 +860,7 @@ function renderHourChart(){
     data:{labels:Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00'),
       datasets:[{data:totals,backgroundColor:ACCENT+'99',borderColor:ACCENT,borderWidth:1,borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' שירים'}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' שירים בממוצע ליום'}}},
       scales:{x:{ticks:{color:MUTED,maxRotation:45},grid:{display:false}},
               y:{beginAtZero:true,ticks:{color:MUTED,precision:0},grid:{color:GRID}}}}
   });
