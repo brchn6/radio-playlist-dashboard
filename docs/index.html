@@ -237,7 +237,7 @@
 <div class=tab-content id=tab-timeline>
   <div class=card>
     <div class=card-title>📊 Timeline — פילוח לפי שעה</div>
-    <div class=card-sub>בחר יום · כל תא = שירים באותה שעה · לחץ על תא לרשימת השירים</div>
+    <div class=card-sub>בחר יום · כל תא = סך שירים באותה שעה · לחץ על תא לרשימת השירים</div>
     <div class=controls id=timelineDays></div>
     <div id=timelineGrid style="overflow-x:auto;overflow-y:auto"></div>
     <div class=chart-legend id=timelineLegend></div>
@@ -247,13 +247,13 @@
 <!-- ── Heatmap ── -->
 <div class=tab-content id=tab-heatmap>
   <div class=card>
-    <div class=card-title>🔥 תחנה × שעה</div>
-    <div class=card-sub>שירים שזוהו לפי שעת יום (שעון ישראל), 7 הימים האחרונים · כהה = שקט · בהיר = הרבה מוזיקה</div>
+    <div class=card-title>🔥 תחנה × שעה — ממוצע יומי</div>
+    <div class=card-sub>ממוצע שירים שזוהו בכל שעה, 7 הימים האחרונים · כהה = שקט · בהיר = הרבה מוזיקה</div>
     <div class=hm-scroll id=stationHourHm></div>
   </div>
   <div class=card>
-    <div class=card-title>📅 יום בשבוע × שעה</div>
-    <div class=card-sub>כל התחנות יחד, 30 הימים האחרונים — מתי הרדיו הכי מוזיקלי?</div>
+    <div class=card-title>📅 יום בשבוע × שעה — ממוצע יומי</div>
+    <div class=card-sub>ממוצע שירים בכל יום בשבוע, 30 הימים האחרונים — מתי הרדיו הכי מוזיקלי?</div>
     <div class=hm-scroll id=dowHourHm></div>
   </div>
   <div class=card id=nonMusicCard style=display:none>
@@ -764,7 +764,6 @@ function tlDrill(slug,hour){
       ' onmouseenter="tlHighlight(\''+sg.matchKey+'\')"'+
       ' onmouseleave="tlHighlight(null)"'+
       ' onclick="tlClickSong(\''+sg.matchKey+'\')">'+
-      '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:hsla('+hue+',60%,55%,0.8);flex-shrink:0"></span>'+
       '<span style="font-size:.78rem;flex:1"><strong>'+esc(sg.artist)+'</strong> — '+esc(sg.title)+'</span>'+
       '<span style="font-size:.62rem;color:var(--accent)">'+(sg.totalAcross>1?'+'+sg.totalAcross:'')+'</span>'+
     '</div>';
@@ -821,11 +820,13 @@ function renderHeatmaps(){
   if(!hm){emptyMsg(el1);emptyMsg(el2);return}
   const hours=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
   const sh=hm.station_hour.matrix;
+  const shDays=hm.station_hour.days||7;
   let rows=stations.filter(s=>sh[s.slug]&&(!activeStation||s.slug===activeStation))
-    .map(s=>({label:s.name,dot:s.color,cells:sh[s.slug]}));
+    .map(s=>({label:s.name,dot:s.color,cells:sh[s.slug].map(v=>Math.round(v/shDays))}));
   if(rows.length&&rows.some(r=>r.cells.some(c=>c)))el1.innerHTML=hmTable(rows,hours);else emptyMsg(el1);
   const dm=hm.dow_hour.matrix;
-  const dRows=DOW_NAMES.map((d,i)=>({label:d,cells:dm[i]}));
+  const dhDays=hm.dow_hour.days||30;
+  const dRows=DOW_NAMES.map((d,i)=>({label:d,cells:dm[i].map(v=>Math.round(v/dhDays))}));
   if(dRows.some(r=>r.cells.some(c=>c)))el2.innerHTML=hmTable(dRows,hours);else emptyMsg(el2);
   renderNonMusic(hours);
   renderHourChart();
@@ -845,11 +846,13 @@ function renderHourChart(){
   destroyChart('hour');
   const hm=D.heatmap;if(!hm)return;
   const sh=hm.station_hour.matrix;
+  const shDays=hm.station_hour.days||7;
   const totals=Array(24).fill(0);
   Object.entries(sh).forEach(([slug,arr])=>{
     if(activeStation&&slug!==activeStation)return;
     arr.forEach((c,i)=>totals[i]+=c);
   });
+  totals.forEach((v,i,a)=>a[i]=Math.round(v/shDays));
   if(!totals.some(c=>c)){emptyMsg(wrap);return}
   if(!wrap.querySelector('canvas'))wrap.innerHTML='<canvas id=hourChart></canvas>';
   charts.hour=new Chart(document.getElementById('hourChart'),{
