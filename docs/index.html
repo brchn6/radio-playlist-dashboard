@@ -61,12 +61,12 @@
     .np-station .radio-icon{font-size:.85rem}
     .np-now{margin-bottom:8px}
     .np-now-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
-    .np-artist{font-weight:700;font-size:.95rem;line-height:1.3}
-    .np-title{font-size:.82rem;opacity:.7;line-height:1.3}
+    .np-title{font-weight:700;font-size:1.1rem;line-height:1.3;margin-bottom:1px}
+    .np-artist{font-size:.85rem;opacity:.6;line-height:1.3}
     .np-prev{border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-top:8px}
     .np-prev-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
-    .np-prev-artist{font-size:.8rem;font-weight:600;opacity:.7}
-    .np-prev-title{font-size:.74rem;opacity:.5}
+    .np-prev-title{font-size:.85rem;font-weight:600;}
+    .np-prev-artist{font-size:.75rem;opacity:.5}
     .np-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
     .np-btn{font-size:.7rem;padding:4px 12px;border-radius:14px;border:1px solid;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
     .np-btn:hover{filter:brightness(1.2)}
@@ -78,6 +78,7 @@
     .window-pill:hover{border-color:var(--muted)}
     .window-pill.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
     .top-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(37,41,64,.5);font-size:.82rem;transition:background .1s}
+    .top-row{cursor:pointer}
     .top-row:hover{background:var(--card-hover);border-radius:4px}
     .top-row:last-child{border-bottom:none}
     .top-rank{width:24px;font-weight:700;color:var(--muted);font-size:.75rem;flex-shrink:0;text-align:center}
@@ -143,6 +144,23 @@
     .transition-arrow{text-align:center;color:var(--accent);font-size:.75rem;font-weight:700;padding:2px 0}
     .transition-prob{font-size:.65rem;color:var(--muted);direction:ltr}
 
+    /* Transitions (new compact) */
+    .trans-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(37,41,64,.5);font-size:.82rem}
+    .trans-item:last-child{border-bottom:none}
+    .trans-song{flex:1;min-width:0}
+    .trans-song-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .trans-song-artist{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .trans-arrow{color:var(--accent);flex-shrink:0;font-size:.7rem}
+    .trans-badge{flex-shrink:0;background:var(--accent);color:var(--bg);font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;direction:ltr}
+    .trans-station-dots{display:flex;gap:2px;flex-shrink:0}
+    .trans-station-dot{width:6px;height:6px;border-radius:50%}
+    .hist-filter-banner{background:var(--card-hover);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+    .hist-filter-title{font-weight:700;font-size:.9rem;margin-bottom:4px}
+    .hist-filter-range{font-size:.72rem;color:var(--muted);margin-bottom:8px}
+    .hist-filter-stations{display:flex;gap:6px;flex-wrap:wrap}
+    .hist-filter-station{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:14px;border:1px solid;font-size:.72rem}
+    .hist-filter-close{float:left;cursor:pointer;opacity:.5;font-size:.78rem}
+    .hist-filter-close:hover{opacity:1}
     /* Clusters */
     #clusterGraph{width:100%;height:450px;border-radius:var(--radius);background:var(--card);touch-action:none}
 
@@ -182,13 +200,17 @@
       .chart-wrap{height:240px}
       .hist-controls{gap:5px}
       .hist-search{font-size:.72rem;padding:5px 8px;min-width:120px}
+      .np-title{font-size:.95rem}
+      .np-artist{font-size:.78rem}
+      .np-prev-title{font-size:.78rem}
+      .np-prev-artist{font-size:.7rem}
     }
     @media(max-width:400px){
       header h1{font-size:.9rem}
       .stats-pill{display:none}
       .tab-btn{font-size:.65rem;padding:7px 4px}
       .np-card{padding:10px}
-      .np-artist{font-size:.85rem}
+      .np-title{font-size:.85rem}
     }
   </style>
 </head>
@@ -302,7 +324,7 @@
   <div class="card">
     <div class="section-header">
       <div class="section-title">🔄 מעברי שירים</div>
-      <div class="section-sub">הרדיו לא אקראי — איזה שירים התקליטנים שמים אחד אחרי השני</div>
+      <div class="section-sub">רצפים מוכרים: אחרי איזה שיר התחנה אוהבת לשים איזה שיר. <strong>×N</strong> = כמה פעמים הרצף הזה זוהה. בחר תחנה לראות רק אצלה.</div>
     </div>
     <div class="window-pills" id="transStationPills"></div>
     <div id="transContent"></div>
@@ -365,6 +387,29 @@ let transStation = 'all';
 let histDedup = true;
 let histReverse = true;
 let histShown = 80;
+let activeHistoryFilter = null;
+
+function filterByTimeWindow(items, window) {
+  const now = Date.now();
+  const windows = { '1h': 3600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, 'all': Infinity };
+  const ms = windows[window] || Infinity;
+  if (ms === Infinity) return items;
+  return items.filter(t => {
+    const dt = parseTs(t.recognized_at);
+    return dt && (now - dt) <= ms;
+  });
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="' + tabName + '"]').classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.getElementById('pills').style.display = tabName === 'np' ? 'none' : 'flex';
+  activeStation = null;
+  renderPills();
+  renderAll();
+}
 
 const STATION_STREAMS = {
   "kol-hashfela": "https://radio.streamgates.net/stream/1036kh",
@@ -432,15 +477,8 @@ async function fetchAll() {
 /* ── Tabs ── */
 document.getElementById('tabBar').onclick = e => {
   const b = e.target.closest('.tab-btn'); if (!b) return;
-  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-  b.classList.add('active');
-  document.getElementById('tab-' + b.dataset.tab).classList.add('active');
-  // Show/hide station pills
-  document.getElementById('pills').style.display = b.dataset.tab === 'np' ? 'none' : 'flex';
-  activeStation = null;
-  renderPills();
-  renderAll();
+  activeHistoryFilter = null;
+  switchTab(b.dataset.tab);
 };
 
 /* ── Station Pills ── */
@@ -512,8 +550,8 @@ function renderNowPlaying() {
     if (c) {
       h += '<div class="np-now">';
       h += '<div class="np-now-label">◄ מנגן עכשיו</div>';
-      h += '<div class="np-artist">' + esc(c.artist) + '</div>';
       h += '<div class="np-title">' + esc(c.title) + '</div>';
+      h += '<div class="np-artist">' + esc(c.artist) + '</div>';
       h += '</div>';
     } else {
       h += '<div class="np-now"><div class="np-now-label">◄ מנגן עכשיו</div><div style="color:var(--muted);font-size:.8rem">אין נתונים</div></div>';
@@ -522,8 +560,8 @@ function renderNowPlaying() {
     if (prev) {
       h += '<div class="np-prev">';
       h += '<div class="np-prev-label">▸ קודם</div>';
-      h += '<div class="np-prev-artist">' + esc(prev.artist) + '</div>';
       h += '<div class="np-prev-title">' + esc(prev.title) + '</div>';
+      h += '<div class="np-prev-artist">' + esc(prev.artist) + '</div>';
       h += '</div>';
     }
 
@@ -570,7 +608,7 @@ function renderTopSongs() {
       '<span class="top-trend flat">—</span>';
     const stationDots = Object.keys(s.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
-    h += '<div class="top-row">';
+    h += '<div class="top-row" data-title="' + esc(s.title) + '" data-artist="' + esc(s.artist) + '" data-count="' + s.count + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(s.title) + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
     h += '<span class="top-count">' + s.count + '×</span>';
@@ -599,7 +637,7 @@ function renderTopArtists() {
       '<span class="top-trend flat">—</span>';
     const stationDots = Object.keys(a.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
-    h += '<div class="top-row">';
+    h += '<div class="top-row" data-artist="' + esc(a.artist) + '" data-count="' + a.count + '" data-stations=\'' + JSON.stringify(a.stations) + '\' data-window="' + topArtistsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(a.artist) + '</div><div class="top-sub"><span class="top-stations">' + stationDots + '</span></div></div>';
     h += '<span class="top-count">' + a.count + '×</span>';
@@ -607,6 +645,36 @@ function renderTopArtists() {
     h += '</div>';
   });
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים לתחנה זו</div>';
+}
+
+/* ── Top-row click → History ── */
+document.getElementById('topSongsList').addEventListener('click', onTopRowClick);
+document.getElementById('topArtistsList').addEventListener('click', onTopRowClick);
+
+function onTopRowClick(e) {
+  const row = e.target.closest('.top-row');
+  if (!row) return;
+  // Don't trigger if clicking a Spotify link or other interactive elements
+  if (e.target.closest('a')) return;
+
+  const title = row.dataset.title;
+  const artist = row.dataset.artist;
+  const count = parseInt(row.dataset.count) || 0;
+  const stations = row.dataset.stations ? JSON.parse(row.dataset.stations) : {};
+  const timeWindow = row.dataset.window || '24h';
+
+  activeHistoryFilter = { title, artist, count, stationBreakdown: stations, timeWindow, isArtist: !title };
+
+  switchTab('insights');
+
+  document.getElementById('histSearch').value = title || artist || '';
+
+  setTimeout(() => {
+    const historyCard = document.querySelector('.card:has(#historyList)');
+    if (historyCard) historyCard.scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+
+  renderHistory();
 }
 
 function renderCrossStation() {
@@ -637,8 +705,27 @@ function renderHistory() {
 
   let items = D.history.history.slice();
   const q = (document.getElementById('histSearch').value || '').toLowerCase();
-  if (q) items = items.filter(t => (t.artist + ' ' + t.title).toLowerCase().includes(q));
+
+  // If filter is set but search is empty, clear the filter
+  if (activeHistoryFilter && !q) {
+    activeHistoryFilter = null;
+  }
+
+  // If filter is active, populate search if empty
+  if (activeHistoryFilter && !q) {
+    const term = activeHistoryFilter.title || activeHistoryFilter.artist || '';
+    document.getElementById('histSearch').value = term;
+  }
+
+  const effectiveQ = (document.getElementById('histSearch').value || '').toLowerCase();
+  if (effectiveQ) items = items.filter(t => (t.artist + ' ' + t.title).toLowerCase().includes(effectiveQ));
   if (activeStation) items = items.filter(t => t.station_slug === activeStation);
+
+  // Apply time window filter from activeHistoryFilter
+  if (activeHistoryFilter && activeHistoryFilter.timeWindow && activeHistoryFilter.timeWindow !== 'all') {
+    items = filterByTimeWindow(items, activeHistoryFilter.timeWindow);
+  }
+
   if (histDedup) {
     const seen = new Set();
     items = items.filter(t => {
@@ -649,6 +736,27 @@ function renderHistory() {
   }
   if (!histReverse) items.reverse();
 
+  // Build filter banner
+  let bannerHtml = '';
+  if (activeHistoryFilter) {
+    const filter = activeHistoryFilter;
+    const label = filter.title ? esc(filter.title) + ' — ' + esc(filter.artist) : esc(filter.artist);
+    const windowLabels = { '1h': 'שעה אחרונה', '24h': '24 שעות אחרונות', '7d': 'שבוע אחרון', '30d': 'חודש אחרון', 'all': 'כל הזמנים' };
+    const rangeLabel = windowLabels[filter.timeWindow] || '24 שעות אחרונות';
+    const stationPills = Object.entries(filter.stationBreakdown).map(([slug, cnt]) => {
+      return '<span class="hist-filter-station" style="color:' + color(slug) + ';border-color:' + color(slug) + '40">' +
+        '<span style="width:6px;height:6px;border-radius:50%;background:' + color(slug) + ';display:inline-block"></span> ' +
+        esc(name(slug)) + ': <strong>' + cnt + '</strong></span>';
+    }).join('');
+
+    bannerHtml = '<div class="hist-filter-banner" id="histFilterBanner">' +
+      '<span class="hist-filter-close" onclick="clearHistoryFilter()">✕</span>' +
+      '<div class="hist-filter-title">' + (filter.isArtist ? '🎤 ' : '🎵 ') + label + '</div>' +
+      '<div class="hist-filter-range">' + rangeLabel + '</div>' +
+      '<div class="hist-filter-stations">' + stationPills + '</div>' +
+      '</div>';
+  }
+
   const shown = items.slice(0, histShown);
   let h = '';
   shown.forEach(t => {
@@ -658,8 +766,15 @@ function renderHistory() {
     h += '<span class="hist-time">' + timeAgo(t.recognized_at) + '</span>';
     h += '</div>';
   });
-  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">לא נמצאו תוצאות</div>';
+  el.innerHTML = bannerHtml + (h || '<div style="color:var(--muted);text-align:center;padding:20px">' +
+    (activeHistoryFilter ? 'לא נמצאו תוצאות לטווח הזמן הזה' : 'לא נמצאו תוצאות') + '</div>');
   document.getElementById('histMoreBtn').style.display = items.length > histShown ? 'inline-block' : 'none';
+}
+
+function clearHistoryFilter() {
+  activeHistoryFilter = null;
+  document.getElementById('histSearch').value = '';
+  renderHistory();
 }
 
 function toggleHistDedup() {
@@ -798,36 +913,46 @@ function renderTransitions() {
 
   let transitions = [];
   if (transStation === 'all') {
-    // Aggregate all stations
+    // Aggregate all stations with per-station tracking
     if (D.transitions.stations) {
-      Object.values(D.transitions.stations).forEach(stData => {
-        if (stData.transitions) transitions = transitions.concat(stData.transitions);
+      const aggMap = {};
+      Object.entries(D.transitions.stations).forEach(([slug, stData]) => {
+        (stData.transitions || []).forEach(t => {
+          const k = (t.from_artist || t.fromartist) + '|' + (t.from_title || t.fromtitle) + '|' + (t.to_artist || '') + '|' + (t.to_title || '');
+          if (!aggMap[k]) {
+            aggMap[k] = { from_artist: t.from_artist || t.fromartist, from_title: t.from_title || t.fromtitle, to_artist: t.to_artist, to_title: t.to_title, count: 0, stations: [] };
+          }
+          aggMap[k].count += t.count;
+          if (!aggMap[k].stations.includes(slug)) aggMap[k].stations.push(slug);
+        });
       });
-      // Deduplicate and sort
-      const map = {};
-      transitions.forEach(t => {
-        const k = t.fromartist + '|' + t.from_title + '|' + t.to_artist + '|' + t.to_title;
-        if (!map[k]) map[k] = { ...t, count: 0 };
-        map[k].count += t.count;
-      });
-      transitions = Object.values(map).sort((a, b) => b.count - a.count);
+      transitions = Object.values(aggMap).sort((a, b) => b.count - a.count);
     }
   } else {
     const stData = D.transitions.stations && D.transitions.stations[transStation];
-    transitions = stData ? stData.transitions || [] : [];
+    transitions = stData ? (stData.transitions || []) : [];
   }
 
   if (!transitions.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני מעברים עדיין</div>'; return; }
 
   let h = '';
   transitions.slice(0, 15).forEach(t => {
-    h += '<div class="transition-item">';
-    h += '<div class="transition-from">' + esc(t.from_artist || t.fromartist) + ' — <em>' + esc(t.from_title || t.fromtitle) + '</em></div>';
-    h += '<div class="transition-arrow">↓ <span class="transition-prob">' + t.count + '×' + (t.probability ? ' (' + Math.round(t.probability * 100) + '%)' : '') + '</span></div>';
-    h += '<div class="transition-to">' + esc(t.to_artist) + ' — <em>' + esc(t.to_title) + '</em></div>';
+    const from = esc(t.from_artist || '') + ' — <em>' + esc(t.from_title || '') + '</em>';
+    const to = esc(t.to_artist || '') + ' — <em>' + esc(t.to_title || '') + '</em>';
+    const dots = transStation === 'all' && t.stations
+      ? '<span class="trans-station-dots">' + t.stations.map(slug =>
+          '<span class="trans-station-dot" style="background:' + color(slug) + '" title="' + esc(name(slug)) + '"></span>'
+        ).join('') + '</span>'
+      : '';
+    h += '<div class="trans-item">';
+    h += '<span class="trans-song"><span class="trans-song-name">' + from + '</span></span>';
+    h += '<span class="trans-arrow">→</span>';
+    h += '<span class="trans-song"><span class="trans-song-name">' + to + '</span></span>';
+    h += '<span class="trans-badge">×' + t.count + '</span>';
+    h += dots;
     h += '</div>';
   });
-  el.innerHTML = h;
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
 }
 
 /* ── Clusters ── */
@@ -962,16 +1087,7 @@ async function init() {
 // Restore tab from URL hash
 (function () {
   const t = location.hash.slice(1);
-  if (t && ['np', 'insights', 'deep'].includes(t)) {
-    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
-    const btn = document.querySelector('.tab-btn[data-tab="' + t + '"]');
-    if (btn) {
-      btn.classList.add('active');
-      document.getElementById('tab-' + t).classList.add('active');
-      document.getElementById('pills').style.display = t === 'np' ? 'none' : 'flex';
-    }
-  }
+  if (t && ['np', 'insights', 'deep'].includes(t)) switchTab(t);
 })();
 
 init();
