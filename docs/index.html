@@ -55,9 +55,9 @@
 
     /* Now Playing Grid */
     .np-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .np-card{border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;border:1px solid var(--border);transition:transform .15s}
+    .np-card{border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;border:1px solid var(--border);transition:transform .15s;text-align:center}
     .np-card:hover{transform:translateY(-1px)}
-    .np-station{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .np-station{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px;justify-content:center}
     .np-station .radio-icon{font-size:.85rem}
     .np-now{margin-bottom:8px}
     .np-now-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
@@ -67,10 +67,24 @@
     .np-prev-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
     .np-prev-title{font-size:.85rem;font-weight:600;}
     .np-prev-artist{font-size:.75rem;opacity:.5}
-    .np-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    .np-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;justify-content:center}
     .np-btn{font-size:.7rem;padding:4px 12px;border-radius:14px;border:1px solid;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
     .np-btn:hover{filter:brightness(1.2)}
     .np-empty{text-align:center;padding:30px;color:var(--muted);font-size:.8rem}
+
+    /* Loading screen */
+    .loading-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#0b0e1a 0%,#080a14 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s ease}
+    .loading-screen.hidden{opacity:0;pointer-events:none}
+    .loading-title{font-size:1.3rem;font-weight:800;color:var(--accent);margin-bottom:4px}
+    .loading-sub{font-size:.85rem;color:var(--muted);margin-bottom:24px}
+    .loading-counter{font-size:3.5rem;font-weight:800;color:var(--fg);line-height:1}
+    .loading-counter-label{font-size:.75rem;color:var(--muted);margin-top:4px}
+    .loading-dots{display:flex;gap:6px;margin-top:20px}
+    .loading-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:loadPulse 1.2s infinite}
+    .loading-dot:nth-child(2){animation-delay:.2s}
+    .loading-dot:nth-child(3){animation-delay:.4s}
+    .loading-dot:nth-child(4){animation-delay:.6s}
+    @keyframes loadPulse{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
 
     /* Top lists */
     .window-pills{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
@@ -208,6 +222,14 @@
   </style>
 </head>
 <body>
+<!-- Loading screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-title">🎧 Radio Dashboard</div>
+  <div class="loading-sub">טוענים את הדאטה...</div>
+  <div class="loading-counter" id="loadingCounter">0</div>
+  <div class="loading-counter-label">שניות</div>
+  <div class="loading-dots"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>
+</div>
 <div class="container">
 
 <header>
@@ -1063,8 +1085,19 @@ function renderAll() {
 }
 
 /* ── Init ── */
+let loadingInterval;
+
 async function init() {
+  let sec = 0;
+  const counterEl = document.getElementById('loadingCounter');
+  loadingInterval = setInterval(() => { sec++; counterEl.textContent = sec; }, 1000);
+
   await fetchAll();
+
+  clearInterval(loadingInterval);
+  document.getElementById('loadingScreen').classList.add('hidden');
+  setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 600);
+
   renderPills();
   renderAll();
   // Set initial button states
