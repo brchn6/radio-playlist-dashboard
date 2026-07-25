@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <meta name="description" content="Radio Playlist Dashboard — automatic track monitoring across Israeli radio stations"/>
-  <title>Radio Playlist Dashboard</title>
+  <meta name="description" content="Radio Playlist Dashboard — מעקב שירים אוטומטי בתחנות רדיו ישראליות"/>
+  <title>Radio Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
@@ -14,1929 +14,967 @@
       --tab-bg: #101325; --tab-active: #1c2038;
       --up: #5ddbb5; --down: #e05555;
       --font: system-ui,-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
-      --radius: 12px; --radius-sm: 8px;
+      --radius: 8px; --radius-sm: 4px;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:var(--font);background:linear-gradient(160deg,#0b0e1a 0%,#080a14 100%);color:var(--fg);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
-    .container{max-width:1120px;margin:0 auto;padding:20px 16px}
+    .container{max-width:1200px;margin:0 auto;padding:20px 16px}
 
     /* Header */
-    header{text-align:center;padding:24px 0 14px}
-    header h1{font-size:1.5rem;font-weight:800;letter-spacing:-.3px}
-    header p{color:var(--muted);font-size:.82rem;margin-top:2px}
-    .status-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.75rem;color:var(--muted);flex-wrap:wrap;margin-top:8px}
-    .dot{width:7px;height:7px;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
-    .dot.on{background:var(--accent);box-shadow:0 0 8px var(--accent)}
-    .dot.off{background:#e05555;box-shadow:0 0 8px #e05555;animation:none}
-    .dot.stale{background:#d4b85a;box-shadow:0 0 8px #d4b85a}
+    header{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;flex-wrap:wrap;gap:8px}
+    .header-left{display:flex;align-items:center;gap:8px}
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+    .status-dot.on{background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+    .status-dot.off{background:#e05555;box-shadow:0 0 8px #e05555}
+    .status-dot.stale{background:#d4b85a;box-shadow:0 0 8px #d4b85a;animation:pulse 2s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-    .sep{opacity:.25;margin:0 4px}
+    header h1{font-size:1.2rem;font-weight:800;letter-spacing:-.3px}
+    .stats-pill{font-size:.72rem;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 14px;white-space:nowrap}
+
+    /* Tabs */
+    .tabs{display:flex;gap:2px;background:var(--tab-bg);border-radius:var(--radius);padding:3px;margin-bottom:16px;position:sticky;top:0;z-index:100}
+    .tab-btn{flex:1;padding:10px 12px;border:none;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap;font-family:var(--font);touch-action:manipulation}
+    .tab-btn:hover{background:var(--card-hover);color:var(--fg)}
+    .tab-btn.active{background:var(--tab-active);color:var(--accent)}
+    .tab-content{display:none;animation:fadeIn .15s ease}
+    .tab-content.active{display:block}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
     /* Station pills */
-    .station-pills{display:flex;gap:5px;margin-top:14px;flex-wrap:wrap;justify-content:center}
-    .pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;font-family:var(--font);display:flex;align-items:center;gap:5px;touch-action:manipulation}
+    .station-pills{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
+    .pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.76rem;font-weight:600;transition:all .15s;font-family:var(--font);display:flex;align-items:center;gap:5px;touch-action:manipulation}
     .pill:hover{background:var(--card-hover);border-color:var(--muted)}
     .pill.active{background:var(--tab-active);color:var(--fg);border-color:transparent;box-shadow:0 0 0 1px rgba(93,219,181,.3)}
     .pill .dot-sm{width:7px;height:7px;border-radius:50%;display:inline-block}
 
-    /* Tabs */
-    .tabs{display:flex;gap:2px;margin-top:14px;background:var(--tab-bg);border-radius:var(--radius);padding:3px;overflow-x:auto}
-    .tab-btn{flex:1;padding:9px 10px;border:none;background:transparent;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;border-radius:var(--radius-sm);transition:all .18s;white-space:nowrap;font-family:var(--font);min-width:0;touch-action:manipulation}
-    .tab-btn:hover{background:var(--card-hover);color:var(--fg)}
-    .tab-btn.active{background:var(--tab-active);color:var(--accent)}
-    .tab-content{display:none;margin-top:14px;animation:fadeIn .25s}
-    .tab-content.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
     /* Cards */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px}
-    .card-title{font-weight:700;font-size:.9rem;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .card-sub{font-size:.74rem;color:var(--muted);margin-bottom:10px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+    .section-header{margin-bottom:12px}
+    .section-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:6px}
+    .section-sub{font-size:.74rem;color:var(--muted);margin-top:2px}
 
-    /* Stat tiles */
-    .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
-    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
-    .stat-card .v{font-size:1.3rem;font-weight:800;color:var(--accent);line-height:1.2}
-    .stat-card .v.small{font-size:1rem}
-    .stat-card .l{font-size:.66rem;color:var(--muted);margin-top:3px}
+    /* Now Playing Grid */
+    .np-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .np-card{border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;border:1px solid var(--border);transition:transform .15s}
+    .np-card:hover{transform:translateY(-1px)}
+    .np-station{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .np-station .radio-icon{font-size:.85rem}
+    .np-now{margin-bottom:8px}
+    .np-now-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+    .np-artist{font-weight:700;font-size:.95rem;line-height:1.3}
+    .np-title{font-size:.82rem;opacity:.7;line-height:1.3}
+    .np-prev{border-top:1px solid rgba(255,255,255,.06);padding-top:8px;margin-top:8px}
+    .np-prev-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+    .np-prev-artist{font-size:.8rem;font-weight:600;opacity:.7}
+    .np-prev-title{font-size:.74rem;opacity:.5}
+    .np-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    .np-btn{font-size:.7rem;padding:4px 12px;border-radius:14px;border:1px solid;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+    .np-btn:hover{filter:brightness(1.2)}
+    .np-empty{text-align:center;padding:30px;color:var(--muted);font-size:.8rem}
 
-    /* NP Grid */
-    .np-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
-    .np-card{border-radius:var(--radius);padding:16px 14px;text-align:center;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
-    .np-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
-    .np-card .ns{font-size:.65rem;text-transform:uppercase;letter-spacing:1.2px;opacity:.7;margin-bottom:5px}
-    .np-card .ar{font-weight:700;font-size:1.05rem;margin-bottom:1px}
-    .np-card .tl{font-size:.88rem;opacity:.75}
-    .np-card .tm{font-size:.68rem;opacity:.45;margin-top:5px}
-    .np-card .np-actions{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
-    .np-card .np-btn{font-size:.7rem;padding:4px 12px;border-radius:14px;border:1px solid;text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
-    .np-card .np-btn:hover{filter:brightness(1.2)}
-    .spotify-link{font-size:.7rem;padding:2px 8px;border-radius:10px;border:1px solid #1DB95455;color:#1DB954;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .15s;white-space:nowrap;flex-shrink:0;vertical-align:middle}
-    .spotify-link:hover{background:#1DB95422;border-color:#1DB954}
-    .hist-toggle{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
-    .hist-toggle input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
-    .hist-cb{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0}
-    #histSelectAllBtn{white-space:nowrap}
-    #histSpotifyBtn{color:#1DB954;border-color:#1DB95455}
-    #histSpotifyBtn:hover{background:#1DB95422;border-color:#1DB954}
+    /* Top lists */
+    .window-pills{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+    .window-pill{padding:4px 14px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.72rem;font-weight:600;transition:all .15s;white-space:nowrap;font-family:var(--font);touch-action:manipulation}
+    .window-pill:hover{border-color:var(--muted)}
+    .window-pill.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+    .top-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(37,41,64,.5);font-size:.82rem;transition:background .1s}
+    .top-row:hover{background:var(--card-hover);border-radius:4px}
+    .top-row:last-child{border-bottom:none}
+    .top-rank{width:24px;font-weight:700;color:var(--muted);font-size:.75rem;flex-shrink:0;text-align:center}
+    .top-info{flex:1;min-width:0}
+    .top-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .top-sub{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .top-count{font-size:.8rem;font-weight:700;color:var(--accent);flex-shrink:0;direction:ltr}
+    .top-trend{font-size:.68rem;font-weight:700;width:40px;text-align:left;direction:ltr;flex-shrink:0}
+    .top-trend.up{color:var(--up)}
+    .top-trend.down{color:var(--down)}
+    .top-trend.flat{color:var(--muted)}
+    .top-trend.new{color:#d4b85a}
+    .top-stations{display:flex;gap:3px;margin-top:2px}
+    .top-station-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+    .top-spotify{font-size:.65rem;padding:2px 8px;border-radius:10px;border:1px solid #1DB95455;color:#1DB954;text-decoration:none;flex-shrink:0;transition:all .15s}
+    .top-spotify:hover{background:#1DB95422;border-color:#1DB954}
 
-    /* Lists */
-    .history-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid rgba(37,41,64,.6);font-size:.84rem;transition:background .1s}
-    .history-item:hover{background:var(--card-hover);border-radius:4px}
-    .history-item:last-child{border-bottom:none}
-    .history-item .hs{font-size:.66rem;opacity:.55;width:78px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .history-item .hi{flex:1;min-width:0}
-    .history-item .hi .ha{font-weight:600}
-    .history-item .hi .ht{opacity:.65;font-size:.78rem}
-    .history-item .hago{font-size:.66rem;opacity:.5;flex-shrink:0;direction:ltr}
-    .rank{width:26px;font-weight:700;color:var(--muted);font-size:.78rem;flex-shrink:0}
-    .cnt{font-size:.82rem;font-weight:700;color:var(--accent);direction:ltr;flex-shrink:0}
-    .trend{font-size:.7rem;font-weight:700;width:44px;text-align:left;direction:ltr;flex-shrink:0}
-    .trend.up{color:var(--up)}
-    .trend.down{color:var(--down)}
-    .trend.flat{color:var(--muted)}
-    .trend.new{color:#d4b85a}
+    /* Cross-station */
+    .cross-row{padding:10px;border-bottom:1px solid rgba(37,41,64,.5)}
+    .cross-row:last-child{border-bottom:none}
+    .cross-song{font-weight:600;font-size:.84rem}
+    .cross-artist{font-size:.74rem;color:var(--muted)}
+    .cross-stations{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+    .cross-station-pill{font-size:.62rem;padding:2px 8px;border-radius:10px;border:1px solid;display:flex;align-items:center;gap:3px}
 
-    /* Controls */
-    .controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
-    .controls .lbl{font-size:.78rem;color:var(--muted)}
-    select,.ctrl-btn,input.search{font-size:.78rem;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-family:var(--font)}
-    select,.ctrl-btn{cursor:pointer}
-    .ctrl-btn.active{color:var(--accent);box-shadow:0 0 0 1px rgba(93,219,181,.3)}.ctrl-btn,.pill,.tab-btn,.np-btn,.spotify-link{user-select:none;-webkit-tap-highlight-color:transparent}
-    input.search{min-width:200px;flex:1;max-width:320px}
+    /* History */
+    .hist-controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+    .hist-search{flex:1;min-width:160px;font-size:.78rem;padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-family:var(--font)}
+    .hist-btn{font-size:.72rem;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-family:var(--font);transition:all .15s}
+    .hist-btn:hover{background:var(--card-hover);color:var(--fg)}
+    .hist-btn.active{color:var(--accent);border-color:rgba(93,219,181,.3)}
+    .hist-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(37,41,64,.5);font-size:.82rem;transition:background .1s}
+    .hist-item:hover{background:var(--card-hover);border-radius:4px}
+    .hist-item:last-child{border-bottom:none}
+    .hist-station{font-size:.66rem;opacity:.55;width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .hist-info{flex:1;min-width:0}
+    .hist-artist{font-weight:600}
+    .hist-title{opacity:.65;font-size:.76rem}
+    .hist-time{font-size:.64rem;opacity:.5;flex-shrink:0;direction:ltr}
+    .hist-more{text-align:center;margin-top:8px}
 
     /* Charts */
-    .chart-wrap{position:relative;width:100%;height:340px}
-    .chart-wrap.tall{height:440px}
+    .chart-wrap{position:relative;width:100%;height:300px}
     .chart-wrap canvas{width:100%!important}
-    .chart-legend{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:.74rem;color:var(--muted)}
+    .chart-legend{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:.72rem;color:var(--muted)}
     .chart-legend span{display:inline-flex;align-items:center;gap:4px}
     .chart-legend .sw{display:inline-block;width:9px;height:9px;border-radius:50%}
 
-    /* Heatmap */
-    .hm-scroll{overflow-x:auto}
-    table.hm{border-collapse:separate;border-spacing:2px;font-size:.72rem;width:100%}
-    table.hm td{padding:5px 2px;text-align:center;border-radius:3px;min-width:26px}
-    table.hm td.hdr{color:var(--muted);font-size:.62rem;font-weight:600;background:transparent}
-    table.hm td.rowlbl{white-space:nowrap;text-align:right;padding:4px 8px;background:transparent;font-size:.72rem}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+    /* Key distribution */
+    .key-bars{display:flex;align-items:flex-end;gap:3px;height:160px;padding:0 4px}
+    .key-bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+    .key-bar-stack{width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:140px;position:relative}
+    .key-bar-major,.key-bar-minor{width:100%;transition:height .3s}
+    .key-bar-major{background:var(--accent);border-radius:2px 2px 0 0;opacity:.8}
+    .key-bar-minor{background:#6ab8e3;border-radius:0 0 2px 2px;opacity:.7}
+    .key-label{font-size:.58rem;color:var(--muted);text-align:center;white-space:nowrap}
+    .key-count{font-size:.55rem;color:var(--muted);text-align:center}
 
-    footer{margin-top:28px;padding:20px 0 14px;border-top:1px solid var(--border);text-align:center}
-    footer .credits{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;font-size:.72rem;color:var(--muted);margin-bottom:6px}
-    footer a{color:var(--accent);text-decoration:none}
-    footer a:hover{opacity:.8;text-decoration:underline}
-    footer .stations-attr{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 12px;font-size:.68rem;color:rgba(152,152,176,.55);margin-top:4px}
-    footer .tag{font-size:.6rem;padding:1px 6px;border-radius:4px;background:rgba(93,219,181,.08);color:var(--accent);margin:0 2px}
+    /* Transitions */
+    .transition-item{padding:12px;border-bottom:1px solid rgba(37,41,64,.5)}
+    .transition-item:last-child{border-bottom:none}
+    .transition-from,.transition-to{font-size:.82rem}
+    .transition-arrow{text-align:center;color:var(--accent);font-size:.75rem;font-weight:700;padding:2px 0}
+    .transition-prob{font-size:.65rem;color:var(--muted);direction:ltr}
 
+    /* Clusters */
+    #clusterGraph{width:100%;height:450px;border-radius:var(--radius);background:var(--card);touch-action:none}
+
+    /* Redundancy */
+    .redundancy-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(37,41,64,.5)}
+    .redundancy-row:last-child{border-bottom:none}
+    .redundancy-name{flex:1;font-weight:600;font-size:.82rem}
+    .redundancy-bar{flex:2;height:8px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+    .redundancy-fill{height:100%;border-radius:4px;transition:width .3s}
+    .redundancy-pct{font-size:.78rem;font-weight:700;color:var(--accent);width:45px;text-align:left;direction:ltr}
+
+    /* Skeleton loading */
+    .skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card-hover) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skeleton-line{height:14px;margin-bottom:6px;border-radius:3px}
+    .skeleton-line.w60{width:60%}
+    .skeleton-line.w80{width:80%}
+    .skeleton-line.w40{width:40%}
+
+    /* Footer */
+    footer{margin-top:24px;padding:16px 0;border-top:1px solid var(--border);text-align:center}
+    .footer-stats{font-size:.72rem;color:var(--muted)}
+
+    /* Responsive */
     @media(max-width:640px){
       .container{padding:10px 8px}
-      header{padding:14px 0 10px}
-      header h1{font-size:1.1rem}
-      header p{font-size:.7rem}
-      .status-bar{font-size:.68rem;margin-top:4px}
-      .station-pills{flex-wrap:nowrap;overflow-x:auto;gap:4px;padding-bottom:4px;justify-content:flex-start;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-      .station-pills::-webkit-scrollbar{display:none}
-      .pill{flex-shrink:0;scroll-snap-align:start;font-size:.7rem;padding:5px 10px}
-      .tabs{scroll-snap-type:x mandatory;gap:1px}
-      .tab-btn{font-size:.65rem;padding:8px 5px;flex:0 0 auto;scroll-snap-align:start;min-width:0}
-      .np-grid{grid-template-columns:1fr 1fr;gap:6px}
-      .np-card{padding:12px 10px}
-      .np-card .ar{font-size:.9rem}
-      .np-card .tl{font-size:.78rem}
-      .np-card .np-btn{font-size:.65rem;padding:3px 10px}
-      .chart-wrap{height:260px}
-      .chart-wrap.tall{height:320px}
-      .history-item{font-size:.78rem;gap:6px;padding:6px 6px}
-      .history-item .hs{width:60px;font-size:.6rem}
-      .history-item .hi .ht{font-size:.7rem}
-      .history-item .hago{font-size:.6rem}
-      .controls{gap:5px}
-      .controls .lbl{font-size:.7rem}
-      select,.ctrl-btn,input.search{font-size:.7rem;padding:5px 8px}
-      input.search{min-width:120px;max-width:none}
-      .stat-row{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:5px}
-      .stat-card{padding:8px}
-      .stat-card .v{font-size:1.1rem}
-      .stat-card .l{font-size:.6rem}
-      .hm-scroll{font-size:.65rem}
-      table.hm td{min-width:20px;padding:3px 1px}
-      footer{padding:14px 0 10px}
-      footer .credits{gap:3px 10px;font-size:.65rem}
-      footer .stations-attr{gap:2px 8px;font-size:.6rem}
-      .card{padding:12px}
-      .card-title{font-size:.82rem}
-      .card-sub{font-size:.68rem}
-      .grid2{grid-template-columns:1fr}
-    }
-    @media(max-width:400px){
-      .container{padding:6px 6px}
       header{padding:10px 0 8px}
       header h1{font-size:1rem}
-      header p{display:none}
-      .status-bar{font-size:.62rem}
-      .station-pills{gap:3px}
-      .pill{font-size:.65rem;padding:4px 8px}
-      .tab-btn{font-size:.6rem;padding:6px 4px}
-      .np-grid{grid-template-columns:1fr}
-      .np-card{padding:10px 8px}
-      .np-card .ar{font-size:.82rem}
-      .np-card .tl{font-size:.72rem}
-      .chart-wrap{height:220px}
-      .chart-wrap.tall{height:280px}
-      .history-item{font-size:.72rem;gap:4px;padding:5px 4px}
-      .history-item .hs{width:50px;font-size:.55rem}
-      .history-item .hi .ht{font-size:.64rem}
-      .rank{width:20px;font-size:.7rem}
-      .cnt{font-size:.72rem}
-      .trend{font-size:.62rem;width:34px}
-      select,.ctrl-btn,input.search{font-size:.65rem;padding:4px 6px}
-      input.search{min-width:80px}
-      .stat-row{grid-template-columns:repeat(2,1fr)}
-      .stat-card .v{font-size:1rem}
-      .controls{flex-direction:column;align-items:stretch;gap:4px}
-      .controls .lbl{min-width:auto}
-      .card{padding:10px}
-      .card-title{font-size:.78rem}
+      .stats-pill{font-size:.65rem;padding:3px 10px}
+      .tabs{position:sticky;top:0}
+      .tab-btn{font-size:.72rem;padding:8px 6px}
+      .np-grid{grid-template-columns:1fr;gap:8px}
+      .station-pills{flex-wrap:nowrap;overflow-x:auto;gap:4px;justify-content:flex-start;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:4px}
+      .station-pills::-webkit-scrollbar{display:none}
+      .pill{flex-shrink:0;scroll-snap-align:start;font-size:.68rem;padding:4px 10px}
+      .card{padding:12px}
+      .chart-wrap{height:240px}
+      .hist-controls{gap:5px}
+      .hist-search{font-size:.72rem;padding:5px 8px;min-width:120px}
+    }
+    @media(max-width:400px){
+      header h1{font-size:.9rem}
+      .stats-pill{display:none}
+      .tab-btn{font-size:.65rem;padding:7px 4px}
+      .np-card{padding:10px}
+      .np-artist{font-size:.85rem}
     }
   </style>
 </head>
 <body>
-<div class=container>
+<div class="container">
+
 <header>
-  <h1>Radio Playlist Dashboard</h1>
-  <p>מעקב שירים אוטומטי ב־<span id=stationCount>8</span> תחנות רדיו · <span id=collectRange></span></p>
-  <div class=status-bar>
-    <span class="dot off" id=statusDot></span>
-    <span id=statusText>טוען...</span>
-    <span class=sep>·</span>
-    <span>עדכון אחרון:</span>
-    <span id=lastUpdate>-</span>
+  <div class="header-left">
+    <span class="status-dot off" id="statusDot"></span>
+    <h1>Radio Dashboard</h1>
   </div>
+  <div class="stats-pill" id="statsPill">טוען...</div>
 </header>
 
-<div class=station-pills id=pills></div>
-
-<div class=tabs id=tabBar>
-  <button class="tab-btn active" data-tab=np>🎵 עכשיו</button>
-  <button class=tab-btn data-tab=timeline>📊 Timeline</button>
-  <button class=tab-btn data-tab=heatmap>🔥 Heatmap</button>
-  <button class=tab-btn data-tab=top>🏆 Top</button>
-  <button class=tab-btn data-tab=trends>📈 מגמות</button>
-  <button class=tab-btn data-tab=history>📋 היסטוריה</button>
-  <button class=tab-btn data-tab=clusters>🔗 Clusters</button>
+<div class="tabs" id="tabBar">
+  <button class="tab-btn active" data-tab="np">🎵 עכשיו</button>
+  <button class="tab-btn" data-tab="insights">📊 תובנות</button>
+  <button class="tab-btn" data-tab="deep">🔬 עומק</button>
 </div>
 
-<!-- ── Now Playing ── -->
-<div class="tab-content active" id=tab-np>
-  <div class=stat-row id=statsRow></div>
-  <div class=np-grid id=npGrid></div>
-</div>
+<!-- Station pills (hidden on Now Playing tab) -->
+<div class="station-pills" id="pills" style="display:none"></div>
 
-<!-- ── Timeline ── -->
-<div class=tab-content id=tab-timeline>
-  <div class=card>
-    <div class=card-title>📊 Timeline — פילוח לפי שעה</div>
-    <div class=card-sub>בחר יום · כל תא = סך כל הניגונים באותה שעה ביום שנבחר (לא ממוצע) · לחץ על תא לרשימת השירים</div>
-    <div class=controls id=timelineDays></div>
-    <div id=timelineGrid style="overflow-x:auto;overflow-y:auto"></div>
-    <div class=chart-legend id=timelineLegend></div>
+<!-- ═══ Tab 1: Now Playing ═══ -->
+<div class="tab-content active" id="tab-np">
+  <div class="np-grid" id="npGrid">
+    <div class="skeleton" style="height:120px"></div>
+    <div class="skeleton" style="height:120px"></div>
+    <div class="skeleton" style="height:120px"></div>
+    <div class="skeleton" style="height:120px"></div>
   </div>
 </div>
 
-<!-- ── Heatmap ── -->
-<div class=tab-content id=tab-heatmap>
-  <div class=card>
-    <div class=card-title>🔥 תחנה × שעה — ממוצע</div>
-    <div class=card-sub>ממוצע שירים לשעה ב-48 השעות האחרונות · כהה = שקט · בהיר = הרבה מוזיקה</div>
-    <div class=hm-scroll id=stationHourHm></div>
+<!-- ═══ Tab 2: Insights ═══ -->
+<div class="tab-content" id="tab-insights">
+
+  <!-- Top Songs -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🏆 שירים מובילים</div>
+      <div class="section-sub">השירים שמושמעים הכי הרבה — עכשיו, היום, השבוע, הכל</div>
+    </div>
+    <div class="window-pills" id="topSongsWindows"></div>
+    <div id="topSongsList"></div>
   </div>
-  <div class=card>
-    <div class=card-title>📅 יום בשבוע × שעה — ממוצע</div>
-    <div class=card-sub>ממוצע שירים לשעה ב-30 הימים האחרונים — מתי הרדיו הכי מוזיקלי?</div>
-    <div class=hm-scroll id=dowHourHm></div>
+
+  <!-- Top Artists -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🎤 אמנים מובילים</div>
+      <div class="section-sub">האמנים שהתחנות לא מפסיקות לנגן</div>
+    </div>
+    <div class="window-pills" id="topArtistsWindows"></div>
+    <div id="topArtistsList"></div>
   </div>
-  <div class=card id=nonMusicCard style=display:none>
-    <div class=card-title>🗣️ דיבור / פרסומות / לא זוהה</div>
-    <div class=card-sub>ממוצע דקות ללא מוזיקה לשעה, 7 הימים האחרונים · ערך מעל 60 = בעיה בזיהוי</div>
-    <div class=hm-scroll id=nonMusicHm></div>
+
+  <!-- Cross-Station -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🔄 חוצי תחנות</div>
+      <div class="section-sub">שירים שבורחים מתחנה אחת ומתנגנים בכמה תחנות</div>
+    </div>
+    <div id="crossStationList"></div>
   </div>
-  <div class=card>
-    <div class=card-title>⏰ השמעות לפי שעה</div>
-    <div class=card-sub>סיכום 7 ימים אחרונים לפי התחנה הנבחרת</div>
-    <div class=chart-wrap><canvas id=hourChart></canvas></div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">📋 היסטוריה</div>
+      <div class="section-sub">חיפוש בכל השירים שזוהו אי פעם</div>
+    </div>
+    <div class="hist-controls">
+      <input class="hist-search" id="histSearch" placeholder="חיפוש אמן או שיר..." oninput="renderHistory()">
+      <button class="hist-btn" id="histDedupBtn" onclick="toggleHistDedup()">✓ ייחודי</button>
+      <button class="hist-btn" id="histReverseBtn" onclick="toggleHistReverse()">↓ חדש→ישן</button>
+    </div>
+    <div id="historyList"></div>
+    <div class="hist-more"><button class="hist-btn" id="histMoreBtn" style="display:none" onclick="loadMoreHistory()">הצג עוד</button></div>
   </div>
 </div>
 
-<!-- ── Top ── -->
-<div class=tab-content id=tab-top>
-  <div class=controls>
-    <span style=font-size:.85rem;font-weight:600>🏆 המובילים</span>
-    <span class=lbl>טווח:</span>
-    <select id=topTimeWindow>
-      <option value=1h>השעה האחרונה</option>
-      <option value=24h selected>24 שעות</option>
-      <option value=7d>7 ימים</option>
-      <option value=30d>30 ימים</option>
-      <option value=all>הכל</option>
-    </select>
-    <span class=lbl id=topTotal></span>
-  </div>
-  <div class=grid2>
-    <div class=card>
-      <div class=card-title>🎤 אמנים</div>
-      <div class=card-sub>▲▼ = שינוי מול התקופה הקודמת</div>
-      <div id=topArtistsList>טוען...</div>
-    </div>
-    <div class=card>
-      <div class=card-title>🎵 שירים</div>
-      <div class=card-sub>▲▼ = שינוי מול התקופה הקודמת</div>
-      <div id=topSongsList>טוען...</div>
-    </div>
-  </div>
-  <div class=card>
-    <div class=card-title>🔄 חוצי תחנות — שירים שמושמעים ביותר מתחנה אחת</div>
-    <div id=crossStationList>טוען...</div>
-  </div>
-</div>
+<!-- ═══ Tab 3: Deep ═══ -->
+<div class="tab-content" id="tab-deep">
 
-<!-- ── Trends ── -->
-<div class=tab-content id=tab-trends>
-  <div class=card>
-    <div class=card-title>📈 פעילות יומית לפי תחנה</div>
-    <div class=card-sub>שירים שזוהו בכל יום, 30 הימים האחרונים</div>
-    <div class=chart-wrap><canvas id=dailyChart></canvas></div>
-    <div class=chart-legend id=dailyLegend></div>
-  </div>
-  <div class=card>
-    <div class=card-title>🆕 גילויים — שירים חדשים מול מגוון</div>
-    <div class=card-sub>שירים שונים ביום ושירים שנשמעו בפעם הראשונה</div>
-    <div class=chart-wrap><canvas id=discoveryChart></canvas></div>
-    <div class=chart-legend id=discoveryLegend></div>
-  </div>
-  <div class=card>
-    <div class=card-title>🚀 אמנים עולים</div>
-    <div class=card-sub>7 הימים האחרונים מול 7 הימים שלפניהם</div>
-    <div id=risingList>טוען...</div>
-  </div>
-  <div class=card id=redundancyCard>
-    <div class=card-title>🔁 חזרתיות — האם התחנה חוזרת על עצמה?</div>
-    <div class=card-sub>שירים ואמנים שמושמעים שוב באותה תחנה</div>
-    <div id=redundancyContent></div>
+  <!-- BPM Flow -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🎵 זרימת BPM</div>
+      <div class="section-sub">איך הקצב של כל תחנה משתנה לאורך היום</div>
+    </div>
+    <div class="window-pills" id="bpmStationPills"></div>
+    <div class="chart-wrap"><canvas id="bpmChart"></canvas></div>
+    <div class="chart-legend" id="bpmLegend"></div>
   </div>
 
-  <!-- ── BPM & Key ── -->
-  <div class=card id=bpmTrendCard style=display:none>
-    <div class=card-title>🎵 BPM לאורך שעות היום</div>
-    <div class=card-sub>ממוצע BPM לפי שעה (שעון ישראל) — קו חלק מראה איך הקצב משתנה לאורך היממה</div>
-    <div class=chart-wrap id=bpmHourWrap><canvas id=bpmHourChart></canvas></div>
-    <div class=chart-legend id=bpmHourLegend></div>
+  <!-- Key Distribution -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🎼 התפלגות סולמות</div>
+      <div class="section-sub">הטביעה המוזיקלית של כל תחנה — שמח (מז׳ור) או עגום (מינור)?</div>
+    </div>
+    <div class="window-pills" id="keyStationPills"></div>
+    <div id="keyDistContent"></div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:.68rem;color:var(--muted)">
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);border-radius:2px;opacity:.8;vertical-align:middle"></span> מז׳ור</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#6ab8e3;border-radius:2px;opacity:.7;vertical-align:middle"></span> מינור</span>
+    </div>
   </div>
-  <div class=card id=keyDistCard style=display:none>
-    <div class=card-title>🎹 התפלגות סולמות</div>
-    <div class=card-sub>כמה שירים זוהו בכל סולם מוזיקלי, לפי תחנה</div>
-    <div class=chart-wrap id=keyDistWrap><canvas id=keyDistChart></canvas></div>
-    <div class=chart-legend id=keyDistLegend></div>
-  </div>
-  <div class=card id=bpmKeyScatterCard style=display:none>
-    <div class=card-title>🎵 BPM × סולם</div>
-    <div class=card-sub>פיזור BPM מול סולם מוזיקלי — גודל נקודה = כמות שירים, צבע = תחנה</div>
-    <div class="chart-wrap tall" id=bpmKeyScatterWrap><canvas id=bpmKeyScatter></canvas></div>
-    <div class=chart-legend id=bpmKeyScatterLegend></div>
-  </div>
-  <div class=card id=bpmStatsCard style=display:none>
-    <div class=card-title>📊 סטטיסטיקת BPM לפי תחנה</div>
-    <div class=card-sub>ממוצע, טווח וסולם נפוץ לכל תחנה</div>
-    <div id=bpmStatsContent></div>
-  </div>
-</div>
 
-<!-- ── History ── -->
-<div class=tab-content id=tab-history>
-  <div class=card>
-    <div class=card-title style="justify-content:space-between">
-      <span>📋 היסטוריית השמעה <span id=historyCount style="font-weight:400;font-size:.72rem;color:var(--muted)"></span></span>
-      <button class=ctrl-btn onclick="exportCSV()">⬇ ייצא CSV</button>
+  <!-- Song Transitions -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🔄 מעברי שירים</div>
+      <div class="section-sub">הרדיו לא אקראי — איזה שירים התקליטנים שמים אחד אחרי השני</div>
     </div>
-    <div class=controls style="flex-wrap:wrap;gap:6px">
-      <span class=lbl>מתאריך:</span>
-      <input type=date id=histDateFrom class=ctrl-btn onchange=onHistFilterChange()>
-      <span class=lbl>עד:</span>
-      <input type=date id=histDateTo class=ctrl-btn onchange=onHistFilterChange()>
-      <label class=hist-toggle><input type=checkbox id=histReverse onchange=onHistFilterChange()> הפוך (ישן→חדש)</label>
-      <label class=hist-toggle><input type=checkbox id=histDedup checked onchange=onHistFilterChange()> ייחודי</label>
-      <button class=ctrl-btn onclick="copySelectedAsText()" title="העתקת שירים נבחרים כטקסט">📋 העתק טקסט</button>
-      <button class=ctrl-btn id=histSpotifyBtn onclick="openAllInSpotify()" title="פתיחת כל השירים הנבחרים בספוטיפיי">🎵 פתח בספוטיפיי</button>
-      <span id=spotifyAuthStatus style="font-size:.72rem;color:var(--muted)"><a href="javascript:void(0)" onclick="initSpotifyAuth();return false" style="color:#1DB954;text-decoration:none">🎵 Connect to Spotify</a></span>
-    </div>
-    <div class=controls>
-      <input class=search id=historySearch placeholder="חיפוש אמן או שיר..." oninput=onHistFilterChange() style="flex:1;min-width:160px" />
-      <button class=ctrl-btn id=histSelectAllBtn onclick="toggleSelectAll()">☐ בחר הכל</button>
-    </div>
-    <div id=historyList>טוען...</div>
-    <div style="text-align:center;margin-top:8px"><button class=ctrl-btn id=historyMore style=display:none>הצג עוד</button></div>
+    <div class="window-pills" id="transStationPills"></div>
+    <div id="transContent"></div>
   </div>
-</div>
 
-<!-- ── Clusters ── -->
-<div class=tab-content id=tab-clusters>
-  <div class=card>
-    <div class=card-title>🔗 מה מתנגן עם מה?</div>
-    <div class=card-sub>שירים שמתנגנים בסמיכות — אותה תחנה בתוך 30 דקות, או במקביל בתחנות שונות. גרור שירים לחקירת הקשרים. <strong id=clusterWindowLabel></strong></div>
-    <div class=controls style=margin-bottom:8px;gap:4px>
-      <button class="ctrl-btn" id=clusterModeBtn onclick=toggleClusterMode() style=font-size:.72rem>🔀 צביעה: לפי קהילה</button>
-      <span style=font-size:.65rem;color:var(--muted)>קווים כתומים = גשרים בין קהילות</span>
+  <!-- Clusters -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🔗 אשכולות שירים</div>
+      <div class="section-sub">שירים שתמיד מופיעים יחד — הפלייליסטים הסודיים בתוך כל תחנה</div>
     </div>
-    <div style=position:relative id=clusterGraphWrap>
-      <svg id=clusterGraph style=width:100%;height:500px;border-radius:8px;background:var(--card);touch-action:none;overscroll-behavior:none></svg>
-      <div id=clusterLoading style=position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--muted)>טוען...</div>
+    <svg id="clusterGraph"></svg>
+    <div class="chart-legend" id="clusterLegend"></div>
+    <div id="clusterDetail" style="margin-top:8px"></div>
+  </div>
+
+  <!-- Redundancy -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">🔁 חזרתיות</div>
+      <div class="section-sub">כמה כל תחנה חוזרת על עצמה? פחות = יותר גיוון</div>
     </div>
-    <div class=chart-legend id=clusterLegend style=margin-bottom:6px></div>
-    <div id=clusterDetail style=margin-top:8px></div>
+    <div id="redundancyContent"></div>
   </div>
 </div>
 
 <footer>
-  <div class=credits>
-    <span>🤖 <a href=https://github.com/dotX12/shazamio target=_blank>ShazamIO</a> מזהה שירים</span>
-    <span>📡 <a href=https://github.com/brchn6/shazamio-proxy target=_blank>shazamio-proxy</a> לוכד שמע</span>
-    <span>⚡ <a href=https://github.com/brchn6/radio-playlist-dashboard target=_blank>קוד מקור</a></span>
-    <span>💾 <span class=tag>45 ימים</span> שמירת היסטוריה</span>
-  </div>
-  <div class=stations-attr>
-    <span>תחנות:</span>
-    <a href=https://1036kh.com target=_blank>103.6FM</a>
-    <a href=https://glglz.co.il target=_blank>גלגלצ</a>
-    <a href=https://99fm.co.il target=_blank>99FM</a>
-    <a href=https://102fm.co.il target=_blank>102FM</a>
-    <a href=https://www.kan.org.il/radio/88.aspx target=_blank>כאן 88</a>
-    <a href=https://www.kan.org.il/radio/bet.aspx target=_blank>כאן ב</a>
-    <a href=https://1036kh.com target=_blank>קול הגליל העליון</a>
-    <a href=https://www.radiodarom.co.il/ target=_blank>רדיו דרום 97FM</a>
-  </div>
-  <div style="font-size:.65rem;color:rgba(152,152,176,.35);margin-top:6px">הדף מתעדכן כל 30 שניות · נתונים נשמרים 45 יום · <span id=collectRangeFooter></span></div>
+  <div class="footer-stats" id="footerStats"></div>
 </footer>
+
 </div>
 
 <script>
-/* ── Supabase ──────────────────────────────────────────────────────────
-   The dashboard data used to be static JSON committed into docs/data/ and
-   git-pushed every 2 minutes. It now lives in a public Supabase Storage
-   bucket; GitHub Pages serves only this page.
+/* ══════════════════════════════════════════════════════════════════════
+   Radio Dashboard v2 — Clean rebuild
+   ══════════════════════════════════════════════════════════════════════ */
 
-   Set SUPABASE_URL to your project URL (Supabase -> Project Settings -> API).
+const SUPABASE_URL = 'https://ktewdeaegtukbosrgxmw.supabase.co';
+const BASE = SUPABASE_URL + '/storage/v1/object/public/dashboard/';
+const POLL = 15000;
 
-   There is deliberately NO API KEY here. The bucket is public, so reads need
-   no key at all. The service_role key writes the data and must never appear in
-   this file — if you find yourself pasting a key below, something is wrong. */
-const SUPABASE_URL='https://ktewdeaegtukbosrgxmw.supabase.co';
-const BASE=SUPABASE_URL+'/storage/v1/object/public/dashboard/';
+const ACCENT = '#5ddbb5';
+const MUTED = '#9898b0';
+const SURFACE = '#151829';
+const GRID = '#252940';
 
-const POLL=30000;
-const SURFACE='#151829',ACCENT='#5ddbb5',MUTED='#9898b0',GRID='#252940';
-let stations=[],activeStation=null;
-let charts={};       // chart.js instances by id
-let D={};            // all loaded data files
-let timelineDay=null; // selected IL date string
-let historyShown=100;
+let stations = [];
+let activeStation = null;
+let D = {};  // loaded data
+let manifest = {};
+const fileCache = {};
+let charts = {};
 
-const STATION_WEBSITES={
-  "kol-hashfela":"https://1036kh.com","galgalatz":"https://glglz.co.il",
-  "99fm":"https://99fm.co.il","radio-tlv":"https://102fm.co.il",
-  "kan-88":"https://www.kan.org.il/radio/88.aspx","kan-bet":"https://www.kan.org.il/radio/bet.aspx",
-  "radio-darom":"https://www.radiodarom.co.il/",
+// State for tabs
+let topSongsWindow = '24h';
+let topArtistsWindow = '24h';
+let bpmStation = 'all';
+let keyStation = 'all';
+let transStation = 'all';
+let histDedup = true;
+let histReverse = true;
+let histShown = 80;
+
+const STATION_STREAMS = {
+  "kol-hashfela": "https://radio.streamgates.net/stream/1036kh",
+  "galgalatz": "https://glzwizzlv.bynetcdn.com/glglz_mp3",
+  "99fm": "https://eco01.livecdn.biz/ecolive/99fm_aac/icecast.audio",
+  "radio-tlv": "https://cdn88.mediacast.co.il/102-tlv-live/102fm_aac/icecast.audio",
+  "kan-88": "https://27953.live.streamtheworld.com/KAN_88.mp3",
+  "kan-bet": "https://27913.live.streamtheworld.com/KAN_BET.mp3",
+  "galil": "https://radio.streamgates.net/stream/galil",
+  "radio-darom": "https://cdn.cybercdn.live/Darom_97FM/Live/icecast.audio",
 };
-const STATION_STREAMS={
-  "kol-hashfela":"https://radio.streamgates.net/stream/1036kh",
-  "galgalatz":"https://glzwizzlv.bynetcdn.com/glglz_mp3",
-  "99fm":"https://99.livecdn.biz/99fm_aac",
-  "radio-tlv":"https://cdn88.mediacast.co.il/102-tlv-live/102fm_aac/icecast.audio",
-  "kan-88":"https://27953.live.streamtheworld.com/KAN_88.mp3",
-  "kan-bet":"https://27913.live.streamtheworld.com/KAN_BET.mp3",
-  "galil":"https://radio.streamgates.net/stream/galil",
-  "radio-darom":"https://cdn.cybercdn.live/Darom_97FM/Live/icecast.audio",
-};
-const DOW_NAMES=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 
-/* ── helpers ── */
-function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function spotifySearchUrl(artist,title){const q=encodeURIComponent(((artist||'')+' '+(title||'')).trim());return 'https://open.spotify.com/search/'+q}
-/* No cache-buster. The old '?_='+Date.now() forced a full re-download of every
-   file on every 30s poll (~750 KB/tab). Supabase serves these gzipped with an
-   ETag, so a plain fetch revalidates and gets a cheap 304 when nothing changed. */
-function loadJSON(u){return fetch(BASE+u).then(r=>r.ok?r.json():null).catch(()=>null)}
+/* ── Helpers ── */
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function spotifySearchUrl(a, t) { return 'https://open.spotify.com/search/' + encodeURIComponent(((a || '') + ' ' + (t || '')).trim()); }
+function loadJSON(u) { return fetch(BASE + u).then(r => r.ok ? r.json() : null).catch(() => null); }
+function stationBySlug(slug) { return stations.find(s => s.slug === slug); }
+function color(slug) { const s = stationBySlug(slug); return s ? s.color : ACCENT; }
+function name(slug) { const s = stationBySlug(slug); return s ? s.name : slug; }
 
-/* Manifest-gated fetching.
-   publish.py uploads a manifest.json of per-file content hashes and only
-   re-uploads files whose contents actually changed. We poll that (~1 KB) and
-   refetch a file only when its hash moves, serving the cached copy otherwise.
-   Idle cost per poll is ~3 KB instead of ~750 KB. */
-let manifest={};            // filename -> hash, as last fetched
-const fileCache={};         // filename -> parsed JSON, for unchanged files
+function parseTs(s) { if (!s) return null; const d = new Date(s.endsWith('Z') ? s : s + 'Z'); return isNaN(d) ? null : d; }
+function timeAgo(s) {
+  const d = parseTs(s); if (!d) return s || '';
+  const df = Math.floor((Date.now() - d) / 1000);
+  if (df < 5) return 'עכשיו'; if (df < 60) return 'לפני ' + df + ' שנ׳';
+  const m = Math.floor(df / 60); if (m < 60) return 'לפני ' + m + ' דק׳';
+  const h = Math.floor(m / 60); if (h < 24) return 'לפני ' + h + ' ש׳';
+  return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
+}
 
-async function loadTracked(name){
-  const h=manifest[name];
-  // Unchanged since last poll and already parsed: skip the network entirely.
-  if(h!==undefined && fileCache[name] && fileCache[name].hash===h) return fileCache[name].data;
-  const data=await loadJSON(name);
-  if(data!==null) fileCache[name]={hash:h,data};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+/* ── Manifest-gated loading ── */
+async function loadTracked(name) {
+  const h = manifest[name];
+  if (h !== undefined && fileCache[name] && fileCache[name].hash === h) return fileCache[name].data;
+  const data = await loadJSON(name);
+  if (data !== null) fileCache[name] = { hash: h, data };
   return data;
 }
-function stationBySlug(slug){return stations.find(s=>s.slug===slug)}
-function color(slug){const s=stationBySlug(slug);return s?s.color:ACCENT}
-function name(slug){const s=stationBySlug(slug);return s?s.name:slug}
 
-function parseTs(s){if(!s)return null;const d=new Date(s.endsWith('Z')?s:s+'Z');return isNaN(d)?null:d}
-
-// Israel-local parts of a UTC timestamp (visitors anywhere see radio time)
-const ilFmt=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
-function ilParts(d){
-  const p={};ilFmt.formatToParts(d).forEach(x=>p[x.type]=x.value);
-  return{date:p.year+'-'+p.month+'-'+p.day,h:+p.hour%24,m:+p.minute};
+async function fetchManifest() {
+  const m = await loadJSON('manifest.json');
+  if (m) manifest = m.files || {};
 }
 
-function timeAgo(s){
-  const d=parseTs(s);if(!d)return s||'';
-  const df=Math.floor((Date.now()-d)/1000);
-  if(df<5)return'עכשיו';if(df<60)return'לפני '+df+' שנ׳';
-  const m=Math.floor(df/60);if(m<60)return'לפני '+m+' דק׳';
-  const h=Math.floor(m/60);if(h<24)return'לפני '+h+' ש׳';
-  return d.toLocaleDateString('he-IL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Jerusalem'});
+async function fetchAll() {
+  await fetchManifest();
+  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans] = await Promise.all([
+    loadTracked('stations.json'),
+    loadTracked('current.json'),
+    loadTracked('history.json'),
+    loadTracked('top.json'),
+    loadTracked('cross_station.json'),
+    loadTracked('bpm_key.json'),
+    loadTracked('clusters.json'),
+    loadTracked('trends.json'),
+    loadTracked('stats.json'),
+    loadTracked('transitions.json'),
+  ]);
+  if (st) stations = st;
+  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans };
 }
 
-// sequential ramp: surface → accent (single hue, monotonic lightness)
-function heatColor(t){
-  if(t<=0)return SURFACE;
-  const mix=(a,b,k)=>Math.round(a+(b-a)*k);
-  const s=[0x15,0x18,0x29],e=[0x5d,0xdb,0xb5];
-  const k=0.15+0.85*Math.sqrt(t); // sqrt lifts low counts into visibility
-  return'#'+[0,1,2].map(i=>mix(s[i],e[i],k).toString(16).padStart(2,'0')).join('');
-}
-function heatText(t){return t>0.45?'#0b0e1a':MUTED}
-
-function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
-function emptyMsg(el,msg){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">'+(msg||'אין נתונים עדיין')+'</div>'}
-function legendHtml(items){return items.map(i=>'<span><span class=sw style=background:'+i.color+'></span>'+esc(i.label)+'</span>').join('')}
-function trendHtml(cur,prev){
-  if(prev===0&&cur>0)return'<span class="trend new">חדש</span>';
-  const d=cur-prev;
-  if(d>0)return'<span class="trend up">▲ +'+d+'</span>';
-  if(d<0)return'<span class="trend down">▼ '+d+'</span>';
-  return'<span class="trend flat">—</span>';
-}
-
-/* ── tabs ── */
-document.getElementById('tabBar').onclick=e=>{
-  const b=e.target.closest('.tab-btn');if(!b)return;
-  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+/* ── Tabs ── */
+document.getElementById('tabBar').onclick = e => {
+  const b = e.target.closest('.tab-btn'); if (!b) return;
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
   b.classList.add('active');
-  document.getElementById('tab-'+b.dataset.tab).classList.add('active');
-  history.replaceState(null,'','#'+b.dataset.tab);
-  renderAll(); // charts need visible canvas for correct sizing
+  document.getElementById('tab-' + b.dataset.tab).classList.add('active');
+  // Show/hide station pills
+  document.getElementById('pills').style.display = b.dataset.tab === 'np' ? 'none' : 'flex';
+  activeStation = null;
+  renderPills();
+  renderAll();
 };
-(function restoreTab(){
-  const t=location.hash.slice(1);
-  const btn=t&&document.querySelector('.tab-btn[data-tab="'+t+'"]');
-  if(btn){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
-    btn.classList.add('active');document.getElementById('tab-'+t).classList.add('active');}
-})();
 
-/* ── pills ── */
-function renderPills(){
-  const el=document.getElementById('pills');
-  let h='<button class="pill'+(activeStation?'':' active')+'" data-slug="">הכל</button>';
-  stations.forEach(s=>{
-    h+='<button class="pill'+(activeStation===s.slug?' active':'')+'" data-slug="'+s.slug+'"><span class=dot-sm style=background:'+s.color+'></span>'+esc(s.name)+'</button>';
+/* ── Station Pills ── */
+function renderPills() {
+  const el = document.getElementById('pills');
+  let h = '<button class="pill' + (!activeStation ? ' active' : '') + '" data-slug="">הכל</button>';
+  stations.forEach(s => {
+    h += '<button class="pill' + (activeStation === s.slug ? ' active' : '') + '" data-slug="' + s.slug + '"><span class="dot-sm" style="background:' + s.color + '"></span>' + esc(s.name) + '</button>';
   });
-  el.innerHTML=h;
-  el.onclick=e=>{
-    const b=e.target.closest('.pill');if(!b)return;
-    activeStation=b.dataset.slug||null;
-    historyShown=100;
-    renderPills();renderAll();
-    if(activeStation)loadStationHistory();
+  el.innerHTML = h;
+  el.onclick = e => {
+    const b = e.target.closest('.pill'); if (!b) return;
+    activeStation = b.dataset.slug || null;
+    histShown = 80;
+    renderPills();
+    renderAll();
   };
 }
 
-/* ── Now Playing ── */
-function renderNowPlaying(){
-  const el=document.getElementById('npGrid');
-  const cur=D.live&&D.live.length?D.live:(D.current||[]);
-  const data=activeStation?cur.filter(t=>t.station_slug===activeStation):cur;
-  if(!data.length){emptyMsg(el,'ממתין לנתונים...');return}
-  el.innerHTML=data.map(t=>{
-    const c=t.station_color||color(t.station_slug),slug=t.station_slug||'';
-    const web=STATION_WEBSITES[slug],stream=STATION_STREAMS[slug];
-    const listen=web?`<a href="${web}" target=_blank class=np-btn style="color:${c};border-color:${c}33">🔊 Site</a>`:'';
-    const direct=stream?`<a href="${stream}" target=_blank class=np-btn style="color:${c};border-color:${c}33">📡 Stream</a>`:'';
-    const shazam=t.url?`<a href="${esc(t.url)}" target=_blank class=np-btn style="color:${c};border-color:${c}33">🔍 Shazam</a>`:'';
-    const spotifyBtn='<a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=np-btn style="color:#1DB954;border-color:#1DB95455">🎧 Spotify</a>';
-    return '<div class="np-card card" style="border-color:'+c+'55;background:linear-gradient(180deg,'+c+'18,var(--card))">'+
-      '<div class=ns style=color:'+c+'>'+esc(t.station_name||name(slug))+'</div>'+
-      '<div class=ar>'+esc(t.artist||'')+'</div>'+
-      '<div class=tl>'+esc(t.title||'')+'</div>'+
-      '<div class=tm>'+timeAgo(t.recognized_at)+'</div>'+
-      '<div class=np-actions>'+listen+direct+shazam+spotifyBtn+'</div>'+
-    '</div>';
-  }).join('');
+/* ── Status ── */
+function updateStatus() {
+  const dot = document.getElementById('statusDot');
+  const stats = D.stats;
+  if (!stats) return;
+  const last = parseTs(stats.last_track_at);
+  if (!last) { dot.className = 'status-dot off'; return; }
+  const age = (Date.now() - last) / 1000;
+  if (age < 120) dot.className = 'status-dot on';
+  else if (age < 600) dot.className = 'status-dot stale';
+  else dot.className = 'status-dot off';
+
+  // Stats pill
+  const total = stats.total_tracks || 0;
+  const first = parseTs(stats.first_track_at);
+  const since = first ? first.toLocaleDateString('he-IL', { day: 'numeric', month: 'short', timeZone: 'Asia/Jerusalem' }) : '';
+  document.getElementById('statsPill').textContent = stations.length + ' תחנות · ' + total.toLocaleString() + ' שירים · מאז ' + since;
+  document.getElementById('footerStats').textContent = stations.length + ' תחנות · ' + total.toLocaleString() + ' שירים · עדכון אחרון: ' + timeAgo(stats.updated_at);
 }
 
-function renderStats(){
-  const s=D.stats;if(!s)return;
-  const busiest=s.busiest_hour!=null?String(s.busiest_hour).padStart(2,'0')+':00':'—';
-  const active=s.most_active_station_today?name(s.most_active_station_today):'—';
-  document.getElementById('statsRow').innerHTML=
-    '<div class=stat-card><div class=v>'+(s.total_tracks||0)+'</div><div class=l>סה״כ שירים</div></div>'+
-    '<div class=stat-card><div class=v>'+(s.tracks_today||0)+'</div><div class=l>שירים היום</div></div>'+
-    '<div class=stat-card><div class=v>'+(s.unique_tracks||0)+'</div><div class=l>שירים שונים</div></div>'+
-    '<div class=stat-card><div class=v>'+(s.unique_artists||0)+'</div><div class=l>אמנים</div></div>'+
-    '<div class=stat-card><div class="v small">'+busiest+'</div><div class=l>השעה העמוסה</div></div>'+
-    '<div class=stat-card><div class="v small">'+esc(active)+'</div><div class=l>הכי פעילה היום</div></div>';
+/* ══════════════════════════════════════════════════════════════════════
+   TAB 1: NOW PLAYING
+   ══════════════════════════════════════════════════════════════════════ */
+function renderNowPlaying() {
+  const el = document.getElementById('npGrid');
+  const cur = D.current || [];
+  if (!cur.length) { el.innerHTML = '<div class="np-empty">ממתין לנתונים...</div>'; return; }
+
+  // Build per-station: current + previous from history
+  const histByStation = {};
+  if (D.history && D.history.history) {
+    D.history.history.forEach(t => {
+      if (!histByStation[t.station_slug]) histByStation[t.station_slug] = [];
+      if (histByStation[t.station_slug].length < 2) {
+        histByStation[t.station_slug].push(t);
+      }
+    });
+  }
+
+  let h = '';
+  stations.forEach(s => {
+    const c = cur.find(t => t.station_slug === s.slug);
+    const prev = histByStation[s.slug] ? histByStation[s.slug][1] : null;
+    const col = s.color;
+    const stream = STATION_STREAMS[s.slug];
+
+    h += '<div class="np-card" style="background:linear-gradient(180deg,' + col + '15,' + SURFACE + ');border-color:' + col + '40">';
+    h += '<div class="np-station" style="color:' + col + '"><span class="radio-icon">📻</span> ' + esc(s.name) + '</div>';
+
+    if (c) {
+      h += '<div class="np-now">';
+      h += '<div class="np-now-label">◄ מנגן עכשיו</div>';
+      h += '<div class="np-artist">' + esc(c.artist) + '</div>';
+      h += '<div class="np-title">' + esc(c.title) + '</div>';
+      h += '</div>';
+    } else {
+      h += '<div class="np-now"><div class="np-now-label">◄ מנגן עכשיו</div><div style="color:var(--muted);font-size:.8rem">אין נתונים</div></div>';
+    }
+
+    if (prev) {
+      h += '<div class="np-prev">';
+      h += '<div class="np-prev-label">▸ קודם</div>';
+      h += '<div class="np-prev-artist">' + esc(prev.artist) + '</div>';
+      h += '<div class="np-prev-title">' + esc(prev.title) + '</div>';
+      h += '</div>';
+    }
+
+    h += '<div class="np-actions">';
+    if (c) h += '<a href="' + spotifySearchUrl(c.artist, c.title) + '" target="_blank" class="np-btn" style="color:#1DB954;border-color:#1DB95455">🎧 Spotify</a>';
+    if (stream) h += '<a href="' + stream + '" target="_blank" class="np-btn" style="color:' + col + ';border-color:' + col + '33">📻 האזנה</a>';
+    h += '</div></div>';
+  });
+
+  el.innerHTML = h;
 }
 
-/* ── Timeline ── */
-function timelineDates(){
-  const pts=(D.timeline&&D.timeline.points)||[];
-  const seen=new Set();
-  pts.forEach(p=>{const d=parseTs(p.ts);if(d)seen.add(ilParts(d).date)});
-  return[...seen].sort().reverse();
-}
-
-function renderTimelineDayButtons(){
-  const days=timelineDates();
-  const el=document.getElementById('timelineDays');
-  if(!days.length){el.innerHTML='';return}
-  if(!timelineDay||!days.includes(timelineDay))timelineDay=days[0];
-  const today=ilParts(new Date()).date;
-  el.innerHTML='<span class=lbl>יום:</span>'+days.map(d=>{
-    const lbl=d===today?'היום':new Date(d+'T00:00:00').toLocaleDateString('he-IL',{weekday:'short',day:'numeric',month:'short'});
-    return'<button class="ctrl-btn'+(d===timelineDay?' active':'')+'" data-day="'+d+'">'+lbl+'</button>';
-  }).join('');
-  el.onclick=e=>{
-    const b=e.target.closest('[data-day]');if(!b)return;
-    timelineDay=b.dataset.day;renderTimeline();
+/* ══════════════════════════════════════════════════════════════════════
+   TAB 2: INSIGHTS
+   ══════════════════════════════════════════════════════════════════════ */
+function renderWindowPills(containerId, activeWindow, callback) {
+  const windows = ['1h', '24h', '7d', '30d', 'all'];
+  const labels = { '1h': 'שעה', '24h': '24 שעות', '7d': 'שבוע', '30d': 'חודש', 'all': 'הכל' };
+  const el = document.getElementById(containerId);
+  el.innerHTML = windows.map(w =>
+    '<button class="window-pill' + (w === activeWindow ? ' active' : '') + '" data-w="' + w + '">' + labels[w] + '</button>'
+  ).join('');
+  el.onclick = e => {
+    const b = e.target.closest('.window-pill'); if (!b) return;
+    callback(b.dataset.w);
   };
 }
 
+function renderTopSongs() {
+  renderWindowPills('topSongsWindows', topSongsWindow, w => { topSongsWindow = w; renderTopSongs(); });
+  const el = document.getElementById('topSongsList');
+  if (!D.top || !D.top.windows) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
+  const data = D.top.windows[topSongsWindow];
+  if (!data || !data.songs || !data.songs.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>'; return; }
 
+  let songs = data.songs;
+  if (activeStation) songs = songs.filter(s => s.stations[activeStation]);
 
-// deterministic hue from artist name — same artist always same hue, for cross-ref highlighting
-function artistHue(artist){
-  let h=0;
-  const s=artist||'';
-  for(let i=0;i<s.length;i++)h=((h<<5)-h)+s.charCodeAt(i),h|=0;
-  return ((h%360)+360)%360;
+  let h = '';
+  songs.slice(0, 20).forEach((s, i) => {
+    const trend = s.prev === 0 && s.count > 0 ? '<span class="top-trend new">חדש</span>' :
+      s.count > s.prev ? '<span class="top-trend up">▲ +' + (s.count - s.prev) + '</span>' :
+      s.count < s.prev ? '<span class="top-trend down">▼ ' + (s.count - s.prev) + '</span>' :
+      '<span class="top-trend flat">—</span>';
+    const stationDots = Object.keys(s.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
+
+    h += '<div class="top-row">';
+    h += '<span class="top-rank">' + (i + 1) + '</span>';
+    h += '<div class="top-info"><div class="top-name">' + esc(s.title) + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
+    h += '<span class="top-count">' + s.count + '×</span>';
+    h += trend;
+    h += '<a href="' + spotifySearchUrl(s.artist, s.title) + '" target="_blank" class="top-spotify">🎧</a>';
+    h += '</div>';
+  });
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים לתחנה זו</div>';
 }
 
-// stable key for song matching across stations/times
-function songMatchKey(a,t){return((a||'')+'||'+(t||'')).toLowerCase()}
+function renderTopArtists() {
+  renderWindowPills('topArtistsWindows', topArtistsWindow, w => { topArtistsWindow = w; renderTopArtists(); });
+  const el = document.getElementById('topArtistsList');
+  if (!D.top || !D.top.windows) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
+  const data = D.top.windows[topArtistsWindow];
+  if (!data || !data.artists || !data.artists.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>'; return; }
 
-// ── Hover highlight system ──
-// When a song is selected in the detail panel, highlight its cells across the grid
-let tlSelectedMatch=null; // the match key currently highlighted
+  let artists = data.artists;
+  if (activeStation) artists = artists.filter(a => a.stations[activeStation]);
 
-function tlHighlight(matchKey){
-  const all=document.querySelectorAll('[data-tl-match]');
-  all.forEach(el=>{
-    el.style.outline=matchKey&&el.dataset.tlMatch===matchKey?'2px solid #fff':'none';
-    el.style.zIndex=matchKey&&el.dataset.tlMatch===matchKey?'3':'';
+  let h = '';
+  artists.slice(0, 20).forEach((a, i) => {
+    const trend = a.prev === 0 && a.count > 0 ? '<span class="top-trend new">חדש</span>' :
+      a.count > a.prev ? '<span class="top-trend up">▲ +' + (a.count - a.prev) + '</span>' :
+      a.count < a.prev ? '<span class="top-trend down">▼ ' + (a.count - a.prev) + '</span>' :
+      '<span class="top-trend flat">—</span>';
+    const stationDots = Object.keys(a.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
+
+    h += '<div class="top-row">';
+    h += '<span class="top-rank">' + (i + 1) + '</span>';
+    h += '<div class="top-info"><div class="top-name">' + esc(a.artist) + '</div><div class="top-sub"><span class="top-stations">' + stationDots + '</span></div></div>';
+    h += '<span class="top-count">' + a.count + '×</span>';
+    h += trend;
+    h += '</div>';
   });
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים לתחנה זו</div>';
 }
 
-function renderTimeline(){
-  renderTimelineDayButtons();
-  const el=document.getElementById('timelineGrid');
-  const legend=document.getElementById('timelineLegend');
-  let pts=(D.timeline&&D.timeline.points)||[];
-  if(activeStation)pts=pts.filter(p=>p.s===activeStation);
+function renderCrossStation() {
+  const el = document.getElementById('crossStationList');
+  if (!D.cross || !D.cross.tracks) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
+  let tracks = D.cross.tracks;
+  if (activeStation) tracks = tracks.filter(t => t.station_slugs && t.station_slugs.includes(activeStation));
 
-  // Always 24 hours, 60-min buckets
-  const buckets={};
-  stations.forEach(s=>{buckets[s.slug]=Array.from({length:24},()=>({count:0,songs:[]}))});
-
-  pts.forEach(p=>{
-    const d=parseTs(p.ts);if(!d)return;
-    const il=ilParts(d);
-    if(timelineDay&&il.date!==timelineDay)return;
-    if(!buckets[p.s])return;
-    const h=il.h;
-    buckets[p.s][h].count++;
-    const mk=songMatchKey(p.a,p.t);
-    buckets[p.s][h].songs.push({artist:p.a,title:p.t,matchKey:mk});
+  let h = '';
+  tracks.slice(0, 30).forEach(t => {
+    const slugs = (t.station_slugs || '').split(',').map(s => s.trim()).filter(Boolean);
+    const pills = slugs.map(sl => {
+      const c = color(sl);
+      return '<span class="cross-station-pill" style="color:' + c + ';border-color:' + c + '40">' + esc(name(sl)) + '</span>';
+    }).join('');
+    h += '<div class="cross-row">';
+    h += '<div class="cross-song">' + esc(t.title) + '</div>';
+    h += '<div class="cross-artist">' + esc(t.artist) + ' · ' + t.station_count + ' תחנות · ' + t.total_plays + ' השמעות</div>';
+    h += '<div class="cross-stations">' + pills + '</div>';
+    h += '</div>';
   });
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
+}
 
-  // Station order by total activity
-  const stationOrder=[...stations].sort((a,b)=>{
-    const ca=buckets[a.slug].reduce((s,v)=>s+v.count,0);
-    const cb=buckets[b.slug].reduce((s,v)=>s+v.count,0);
-    return cb-ca;
-  });
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!D.history || !D.history.history) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
 
-  let globalMax=0;
-  stationOrder.forEach(s=>buckets[s.slug].forEach(b=>{if(b.count>globalMax)globalMax=b.count}));
-  globalMax=Math.max(1,globalMax);
-
-  const hasData=stationOrder.some(s=>buckets[s.slug].some(b=>b.count>0));
-  if(!hasData){
-    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">אין נתונים ליום/תחנה שנבחרו</div>';
-    legend.innerHTML='';return;
-  }
-
-  // Column header — 24 hours, station label on the RIGHT side (last column)
-  const colW=32;
-  let html='<table class=hm style="min-width:'+(24*colW+140)+'px;direction:ltr">';
-  html+='<tr>';
-  for(let h=0;h<24;h++){
-    html+='<td class=hdr style="font-size:.6rem;min-width:'+colW+'px;width:'+colW+'px;padding:3px 0">'+
-      String(h).padStart(2,'0')+'</td>';
-  }
-  html+='<td class=rowlbl style=width:90px;text-align:right;font-size:.65rem>תחנה</td></tr>';
-
-  const allSongCells=[];
-
-  stationOrder.forEach(s=>{
-    const row=buckets[s.slug];
-    const total=row.reduce((a,b)=>a+b.count,0);
-    if(!total)return;
-    html+='<tr>';
-    row.forEach((b,h)=>{
-      const t=b.count/globalMax;
-      html+='<td style="background:'+heatColor(t)+';color:'+heatText(t)+';'+
-        'min-width:'+colW+'px;width:'+colW+'px;height:32px;padding:0;border-radius:3px;'+
-        'font-size:.6rem;font-weight:'+(b.count?'700':'400')+';cursor:'+(b.count?'pointer':'default')+'"'+
-        ' data-slug="'+s.slug+'" data-hour="'+h+'" data-count="'+b.count+'"'+
-        ' onclick="tlDrill(\''+s.slug+'\','+h+')">'+
-        (b.count||'')+'</td>';
-      b.songs.forEach(song=>{
-        allSongCells.push({slug:s.slug,hour:h,matchKey:song.matchKey,artist:song.artist,title:song.title,count:b.count});
-      });
+  let items = D.history.history.slice();
+  const q = (document.getElementById('histSearch').value || '').toLowerCase();
+  if (q) items = items.filter(t => (t.artist + ' ' + t.title).toLowerCase().includes(q));
+  if (activeStation) items = items.filter(t => t.station_slug === activeStation);
+  if (histDedup) {
+    const seen = new Set();
+    items = items.filter(t => {
+      const k = (t.artist + '|' + t.title + '|' + t.station_slug).toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
     });
-    // Station label on the RIGHT side (last column in LTR table)
-    html+='<td class=rowlbl style="font-size:.72rem;padding:3px 8px;white-space:nowrap;text-align:right">'+
-      '<span class=dot-sm style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+s.color+';margin-left:4px;vertical-align:middle"></span>'+
-      '<span style=vertical-align:middle>'+esc(name(s.slug))+'</span>'+
-      '<span style=color:var(--muted);font-size:.6rem;margin-right:4px>'+total+'</span>'+
-      '</td>';
-    html+='</tr>';
-  });
-  html+='</table>';
-
-  html+='<div id=tlDetail style="margin-top:8px;min-height:30px"></div>';
-
-  el.innerHTML=html;
-  el._allSongCells=allSongCells;
-
-  // Station totals in footer
-  const footerStations=stationOrder.filter(s=>buckets[s.slug].some(b=>b.count>0))
-    .map(s=>({color:s.color,label:name(s.slug)+' — '+buckets[s.slug].reduce((a,b)=>a+b.count,0)}));
-  legend.innerHTML=legendHtml(footerStations);
-  tlSelectedMatch=null;
-}
-
-// ── Drill-down: click a heatmap cell → show songs in that bucket ──
-function tlDrill(slug,hour){
-  const detail=document.getElementById('tlDetail');
-  const grid=document.getElementById('timelineGrid');
-  const allCells=grid._allSongCells||[];
-  const songsInCell=allCells.filter(c=>c.slug===slug&&c.hour===hour);
-  if(!songsInCell.length){detail.innerHTML='';return}
-
-  let html='<div class=card style="margin-bottom:0;padding:10px">'+
-    '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">🎵 שירים בשעה '+String(hour).padStart(2,'0')+':00 — לחץ על שיר להדגשה</div>';
-
-  const songGroups={};
-  songsInCell.forEach(s=>{
-    const mk=s.matchKey;
-    if(!songGroups[mk]){
-      const totalAcross=allCells.filter(c=>c.matchKey===mk).length;
-      songGroups[mk]={artist:s.artist,title:s.title,matchKey:mk,totalAcross};
-    }
-  });
-
-  Object.values(songGroups).forEach(sg=>{
-    const hue=artistHue(sg.artist);
-    const isActive=tlSelectedMatch===sg.matchKey;
-    html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;'+
-      'border-radius:4px;cursor:pointer;transition:background .15s;'+
-      'background:'+(isActive?'rgba(93,219,181,.15':'transparent')+';"'+
-      ' onmouseenter="tlHighlight(\''+sg.matchKey+'\')"'+
-      ' onmouseleave="tlHighlight(null)"'+
-      ' onclick="tlClickSong(\''+sg.matchKey+'\')">'+
-      '<span style="font-size:.78rem;flex:1"><strong>'+esc(sg.artist)+'</strong> — '+esc(sg.title)+'</span>'+
-      '<span style="font-size:.62rem;color:var(--accent)">'+(sg.totalAcross>1?'+'+sg.totalAcross:'')+'</span>'+
-    '</div>';
-  });
-  html+='</div>';
-  detail.innerHTML=html;
-}
-
-// ── Click a song in drill-down → highlight all matching cells across grid ──
-function tlClickSong(matchKey){
-  tlSelectedMatch=(tlSelectedMatch===matchKey)?null:matchKey;
-  const allCells=document.getElementById('timelineGrid')._allSongCells||[];
-  const matchingCells=allCells.filter(c=>c.matchKey===matchKey);
-
-  document.querySelectorAll('.tl-cell').forEach(td=>{
-    const slug=td.dataset.slug,hour=+td.dataset.hour;
-    const isMatch=matchingCells.some(c=>c.slug===slug&&c.hour===hour);
-    if(tlSelectedMatch&&isMatch){
-      td.style.outline='2px solid #5ddbb5';
-      td.style.boxShadow='inset 0 0 8px rgba(93,219,181,.3)';
-    }else{
-      td.style.outline='';
-      td.style.boxShadow='';
-    }
-  });
-
-  // Don't re-navigate — clicking a song just highlights across the grid,
-  // staying on the same station+hour drill-down that's already shown.
-}
-
-// Add a global click-away listener to deselect
-// (handled via onclick on the document body)
-
-/* ── Heatmaps ── */
-function hmTable(rows,colLabels){
-  // rows: [{label, dot, cells:[counts]}]
-  const max=Math.max(1,...rows.flatMap(r=>r.cells));
-  let h='<table class=hm><tr><td class=rowlbl></td>';
-  colLabels.forEach(c=>h+='<td class=hdr>'+c+'</td>');
-  h+='</tr>';
-  rows.forEach(r=>{
-    h+='<tr><td class=rowlbl>'+(r.dot?'<span class=dot-sm style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+r.dot+';margin-left:5px"></span>':'')+esc(r.label)+'</td>';
-    r.cells.forEach((c,i)=>{
-      const t=c/max;
-      h+='<td style="background:'+heatColor(t)+';color:'+heatText(t)+';font-weight:'+(c?'600':'400')+'" title="'+esc(r.label)+' '+colLabels[i]+': '+c+' שירים">'+(c||'')+'</td>';
-    });
-    h+='</tr>';
-  });
-  return h+'</table>';
-}
-function renderHeatmaps(){
-  const hm=D.heatmap;
-  const el1=document.getElementById('stationHourHm'),el2=document.getElementById('dowHourHm');
-  if(!hm){emptyMsg(el1);emptyMsg(el2);return}
-  const hours=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
-  const sh=hm.station_hour.matrix;
-  const shDays=hm.station_hour.days||7;
-  let rows=stations.filter(s=>sh[s.slug]&&(!activeStation||s.slug===activeStation))
-    .map(s=>({label:s.name,dot:s.color,cells:sh[s.slug].map(v=>Math.round(v/shDays))}));
-  if(rows.length&&rows.some(r=>r.cells.some(c=>c)))el1.innerHTML=hmTable(rows,hours);else emptyMsg(el1);
-  const dm=hm.dow_hour.matrix;
-  const dhDays=hm.dow_hour.days||30;
-  const dRows=DOW_NAMES.map((d,i)=>({label:d,cells:dm[i].map(v=>Math.round(v/dhDays))}));
-  if(dRows.some(r=>r.cells.some(c=>c)))el2.innerHTML=hmTable(dRows,hours);else emptyMsg(el2);
-  renderNonMusic(hours);
-  renderHourChart();
-}
-function renderNonMusic(hours){
-  const card=document.getElementById('nonMusicCard');
-  const nm=D.nonMusic;
-  const m=nm&&nm.station_hour_minutes;
-  const nonMusicDays=nm.days||7;
-  // Data from older generations has raw totals (not per-day); divide to normalize.
-  const nmDiv=nm.per_day?1:nonMusicDays;
-  const rows=m?stations.filter(s=>m[s.slug]&&(!activeStation||s.slug===activeStation))
-    .map(s=>({label:s.name,dot:s.color,cells:m[s.slug].map(v=>Math.round(v/nmDiv))})):[];
-  if(!rows.length||!rows.some(r=>r.cells.some(c=>c))){card.style.display='none';return}
-  card.style.display='';
-  document.getElementById('nonMusicHm').innerHTML=hmTable(rows,hours);
-}
-function renderHourChart(){
-  const wrap=document.querySelector('#tab-heatmap .chart-wrap');
-  destroyChart('hour');
-  const hm=D.heatmap;if(!hm)return;
-  const sh=hm.station_hour.matrix;
-  const shDays=hm.station_hour.days||7;
-  const totals=Array(24).fill(0);
-  Object.entries(sh).forEach(([slug,arr])=>{
-    if(activeStation&&slug!==activeStation)return;
-    arr.forEach((c,i)=>totals[i]+=c);
-  });
-  totals.forEach((v,i,a)=>a[i]=Math.round(v/shDays));
-  if(!totals.some(c=>c)){emptyMsg(wrap);return}
-  if(!wrap.querySelector('canvas'))wrap.innerHTML='<canvas id=hourChart></canvas>';
-  charts.hour=new Chart(document.getElementById('hourChart'),{
-    type:'bar',
-    data:{labels:Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00'),
-      datasets:[{data:totals,backgroundColor:ACCENT+'99',borderColor:ACCENT,borderWidth:1,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' שירים בממוצע ליום'}}},
-      scales:{x:{ticks:{color:MUTED,maxRotation:45},grid:{display:false}},
-              y:{beginAtZero:true,ticks:{color:MUTED,precision:0},grid:{color:GRID}}}}
-  });
-}
-
-/* ── Top ── */
-function rerank(entries){
-  // station filter: re-rank by that station's own counts
-  if(!activeStation)return entries.map(e=>({...e,shown:e.count}));
-  return entries.map(e=>({...e,shown:(e.stations||{})[activeStation]||0}))
-    .filter(e=>e.shown>0).sort((a,b)=>b.shown-a.shown);
-}
-function renderTop(){
-  const w=document.getElementById('topTimeWindow').value;
-  const win=D.top&&D.top.windows&&D.top.windows[w];
-  const elA=document.getElementById('topArtistsList'),elS=document.getElementById('topSongsList');
-  if(!win){emptyMsg(elA);emptyMsg(elS);return}
-  document.getElementById('topTotal').textContent=win.total_plays?win.total_plays+' השמעות בטווח':'';
-  const artists=rerank(win.artists).slice(0,20);
-  const songs=rerank(win.songs).slice(0,20);
-  if(!artists.length)emptyMsg(elA);else elA.innerHTML=artists.map((t,i)=>
-    '<div class=history-item><div class=rank>#'+(i+1)+'</div>'+
-    '<div class=hi><div class=ha>'+esc(t.artist)+'</div><div style="font-size:.66rem;color:var(--muted)">'+Object.keys(t.stations||{}).length+' תחנות</div></div>'+
-    (activeStation?'':trendHtml(t.count,t.prev))+
-    '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,'')+'" target=_blank class=spotify-link title="חיפוש אמן בספוטיפיי">🎧</a></div>'+
-    '<div class=cnt>'+t.shown+'×</div></div>').join('');
-  if(!songs.length)emptyMsg(elS);else elS.innerHTML=songs.map((t,i)=>
-    '<div class=history-item><div class=rank>#'+(i+1)+'</div>'+
-    '<div class=hi><div class=ha>'+esc(t.artist)+'</div><div class=ht>'+esc(t.title)+'</div></div>'+
-    (activeStation?'':trendHtml(t.count,t.prev))+
-    '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=spotify-link title="חיפוש בספוטיפיי">🎧</a></div>'+
-    '<div class=cnt>'+t.shown+'×</div></div>').join('');
-}
-function renderCrossStation(){
-  const el=document.getElementById('crossStationList');
-  const d=D.cross&&D.cross.tracks;
-  if(!d||!d.length){emptyMsg(el,'עדיין אין שירים חוצי־תחנות');return}
-  el.innerHTML=d.slice(0,20).map(t=>
-    '<div class=history-item>'+
-      '<div class=rank style=color:var(--accent)>'+t.station_count+'×</div>'+
-      '<div class=hi><div class=ha>'+esc(t.artist)+'</div><div class=ht>'+esc(t.title)+'</div></div>'+
-      '<div style="font-size:.66rem;color:var(--muted);text-align:left;direction:ltr;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.station_names||'')+'</div>'+
-    '</div>').join('');
-}
-
-/* ── Trends ── */
-function renderTrends(){
-  const tr=D.trends;
-  const dailyWrap=document.querySelector('#tab-trends .chart-wrap');
-  destroyChart('daily');destroyChart('discovery');
-  renderRedundancy();
-  if(!tr||!tr.daily||!tr.daily.length){
-    emptyMsg(dailyWrap);document.getElementById('risingList').innerHTML='';return;
   }
-  const days=tr.daily;
-  const labels=days.map(d=>new Date(d.date+'T00:00:00').toLocaleDateString('he-IL',{day:'numeric',month:'short'}));
-  // stacked daily per station (fixed station order, 2px surface gap between segments)
-  const wraps=document.querySelectorAll('#tab-trends .chart-wrap');
-  // Always reset — clears any leftover canvases from previous buggy renders
-  wraps[0].innerHTML='<canvas id=dailyChart></canvas>';
-  charts.daily=new Chart(document.getElementById('dailyChart'),{
-    type:'bar',
-    data:{labels,datasets:stations
-      .filter(s=>!activeStation||s.slug===activeStation)
-      .map(s=>({label:s.name,data:days.map(d=>(d.stations||{})[s.slug]||0),
-        backgroundColor:s.color,borderColor:SURFACE,borderWidth:1,stack:'d',maxBarThickness:70}))},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{legend:{display:false}},
-      scales:{x:{stacked:true,ticks:{color:MUTED},grid:{display:false}},
-              y:{stacked:true,beginAtZero:true,ticks:{color:MUTED,precision:0},grid:{color:GRID}}}}
+  if (!histReverse) items.reverse();
+
+  const shown = items.slice(0, histShown);
+  let h = '';
+  shown.forEach(t => {
+    h += '<div class="hist-item">';
+    h += '<span class="hist-station" style="color:' + color(t.station_slug) + '">' + esc(name(t.station_slug)) + '</span>';
+    h += '<div class="hist-info"><span class="hist-artist">' + esc(t.artist) + '</span> — <span class="hist-title">' + esc(t.title) + '</span></div>';
+    h += '<span class="hist-time">' + timeAgo(t.recognized_at) + '</span>';
+    h += '</div>';
   });
-  document.getElementById('dailyLegend').innerHTML=legendHtml(
-    stations.filter(s=>!activeStation||s.slug===activeStation).map(s=>({color:s.color,label:s.name})));
-  // discovery: unique vs new songs per day
-  // Always reset — clears any leftover canvases
-  wraps[1].innerHTML='<canvas id=discoveryChart></canvas>';
-  charts.discovery=new Chart(document.getElementById('discoveryChart'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'שירים שונים',data:days.map(d=>d.unique_songs),backgroundColor:ACCENT+'99',borderColor:ACCENT,borderWidth:1,borderRadius:4,maxBarThickness:70},
-      {label:'חדשים לגמרי',data:days.map(d=>d.new_songs),backgroundColor:'#c86ae399',borderColor:'#c86ae3',borderWidth:1,borderRadius:4,maxBarThickness:70},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:MUTED},grid:{display:false}},
-              y:{beginAtZero:true,ticks:{color:MUTED,precision:0},grid:{color:GRID}}}}
-  });
-  document.getElementById('discoveryLegend').innerHTML=legendHtml([
-    {color:ACCENT,label:'שירים שונים ביום'},{color:'#c86ae3',label:'נשמעו לראשונה'}]);
-  // rising artists
-  const el=document.getElementById('risingList');
-  if(!tr.rising_artists||!tr.rising_artists.length){emptyMsg(el,'צריך עוד כמה ימים של נתונים');return}
-  el.innerHTML=tr.rising_artists.map((r,i)=>
-    '<div class=history-item><div class=rank>#'+(i+1)+'</div>'+
-    '<div class=hi><div class=ha>'+esc(r.artist)+'</div>'+
-    '<div style="font-size:.66rem;color:var(--muted)">'+r.prev+' → '+r.count+' השמעות</div></div>'+
-    trendHtml(r.count,r.prev)+'</div>').join('');
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">לא נמצאו תוצאות</div>';
+  document.getElementById('histMoreBtn').style.display = items.length > histShown ? 'inline-block' : 'none';
 }
 
-function renderRedundancy(){
-  const el=document.getElementById('redundancyContent');
-  const red=D.trends&&D.trends.redundancy;
-  if(!red||!red.stations||!Object.keys(red.stations).length){
-    emptyMsg(el,'עדיין אין מספיק נתונים');return;
-  }
-  if(!red.ready){
-    const h=red.hours_collected||0,rq=red.hours_required||48;
-    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">'+
-      '<div style="font-size:1.5rem;margin-bottom:6px">⏳</div>'+
-      '<div>עדיין נאספים נתונים לניתוח חזרתיות</div>'+
-      '<div style="font-size:.8rem;margin-top:6px;color:var(--muted)">'+
-        h+' / '+rq+' שעות נדרשות</div>'+
-      '<div style="margin-top:10px;background:var(--tab-bg);border-radius:6px;overflow:hidden;height:6px;max-width:300px;margin-left:auto;margin-right:auto">'+
-        '<div style="background:var(--accent);height:100%;width:'+Math.min(100,h/rq*100)+'%;transition:width .5s"></div>'+
-      '</div>'+
-    '</div>';
-    return;
-  }
-
-  const stations=Object.entries(red.stations).sort((a,b)=>b[1].plays-a[1].plays);
-  let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">';
-  stations.forEach(([slug,data]) => {
-    const c=color(slug);
-    const barW=Math.min(100,data.song_repeat_pct*3);
-    html+='<div class=card style="margin-bottom:0;padding:12px;border-color:'+c+'33">'+
-      '<div style="font-weight:700;font-size:.85rem;margin-bottom:6px"><span style=display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-left:5px></span>'+esc(name(slug))+'</div>'+
-      '<div style="display:flex;gap:0 12px;flex-wrap:wrap;font-size:.78rem;margin-bottom:6px">'+
-        '<span><span style=color:var(--muted)>השמעות:</span> <strong>'+data.plays+'</strong></span>'+
-        '<span><span style=color:var(--muted)>שירים:</span> <strong>'+data.unique_songs+'</strong></span>'+
-        '<span><span style=color:var(--muted)>אמנים:</span> <strong>'+data.unique_artists+'</strong></span>'+
-      '</div>'+
-      '<div style="margin-bottom:4px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:.7rem">'+
-          '<span style=color:var(--muted)>חזרתיות שירים</span>'+
-          '<strong>'+(data.song_repeat_pct||'0')+'%</strong></div>'+
-        '<div style="background:var(--tab-bg);border-radius:4px;height:5px;overflow:hidden">'+
-          '<div style="background:'+c+';height:100%;width:'+barW+'%;border-radius:4px"></div></div>'+
-      '</div>'+
-      '<div style="margin-bottom:6px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:.7rem">'+
-          '<span style=color:var(--muted)>חזרתיות אמנים</span>'+
-          '<strong>'+(data.artist_repeat_pct||'0')+'%</strong></div>'+
-        '<div style="background:var(--tab-bg);border-radius:4px;height:5px;overflow:hidden">'+
-          '<div style="background:'+c+';height:100%;width:'+Math.min(100,data.artist_repeat_pct*1.5)+'%;border-radius:4px"></div></div>'+
-      '</div>';
-    // Top repeated songs
-    if(data.top_repeated_songs&&data.top_repeated_songs.length){
-      html+='<div style="font-size:.68rem;color:var(--muted);margin-bottom:2px">שירים חוזרים:</div>';
-      data.top_repeated_songs.forEach(s=>{
-        html+='<div style="font-size:.72rem;display:flex;justify-content:space-between"><span>'+esc(s.artist.substr(0,18))+' — '+esc(s.title.substr(0,22))+'</span><span style=color:'+c+';font-weight:700>×'+s.plays+'</span></div>';
-      });
-    }
-    // Top repeated artists
-    if(data.top_repeated_artists&&data.top_repeated_artists.length){
-      html+='<div style="font-size:.68rem;color:var(--muted);margin-top:4px;margin-bottom:2px">אמנים חוזרים:</div>';
-      data.top_repeated_artists.forEach(a=>{
-        html+='<div style="font-size:.72rem;display:flex;justify-content:space-between"><span>'+esc(a.artist.substr(0,22))+'</span><span style=color:'+c+';font-weight:700>×'+a.plays+'</span></div>';
-      });
-    }
-    html+='</div>';
-  });
-  html+='</div>';
-  el.innerHTML=html;
-}
-
-/* ── BPM & Key ── */
-function renderBpmKey(){
-  const bk=D.bpmKey;
-  if(!bk||!bk.stations||!Object.keys(bk.stations).length){
-    ['bpmTrendCard','keyDistCard','bpmKeyScatterCard','bpmStatsCard'].forEach(function(id){
-      document.getElementById(id).style.display='none';
-    });
-    return;
-  }
-  ['bpmTrendCard','keyDistCard','bpmKeyScatterCard','bpmStatsCard'].forEach(function(id){
-    document.getElementById(id).style.display='';
-  });
-  renderBpmHourChart(bk);
-  renderKeyDistChart(bk);
-  renderBpmKeyScatter(bk);
-  renderBpmStats(bk);
-}
-
-function renderBpmHourChart(bk){
-  destroyChart('bpmHour');
-  const stations_data = bk.stations;
-  const active_slugs = activeStation ? [activeStation] : Object.keys(stations_data);
-  const datasets=[];
-  // Build 24h labels
-  const labels = Array.from({length:24}, function(_,i){return String(i).padStart(2,'0')+':00'});
-  active_slugs.forEach(function(slug){
-    const sd = stations_data[slug];
-    if(!sd||!sd.bpm||!sd.bpm.by_hour||!sd.bpm.by_hour.length) return;
-    const c = color(slug);
-    const hourMap = {};
-    sd.bpm.by_hour.forEach(function(h){hourMap[h.hour] = h.mean_bpm});
-    const data = Array.from({length:24}, function(_,i){return hourMap[i] !== undefined ? hourMap[i] : null});
-    const hasData = data.some(function(v){return v !== null});
-    if(!hasData) return;
-    datasets.push({
-      label: name(slug),
-      data: data,
-      borderColor: c,
-      backgroundColor: c+'33',
-      borderWidth: 2,
-      tension: 0.4,
-      pointRadius: 3,
-      pointHoverRadius: 6,
-      spanGaps: true,
-      fill: datasets.length === 0 ? {above: c+'15'} : false,
-    });
-  });
-  if(!datasets.length){
-    document.getElementById('bpmTrendCard').style.display='none';
-    return;
-  }
-  const el=document.getElementById('bpmHourChart');
-  if(!el) return;
-  charts.bpmHour=new Chart(document.getElementById('bpmHourChart'),{
-    type:'line',
-    data:{labels:labels,datasets:datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{title:function(items){return 'שעה '+items[0].label},label:function(ctx){return ctx.parsed.y+' BPM'}}}
-      },
-      scales:{
-        x:{ticks:{color:MUTED,maxRotation:45},grid:{display:false}},
-        y:{beginAtZero:false,min:60,max:200,ticks:{color:MUTED,precision:0},grid:{color:GRID},
-           title:{display:true,text:'BPM',color:MUTED}}
-      }
-    }
-  });
-  document.getElementById('bpmHourLegend').innerHTML = legendHtml(
-    datasets.map(function(ds,i){return {color:ds.borderColor,label:ds.label}})
-  );
-}
-
-function renderKeyDistChart(bk){
-  destroyChart('keyDist');
-  const stations_data = bk.stations;
-  const active_slugs = activeStation ? [activeStation] : Object.keys(stations_data);
-  // Collect all unique keys
-  const allKeys = new Set();
-  active_slugs.forEach(function(slug){
-    const sd = stations_data[slug];
-    if(sd&&sd.keys) Object.keys(sd.keys).forEach(function(k){allKeys.add(k)});
-  });
-  if(!allKeys.size){
-    document.getElementById('keyDistCard').style.display='none';
-    return;
-  }
-  // Sort keys: majors first (by pitch), then minors
-  const keyOrder = ['C major','C# major','D major','Eb major','E major','F major',
-    'F# major','G major','G# major','A major','Bb major','B major',
-    'C minor','C# minor','D minor','Eb minor','E minor','F minor',
-    'F# minor','G minor','G# minor','A minor','Bb minor','B minor'];
-  const sortedKeys = Array.from(allKeys).sort(function(a,b){
-    const ia = keyOrder.indexOf(a), ib = keyOrder.indexOf(b);
-    return (ia===-1?999:ia) - (ib===-1?999:ib);
-  });
-  const labels = sortedKeys;
-  const datasets = [];
-  active_slugs.forEach(function(slug){
-    const sd = stations_data[slug];
-    if(!sd||!sd.keys) return;
-    const c = color(slug);
-    const data = sortedKeys.map(function(k){return sd.keys[k] || 0});
-    if(data.every(function(v){return v===0})) return;
-    datasets.push({
-      label: name(slug),
-      data: data,
-      backgroundColor: c+'99',
-      borderColor: c,
-      borderWidth: 1,
-      borderRadius: 3,
-    });
-  });
-  if(!datasets.length){
-    document.getElementById('keyDistCard').style.display='none';
-    return;
-  }
-  const el=document.getElementById('keyDistChart');
-  if(!el) return;
-  charts.keyDist=new Chart(document.getElementById('keyDistChart'),{
-    type:'bar',
-    data:{labels:labels,datasets:datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      indexAxis:'y',
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{label:function(ctx){return ctx.parsed.x+' שירים'}}}
-      },
-      scales:{
-        x:{beginAtZero:true,ticks:{color:MUTED,precision:0},grid:{color:GRID}},
-        y:{ticks:{color:MUTED,font:{size:9}},grid:{display:false}}
-      }
-    }
-  });
-  document.getElementById('keyDistLegend').innerHTML = legendHtml(
-    datasets.map(function(ds){return {color:ds.backgroundColor,label:ds.label}})
-  );
-}
-
-function renderBpmKeyScatter(bk){
-  destroyChart('bpmKeyScatter');
-  const stations_data = bk.stations;
-  if(!stations_data||!Object.keys(stations_data).length){
-    document.getElementById('bpmKeyScatterCard').style.display='none';
-    return;
-  }
-  // BPM-by-key cross-station data
-  const cross = bk.cross_station;
-  if(!cross||!cross.bpm_by_key||!Object.keys(cross.bpm_by_key).length){
-    document.getElementById('bpmKeyScatterCard').style.display='none';
-    return;
-  }
-  // Build scatter: y-axis = key index, x-axis = mean BPM
-  const keyOrder = ['C major','C# major','D major','Eb major','E major','F major',
-    'F# major','G major','G# major','A major','Bb major','B major',
-    'C minor','C# minor','D minor','Eb minor','E minor','F minor',
-    'F# minor','G minor','G# minor','A minor','Bb minor','B minor'];
-  const labels = keyOrder.filter(function(k){return cross.bpm_by_key[k]});
-  const data = labels.map(function(k,i){
-    const d = cross.bpm_by_key[k];
-    return {x: d.mean_bpm, y: i, key: k, count: d.count, r: Math.max(5, Math.min(20, Math.sqrt(d.count)*3))};
-  });
-  if(!data.length){
-    document.getElementById('bpmKeyScatterCard').style.display='none';
-    return;
-  }
-  const el=document.getElementById('bpmKeyScatter');
-  if(!el) return;
-  charts.bpmKeyScatter=new Chart(document.getElementById('bpmKeyScatter'),{
-    type:'scatter',
-    data:{
-      datasets:[{
-        label:'BPM × Key',
-        data:data,
-        backgroundColor:'#5ddbb5cc',
-        borderColor:'#5ddbb5',
-        borderWidth:1,
-      }]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{
-          label:function(ctx){
-            const r=ctx.raw;
-            return r.key+': '+r.x+' BPM ('+r.count+' songs)';
-          }
-        }}
-      },
-      scales:{
-        x:{title:{display:true,text:'BPM',color:MUTED},min:60,max:200,
-           ticks:{color:MUTED},grid:{color:GRID}},
-        y:{title:{display:true,text:'Key',color:MUTED},
-           ticks:{color:MUTED,font:{size:9},
-             callback:function(val){return labels[val]||''}},
-           grid:{display:false}}
-      }
-    }
-  });
-  document.getElementById('bpmKeyScatterLegend').innerHTML =
-    '<span>גודל נקודה = כמות שירים</span>';
-}
-
-function renderBpmStats(bk){
-  const el=document.getElementById('bpmStatsContent');
-  const stations_data = bk.stations;
-  if(!stations_data||!Object.keys(stations_data).length){
-    document.getElementById('bpmStatsCard').style.display='none';
-    return;
-  }
-  const active_slugs = activeStation ? [activeStation] : Object.keys(stations_data);
-  let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">';
-  active_slugs.forEach(function(slug){
-    const sd = stations_data[slug];
-    if(!sd||!sd.bpm||!sd.bpm.count) return;
-    const c = color(slug);
-    const bpm = sd.bpm;
-    // Most common key
-    const keys = sd.keys;
-    let topKey = '—', topKeyCount = 0;
-    if(keys){
-      Object.keys(keys).forEach(function(k){
-        if(keys[k] > topKeyCount){topKey = k; topKeyCount = keys[k]}
-      });
-    }
-    html+='<div class=card style="margin-bottom:0;padding:12px;border-color:'+c+'33">'+
-      '<div style="font-weight:600;font-size:.82rem;margin-bottom:6px"><span class=dot-sm style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-left:5px"></span>'+esc(name(slug))+'</div>'+
-      '<table style="font-size:.75rem;width:100%;border-collapse:collapse">'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>ממוצע BPM</td><td style=text-align:left;font-weight:600;padding:2px 4px><strong>'+bpm.mean+'</strong></td></tr>'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>חציון BPM</td><td style=text-align:left;font-weight:600;padding:2px 4px><strong>'+bpm.median+'</strong></td></tr>'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>טווח BPM</td><td style=text-align:left;padding:2px 4px>'+bpm.min+' – '+bpm.max+'</td></tr>'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>סטיית תקן</td><td style=text-align:left;padding:2px 4px>±'+bpm.std+'</td></tr>'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>שירים עם נתונים</td><td style=text-align:left;padding:2px 4px>'+bpm.count+'</td></tr>'+
-      '<tr><td style=color:var(--muted);padding:2px 4px>סולם נפוץ</td><td style=text-align:left;padding:2px 4px;font-weight:600>'+esc(topKey)+' ('+topKeyCount+'×)</td></tr>'+
-      '</table></div>';
-  });
-  html+='</div>';
-  el.innerHTML = html;
-}
-
-/* ── History ── */
-function historyData(){
-  if(activeStation&&D.stationHistory&&D.stationHistory.slug===activeStation)
-    return D.stationHistory.data;
-  let d=(D.history&&D.history.history)||[];
-  if(activeStation)d=d.filter(t=>t.station_slug===activeStation);
-  return d;
-}
-
-/* ── History filter state ── */
-let histSelectedIndices=new Set();
-let histFilteredData=[];
-
-function onHistFilterChange(){
-  historyShown=100;
-  histSelectedIndices.clear();
-  const btn=document.getElementById('histSelectAllBtn');
-  if(btn)btn.textContent='☐ בחר הכל';
+function toggleHistDedup() {
+  histDedup = !histDedup;
+  document.getElementById('histDedupBtn').classList.toggle('active', histDedup);
   renderHistory();
 }
+function toggleHistReverse() {
+  histReverse = !histReverse;
+  document.getElementById('histReverseBtn').textContent = histReverse ? '↓ חדש→ישן' : '↑ ישן→חדש';
+  document.getElementById('histReverseBtn').classList.toggle('active', !histReverse);
+  renderHistory();
+}
+function loadMoreHistory() { histShown += 80; renderHistory(); }
 
-function renderHistory(){
-  const el=document.getElementById('historyList');
-  const q=(document.getElementById('historySearch').value||'').trim().toLowerCase();
-  const dateFrom=document.getElementById('histDateFrom').value;
-  const dateTo=document.getElementById('histDateTo').value;
-  const reverse=document.getElementById('histReverse').checked;
-  const dedup=document.getElementById('histDedup').checked;
-  let d=historyData();
-  // Date filter
-  if(dateFrom||dateTo){
-    d=d.filter(t=>{
-      const ts=t.recognized_at?t.recognized_at.slice(0,10):'';
-      if(dateFrom&&ts<dateFrom)return false;
-      if(dateTo&&ts>dateTo)return false;
-      return true;
+/* ══════════════════════════════════════════════════════════════════════
+   TAB 3: DEEP
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── BPM Flow ── */
+function renderBpmFlow() {
+  // Station pills
+  const pillsEl = document.getElementById('bpmStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (bpmStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.map(s => '<button class="window-pill' + (bpmStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; bpmStation = b.dataset.s; renderBpmFlow(); };
+
+  if (!D.bpm || !D.bpm.stations) return;
+  destroyChart('bpm');
+
+  const ctx = document.getElementById('bpmChart').getContext('2d');
+  const slugs = bpmStation === 'all' ? stations.map(s => s.slug) : [bpmStation];
+  const datasets = [];
+
+  slugs.forEach(slug => {
+    const stData = D.bpm.stations[slug];
+    if (!stData || !stData.bpm || !stData.bpm.by_hour) return;
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const data = hours.map(h => {
+      const entry = stData.bpm.by_hour.find(e => e.hour === h);
+      return entry ? entry.mean_bpm : null;
     });
-  }
-  // Search filter
-  if(q)d=d.filter(t=>((t.artist||'')+' '+(t.title||'')).toLowerCase().includes(q));
-  // Dedup
-  if(dedup){
-    const seen=new Set();
-    d=d.filter(t=>{const k=songMatchKey(t.artist,t.title);if(seen.has(k))return false;seen.add(k);return true});
-  }
-  // Reverse
-  if(reverse)d=[...d].reverse();
-  el._data=d;
-  histFilteredData=d;
-  document.getElementById('historyCount').textContent=d.length?'('+d.length+' שירים'+(D.history&&D.history.total>d.length&&!q&&!activeStation?' מתוך '+D.history.total:'')+')':'';
-  if(!d.length){emptyMsg(el);document.getElementById('historyMore').style.display='none';return}
-  const slice=d.slice(0,historyShown);
-  el.innerHTML=slice.map((t,i)=>{
-    const checked=histSelectedIndices.has(i)?'checked':'';
-    return '<div class=history-item>'+
-      '<input type=checkbox class=hist-cb data-idx="'+i+'" '+checked+' onchange="histToggleCb(this,'+i+')">'+
-      '<div class=hs style=color:'+(t.station_color||'#666')+'>'+esc(t.station_name||'')+'</div>'+
-      '<div class=hi><div class=ha>'+esc(t.artist||'')+'</div><div class=ht>'+esc(t.title||'')+'</div></div>'+
-      '<div style=flex-shrink:0><a href="'+spotifySearchUrl(t.artist,t.title)+'" target=_blank class=spotify-link title="חיפוש בספוטיפיי">🎧</a></div>'+
-      '<div class=hago>'+timeAgo(t.recognized_at)+'</div>'+
-    '</div>';
+    datasets.push({
+      label: name(slug),
+      data,
+      borderColor: color(slug),
+      backgroundColor: color(slug) + '20',
+      borderWidth: 2,
+      pointRadius: 2,
+      tension: 0.3,
+      fill: false,
+    });
+  });
+
+  charts.bpm = new Chart(ctx, {
+    type: 'line',
+    data: { labels: Array.from({ length: 24 }, (_, i) => i + ':00'), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' } },
+        y: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' }, title: { display: true, text: 'BPM', color: MUTED } },
+      },
+      interaction: { mode: 'index', intersect: false },
+    },
+  });
+
+  // Legend
+  document.getElementById('bpmLegend').innerHTML = slugs.map(slug => {
+    const stData = D.bpm.stations[slug];
+    const avg = stData && stData.bpm ? ' — ממוצע ' + stData.bpm.mean + ' BPM' : '';
+    return '<span><span class="sw" style="background:' + color(slug) + '"></span>' + esc(name(slug)) + avg + '</span>';
   }).join('');
-  const more=document.getElementById('historyMore');
-  more.style.display=d.length>historyShown?'':'none';
-  more.onclick=()=>{historyShown+=100;renderHistory()};
 }
-function histToggleCb(el,idx){
-  if(el.checked)histSelectedIndices.add(idx);
-  else histSelectedIndices.delete(idx);
-  const all=document.querySelectorAll('.hist-cb');
-  const checked=document.querySelectorAll('.hist-cb:checked');
-  document.getElementById('histSelectAllBtn').textContent=
-    checked.length===all.length&&all.length>0?'☑ בטל הכל':'☐ בחר הכל';
-}
-function toggleSelectAll(){
-  const cbs=document.querySelectorAll('.hist-cb');
-  const allChecked=Array.from(cbs).every(cb=>cb.checked);
-  cbs.forEach(cb=>{
-    cb.checked=!allChecked;
-    const idx=+cb.dataset.idx;
-    if(cb.checked)histSelectedIndices.add(idx);
-    else histSelectedIndices.delete(idx);
+
+/* ── Key Distribution ── */
+function renderKeyDist() {
+  const pillsEl = document.getElementById('keyStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (keyStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.map(s => '<button class="window-pill' + (keyStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; keyStation = b.dataset.s; renderKeyDist(); };
+
+  const el = document.getElementById('keyDistContent');
+  if (!D.bpm || !D.bpm.stations) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
+
+  // Aggregate keys
+  const keyCounts = {};
+  const slugs = keyStation === 'all' ? stations.map(s => s.slug) : [keyStation];
+  slugs.forEach(slug => {
+    const stData = D.bpm.stations[slug];
+    if (!stData || !stData.keys) return;
+    Object.entries(stData.keys).forEach(([k, v]) => { keyCounts[k] = (keyCounts[k] || 0) + v; });
   });
-  document.getElementById('histSelectAllBtn').textContent=allChecked?'☐ בחר הכל':'☑ בטל הכל';
-}
-function copySelectedAsText(){
-  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
-  if(!selected.length){alert('לא נבחרו שירים');return}
-  const text=selected.map(t=>((t.artist||'')+' — '+(t.title||'')).trim()).join('\n');
-  navigator.clipboard.writeText(text).then(()=>{
-    alert('הועתקו '+selected.length+' שירים');
-  }).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=text;document.body.appendChild(ta);
-    ta.select();document.execCommand('copy');
-    document.body.removeChild(ta);
-    alert('הועתקו '+selected.length+' שירים');
+
+  if (!Object.keys(keyCounts).length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
+
+  // Sort by circle of fifths: C, G, D, A, E, B, F#, C#, Ab, Eb, Bb, F
+  const keyOrder = ['C major', 'G major', 'D major', 'A major', 'E major', 'B major', 'F# major', 'C# major',
+    'A minor', 'E minor', 'B minor', 'F# minor', 'C# minor', 'G# minor', 'D# minor', 'A# minor',
+    'C minor', 'G minor', 'D minor', 'A minor', 'E minor', 'B minor', 'F minor',
+    'Db major', 'Eb major', 'F major', 'Ab major', 'Bb major',
+    'C# major', 'Eb minor', 'F# minor', 'Ab minor', 'Bb minor'];
+  // Simpler: just sort by count
+  const sorted = Object.entries(keyCounts).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted[0][1];
+
+  // Determine major/minor
+  function isMajor(k) { return k.toLowerCase().includes('major'); }
+
+  let h = '<div class="key-bars">';
+  sorted.slice(0, 16).forEach(([key, count]) => {
+    const pct = (count / maxCount) * 100;
+    const shortKey = key.replace(' major', '').replace(' minor', '').replace('b', '♭').replace('#', '♯');
+    h += '<div class="key-bar-group">';
+    h += '<div class="key-bar-stack">';
+    h += '<div class="' + (isMajor(key) ? 'key-bar-major' : 'key-bar-minor') + '" style="height:' + pct + '%"></div>';
+    h += '</div>';
+    h += '<div class="key-label">' + shortKey + '</div>';
+    h += '<div class="key-count">' + count + '</div>';
+    h += '</div>';
   });
+  h += '</div>';
+  el.innerHTML = h;
 }
-function openAllInSpotify(){
-  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
-  if(!selected.length){alert('לא נבחרו שירים');return}
-  selected.forEach((t,i)=>{
-    setTimeout(()=>window.open(spotifySearchUrl(t.artist,t.title),'_blank'),i*150);
+
+/* ── Song Transitions ── */
+function renderTransitions() {
+  const pillsEl = document.getElementById('transStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (transStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.map(s => '<button class="window-pill' + (transStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; transStation = b.dataset.s; renderTransitions(); };
+
+  const el = document.getElementById('transContent');
+  if (!D.transitions) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">נתוני מעברים בבנייה...</div>'; return; }
+
+  let transitions = [];
+  if (transStation === 'all') {
+    // Aggregate all stations
+    if (D.transitions.stations) {
+      Object.values(D.transitions.stations).forEach(stData => {
+        if (stData.transitions) transitions = transitions.concat(stData.transitions);
+      });
+      // Deduplicate and sort
+      const map = {};
+      transitions.forEach(t => {
+        const k = t.fromartist + '|' + t.from_title + '|' + t.to_artist + '|' + t.to_title;
+        if (!map[k]) map[k] = { ...t, count: 0 };
+        map[k].count += t.count;
+      });
+      transitions = Object.values(map).sort((a, b) => b.count - a.count);
+    }
+  } else {
+    const stData = D.transitions.stations && D.transitions.stations[transStation];
+    transitions = stData ? stData.transitions || [] : [];
+  }
+
+  if (!transitions.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני מעברים עדיין</div>'; return; }
+
+  let h = '';
+  transitions.slice(0, 15).forEach(t => {
+    h += '<div class="transition-item">';
+    h += '<div class="transition-from">' + esc(t.from_artist || t.fromartist) + ' — <em>' + esc(t.from_title || t.fromtitle) + '</em></div>';
+    h += '<div class="transition-arrow">↓ <span class="transition-prob">' + t.count + '×' + (t.probability ? ' (' + Math.round(t.probability * 100) + '%)' : '') + '</span></div>';
+    h += '<div class="transition-to">' + esc(t.to_artist) + ' — <em>' + esc(t.to_title) + '</em></div>';
+    h += '</div>';
   });
-}
-async function loadStationHistory(){
-  if(!activeStation)return;
-  // Tracked too: re-clicking a station pill costs nothing if its history hasn't
-  // changed. These files are 27-126 KB each, so it is worth the check.
-  const j=await loadTracked('stations/'+activeStation+'/history.json');
-  if(j&&j.history)D.stationHistory={slug:activeStation,data:j.history};
-  onHistFilterChange();
-}
-function exportCSV(){
-  const el=document.getElementById('historyList');
-  if(!el._data||!el._data.length){alert('אין נתונים לייצוא');return}
-  const headers=['Station','Artist','Title','Recognized At'];
-  const rows=el._data.map(t=>[t.station_name,t.artist,t.title,t.recognized_at]
-    .map(v=>(v||'').toString().replace(/,/g,' ')));
-  const csv=[headers.join(','),...rows.map(r=>r.join(','))].join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download='radio-playlist-'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();URL.revokeObjectURL(a.href);
+  el.innerHTML = h;
 }
 
-/* ── Phase 3: Spotify API integration ── */
-const SPOTIFY_API='http://127.0.0.1:9900';
-
-async function initSpotifyAuth(){
-  try{
-    const tokenRes=await fetch(SPOTIFY_API+'/token',{cache:'no-store'});
-    if(tokenRes.ok){
-      const data=await tokenRes.json();
-      if(data.authenticated){updateSpotifyStatus(true);return}
-      // Not authenticated — open Spotify OAuth
-      window.open(SPOTIFY_API+'/auth','spotify-auth','width=600,height=700');
-      return;
-    }
-  }catch(e){/* service not running on this machine */}
-  const el=document.getElementById('spotifyAuthStatus');
-  if(el)el.style.display='none';
-}
-
-// Check if the Spotify API service is reachable and authenticated.
-// Shows the appropriate status; call this only on user interaction.
-async function checkSpotifyAuth(){
-  try{
-    const r=await fetch(SPOTIFY_API+'/token',{cache:'no-store'});
-    if(r.ok){
-      const data=await r.json();
-      updateSpotifyStatus(!!data.authenticated, true);
-      return !!data.authenticated;
-    }
-  }catch(e){
-    const el=document.getElementById('spotifyAuthStatus');
-    if(el)el.style.display='none';
-    return false;
-  }
-  updateSpotifyStatus(false, true);
-  return false;
-}
-
-function updateSpotifyStatus(authed, online){
-  const el=document.getElementById('spotifyAuthStatus');
-  if(!el)return;
-  el.style.display=online?'':'none';
-  if(authed){
-    el.innerHTML='✅ Spotify <button class=ctrl-btn onclick="exportToSpotify()" style=font-size:.72rem;padding:2px 8px>➕ Create Playlist</button>';
-  }else{
-    el.innerHTML='<a href=# onclick="initSpotifyAuth();return false" style=color:#1DB954;text-decoration:none>🎵 Connect to Spotify</a>';
-  }
-}
-
-async function exportToSpotify(){
-  const selected=histFilteredData.filter((_,i)=>histSelectedIndices.has(i));
-  if(!selected.length){alert('לא נבחרו שירים');return}
-  const stationName=activeStation?name(activeStation):'כל התחנות';
-  const dateStr=new Date().toISOString().slice(0,10);
-  const playlistName=stationName+' — '+dateStr;
-  try{
-    const r=await fetch(SPOTIFY_API+'/create-playlist',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        name:playlistName,
-        description:'נוצר מ-Radio Playlist Dashboard',
-        public:false,
-        tracks:selected.map(t=>({artist:t.artist,title:t.title})),
-      }),
-    });
-    if(!r.ok){const e=await r.text();alert('שגיאה: '+e);return}
-    const data=await r.json();
-    if(data.playlist_url){
-      alert('✅ הפלייליסט נוצר! נוספו '+data.track_count+' שירים'+(data.failed_count?' ('+data.failed_count+' לא נמצאו בספוטיפיי)':'')+'.');
-      window.open(data.playlist_url,'_blank');
-    }
-  }catch(e){
-    alert('שגיאה בחיבור לשרת ספוטיפיי: '+e.message);
-  }
-}
-/* ── Clusters — community detection force graph ── */
-let clusterSim=null;
-let clusterSelectedNode=null;
-let clusterDataKey=null;      // tracks data version to skip re-render on 30s poll
-let clusterMode='community';  // 'community' | 'station'
-
-function toggleClusterMode(){
-  clusterMode=clusterMode==='community'?'station':'community';
-  clusterDataKey=null;  // force re-render
-  document.getElementById('clusterModeBtn').textContent=
-    '🔀 צביעה: '+(clusterMode==='community'?'לפי קהילה':'לפי תחנה');
-  renderClusters();
-}
-
-// Community color palette (distinct, colorblind-friendly)
-const CLUSTER_COLORS=[
-  '#5ddbb5','#f6a623','#7b68ee','#e87461','#4ecdc4',
-  '#ff6b9d','#45b7d1','#f7dc6f','#bb8fce','#85c1e9',
-  '#f0b27a','#82e0aa','#f1948a','#a3e4d7','#d7bde2',
-  '#aeb6bf','#f9e79f','#a9cce3','#d4ac0d','#7dcea0',
-];
-
-function renderClusters(){
-  const cl=D.clusters;
-  const wrap=document.getElementById('clusterGraphWrap');
-  const loading=document.getElementById('clusterLoading');
-  const svg=document.getElementById('clusterGraph');
-  const detail=document.getElementById('clusterDetail');
-
-  if(!cl||!cl.songs||!cl.songs.length||!cl.ready){
-    wrap.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">צריך עוד נתונים — בדוק שוב מאוחר יותר</div>';
-    detail.innerHTML='';return
-  }
-
-  // ⛔ Don't re-render on every 30s poll — only if the actual data changed.
-  // The force simulation restart jiggles the graph and is confusing.
-  const newKey=cl.window_hours+':'+cl.total_songs+':'+cl.communities.length+':'+cl.edges.length+':'+clusterMode;
-  if(newKey===clusterDataKey && clusterSim){
-    // Data unchanged — just update the label and skip the expensive render
-    document.getElementById('clusterWindowLabel').textContent=
-      'חלון: '+cl.window_hours+' שעות · '+cl.total_songs+' שירים · '+cl.communities.length+' קהילות'+
-      (cl.edges?(' · '+cl.edges.filter(e=>e[3]).length+' גשרים'):'');
-    if(loading)loading.style.display='none';
+/* ── Clusters ── */
+function renderClusters() {
+  const data = D.clusters;
+  if (!data || !data.ready || !data.songs || !data.songs.length) {
+    document.getElementById('clusterGraph').innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="' + MUTED + '" font-size="14">אין נתוני אשכולות עדיין</text>';
     return;
   }
-  clusterDataKey=newKey;
 
-  document.getElementById('clusterWindowLabel').textContent=
-    'חלון: '+cl.window_hours+' שעות · '+cl.total_songs+' שירים · '+cl.communities.length+' קהילות'+
-    (cl.edges?(' · '+cl.edges.filter(e=>e[3]).length+' גשרים'):'');
+  const svg = d3.select('#clusterGraph');
+  svg.selectAll('*').remove();
+  const width = svg.node().clientWidth || 600;
+  const height = 450;
 
-  if(loading)loading.style.display='none';
+  const nodes = data.songs.map((s, i) => ({ ...s, id: i }));
+  const links = data.edges.map(e => ({ source: e[0], target: e[1], weight: e[2], bridge: e[3] }));
 
-  // Build community lookup
-  const commMap={};
-  (cl.communities||[]).forEach((c,i)=>{
-    commMap[c.id]=CLUSTER_COLORS[i%CLUSTER_COLORS.length];
-  });
+  // Community colors
+  const communityColors = {};
+  const palette = ['#5ddbb5', '#e36a6a', '#6ab8e3', '#e3c86a', '#c86ae3', '#e38a6a', '#a06ae3', '#e36ac8'];
+  data.communities.forEach((c, i) => { communityColors[c.id] = palette[i % palette.length]; });
 
-  // Build nodes from flat songs array
-  const nodes=[];
-  cl.songs.forEach((s,i)=>{
-    const cid=s.community;
-    const commColor=commMap[cid]||'#5ddbb5';
-    const st=stationBySlug(s.primary_station);
-    const stationColor=st?st.color:'#5ddbb5';
-    nodes.push({
-      id:i, artist:s.artist, title:s.title,
-      plays:s.plays, community:cid,
-      community_color:commColor,
-      station_color:stationColor,
-      primary_station:s.primary_station,
-      stations:s.stations,
-      is_bridge:!!s.is_bridge,
-      bridge_communities:s.bridge_communities||[],
-      r:Math.max(5,Math.min(18,3+Math.sqrt(s.plays)*3)),
-      top:s.top||[],
-    });
-  });
+  const simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => 80 / Math.sqrt(d.weight || 1)))
+    .force('charge', d3.forceManyBody().strength(-60))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(8));
 
-  // Build links from numeric-index edges
-  // In station mode: only show edges between songs on the same station
-  // In community mode: show all edges
-  const links=[];
-  (cl.edges||[]).forEach(e=>{
-    const si=e[0], ti=e[1], cnt=e[2], bridge=!!e[3];
-    if(si>=nodes.length||ti>=nodes.length)return;
-    // Station mode: skip cross-station edges
-    if(clusterMode==='station' && nodes[si].primary_station!==nodes[ti].primary_station) return;
-    links.push({source:si,target:ti,count:cnt,bridge:bridge});
-  });
+  const link = svg.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke', d => d.bridge ? '#e38a6a' : '#ffffff')
+    .attr('stroke-opacity', d => d.bridge ? 0.4 : 0.1)
+    .attr('stroke-width', d => Math.sqrt(d.weight || 1));
 
-  if(clusterSim)clusterSim.stop();
-
-  const width=svg.clientWidth||800;
-  const height=500;
-
-  svg.innerHTML='';
-  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-  svg.appendChild(g);
-
-  // Zoom
-  let zoomTransform=d3.zoomIdentity;
-  d3.select(svg).call(d3.zoom()
-    .scaleExtent([0.2,4])
-    .filter(event=>!event.target.closest('circle'))  // don't zoom when starting on a node
-    .on('zoom',(event)=>{
-      zoomTransform=event.transform;
-      g.setAttribute('transform',event.transform);
-    }));
-
-  // Force simulation
-  const sim=d3.forceSimulation(nodes)
-    .force('link',d3.forceLink(links).id(d=>d.id)
-      .distance(d=>60+20*Math.log(1+d.count))
-      .strength(d=>d.bridge?0.02:Math.min(1,d.count/10)))
-    .force('charge',d3.forceManyBody().strength(-150))
-    .force('center',d3.forceCenter(width/2,height/2))
-    .force('collision',d3.forceCollide().radius(d=>d.r+6));
-  clusterSim=sim;
-
-  // ── Edges layer (behind nodes) ──
-  const linkGroup=d3.select(g).append('g');
-
-  const regularLinks=links.filter(l=>!l.bridge);
-  const bridgeLinks=links.filter(l=>l.bridge);
-
-  const linkSelection=linkGroup.selectAll('line.regular')
-    .data(regularLinks).join('line')
-    .attr('class','regular')
-    .attr('stroke','rgba(93,219,181,0.12)')
-    .attr('stroke-width',d=>Math.max(0.5,Math.min(2.5,0.5+Math.log(1+d.count)*0.8)));
-
-  const bridgeSelection=linkGroup.selectAll('line.bridge')
-    .data(bridgeLinks).join('line')
-    .attr('class','bridge')
-    .attr('stroke','#f6a623')
-    .attr('stroke-width',d=>Math.max(1.5,Math.min(5,1+Math.log(1+d.count)*1.2)))
-    .attr('stroke-dasharray','5,3')
-    .attr('stroke-opacity',0.7)
-    .attr('cursor','pointer');
-
-  // ── Nodes layer ──
-  const nodeGroup=d3.select(g).append('g');
-
-  // Bridge glow ring
-  const bridgeGlow=nodeGroup.append('g').selectAll('circle.glow')
-    .data(nodes.filter(n=>n.is_bridge)).join('circle')
-    .attr('class','glow')
-    .attr('r',d=>d.r+4)
-    .attr('fill','none')
-    .attr('stroke','#f6a623')
-    .attr('stroke-width',2)
-    .attr('stroke-dasharray','3,2')
-    .attr('opacity',0.6)
-    .attr('pointer-events','none');
-
-  const nodeSelection=nodeGroup.selectAll('circle.node')
-    .data(nodes).join('circle')
-    .attr('class','node')
-    .attr('r',d=>d.r)
-    .attr('fill',d=>clusterMode==='station'?d.station_color:d.community_color)
-    .attr('stroke','#0b0e1a')
-    .attr('stroke-width',1.5)
-    .attr('cursor','pointer')
-    .attr('opacity',0.85)
+  const node = svg.append('g').selectAll('circle').data(nodes).join('circle')
+    .attr('r', d => Math.max(4, Math.min(12, Math.sqrt(d.plays) * 2)))
+    .attr('fill', d => communityColors[d.community] || ACCENT)
+    .attr('stroke', d => d.is_bridge ? '#e38a6a' : 'none')
+    .attr('stroke-width', 1.5)
+    .attr('cursor', 'pointer')
     .call(d3.drag()
-      .on('start',(event,d)=>{
-        // Pin immediately so the first drag frame snaps to cursor.
-        // But DON'T restart the sim — the drag handler will do that on actual movement.
-        d.fx=d.x;d.fy=d.y;
-      })
-      .on('drag',(event,d)=>{
-        if(!event.active)sim.alphaTarget(0.3).restart();  // kickstart on first move
-        d.fx=event.x;d.fy=event.y;
-      })
-      .on('end',(event,d)=>{
-        if(!event.active)sim.alphaTarget(0);
-        d.fx=null;d.fy=null;
-      })
-    )
-    .on('click',(event,d)=>{
-      event.stopPropagation();
-      selectClusterNode(d);
-      // Stop residual jiggle after click
-      sim.alphaTarget(0).alpha(0);
-    })
-    .on('mouseenter',function(event,d){
-      d3.select(this).attr('stroke','#fff').attr('stroke-width',2.5).attr('opacity',1);
-      highlightConnections(d,linkSelection,nodeSelection,bridgeSelection,true);
-    })
-    .on('mouseleave',function(event,d){
-      d3.select(this).attr('stroke','#0b0e1a').attr('stroke-width',1.5).attr('opacity',0.85);
-      highlightConnections(d,linkSelection,nodeSelection,bridgeSelection,false);
-    });
+      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+    );
 
-  // Labels
-  const labelGroup=nodeGroup.append('g');
-  const labels=labelGroup.selectAll('text')
-    .data(nodes).join('text')
-    .text(d=>{
-      const txt=d.artist+(d.title?' — '+d.title:'');
-      return txt.length>25?txt.slice(0,23)+'...':txt;
-    })
-    .attr('font-size','8px')
-    .attr('fill','#e8e8f0')
-    .attr('text-anchor','middle')
-    .attr('dy',d=>d.r+12)
-    .attr('pointer-events','none')
-    .attr('opacity',0.6);
-
-  // Tick
-  sim.on('tick',()=>{
-    linkSelection
-      .attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
-      .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-    bridgeSelection
-      .attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
-      .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-    nodeSelection
-      .attr('cx',d=>d.x).attr('cy',d=>d.y);
-    bridgeGlow
-      .attr('cx',d=>d.x).attr('cy',d=>d.y);
-    labels
-      .attr('x',d=>d.x).attr('y',d=>d.y);
+  node.on('click', (e, d) => {
+    const detail = document.getElementById('clusterDetail');
+    const neighbors = (d.top || []).map(n => esc(n.artist) + ' — ' + esc(n.title)).join('<br>');
+    detail.innerHTML = '<div style="font-size:.82rem"><strong>' + esc(d.artist) + ' — ' + esc(d.title) + '</strong><br><span style="color:var(--muted);font-size:.74rem">מושמע עם:</span><br>' + (neighbors || 'אין') + '</div>';
   });
 
-  // Legend — adapts to mode
-  const legendItems=[];
-  const seenColors=new Set();
-  if(clusterMode==='station'){
-    // By station: group nodes by their primary station
-    const stGroups={};
-    nodes.forEach(n=>{
-      const s=n.primary_station;
-      if(!stGroups[s])stGroups[s]={count:0,color:n.station_color};
-      stGroups[s].count++;
-    });
-    Object.entries(stGroups).forEach(([slug,g]) => {
-      if(seenColors.has(g.color))return;
-      seenColors.add(g.color);
-      const st=stationBySlug(slug);
-      legendItems.push({color:g.color,label:(st?st.name:slug)+' — '+g.count});
-    });
-  }else{
-    (cl.communities||[]).forEach((c,i)=>{
-      const col=CLUSTER_COLORS[i%CLUSTER_COLORS.length];
-      if(seenColors.has(col))return;
-      seenColors.add(col);
-      const st=stationBySlug(c.label);
-      const label=(st?st.name:c.label)+' — '+c.size;
-      legendItems.push({color:col,label:label});
-    });
-  }
-  const bridgeEdgeCount=(cl.edges||[]).filter(e=>e[3]).length;
-  if(bridgeEdgeCount>0 && clusterMode!=='station'){
-    legendItems.push({color:'#f6a623',label:'🔗 גשר — '+bridgeEdgeCount+' קישורים'});
-  }
-  document.getElementById('clusterLegend').innerHTML=legendHtml(legendItems);
+  // Tooltip on hover
+  node.append('title').text(d => d.artist + ' — ' + d.title + ' (' + d.plays + '×)');
 
-  detail.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:.82rem">👆 גרור צמתים · לחץ לפרטים · קווים כתומים = גשרים בין קהילות</div>';
-
-  // Click background to deselect
-  d3.select(svg).on('click',()=>{
-    clusterSelectedNode=null;
-    nodeSelection.attr('opacity',0.85).attr('stroke','#0b0e1a').attr('stroke-width',1.5);
-    linkSelection.attr('opacity',1);
-    bridgeSelection.attr('stroke-opacity',0.7);
-    bridgeGlow.attr('opacity',0.6);
-    labels.attr('opacity',0.6);
-    detail.innerHTML='<div style="text-align:center;padding:12px;color:var(--muted);font-size:.82rem">👆 גרור צמתים · לחץ לפרטים · קווים כתומים = גשרים בין קהילות</div>';
+  simulation.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('cx', d => d.x = Math.max(10, Math.min(width - 10, d.x))).attr('cy', d => d.y = Math.max(10, Math.min(height - 10, d.y)));
   });
+
+  // Legend
+  document.getElementById('clusterLegend').innerHTML = data.communities.slice(0, 8).map(c =>
+    '<span><span class="sw" style="background:' + (communityColors[c.id] || ACCENT) + '"></span>' + esc(name(c.dominant_station)) + ' (' + c.size + ' שירים)</span>'
+  ).join('');
 }
 
-function highlightConnections(d,linkSel,nodeSel,bridgeSel,show){
-  const connectedIds=new Set();
-  linkSel.each(function(l){
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    if(sid===d.id||tid===d.id){connectedIds.add(sid);connectedIds.add(tid);}
-  });
-  bridgeSel.each(function(l){
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    if(sid===d.id||tid===d.id){connectedIds.add(sid);connectedIds.add(tid);}
-  });
-
-  nodeSel.attr('opacity',n=>show?(connectedIds.has(n.id)||n.id===d.id?1:0.12):0.85);
-  linkSel.attr('opacity',l=>{
-    if(!show)return 1;
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    return (sid===d.id||tid===d.id)?1:0.08;
-  });
-  bridgeSel.attr('stroke-opacity',l=>{
-    if(!show)return 0.7;
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    return (sid===d.id||tid===d.id)?1:0.08;
-  });
-}
-
-function highlightConnections(d,linkSel,nodeSel,show){
-  const connectedIds=new Set();
-  linkSel.each(function(l){
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    if(sid===d.id||tid===d.id){
-      connectedIds.add(sid);
-      connectedIds.add(tid);
-    }
-  });
-
-  nodeSel.attr('opacity',n=>show?(connectedIds.has(n.id)||n.id===d.id?1:0.15):0.85);
-  linkSel.attr('stroke-opacity',l=>{
-    if(!show)return 0.4;
-    const sid=typeof l.source==='object'?l.source.id:l.source;
-    const tid=typeof l.target==='object'?l.target.id:l.target;
-    return (sid===d.id||tid===d.id)?0.8:0.05;
-  });
-}
-
-function selectClusterNode(d){
-  clusterSelectedNode=d;
-  const detail=document.getElementById('clusterDetail');
-  const cl=D.clusters;
-  if(!cl||!cl.songs)return;
-
-  const sts=Object.keys(d.stations||{});
-  const stNames=sts.map(slug=>name(slug)).join(', ');
-  const stCount=sts.length;
-  const bridgeInfo=d.is_bridge&&d.bridge_communities.length?' · 🔗 גשר ל'+d.bridge_communities.length+' קהילות':'';
-  const commInfo=(cl.communities||[]).find(c=>c.id===d.community);
-  const commLabel=commInfo?(stationBySlug(commInfo.label)?stationBySlug(commInfo.label).name:commInfo.label):'?';
-
-  // All songs in same community (declare before use)
-  const sameComm=cl.songs.filter(s=>s.community===d.community);
-
-  let html='<div class=card style="margin-bottom:0;padding:12px">'+
-    // Selected song header
-    '<div style="margin-bottom:8px">'+
-      '<div style="font-size:.9rem;font-weight:600">'+esc(d.artist)+' — '+esc(d.title)+'</div>'+
-      '<div style="font-size:.7rem;color:var(--muted);margin-top:2px">'+
-        esc(stNames)+' · '+d.plays+' ניגונים'+
-        (stCount>1?' · <span style=color:var(--accent)>🌐 '+stCount+' תחנות</span>':'')+
-        bridgeInfo+
-      '</div>'+
-    '</div>'+
-    // Community header
-    '<div style="font-size:.72rem;color:var(--muted);margin-bottom:4px">'+
-      '🎯 קהילת <strong>'+esc(commLabel)+'</strong> — '+sameComm.length+' שירים'+
-    '</div>';
-  const byStation={};
-  sameComm.forEach(s=>{
-    const stSlug=s.primary_station||'unknown';
-    if(!byStation[stSlug])byStation[stSlug]=[];
-    byStation[stSlug].push(s);
-  });
-
-  Object.entries(byStation).forEach(([slug, songs]) => {
-    const st=stationBySlug(slug);
-    const stColor=st?st.color:'#666';
-    const stName=st?st.name:slug;
-    const multiCount=songs.filter(s=>Object.keys(s.stations||{}).length>1).length;
-    html+='<div style="font-size:.7rem;color:'+stColor+';font-weight:600;margin:4px 0 2px 0">'+
-      '▸ '+esc(stName)+' ('+songs.length+' שירים'+
-      (multiCount?', '+multiCount+' חוצי תחנות':'')+')</div>';
-    songs.forEach(s=>{
-      const sts2=Object.keys(s.stations||{});
-      const isSelected=s.artist===d.artist&&s.title===d.title;
-      const crossTag=sts2.length>1?'<span style=color:var(--accent);font-size:.6rem> 🌐</span>':'';
-      html+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:.76rem;padding:2px 8px;'+
-        'border-radius:4px'+(isSelected?';background:var(--tab-active)':'')+'"'+
-        ' onmouseenter="this.style.background=\'var(--card-hover)\';"'+
-        ' onmouseleave="this.style.background='+(isSelected?'\'var(--tab-active)\'':'\'transparent\'')+'"'+
-        '>'+
-        '<span>'+(isSelected?'👉 ':'')+esc(s.artist)+' — '+esc(s.title)+crossTag+'</span>'+
-        '<span style=color:var(--muted);font-size:.65rem>'+s.plays+'×</span>'+
-      '</div>';
-    });
-  });
-
-  // Top co-occurring
-  const top=d.top||[];
-  if(top.length){
-    html+='<div style="margin-top:8px;font-size:.72rem;color:var(--muted);margin-bottom:4px">🔗 מתנגן יחד עם:</div>'+
-      top.map(t=>'<div style="display:flex;justify-content:space-between;align-items:center;font-size:.74rem;padding:2px 8px;border-radius:4px">'+
-        '<span>'+esc(t.artist)+' — '+esc(t.title)+'</span>'+
-        '<span style=color:var(--accent);font-weight:600;white-space:nowrap>'+t.count+'×</span></div>'
-      ).join('');
+/* ── Redundancy ── */
+function renderRedundancy() {
+  const el = document.getElementById('redundancyContent');
+  if (!D.trends || !D.trends.redundancy) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
+  const red = D.trends.redundancy;
+  if (!red.ready) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אוסף נתונים... ' + Math.round(red.hours_collected) + '/' + red.hours_required + ' שעות</div>';
+    return;
   }
 
-  html+='</div>';
-  detail.innerHTML=html;
+  const stationData = red.stations || {};
+  const entries = Object.entries(stationData).sort((a, b) => b[1].song_repeat_pct - a[1].song_repeat_pct);
+
+  let h = '';
+  entries.forEach(([slug, data]) => {
+    const pct = data.song_repeat_pct;
+    const barColor = pct > 30 ? '#e05555' : pct > 15 ? '#d4b85a' : ACCENT;
+    h += '<div class="redundancy-row">';
+    h += '<span class="redundancy-name" style="color:' + color(slug) + '">' + esc(name(slug)) + '</span>';
+    h += '<div class="redundancy-bar"><div class="redundancy-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>';
+    h += '<span class="redundancy-pct">' + pct + '%</span>';
+    h += '</div>';
+  });
+  el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
 }
-/* ── status ── */
-function renderStatus(){
-  const s=D.stats;
-  const dot=document.getElementById('statusDot'),txt=document.getElementById('statusText');
-  if(!s){dot.className='dot off';txt.textContent='שגיאה';return}
-  const upd=parseTs(s.updated_at);
-  const age=upd?(Date.now()-upd)/60000:1e9;
-  if(age<6){dot.className='dot on';txt.textContent='חי'}
-  else if(age<30){dot.className='dot stale';txt.textContent='מתעכב מעט'}
-  else{dot.className='dot off';txt.textContent='לא מעודכן'}
-  document.getElementById('lastUpdate').textContent=timeAgo(s.updated_at)||'-';
-  if(s.first_track_at){
-    const f=parseTs(s.first_track_at);
-    const opts={day:'numeric',month:'short',year:'numeric'};
-    document.getElementById('collectRange').textContent='אוסף נתונים מ־'+f.toLocaleDateString('he-IL',opts);
-    document.getElementById('collectRangeFooter').textContent='אוסף מ־'+f.toLocaleDateString('he-IL',opts);
+
+/* ══════════════════════════════════════════════════════════════════════
+   RENDER ALL
+   ══════════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  updateStatus();
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (!activeTab) return;
+  const tab = activeTab.dataset.tab;
+
+  if (tab === 'np') renderNowPlaying();
+  else if (tab === 'insights') {
+    renderTopSongs();
+    renderTopArtists();
+    renderCrossStation();
+    renderHistory();
+  } else if (tab === 'deep') {
+    renderBpmFlow();
+    renderKeyDist();
+    renderTransitions();
+    renderClusters();
+    renderRedundancy();
   }
 }
 
-/* ── render orchestration ── */
-function activeTab(){const b=document.querySelector('.tab-btn.active');return b?b.dataset.tab:'np'}
-function renderAll(){
-  renderStats();renderNowPlaying();renderStatus();
-  const t=activeTab();
-  if(t==='timeline')renderTimeline();
-  if(t==='heatmap')renderHeatmaps();
-  if(t==='top'){renderTop();renderCrossStation()}
-  if(t==='trends'){renderTrends();renderBpmKey()}
-  if(t==='history')renderHistory();
-  if(t==='clusters')renderClusters();
-}
+/* ── Init ── */
+async function init() {
+  await fetchAll();
+  renderPills();
+  renderAll();
+  // Set initial button states
+  document.getElementById('histDedupBtn').classList.add('active');
 
-async function fetchLive(){
-  // Now Playing data comes from current.json via Supabase. No localhost fetches
-  // from an HTTPS page — those trigger Chrome Private Network Access prompts.
-  // On the collector machine, access the proxies directly.
-  D.live=null;
-}
-
-async function fetchAll(){
-  try{
-    // Cheap first: one small request tells us which of the 11 files actually
-    // moved. Everything unchanged is served from fileCache without a request.
-    manifest=(await loadJSON('manifest.json')||{}).files||{};
-
-    const[st,cur,stats,timeline,heatmap,trends,top,cross,hist,nonMusic,clusters,bpmKey]=await Promise.all([
-      loadTracked('stations.json'),loadTracked('current.json'),loadTracked('stats.json'),
-      loadTracked('timeline.json'),loadTracked('heatmap.json'),loadTracked('trends.json'),
-      loadTracked('top.json'),loadTracked('cross_station.json'),loadTracked('history.json'),
-      loadTracked('non_music.json'),loadTracked('clusters.json'),loadTracked('bpm_key.json'),
-    ]);
-    if(st)stations=st;
-    Object.assign(D,{current:cur,stats,timeline,heatmap,trends,top,cross,history:hist,nonMusic,clusters,bpmKey});
-    document.getElementById('stationCount').textContent=stations.length||'8';
-    await fetchLive();
-    if(!document.getElementById('pills').innerHTML)renderPills();
+  // Poll
+  setInterval(async () => {
+    await fetchAll();
     renderAll();
-    // Spotify auth is checked on user click only — no auto-fetch to localhost
-    // which triggers Chrome Private Network Access prompts on HTTPS pages.
-  }catch(e){
-    console.warn(e);
-    document.getElementById('statusDot').className='dot off';
-    document.getElementById('statusText').textContent='שגיאה';
-  }
+  }, POLL);
 }
-fetchAll();setInterval(fetchAll,POLL);
-document.getElementById('topTimeWindow').onchange=renderTop;
+
+// Restore tab from URL hash
+(function () {
+  const t = location.hash.slice(1);
+  if (t && ['np', 'insights', 'deep'].includes(t)) {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    const btn = document.querySelector('.tab-btn[data-tab="' + t + '"]');
+    if (btn) {
+      btn.classList.add('active');
+      document.getElementById('tab-' + t).classList.add('active');
+      document.getElementById('pills').style.display = t === 'np' ? 'none' : 'flex';
+    }
+  }
+})();
+
+init();
 </script>
-<script src="analytics.js"></script>
 </body>
 </html>

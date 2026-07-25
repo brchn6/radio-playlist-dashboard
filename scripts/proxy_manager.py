@@ -25,9 +25,9 @@ SHAZAMIO_SCRIPT = PROJECT_ROOT / "shazamio" / "shazamio_proxy.py"
 SHAZAMIO_DIR = PROJECT_ROOT / "shazamio"
 VENV_PYTHON = SHAZAMIO_DIR / ".venv" / "bin" / "python"
 
-# Import station config from db.py
+# Import station config
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
-from db import STATIONS_CONFIG, PlaylistDB  # noqa: E402
+from supabase_db import STATIONS_CONFIG  # noqa: E402
 
 # Seconds a proxy waits after a successful recognition before sampling again.
 # This is the main lever on Shazam call volume: 8 stations at 20s was ~2k
@@ -59,7 +59,11 @@ def is_running(slug: str) -> tuple[bool, int]:
     pid_file = _pid_file(slug)
     if not pid_file.exists():
         return False, 0
-    pid = int(pid_file.read_text().strip())
+    raw = pid_file.read_text().strip()
+    if not raw:
+        pid_file.unlink(missing_ok=True)
+        return False, 0
+    pid = int(raw)
     try:
         os.kill(pid, 0)  # signal 0 = test existence
     except (OSError, ProcessLookupError):

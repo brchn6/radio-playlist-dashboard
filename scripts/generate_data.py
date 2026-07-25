@@ -22,6 +22,13 @@ Files written to docs/data/:
 from __future__ import annotations
 
 import json
+import sys
+from pathlib import Path
+
+# Ensure scripts/ is on the path for sibling imports (supabase_db, etc.)
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 
 import numpy as np
 
@@ -31,11 +38,10 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from db import PlaylistDB
+from supabase_db import SupabaseDB
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
-DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
 
 IL_TZ = ZoneInfo("Asia/Jerusalem")
 
@@ -147,17 +153,24 @@ def build_top(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
 
 
 def build_heatmap(tracks: list[dict[str, Any]], slugs: list[str], now: datetime) -> dict[str, Any]:
-    station_cutoff = now - timedelta(days=HEATMAP_STATION_DAYS)
-    dow_cutoff = now - timedelta(days=HEATMAP_DOW_DAYS)
+    # Use naive Israel-time for comparison so that day boundaries align with
+    # Asia/Jerusalem midnight rather than UTC midnight. Both _dt and now come
+    # in as UTC-aware; converting both to naive IL keeps the "last N days"
+    # window equivalent while making the hour-of-day aggregation consistent
+    # with the IL-based _il field.
+    now_naive = now.astimezone(IL_TZ).replace(tzinfo=None)
+    station_cutoff = now_naive - timedelta(days=HEATMAP_STATION_DAYS)
+    dow_cutoff = now_naive - timedelta(days=HEATMAP_DOW_DAYS)
 
     station_hour = {s: [0] * 24 for s in slugs}
     dow_hour = [[0] * 24 for _ in range(7)]  # 0 = Sunday (Israeli week)
 
     for t in tracks:
         il = t["_il"]
-        if t["_dt"] >= station_cutoff and t["station_slug"] in station_hour:
+        _dt_naive = t["_dt"].astimezone(IL_TZ).replace(tzinfo=None)
+        if _dt_naive >= station_cutoff and t["station_slug"] in station_hour:
             station_hour[t["station_slug"]][il.hour] += 1
-        if t["_dt"] >= dow_cutoff:
+        if _dt_naive >= dow_cutoff:
             dow_hour[(il.weekday() + 1) % 7][il.hour] += 1
 
     return {
@@ -168,7 +181,7 @@ def build_heatmap(tracks: list[dict[str, Any]], slugs: list[str], now: datetime)
     }
 
 
-def build_non_music(db: PlaylistDB, slugs: list[str], now: datetime) -> dict[str, Any] | None:
+def build_non_music(db: SupabaseDB, slugs: list[str], now: datetime) -> dict[str, Any] | None:
     """Minutes of talk/commercials/unrecognized audio per station per IL hour (7d).
     Returns None when the non-music agent hasn't logged anything yet."""
     intervals = db.get_non_music_intervals(days=HEATMAP_STATION_DAYS)
@@ -598,9 +611,71 @@ def build_bpm_key(tracks: list[dict[str, Any]],
     }
 
 
+def build_transitions(tracks: list[dict[str, Any]], slugs: list[str]) -> dict[str, Any]:
+    """Compute song transitions: which tracks follow which.
+    
+    For each station, find consecutive tracks (within 5 min window) and count
+    how many times track B follows track A. Returns top transitions per station.
+    """
+    TRANSITION_WINDOW_MIN = 5
+    TOP_N = 20
+    
+    by_station: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for t in tracks:
+        by_station[t["station_slug"]].append(t)
+    
+    stations_out: dict[str, Any] = {}
+    for slug in slugs:
+        st = by_station.get(slug, [])
+        if len(st) < 2:
+            continue
+        
+        # Sort by time (oldest first)
+        st_sorted = sorted(st, key=lambda x: x["_dt"])
+        
+        # Count transitions
+        transition_counts: dict[str, dict[str, Any]] = {}
+        for i in range(len(st_sorted) - 1):
+            t1 = st_sorted[i]
+            t2 = st_sorted[i + 1]
+            
+            # Check if within window
+            delta_min = (t2["_dt"] - t1["_dt"]).total_seconds() / 60
+            if delta_min > TRANSITION_WINDOW_MIN:
+                continue
+            
+            key = (t1["artist"] or "").lower() + "|" + (t1["title"] or "").lower() + "|" + \
+                  (t2["artist"] or "").lower() + "|" + (t2["title"] or "").lower()
+            
+            if key not in transition_counts:
+                transition_counts[key] = {
+                    "from_artist": t1["artist"],
+                    "from_title": t1["title"],
+                    "to_artist": t2["artist"],
+                    "to_title": t2["title"],
+                    "count": 0,
+                }
+            transition_counts[key]["count"] += 1
+        
+        # Calculate probabilities and sort
+        transitions = list(transition_counts.values())
+        total_transitions = sum(t["count"] for t in transitions)
+        for t in transitions:
+            t["probability"] = t["count"] / total_transitions if total_transitions > 0 else 0
+        
+        transitions.sort(key=lambda x: -x["count"])
+        
+        stations_out[slug] = {
+            "transitions": transitions[:TOP_N],
+            "total_transitions": total_transitions,
+        }
+    
+    return {"stations": stations_out}
+
+
 def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    db = PlaylistDB(DB_PATH)
+    db = SupabaseDB()
     stations = db.get_stations()
     slugs = [s["slug"] for s in stations]
     total_count = db.get_all_tracks_count()
@@ -633,16 +708,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
 
     write_json(output_dir / "top.json", {"windows": build_top(tracks, now)}, sizes, "top.json")
 
-    tl_cutoff = now - timedelta(hours=TIMELINE_HOURS)
-    write_json(output_dir / "timeline.json", {
-        "hours": TIMELINE_HOURS,
-        "points": [{"a": t["artist"], "t": t["title"], "s": t["station_slug"],
-                    "ts": t["recognized_at"]}
-                   for t in tracks if t["_dt"] >= tl_cutoff],
-    }, sizes, "timeline.json")
-
-    write_json(output_dir / "heatmap.json", build_heatmap(tracks, slugs, now), sizes, "heatmap.json")
-    write_json(output_dir / "non_music.json", build_non_music(db, slugs, now), sizes, "non_music.json")
+    # v2: removed timeline.json, heatmap.json, non_music.json
     trends = build_trends(tracks, now)
 
     # ── Per-station redundancy (repeat-safe tracks only) ──
@@ -709,6 +775,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     else:
         write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
     write_json(output_dir / "bpm_key.json", build_bpm_key(tracks, slugs), sizes, "bpm_key.json")
+    write_json(output_dir / "transitions.json", build_transitions(tracks, slugs), sizes, "transitions.json")
 
     # headline stats — the only file that always changes (updated_at heartbeat)
     stats = db.get_stats()

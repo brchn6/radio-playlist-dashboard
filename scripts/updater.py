@@ -2,23 +2,21 @@
 """
 1036 Playlist Dashboard — Multi-Station Updater Daemon.
 
-Polls ALL ShazamIO proxy instances, stores new tracks in SQLite (tagged by
-station_id), mirrors them into Supabase Postgres, and publishes the precomputed
-aggregates to Supabase Storage for the dashboard to read.
+Polls ALL ShazamIO proxy instances, stores new tracks directly into Supabase
+Postgres (source of truth), and publishes the precomputed aggregates to
+Supabase Storage for the dashboard to read.
 
 This daemon does NOT touch git. It used to `git commit && git push` docs/data
 every 120s — ~720 commits/day — which is what put the GitHub account at risk.
-The data layer now lives in Supabase; GitHub Pages only serves the static
-frontend, deployed by .github/workflows/deploy.yml on real code commits.
+The data layer now lives entirely in Supabase; GitHub Pages only serves the
+static frontend, deployed by .github/workflows/deploy.yml on real code commits.
 
-SQLite remains the source of truth. Supabase is a published mirror, and every
-call into it is best-effort: if Supabase is down, collection continues and
-`scripts/migrate_to_supabase.py` reconciles the gap afterwards.
+Reliability: if a Supabase write fails, the row goes into a local retry queue
+(data/retry_queue.jsonl) and is retried on every cycle. No data is lost.
 """
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import signal
@@ -33,19 +31,15 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from db import PlaylistDB, STATIONS_CONFIG, STATIONS_BY_PORT  # noqa: E402
+from supabase_db import SupabaseDB, STATIONS_CONFIG, STATIONS_BY_PORT  # noqa: E402
 from publish import generate_and_publish  # noqa: E402
-from supabase_client import insert_track as supabase_insert_track  # noqa: E402
 
-DB_PATH = PROJECT_ROOT / "data" / "playlist.db"
+RETRY_QUEUE_PATH = PROJECT_ROOT / "data" / "retry_queue.jsonl"
 
 # ── defaults ───────────────────────────────────────────────────────────
 DEFAULT_INTERVAL = 20
 RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
 CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll
-# A song longer than this window would be logged twice; a replay sooner than it
-# would be missed. 30 min clears the longest tracks and is well under how soon
-# radio repeats a hit.
 DEDUPE_WINDOW_MINUTES = int(os.environ.get("DEDUPE_WINDOW_MINUTES", "30"))
 
 running = True
@@ -61,6 +55,73 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+# ── retry queue ────────────────────────────────────────────────────────
+
+def _queue_path() -> Path:
+    RETRY_QUEUE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    return RETRY_QUEUE_PATH
+
+
+def enqueue_failed_track(row: dict[str, Any]) -> None:
+    """Append a failed track write to the retry queue."""
+    try:
+        with open(_queue_path(), "a") as f:
+            f.write(json.dumps(row, default=str) + "\n")
+    except Exception as exc:
+        print(f"[updater] retry queue write failed: {exc}", flush=True)
+
+
+def flush_retry_queue(db: SupabaseDB) -> int:
+    """Try to re-insert all queued tracks. Returns number flushed."""
+    qp = _queue_path()
+    if not qp.exists() or qp.stat().st_size == 0:
+        return 0
+
+    try:
+        lines = qp.read_text("utf-8").strip().splitlines()
+    except Exception as exc:
+        print(f"[updater] retry queue read failed: {exc}", flush=True)
+        return 0
+
+    if not lines:
+        return 0
+
+    kept: list[str] = []
+    flushed = 0
+    for line in lines:
+        try:
+            row = json.loads(line)
+            ok = db.insert_track(
+                station_id=row["station_id"],
+                artist=row["artist"],
+                title=row["title"],
+                text=row.get("text", ""),
+                url=row.get("url", ""),
+                shazam_key=row.get("shazam_key", ""),
+                isrc=row.get("isrc", ""),
+                bpm=row.get("bpm"),
+                musical_key=row.get("musical_key"),
+                recognized_at=row.get("recognized_at", now_iso()),
+                station_slug=row.get("station_slug", ""),
+            )
+            if ok:
+                flushed += 1
+            else:
+                kept.append(line)
+        except Exception:
+            kept.append(line)
+
+    # Rewrite with only the still-failed lines
+    try:
+        qp.write_text("\n".join(kept) + ("\n" if kept else ""), "utf-8")
+    except Exception as exc:
+        print(f"[updater] retry queue rewrite failed: {exc}", flush=True)
+
+    if flushed:
+        print(json.dumps({"event": "retry_queue_flushed", "count": flushed}), flush=True)
+    return flushed
+
+
 # ── publishing ─────────────────────────────────────────────────────────
 
 def publish() -> None:
@@ -73,8 +134,8 @@ def publish() -> None:
     """
     try:
         generate_and_publish()
-    except Exception as exc:  # noqa: BLE001 - collection must survive anything here
-        print(f"[updater] publish failed (data is safe in SQLite): {exc}", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[updater] publish failed (data is safe in Postgres): {exc}", flush=True)
 
 
 # ── proxy polling ──────────────────────────────────────────────────────
@@ -124,7 +185,7 @@ def main() -> None:
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
 
-    db = PlaylistDB(DB_PATH)
+    db = SupabaseDB()
     stations = db.get_stations()
     station_map = {s["proxy_port"]: s["id"] for s in stations}
     slug_map = {s["slug"]: s for s in STATIONS_CONFIG}
@@ -134,6 +195,7 @@ def main() -> None:
         "stations": len(stations),
         "ports": list(station_map.keys()),
         "interval": args.interval,
+        "source": "supabase",
     }), flush=True)
 
     iteration = 0
@@ -141,6 +203,9 @@ def main() -> None:
     while running:
         iteration += 1
         loop_start = time.time()
+
+        # ── Flush any previously failed writes ──
+        flush_retry_queue(db)
 
         # ── Poll each proxy ──
         for s in stations:
@@ -151,21 +216,18 @@ def main() -> None:
             track = extract_track(proxy_state)
 
             if not track:
-                # No song detected — log as non-music (commercials, talk, silence)
+                # No song detected — log as non-music
                 open_event = db.get_open_non_music_event(station_id)
                 if open_event:
-                    # Extend the ongoing non-music interval
                     db.end_non_music_event(station_id)
                 else:
-                    # Start a new non-music interval
                     db.start_non_music_event(station_id, reason="unknown")
                 continue
 
             # Song detected — close any open non-music interval
             db.end_non_music_event(station_id)
 
-            # Same song across consecutive samples of one play → one row.
-            # The same song hours later is a genuine replay → its own row.
+            # Dedup within window
             if db.track_exists(
                 station_id=station_id,
                 shazam_key=track.get("shazam_key", ""),
@@ -176,9 +238,10 @@ def main() -> None:
                 continue  # still the same play
 
             # New track!
+            slug = s["slug"]
             print(json.dumps({
                 "event": "new_track",
-                "station": s["slug"],
+                "station": slug,
                 "artist": track["artist"],
                 "title": track["title"],
                 "text": track.get("text", ""),
@@ -187,9 +250,8 @@ def main() -> None:
 
             recognized_at = track.get("recognized_at", now_iso())
 
-            # SQLite first — it is the source of truth and the dedupe window
-            # (db.track_exists, above) reads from it.
-            db.insert_track(
+            # Write directly to Supabase Postgres
+            ok = db.insert_track(
                 station_id=station_id,
                 artist=track["artist"],
                 title=track["title"],
@@ -200,29 +262,32 @@ def main() -> None:
                 bpm=track.get("bpm"),
                 musical_key=track.get("musical_key"),
                 recognized_at=recognized_at,
+                station_slug=slug,
             )
 
-            # Then mirror to Postgres. Best-effort: supabase_insert_track never
-            # raises, so a Supabase outage cannot stop us collecting. The row is
-            # already durable in SQLite, and migrate_to_supabase.py is an
-            # idempotent upsert, so re-running it later fills any gap.
-            supabase_insert_track({
-                "station_id": station_id,
-                "station_slug": s["slug"],
-                "artist": track["artist"],
-                "title": track["title"],
-                "text": track.get("text", ""),
-                "url": track.get("url", ""),
-                "shazam_key": track.get("shazam_key", ""),
-                "isrc": track.get("isrc") or None,
-                "bpm": track.get("bpm"),
-                "musical_key": track.get("musical_key"),
-                "recognized_at": recognized_at,
-            })
+            if not ok:
+                # Supabase write failed — save to retry queue
+                enqueue_failed_track({
+                    "station_id": station_id,
+                    "station_slug": slug,
+                    "artist": track["artist"],
+                    "title": track["title"],
+                    "text": track.get("text", ""),
+                    "url": track.get("url", ""),
+                    "shazam_key": track.get("shazam_key", ""),
+                    "isrc": track.get("isrc", ""),
+                    "bpm": track.get("bpm"),
+                    "musical_key": track.get("musical_key"),
+                    "recognized_at": recognized_at,
+                })
+                print(json.dumps({
+                    "event": "track_queued",
+                    "station": slug,
+                    "artist": track["artist"],
+                    "title": track["title"],
+                }), flush=True)
 
         # ── Regenerate + publish the aggregates ──
-        # No git anywhere. publish() uploads only the files whose content hash
-        # actually changed, so an idle cycle costs ~3 KB instead of 1.5 MB.
         publish()
 
         # ── Periodic cleanup ──
@@ -243,4 +308,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import argparse
     main()
