@@ -104,7 +104,25 @@ def generate_and_publish(
     Supabase project.
     """
     SITE_DATA.mkdir(parents=True, exist_ok=True)
-    generate_all(SITE_DATA)
+    # Run generate_data.py as a subprocess for reliable module loading
+    import subprocess, sys as _sys
+    gen_script = str(PROJECT_ROOT / "scripts" / "generate_data.py")
+    result = subprocess.run(
+        [_sys.executable, gen_script],
+        cwd=str(PROJECT_ROOT),
+        capture_output=True, text=True, timeout=300,
+    )
+    if result.returncode != 0:
+        print(f"[publish] generate_data failed: {result.stderr.strip()}", flush=True)
+        return {"changed": 0, "uploaded": 0, "bytes": 0}
+    # Copy generated files from docs/data to site-data
+    import shutil
+    src = PROJECT_ROOT / "docs" / "data"
+    if src.exists():
+        if SITE_DATA.exists():
+            shutil.rmtree(SITE_DATA)
+        shutil.copytree(str(src), str(SITE_DATA), dirs_exist_ok=True)
+    print(f"[publish] generated {len(list(SITE_DATA.rglob('*.json')))} files", flush=True)
 
     files = collect_files()
     state = {} if force else load_state()
