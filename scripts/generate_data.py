@@ -524,9 +524,14 @@ def build_bpm_key(tracks: list[dict[str, Any]],
 
     # ── Generate all 15-min slots for the full 48h period ──────────────
     total_slots = BPM_LOOKBACK_HOURS * 60 // BPM_BUCKET_MINUTES  # 192
+    # Round now DOWN to nearest bucket boundary so slots align with bucket keys
+    bucket_now = now.replace(
+        minute=(now.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES,
+        second=0, microsecond=0,
+    )
     all_slots: list[str] = []
     for i in range(total_slots):
-        slot_time = now - timedelta(minutes=i * BPM_BUCKET_MINUTES)
+        slot_time = bucket_now - timedelta(minutes=i * BPM_BUCKET_MINUTES)
         all_slots.append(slot_time.strftime("%H:%M"))
     all_slots.reverse()  # chronological
     slot_index: dict[str, int] = {s: i for i, s in enumerate(all_slots)}
@@ -597,11 +602,28 @@ def build_bpm_key(tracks: list[dict[str, Any]],
                 bpm_realtime_counts.append(0)
 
         # ── Keys realtime: key × time heatmap matrix ──────────────────
+        # Normalize database key names (e.g. "C major" → "C", "A minor" → "Am")
+        def normalize_key(raw: str) -> str:
+            r = raw.strip().replace("\u266d", "b").replace("\u266f", "#").replace("\u266e", "")
+            # Handle "C major" → "C", "C minor" → "Cm"
+            is_minor = "minor" in r.lower()
+            r = r.lower().replace(" major", "").replace(" minor", "").strip()
+            # Map alternative spellings
+            aliases = {"db": "c#", "gb": "f#", "ab": "g#", "eb": "d#", "bb": "a#",
+                       "c#": "c#", "f#": "f#", "g#": "g#", "d#": "d#", "a#": "a#"}
+            r = aliases.get(r, r)
+            # Capitalize first letter
+            r = r.capitalize() if r else ""
+            if is_minor and r and not r.endswith("m"):
+                r += "m"
+            return r
+
         matrix: list[list[int]] = [[0] * total_slots for _ in range(len(key_labels))]
         for t in st_recent:
             k = t.get("musical_key")
             if k:
-                ki = key_index_map.get(k)
+                nk = normalize_key(k)
+                ki = key_index_map.get(nk)
                 if ki is not None:
                     il = t["_il"]
                     bucket_min = (il.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES
@@ -1102,9 +1124,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
 
     cross_tracks = db.get_cross_station_tracks()
     for t in cross_tracks:
-        slugs = (t.get("station_slugs") or "").split(",")
+        station_slugs = (t.get("station_slugs") or "").split(",")
         per_station: dict[str, int] = {}
-        for slug in slugs:
+        for slug in station_slugs:
             slug = slug.strip()
             if not slug:
                 continue
