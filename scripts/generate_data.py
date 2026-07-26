@@ -1156,11 +1156,6 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     else:
         write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
     write_json(output_dir / "bpm_key.json", build_bpm_key(tracks, slugs), sizes, "bpm_key.json")
-    # Verify what was written
-    import json as _json
-    _verify = _json.load(open(output_dir / "bpm_key.json"))
-    _has_br = any("bpm_realtime" in s for s in _verify.get("stations", {}).values())
-    print(f"  [bpm_key] stations={len(_verify.get('stations',{}))}, has_bpm_realtime={_has_br}", flush=True)
     transitions_result = build_transitions(tracks, slugs)
     write_json(output_dir / "transitions.json", {"stations": transitions_result["stations"]}, sizes, "transitions.json")
 
