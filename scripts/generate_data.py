@@ -56,6 +56,10 @@ HEATMAP_DOW_DAYS = 30
 TRENDS_DAYS = 30
 RISING_MIN_PLAYS = 3
 
+# ── BPM realtime ─────────────────────────────────────────────────────────
+BPM_LOOKBACK_HOURS = 48
+BPM_BUCKET_MINUTES = 15
+
 # ── Repeat-data epoch ──────────────────────────────────────────────────
 # Until this moment the collector deduped tracks against ALL of history, so a
 # song replayed later on the same station was silently dropped: every track
@@ -501,22 +505,38 @@ def build_trends(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
 
 def build_bpm_key(tracks: list[dict[str, Any]],
                    slugs: list[str]) -> dict[str, Any]:
-    """Build BPM and musical-key aggregates per station.
+    """Build BPM and musical-key aggregates with real-time 15-min granularity.
 
-    Only considers tracks where bpm IS NOT NULL (the rest are older tracks
-    collected before BPM/key detection was added on 2026-07-14).
+    Realtime data uses the last 48 hours bucketed into 15-minute intervals.
+    Also retains all-time BPM statistics and key distribution per station,
+    plus cross-station BPM-by-key and BPM-by-hour aggregates.
 
-    Returns:
-        dict with:
-          - stations: {slug: {bpm: {mean, min, max, histogram, by_hour},
-                              keys: {key_name: count}},
-          - cross_station: {bpm_by_key: {key_name: {mean_bpm, count}},
-                            bpm_by_hour: [{hour, mean_bpm, count}]}
+    Only considers tracks where bpm IS NOT NULL.
     """
     # Filter to tracks with BPM data
     with_bpm = [t for t in tracks if t.get("bpm") is not None]
     if not with_bpm:
-        return {"stations": {}, "cross_station": {}}
+        return {"stations": {}, "cross_station": {}, "lookback": {}, "global": {}}
+
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(hours=BPM_LOOKBACK_HOURS)
+    recent_bpm = [t for t in with_bpm if t["_dt"] >= cutoff]
+
+    # ── Generate all 15-min slots for the full 48h period ──────────────
+    total_slots = BPM_LOOKBACK_HOURS * 60 // BPM_BUCKET_MINUTES  # 192
+    all_slots: list[str] = []
+    for i in range(total_slots):
+        slot_time = now - timedelta(minutes=i * BPM_BUCKET_MINUTES)
+        all_slots.append(slot_time.strftime("%H:%M"))
+    all_slots.reverse()  # chronological
+    slot_index: dict[str, int] = {s: i for i, s in enumerate(all_slots)}
+
+    # ── Key labels sorted by circle of fifths ──────────────────────────
+    key_labels = [
+        "C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F",
+        "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m",
+    ]
+    key_index_map: dict[str, int] = {k: i for i, k in enumerate(key_labels)}
 
     # Per-station grouping
     by_slug: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -533,7 +553,7 @@ def build_bpm_key(tracks: list[dict[str, Any]],
         if len(bpm_vals) == 0:
             continue
 
-        # BPM stats
+        # ── BPM stats (all-time, by_hour removed) ─────────────────────
         mean_bpm = float(np.mean(bpm_vals))
         median_bpm = float(np.median(bpm_vals))
         min_bpm = float(np.min(bpm_vals))
@@ -548,30 +568,49 @@ def build_bpm_key(tracks: list[dict[str, Any]],
             for i in range(len(hist_counts))
         ]
 
-        # BPM by hour (IL time)
-        hour_map: dict[int, list[float]] = defaultdict(list)
-        for t in st:
-            il_hour = t["_il"].hour
-            if t["bpm"] is not None:
-                hour_map[il_hour].append(t["bpm"])
-        by_hour = []
-        for h in range(24):
-            vals = hour_map.get(h, [])
-            if vals:
-                by_hour.append({
-                    "hour": h,
-                    "mean_bpm": round(float(np.mean(vals)), 1),
-                    "median_bpm": round(float(np.median(vals)), 1),
-                    "count": len(vals),
-                })
-
-        # Key distribution
+        # ── Key distribution (all-time, same as before) ───────────────
         keys: dict[str, int] = defaultdict(int)
         for t in st:
             k = t.get("musical_key")
             if k:
                 keys[k] += 1
         keys_sorted = dict(sorted(keys.items(), key=lambda x: -x[1]))
+
+        # ── BPM realtime: 15-min buckets (last 48h) ───────────────────
+        st_recent = [t for t in st if t["_dt"] >= cutoff]
+        bucket_bpms: dict[str, list[float]] = defaultdict(list)
+        for t in st_recent:
+            il = t["_il"]
+            bucket_min = (il.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES
+            bucket_key = f"{il.hour:02d}:{bucket_min:02d}"
+            bucket_bpms[bucket_key].append(t["bpm"])
+
+        bpm_realtime_data: list[float | None] = []
+        bpm_realtime_counts: list[int] = []
+        for slot in all_slots:
+            vals = bucket_bpms.get(slot, [])
+            if vals:
+                bpm_realtime_data.append(round(float(np.mean(vals)), 1))
+                bpm_realtime_counts.append(len(vals))
+            else:
+                bpm_realtime_data.append(None)
+                bpm_realtime_counts.append(0)
+
+        # ── Keys realtime: key × time heatmap matrix ──────────────────
+        matrix: list[list[int]] = [[0] * total_slots for _ in range(len(key_labels))]
+        for t in st_recent:
+            k = t.get("musical_key")
+            if k:
+                ki = key_index_map.get(k)
+                if ki is not None:
+                    il = t["_il"]
+                    bucket_min = (il.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES
+                    bucket_key = f"{il.hour:02d}:{bucket_min:02d}"
+                    si = slot_index.get(bucket_key)
+                    if si is not None:
+                        matrix[ki][si] += 1
+
+        key_totals: dict[str, int] = {key_labels[ki]: sum(row) for ki, row in enumerate(matrix)}
 
         stations_out[slug] = {
             "bpm": {
@@ -582,12 +621,26 @@ def build_bpm_key(tracks: list[dict[str, Any]],
                 "std": round(std_bpm, 1),
                 "count": len(bpm_vals),
                 "histogram": histogram,
-                "by_hour": by_hour,
+            },
+            "bpm_realtime": {
+                "lookback_hours": BPM_LOOKBACK_HOURS,
+                "bucket_minutes": BPM_BUCKET_MINUTES,
+                "slots": all_slots,
+                "data": bpm_realtime_data,
+                "counts": bpm_realtime_counts,
+                "total_detections": sum(bpm_realtime_counts),
             },
             "keys": keys_sorted,
+            "keys_realtime": {
+                "lookback_hours": BPM_LOOKBACK_HOURS,
+                "key_labels": key_labels,
+                "slot_labels": all_slots,
+                "matrix": matrix,
+                "totals": key_totals,
+            },
         }
 
-    # Cross-station: BPM by key
+    # ── Cross-station: BPM by key (all-time, unchanged) ────────────────
     bpm_by_key: dict[str, list[float]] = defaultdict(list)
     cross_by_hour: dict[int, list[float]] = defaultdict(list)
     for t in with_bpm:
@@ -613,7 +666,6 @@ def build_bpm_key(tracks: list[dict[str, Any]],
                 "count": len(vals),
             })
 
-    now = datetime.now(timezone.utc)
     return {
         "stations": stations_out,
         "cross_station": {
@@ -621,10 +673,16 @@ def build_bpm_key(tracks: list[dict[str, Any]],
             "bpm_by_hour": cross_hour_out,
         },
         "lookback": {
-            "start": REPEAT_DATA_EPOCH.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "start": (now - timedelta(hours=BPM_LOOKBACK_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "end": now_iso(),
-            "days": round((now - REPEAT_DATA_EPOCH).total_seconds() / 86400, 1),
-            "description": "כל הדאטה הזמינה מ-REPEAT_DATA_EPOCH",
+            "days": round(BPM_LOOKBACK_HOURS / 24, 1),
+            "bucket_minutes": BPM_BUCKET_MINUTES,
+            "description": f"BPM ב-{BPM_BUCKET_MINUTES} דקות ב-{BPM_LOOKBACK_HOURS} השעות האחרונות",
+        },
+        "global": {
+            "lookback_hours": BPM_LOOKBACK_HOURS,
+            "bucket_minutes": BPM_BUCKET_MINUTES,
+            "all_slots": all_slots,
         },
     }
 
@@ -663,6 +721,7 @@ def build_transitions(tracks: list[dict[str, Any]], slugs: list[str]) -> dict[st
         return "night"
 
     stations_out: dict[str, Any] = {}
+    from_song_map: dict[str, Any] = defaultdict(dict)
     for slug in slugs:
         st = by_station.get(slug, [])
         if len(st) < 2:
@@ -836,7 +895,33 @@ def build_transitions(tracks: list[dict[str, Any]], slugs: list[str]) -> dict[st
             "hour_distribution": hour_distribution,
         }
 
-    return {"stations": stations_out}
+        # ── Build from-song map for transition explorer ─────────────
+        for fk, f_meta in song_meta.items():
+            outgoing = out_of_song.get(fk, {})
+            if not outgoing:
+                continue
+            denom = from_total.get(slug + "|" + fk, 0)
+            outgoing_list = []
+            for tk, cnt in sorted(outgoing.items(), key=lambda x: -x[1]):
+                meta = song_meta.get(tk, {"artist": "?", "title": "?"})
+                prob = round(cnt / denom * 100, 1) if denom > 0 else 0
+                outgoing_list.append({
+                    "artist": meta["artist"],
+                    "title": meta["title"],
+                    "count": cnt,
+                    "probability": prob,
+                    "station": slug,
+                })
+            from_song_map[slug][fk] = {
+                "artist": f_meta["artist"],
+                "title": f_meta["title"],
+                "outgoing": outgoing_list,
+            }
+
+    return {
+        "stations": stations_out,
+        "_from_song_map": dict(from_song_map),
+    }
 
 
 def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
@@ -1010,8 +1095,31 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         "daily_trend": dict(daily_rep_trend),
     }
     write_json(output_dir / "trends.json", trends, sizes, "trends.json")
+    # ── Cross-station: enrich with per-station play counts ──────────
+    station_song_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for tr in tracks:
+        station_song_counts[tr["station_slug"]][song_key(tr)] += 1
+
+    cross_tracks = db.get_cross_station_tracks()
+    for t in cross_tracks:
+        slugs = (t.get("station_slugs") or "").split(",")
+        per_station: dict[str, int] = {}
+        for slug in slugs:
+            slug = slug.strip()
+            if not slug:
+                continue
+            count = station_song_counts.get(slug, {}).get(song_key(t), 0)
+            if count > 0:
+                per_station[slug] = count
+        total = sum(per_station.values())
+        t["per_station"] = per_station
+        t["pct_by_station"] = {
+            slug: round(count / total * 100, 1)
+            for slug, count in per_station.items()
+        } if total > 0 else {}
+
     write_json(output_dir / "cross_station.json",
-               {"tracks": db.get_cross_station_tracks()}, sizes, "cross_station.json")
+               {"tracks": cross_tracks}, sizes, "cross_station.json")
     # Cluster graph is a meta-analysis: only regenerate every CLUSTER_REFRESH_HOURS.
     # The 30-second poll shouldn't shuffle the force graph — it's confusing and wasteful.
     cluster_path = output_dir / "clusters.json"
@@ -1026,7 +1134,27 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     else:
         write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
     write_json(output_dir / "bpm_key.json", build_bpm_key(tracks, slugs), sizes, "bpm_key.json")
-    write_json(output_dir / "transitions.json", build_transitions(tracks, slugs), sizes, "transitions.json")
+    transitions_result = build_transitions(tracks, slugs)
+    write_json(output_dir / "transitions.json", {"stations": transitions_result["stations"]}, sizes, "transitions.json")
+
+    # ── Transition explorer map ────────────────────────────────────
+    from_song_map = transitions_result.get("_from_song_map", {})
+    transition_map_stations: dict[str, Any] = {}
+    transition_map_songs_mapped = 0
+    for slug, songs in from_song_map.items():
+        song_entries: dict[str, Any] = {}
+        for fk, entry in songs.items():
+            song_entries[fk] = entry
+            transition_map_songs_mapped += 1
+        transition_map_stations[slug] = {"songs": song_entries}
+
+    write_json(output_dir / "transition_map.json", {
+        "stations": transition_map_stations,
+        "meta": {
+            "total_songs_mapped": transition_map_songs_mapped,
+            "formula": {"probability": "P(B|A) = count(A→B) / count(A→*)"},
+        },
+    }, sizes, "transition_map.json")
 
     # headline stats — the only file that always changes (updated_at heartbeat)
     stats = db.get_stats()

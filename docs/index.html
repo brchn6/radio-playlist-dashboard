@@ -264,6 +264,78 @@
     .sparkline{display:block;margin:4px auto;max-width:100%}
     .red-legend{display:flex;gap:8px;font-size:.65rem;color:var(--muted);justify-content:center;margin:6px 0}
 
+    /* ── Radio Dashboard v2.5 — New styles ── */
+
+    /* Sticky station pills */
+    .pills-sticky { position: sticky; top: 42px; z-index: 99; background: var(--bg); padding: 6px 0; }
+    .pills-sticky::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--border); }
+
+    /* Cross-station donut */
+    .cross-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(37,41,64,.5); }
+    .cross-row:last-child { border-bottom: none; }
+    .cross-donut { flex-shrink: 0; cursor: pointer; }
+    .cross-donut svg { display: block; }
+    .cross-info { flex: 1; min-width: 0; }
+    .cross-song { font-weight: 600; font-size: .84rem; }
+    .cross-artist { font-size: .74rem; color: var(--muted); }
+    .cross-meta { font-size: .68rem; color: var(--muted); margin-top: 2px; }
+    .cross-stations { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+
+    /* BPM current time indicator */
+    .bpm-current-time { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); opacity: .5; pointer-events: none; z-index: 5; border-left: 1px dashed var(--accent); }
+    .bpm-time-range-pills { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+
+    /* Key heatmap */
+    .key-heatmap-wrapper { overflow-x: auto; margin: 4px 0; }
+    .key-heatmap { display: flex; flex-direction: column; gap: 1px; }
+    .key-heatmap-row { display: flex; align-items: center; gap: 2px; }
+    .key-heatmap-labels { display: flex; gap: 2px; margin-bottom: 2px; padding-left: 32px; }
+    .key-heatmap-label { font-size: .55rem; color: var(--muted); flex-shrink: 0; width: 8px; text-align: center; white-space: nowrap; transform: rotate(-45deg); transform-origin: left center; }
+    .key-hm-label { width: 30px; font-size: .6rem; color: var(--muted); text-align: left; flex-shrink: 0; direction: ltr; }
+    .key-cell { width: 8px; height: 8px; border-radius: 1px; flex-shrink: 0; cursor: pointer; }
+    .key-cell:hover { outline: 1px solid var(--fg); outline-offset: -1px; }
+
+    /* Cluster card */
+    .cluster-controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+    .cluster-search { flex: 1; min-width: 140px; font-size: .78rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--fg); font-family: var(--font); }
+    .cluster-hero { padding: 12px; background: var(--card-hover); border-radius: var(--radius); margin-bottom: 10px; text-align: center; }
+    .cluster-hero-title { font-size: 1.1rem; font-weight: 700; }
+    .cluster-hero-artist { font-size: .85rem; color: var(--muted); margin-top: 1px; }
+    .cluster-card { padding: 8px 12px; border-bottom: 1px solid rgba(37,41,64,.5); display: flex; justify-content: space-between; align-items: center; }
+    .cluster-card:last-child { border-bottom: none; }
+    .cluster-card-name { font-weight: 600; font-size: .82rem; }
+    .cluster-card-artist { font-size: .7rem; color: var(--muted); }
+    .cluster-card-count { font-size: .78rem; font-weight: 700; color: var(--accent); flex-shrink: 0; direction: ltr; }
+    .cluster-station-info { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+
+    /* Transition explorer */
+    .explorer-controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+    .explorer-search { flex: 1; min-width: 140px; font-size: .78rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--fg); font-family: var(--font); }
+    .explorer-btn { font-size: .72rem; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; font-family: var(--font); transition: all .15s; touch-action: manipulation; }
+    .explorer-btn:hover { background: var(--card-hover); color: var(--fg); }
+    .explorer-btn.active { color: var(--accent); border-color: rgba(93,219,181,.3); }
+    .explorer-hero { padding: 16px; background: var(--card-hover); border-radius: var(--radius); margin-bottom: 12px; text-align: center; border: 1px solid var(--border); }
+    .explorer-hero-title { font-size: 1.2rem; font-weight: 700; }
+    .explorer-hero-artist { font-size: .9rem; color: var(--muted); margin-top: 2px; }
+    .explorer-hero-badge { display: inline-block; font-size: .65rem; padding: 2px 10px; border-radius: 10px; margin-top: 6px; background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+    .explorer-section-title { font-weight: 700; font-size: .85rem; margin: 10px 0 6px; display: flex; align-items: center; gap: 6px; }
+    .explorer-station-header { font-size: .78rem; font-weight: 700; padding: 6px 0; margin: 6px 0 4px; display: flex; align-items: center; gap: 5px; }
+    .explorer-card { padding: 8px 12px; border-bottom: 1px solid rgba(37,41,64,.5); cursor: pointer; transition: background .1s; }
+    .explorer-card:hover { background: var(--card-hover); border-radius: var(--radius-sm); }
+    .explorer-card:last-child { border-bottom: none; }
+    .explorer-card-main { display: flex; justify-content: space-between; align-items: center; }
+    .explorer-card-title { font-weight: 600; font-size: .82rem; }
+    .explorer-card-artist { font-size: .7rem; color: var(--muted); }
+    .explorer-card-stats { font-size: .74rem; font-weight: 700; color: var(--accent); flex-shrink: 0; direction: ltr; }
+    .explorer-prob-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,.05); margin-top: 4px; }
+    .explorer-prob-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+    .explorer-breadcrumb { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; padding: 8px 10px; background: var(--card-hover); border-radius: var(--radius); margin-top: 10px; font-size: .78rem; }
+    .explorer-breadcrumb-item { cursor: pointer; color: var(--muted); transition: color .15s; }
+    .explorer-breadcrumb-item:hover { color: var(--accent); }
+    .explorer-breadcrumb-arrow { color: var(--accent); font-size: .65rem; }
+    .explorer-empty { text-align: center; padding: 30px; color: var(--muted); font-size: .82rem; }
+    .explorer-nav-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
     /* Uptime card */
     .uptime-status{font-size:.9rem;font-weight:700;margin-bottom:6px}
     .uptime-bar{height:10px;border-radius:5px;background:rgba(255,255,255,.05);margin:6px 0;overflow:hidden}
@@ -302,7 +374,7 @@
 </div>
 
 <!-- Station pills (hidden on Now Playing tab) -->
-<div class="station-pills" id="pills" style="display:none"></div>
+<div class="pills-sticky"><div class="station-pills" id="pills" style="display:none"></div></div>
 
 <!-- ═══ Tab 1: Now Playing ═══ -->
 <div class="tab-content active" id="tab-np">
@@ -393,22 +465,23 @@
   <!-- Song Transitions -->
   <div class="card">
     <div class="section-header">
-      <div class="section-title">🔄 מעברי שירים</div>
-      <div class="section-sub">רצפים מוכרים: אחרי איזה שיר התחנה אוהבת לשים איזה שיר. <strong>×N</strong> = כמה פעמים הרצף הזה זוהה. בחר תחנה לראות רק אצלה.</div>
+      <div class="section-title">🔄 חקר מעברים — Transition Explorer</div>
+      <div class="section-sub">בנה פלייליסט לפי ההיגיון של תחנת הרדיו — אחרי איזה שיר בא איזה שיר</div>
     </div>
-    <div class="window-pills" id="transStationPills"></div>
     <div id="transContent"></div>
   </div>
 
   <!-- Clusters -->
   <div class="card">
     <div class="section-header">
-      <div class="section-title">🔗 אשכולות שירים</div>
-      <div class="section-sub">שירים שתמיד מופיעים יחד — הפלייליסטים הסודיים בתוך כל תחנה</div>
+      <div class="section-title">🔗 שירים שמתנגנים יחד</div>
+      <div class="section-sub">שירים שנמצאים יחד באותו פלייליסט — לפי קרבה בזמן ובתחנה</div>
     </div>
-    <svg id="clusterGraph"></svg>
-    <div class="chart-legend" id="clusterLegend"></div>
-    <div id="clusterDetail" style="margin-top:8px"></div>
+    <div class="cluster-controls">
+      <button class="hist-btn" onclick="pickRandomClusterSong()">🔀 בחר שיר אקראי</button>
+      <input class="cluster-search" id="clusterSearch" placeholder="חפש שיר..." oninput="onClusterSearch()">
+    </div>
+    <div id="clusterContent"><div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div></div>
   </div>
 
   <!-- Redundancy -->
@@ -469,6 +542,8 @@ let histReverse = true;
 let histShown = 80;
 let activeHistoryFilter = null;
 let expandedRedundancySlug = null;
+let bpmTimeRange = '48h';
+const explorerState = { currentSong: null, currentStation: 'all', history: [] };
 
 function filterByTimeWindow(items, window) {
   const now = Date.now();
@@ -567,7 +642,7 @@ async function fetchManifest() {
 
 async function fetchAll() {
   await fetchManifest();
-  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans] = await Promise.all([
+  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans, transMap] = await Promise.all([
     loadTracked('stations.json'),
     loadTracked('current.json'),
     loadTracked('history.json'),
@@ -578,9 +653,10 @@ async function fetchAll() {
     loadTracked('trends.json'),
     loadTracked('stats.json'),
     loadTracked('transitions.json'),
+    loadTracked('transition_map.json'),
   ]);
   if (st) stations = st;
-  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans };
+  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap };
 }
 
 /* ── Tabs ── */
@@ -815,6 +891,39 @@ function onTopRowClick(e) {
   renderHistory();
 }
 
+function renderMiniDonut(perStation, size) {
+  size = size || 36;
+  const total = Object.values(perStation).reduce((a, b) => a + b, 0);
+  if (!total) return '';
+  const cx = size / 2, cy = size / 2, r = size / 2 - 2;
+  const holeR = r * 0.45;
+  let cumulative = 0;
+  let paths = '';
+  const entries = Object.entries(perStation);
+  const colors = {};
+
+  entries.forEach(([slug]) => {
+    colors[slug] = color(slug);
+  });
+
+  entries.forEach(([slug, count], i) => {
+    const pct = count / total;
+    const startAngle = (cumulative / total) * 360;
+    const endAngle = startAngle + pct * 360;
+    const startRad = (startAngle - 90) * Math.PI / 180;
+    const endRad = (endAngle - 90) * Math.PI / 180;
+    const x1 = cx + r * Math.cos(startRad);
+    const y1 = cy + r * Math.sin(startRad);
+    const x2 = cx + r * Math.cos(endRad);
+    const y2 = cy + r * Math.sin(endRad);
+    const largeArc = pct > 0.5 ? 1 : 0;
+    paths += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} Z" fill="${colors[slug]}" opacity="0.85" style="cursor:pointer"/>`;
+    cumulative += count;
+  });
+  paths += `<circle cx="${cx}" cy="${cy}" r="${holeR}" fill="var(--bg)"/>`;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="cross-donut-svg">${paths}</svg>`;
+}
+
 function renderCrossStation() {
   const el = document.getElementById('crossStationList');
   if (!D.cross || !D.cross.tracks) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
@@ -828,10 +937,27 @@ function renderCrossStation() {
       const c = color(sl);
       return '<span class="cross-station-pill" style="color:' + c + ';border-color:' + c + '40">' + esc(name(sl)) + '</span>';
     }).join('');
+
+    // Mini donut if per_station data exists
+    let donutHtml = '';
+    let metaHtml = '';
+    if (t.per_station && Object.keys(t.per_station).length > 0) {
+      donutHtml = '<div class="cross-donut" onclick="event.stopPropagation()">' + renderMiniDonut(t.per_station) + '</div>';
+      const stationCount = Object.keys(t.per_station).length;
+      const totalPlays = Object.values(t.per_station).reduce((a, b) => a + b, 0);
+      metaHtml = '<div class="cross-meta">' + stationCount + ' תחנות · ' + totalPlays + ' השמעות</div>';
+    } else {
+      metaHtml = '<div class="cross-meta">' + t.station_count + ' תחנות · ' + t.total_plays + ' השמעות</div>';
+    }
+
     h += '<div class="cross-row">';
+    h += donutHtml;
+    h += '<div class="cross-info">';
     h += '<div class="cross-song">' + esc(t.title) + '</div>';
-    h += '<div class="cross-artist">' + esc(t.artist) + ' · ' + t.station_count + ' תחנות · ' + t.total_plays + ' השמעות</div>';
+    h += '<div class="cross-artist">' + esc(t.artist) + '</div>';
+    h += metaHtml;
     h += '<div class="cross-stations">' + pills + '</div>';
+    h += '</div>';
     h += '</div>';
   });
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
@@ -934,6 +1060,133 @@ function loadMoreHistory() { histShown += 80; renderHistory(); }
 
 /* ── BPM Flow ── */
 function renderBpmFlow() {
+  // Check for real-time BPM data
+  const hasRealtime = D.bpm && D.bpm.stations && Object.values(D.bpm.stations).some(s => s && s.bpm_realtime);
+  if (hasRealtime) {
+    renderBpmRealtime();
+  } else {
+    renderBpmLegacy();
+  }
+}
+
+function renderBpmRealtime() {
+  // Update section-sub
+  const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
+  if (subEl) {
+    subEl.innerHTML = 'BPM בזמן אמת — קצב השירים ב-48 השעות האחרונות, ברזולוציית 15 דקות';
+  }
+
+  // Station pills
+  const pillsEl = document.getElementById('bpmStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (bpmStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.map(s => '<button class="window-pill' + (bpmStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; bpmStation = b.dataset.s; renderBpmFlow(); };
+
+  if (!D.bpm || !D.bpm.stations || !D.bpm.global || !D.bpm.global.all_slots) return;
+  destroyChart('bpm');
+
+  const ctx = document.getElementById('bpmChart').getContext('2d');
+  const slugs = bpmStation === 'all' ? stations.map(s => s.slug) : [bpmStation];
+  const allSlots = D.bpm.global.all_slots;
+  const datasets = [];
+
+  // Apply time range filter
+  const rangeHours = parseInt(bpmTimeRange) || 48;
+  const slotsToShow = Math.ceil((rangeHours * 60) / (D.bpm.global.bucket_minutes || 15));
+  const slotStart = Math.max(0, allSlots.length - slotsToShow);
+  const visibleSlots = allSlots.slice(slotStart);
+
+  slugs.forEach(slug => {
+    const stData = D.bpm.stations[slug];
+    if (!stData || !stData.bpm_realtime) return;
+    const rt = stData.bpm_realtime;
+    const data = [];
+    const counts = [];
+    allSlots.forEach((slot, i) => {
+      const idx = rt.slots ? rt.slots.indexOf(slot) : -1;
+      if (idx >= 0 && rt.counts && rt.counts[idx] > 0) {
+        data.push(rt.data ? rt.data[idx] : null);
+        counts.push(rt.counts[idx]);
+      } else {
+        data.push(null);
+        counts.push(0);
+      }
+    });
+    datasets.push({
+      label: name(slug),
+      data,
+      counts,
+      borderColor: color(slug),
+      backgroundColor: color(slug) + '20',
+      borderWidth: 2,
+      pointRadius: 1,
+      tension: 0,
+      fill: false,
+      spanGaps: false,
+    });
+  });
+
+  if (!datasets.length) return;
+
+  charts.bpm = new Chart(ctx, {
+    type: 'line',
+    data: { labels: visibleSlots, datasets: datasets.map(ds => ({
+      ...ds,
+      data: ds.data.slice(slotStart),
+      counts: ds.counts.slice(slotStart),
+    })) },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: function(items) {
+              if (!items.length) return '';
+              return '🕐 ' + items[0].label;
+            },
+            label: function(ctx) {
+              const ds = ctx.dataset;
+              const idx = ctx.dataIndex;
+              const val = ctx.parsed.y;
+              const cnt = ds.counts ? ds.counts[idx] : 0;
+              const stName = ds.label || '';
+              let lines = ['📻 ' + stName];
+              lines.push('BPM: ' + (val !== null ? val.toFixed(1) : '—'));
+              lines.push('זוהו: ' + cnt + ' שירים');
+              return lines;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: MUTED, font: { size: 9 }, maxTicksLimit: 20 },
+          grid: { color: GRID + '40' },
+        },
+        y: {
+          ticks: { color: MUTED, font: { size: 10 } },
+          grid: { color: GRID + '40' },
+          title: { display: true, text: 'BPM', color: MUTED },
+        },
+      },
+      interaction: { mode: 'index', intersect: false },
+    },
+  });
+
+  // Legend
+  document.getElementById('bpmLegend').innerHTML = slugs.map(slug => {
+    const stData = D.bpm.stations[slug];
+    const rt = stData && stData.bpm_realtime;
+    const avg = rt && rt.data ? ' — ממוצע ' + (rt.data.filter(v => v !== null).reduce((a, b) => a + b, 0) / (rt.data.filter(v => v !== null).length || 1)).toFixed(0) + ' BPM' : '';
+    return '<span><span class="sw" style="background:' + color(slug) + '"></span>' + esc(name(slug)) + avg + '</span>';
+  }).join('');
+
+  // Add time range pills
+  renderBpmTimeRangePills();
+}
+
+function renderBpmLegacy() {
   // Update section-sub with lookback info
   const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
   if (subEl && D.bpm && D.bpm.lookback) {
@@ -1014,8 +1267,149 @@ function renderBpmFlow() {
   }).join('');
 }
 
+function renderBpmTimeRangePills() {
+  const parent = document.getElementById('bpmLegend');
+  if (!parent) return;
+  // Remove existing range pills if any
+  const existing = document.querySelector('.bpm-time-range-pills');
+  if (existing) existing.remove();
+
+  const pills = document.createElement('div');
+  pills.className = 'bpm-time-range-pills';
+  const ranges = ['6h', '12h', '24h', '48h'];
+  ranges.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'window-pill' + (bpmTimeRange === r ? ' active' : '');
+    btn.textContent = r;
+    btn.dataset.r = r;
+    btn.onclick = () => { bpmTimeRange = r; renderBpmFlow(); };
+    pills.appendChild(btn);
+  });
+  parent.parentNode.insertBefore(pills, parent);
+}
+
 /* ── Key Distribution ── */
 function renderKeyDist() {
+  // Check for real-time key data
+  const hasRealtime = D.bpm && D.bpm.stations && Object.values(D.bpm.stations).some(s => s && s.keys_realtime);
+  if (hasRealtime) {
+    renderKeyDistRealtime();
+  } else {
+    renderKeyDistLegacy();
+  }
+}
+
+function renderKeyDistRealtime() {
+  const subEl = document.querySelector('.card:has(#keyDistContent) .section-sub');
+  if (subEl) {
+    subEl.innerHTML = 'הטביעה המוזיקלית של כל תחנה — סולמות לאורך זמן';
+  }
+
+  const pillsEl = document.getElementById('keyStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (keyStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.map(s => '<button class="window-pill' + (keyStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; keyStation = b.dataset.s; renderKeyDist(); };
+
+  const el = document.getElementById('keyDistContent');
+  if (!D.bpm || !D.bpm.stations) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
+
+  // Aggregate keys_realtime across selected stations
+  const slugs = keyStation === 'all' ? stations.map(s => s.slug) : [keyStation];
+  let mergedKeys = null;
+  let mergedSlots = null;
+
+  slugs.forEach(slug => {
+    const stData = D.bpm.stations[slug];
+    if (!stData || !stData.keys_realtime) return;
+    const kr = stData.keys_realtime;
+    if (!mergedKeys) {
+      mergedKeys = { ...kr };
+      mergedSlots = kr.slot_labels || [];
+    } else {
+      // Merge matrix
+      if (kr.matrix && mergedKeys.matrix) {
+        mergedKeys.matrix = mergedKeys.matrix.map((row, yi) => {
+          if (kr.matrix[yi]) {
+            return row.map((v, xi) => v + (kr.matrix[yi][xi] || 0));
+          }
+          return row;
+        });
+      }
+      // Merge totals
+      if (kr.totals && mergedKeys.totals) {
+        Object.entries(kr.totals).forEach(([k, v]) => {
+          mergedKeys.totals[k] = (mergedKeys.totals[k] || 0) + v;
+        });
+      }
+    }
+  });
+
+  if (!mergedKeys) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
+
+  // Apply BPM time range filter
+  const rangeHours = parseInt(bpmTimeRange) || 48;
+  const bucketMin = D.bpm.global ? (D.bpm.global.bucket_minutes || 15) : 15;
+  const slotsToShow = Math.ceil((rangeHours * 60) / bucketMin);
+
+  let slotLabels = mergedSlots || mergedKeys.slot_labels || [];
+  let matrix = mergedKeys.matrix || [];
+  const keyLabels = mergedKeys.key_labels || [];
+
+  if (slotLabels.length > slotsToShow) {
+    const start = slotLabels.length - slotsToShow;
+    slotLabels = slotLabels.slice(start);
+    if (matrix.length) {
+      matrix = matrix.map(row => row.slice(start));
+    }
+  }
+
+  el.innerHTML = '<div class="key-heatmap-wrapper">' + renderKeyHeatmap({
+    key_labels: keyLabels,
+    slot_labels: slotLabels,
+    matrix: matrix
+  }) + '</div>';
+
+  // Hide the major/minor legend below
+  const legend = document.querySelector('.card:has(#keyDistContent) > div:last-child');
+  if (legend) legend.style.display = 'none';
+}
+
+function renderKeyHeatmap(data) {
+  if (!data || !data.matrix || !data.matrix.length) return '<div style="color:var(--muted);text-align:center;padding:10px">אין נתונים</div>';
+  const maxVal = Math.max(1, ...data.matrix.flat().filter(v => v > 0));
+  let html = '<div class="key-heatmap">';
+
+  // X-axis labels (top)
+  html += '<div class="key-heatmap-row" style="margin-bottom:2px">';
+  html += '<span class="key-hm-label"></span>';
+  const labelEvery = Math.max(1, Math.floor(data.slot_labels.length / 20));
+  data.slot_labels.forEach((label, xi) => {
+    if (xi % labelEvery === 0) {
+      html += '<span class="key-heatmap-label" style="width:8px">' + esc(label) + '</span>';
+    } else {
+      html += '<span style="width:8px;flex-shrink:0"></span>';
+    }
+  });
+  html += '</div>';
+
+  data.key_labels.forEach((key, yi) => {
+    html += '<div class="key-heatmap-row">';
+    html += '<span class="key-hm-label">' + esc(key) + '</span>';
+    (data.matrix[yi] || []).forEach((val, xi) => {
+      const intensity = val > 0 ? val / maxVal : 0;
+      const colorStr = val > 0
+        ? 'rgba(93, 219, 181, ' + (0.1 + intensity * 0.7) + ')'
+        : 'transparent';
+      const timeLabel = data.slot_labels[xi] || '';
+      html += '<span class="key-cell" style="background:' + colorStr + '" title="' + timeLabel + ' · ' + esc(key) + ': ' + val + ' tracks"></span>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderKeyDistLegacy() {
   const pillsEl = document.getElementById('keyStationPills');
   pillsEl.innerHTML = '<button class="window-pill' + (keyStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
     stations.map(s => '<button class="window-pill' + (keyStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
@@ -1064,10 +1458,281 @@ function renderKeyDist() {
   el.innerHTML = h;
 }
 
-/* ── Song Transitions v2 ── */
+/* ── Transition Explorer ── */
 function renderTransitions() {
+  // Check if transition_map is available
+  if (D.transition_map && D.transition_map.stations) {
+    renderTransitionExplorer();
+  } else {
+    renderTransitionsLegacy();
+  }
+}
+
+function renderTransitionExplorer() {
+  const el = document.getElementById('transContent');
+  const map = D.transition_map;
+  if (!map || !map.stations) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">תקלת טעינה...</div>'; return; }
+
+  // Section subtitle with song count
+  const totalSongs = Object.values(map.stations).reduce((sum, st) => sum + Object.keys(st.songs || {}).length, 0);
+  const subEl = document.querySelector('.card:has(#transContent) .section-sub');
+  if (subEl && map.meta) {
+    subEl.innerHTML = 'בנה פלייליסט לפי ההיגיון של תחנת הרדיו — ' + (map.meta.total_songs_mapped || totalSongs) + ' שירים ממופים';
+  }
+
+  let h = '';
+
+  // Controls
+  h += '<div class="explorer-controls">';
+  h += '<button class="explorer-btn" onclick="pickExplorerRandomSong()">🔀 רנדומלי</button>';
+  h += '<input class="explorer-search" id="explorerSearch" placeholder="חפש שיר..." oninput="onExplorerSearch()">';
   // Station pills
-  const pillsEl = document.getElementById('transStationPills');
+  const allStations = Object.keys(map.stations);
+  h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+  h += '<button class="window-pill' + (explorerState.currentStation === 'all' ? ' active' : '') + '" onclick="explorerState.currentStation=\'all\';renderTransitionExplorer()">הכל</button>';
+  allStations.forEach(slug => {
+    const st = stations.find(s => s.slug === slug);
+    if (!st) return;
+    h += '<button class="window-pill' + (explorerState.currentStation === slug ? ' active' : '') + '" onclick="explorerState.currentStation=\'' + slug + '\';renderTransitionExplorer()" style="color:' + st.color + '">' + esc(st.name) + '</button>';
+  });
+  h += '</div>';
+  h += '</div>';
+
+  // Breadcrumb trail
+  if (explorerState.history.length > 0) {
+    h += '<div class="explorer-breadcrumb">';
+    explorerState.history.forEach((item, i) => {
+      if (i > 0) h += '<span class="explorer-breadcrumb-arrow">→</span>';
+      h += '<span class="explorer-breadcrumb-item" onclick="navigateBackTo(' + i + ')">' + esc(item.title) + '</span>';
+    });
+    if (explorerState.currentSong) {
+      h += '<span class="explorer-breadcrumb-arrow">→</span>';
+      h += '<span class="explorer-breadcrumb-item" style="color:var(--fg)">' + esc(explorerState.currentSong.title) + '</span>';
+    }
+    h += '</div>';
+  }
+
+  // No song selected state
+  if (!explorerState.currentSong) {
+    h += '<div class="explorer-empty">בחר שיר כדי להתחיל לחקור<br><span style="font-size:.72rem;color:var(--muted)">לחץ "רנדומלי" או חפש שיר</span></div>';
+    el.innerHTML = h;
+    return;
+  }
+
+  // Hero section
+  const cs = explorerState.currentSong;
+  h += '<div class="explorer-hero">';
+  h += '<div class="explorer-hero-title">🎵 ' + esc(cs.title) + '</div>';
+  h += '<div class="explorer-hero-artist">' + esc(cs.artist) + '</div>';
+  // Station badge if known from last history entry
+  if (explorerState.history.length > 0) {
+    const lastStation = explorerState.history[explorerState.history.length - 1].station;
+    if (lastStation) {
+      h += '<span class="explorer-hero-badge" style="color:' + color(lastStation) + ';border-color:' + color(lastStation) + '40">📻 ' + esc(name(lastStation)) + '</span>';
+    }
+  }
+  h += '</div>';
+
+  // "לאן מכאן?" - Outgoing transitions section
+  h += '<div class="explorer-section-title">📍 לאן מכאן?</div>';
+
+  const allOutgoing = [];
+  // Search across all stations (or filtered)
+  const stationSlugs = explorerState.currentStation === 'all' ? allStations : [explorerState.currentStation];
+  stationSlugs.forEach(slug => {
+    const stSongs = map.stations[slug] && map.stations[slug].songs;
+    if (!stSongs) return;
+    // The song key format: "title|artist" or "artist|title"? Try both
+    const key1 = (cs.title + '|' + cs.artist).toLowerCase();
+    const key2 = (cs.artist + '|' + cs.title).toLowerCase();
+    const songEntry = stSongs[key1] || stSongs[key2];
+    if (songEntry && songEntry.outgoing && songEntry.outgoing.length) {
+      songEntry.outgoing.forEach(t => {
+        allOutgoing.push({ ...t, station: slug });
+      });
+    }
+  });
+
+  // Group by station
+  const byStation = {};
+  allOutgoing.forEach(t => {
+    if (!byStation[t.station]) byStation[t.station] = [];
+    byStation[t.station].push(t);
+  });
+
+  if (Object.keys(byStation).length === 0) {
+    h += '<div style="color:var(--muted);text-align:center;padding:16px;font-size:.82rem">אין מעברים לשיר הזה</div>';
+  } else {
+    // Sort stations by number of transitions
+    const sortedStations = Object.entries(byStation).sort((a, b) => b[1].length - a[1].length);
+    sortedStations.forEach(([slug, transitions]) => {
+      const st = stations.find(s => s.slug === slug);
+      const stName = st ? st.name : slug;
+      h += '<div class="explorer-station-header" style="color:' + color(slug) + '">📻 ' + esc(stName) + '</div>';
+      transitions.sort((a, b) => b.count - a.count).forEach(t => {
+        const prob = t.probability || 0;
+        const probColor = prob > 60 ? '#e05555' : prob > 30 ? '#d4b85a' : '#5ddbb5';
+        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\'' + slug + '\')">';
+        h += '<div class="explorer-card-main">';
+        h += '<div><div class="explorer-card-title">→ ' + esc(t.title) + '</div><div class="explorer-card-artist">' + esc(t.artist) + '</div></div>';
+        h += '<span class="explorer-card-stats">×' + t.count + (prob > 0 ? ' ' + prob + '%' : '') + '</span>';
+        h += '</div>';
+        if (prob > 0) {
+          h += '<div class="explorer-prob-bar"><div class="explorer-prob-fill" style="width:' + prob + '%;background:' + probColor + '"></div></div>';
+        }
+        h += '</div>';
+      });
+    });
+  }
+
+  // Navigation buttons
+  h += '<div class="explorer-nav-btns">';
+  if (explorerState.history.length > 0) {
+    h += '<button class="explorer-btn" onclick="goBackInPath()">↩ חזרה</button>';
+  }
+  h += '<button class="explorer-btn" onclick="resetExplorer()">⟳ התחל מחדש</button>';
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+function pickExplorerRandomSong() {
+  const map = D.transition_map;
+  if (!map || !map.stations) return;
+  // Collect all songs that have outgoing transitions
+  const allSongs = [];
+  Object.values(map.stations).forEach(st => {
+    if (!st.songs) return;
+    Object.values(st.songs).forEach(song => {
+      if (song.outgoing && song.outgoing.length > 0) {
+        allSongs.push({ artist: song.artist, title: song.title });
+      }
+    });
+  });
+  if (!allSongs.length) return;
+  const pick = allSongs[Math.floor(Math.random() * allSongs.length)];
+  explorerState.currentSong = pick;
+  explorerState.history = [];
+  renderTransitionExplorer();
+}
+
+function onExplorerSearch() {
+  const q = (document.getElementById('explorerSearch').value || '').toLowerCase().trim();
+  const map = D.transition_map;
+  if (!map || !map.stations || !q) {
+    if (!q) {
+      // Just re-render current state
+      renderTransitionExplorer();
+    }
+    return;
+  }
+
+  // Search across all stations
+  const results = [];
+  const seen = new Set();
+  Object.values(map.stations).forEach(st => {
+    if (!st.songs) return;
+    Object.values(st.songs).forEach(song => {
+      if (!song.outgoing || !song.outgoing.length) return;
+      const match = (song.title + ' ' + song.artist).toLowerCase().includes(q);
+      if (match) {
+        const key = song.title + '|' + song.artist;
+        if (!seen.has(key)) {
+          seen.add(key);
+          results.push({ artist: song.artist, title: song.title, outgoing: song.outgoing.length });
+        }
+      }
+    });
+  });
+
+  if (!results.length) {
+    renderTransitionExplorer();
+    // Override content with search results message
+    const el = document.getElementById('transContent');
+    const h = el.innerHTML;
+    el.innerHTML = h + '<div style="color:var(--muted);text-align:center;padding:16px">לא נמצאו תוצאות עבור "' + esc(q) + '"</div>';
+    return;
+  }
+
+  // Show search results
+  let resultsHtml = '<div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">נמצאו ' + results.length + ' שירים:</div>';
+  results.slice(0, 15).forEach(s => {
+    resultsHtml += '<div class="explorer-card" onclick="selectExplorerSong(' + JSON.stringify(s.artist) + ',' + JSON.stringify(s.title) + ')">';
+    resultsHtml += '<div class="explorer-card-main">';
+    resultsHtml += '<div><div class="explorer-card-title">' + esc(s.title) + '</div><div class="explorer-card-artist">' + esc(s.artist) + '</div></div>';
+    resultsHtml += '<span class="explorer-card-stats">' + s.outgoing + ' מעברים</span>';
+    resultsHtml += '</div></div>';
+  });
+  if (results.length > 15) {
+    resultsHtml += '<div style="text-align:center;padding:6px;font-size:.72rem;color:var(--muted)">עוד ' + (results.length - 15) + ' תוצאות...</div>';
+  }
+
+  const el = document.getElementById('transContent');
+  // Keep the controls, replace content below
+  const controls = el.querySelector('.explorer-controls');
+  if (controls) {
+    el.innerHTML = controls.outerHTML + resultsHtml;
+    // Re-bind search input
+    const searchInput = el.querySelector('#explorerSearch');
+    if (searchInput) searchInput.oninput = () => onExplorerSearch();
+  } else {
+    el.innerHTML = resultsHtml;
+  }
+}
+
+function selectExplorerSong(artist, title) {
+  explorerState.currentSong = { artist, title };
+  explorerState.history = [];
+  document.getElementById('explorerSearch').value = '';
+  renderTransitionExplorer();
+}
+
+function navigateToSong(artist, title, station) {
+  if (!explorerState.currentSong) return;
+  explorerState.history.push({
+    ...explorerState.currentSong,
+    station: station || explorerState.currentStation
+  });
+  explorerState.currentSong = { artist, title };
+  if (station) explorerState.currentStation = station;
+  renderTransitionExplorer();
+}
+
+function navigateBackTo(idx) {
+  if (idx < 0 || idx >= explorerState.history.length) return;
+  const target = explorerState.history[idx];
+  // Truncate history to this point
+  explorerState.history = explorerState.history.slice(0, idx);
+  explorerState.currentSong = { artist: target.artist, title: target.title };
+  renderTransitionExplorer();
+}
+
+function goBackInPath() {
+  if (!explorerState.history.length) return;
+  const prev = explorerState.history.pop();
+  explorerState.currentSong = { artist: prev.artist, title: prev.title };
+  renderTransitionExplorer();
+}
+
+function resetExplorer() {
+  explorerState.currentSong = null;
+  explorerState.history = [];
+  explorerState.currentStation = 'all';
+  document.getElementById('explorerSearch').value = '';
+  renderTransitionExplorer();
+}
+
+function renderTransitionsLegacy() {
+  // Station pills - create container if not exists
+  let pillsEl = document.getElementById('transStationPills');
+  if (!pillsEl) {
+    pillsEl = document.createElement('div');
+    pillsEl.id = 'transStationPills';
+    pillsEl.className = 'window-pills';
+    const transContent = document.getElementById('transContent');
+    if (transContent) transContent.parentNode.insertBefore(pillsEl, transContent);
+  }
+  pillsEl.style.display = 'flex';
   pillsEl.innerHTML = '<button class="window-pill' + (transStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
     stations.map(s => '<button class="window-pill' + (transStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
   pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; transStation = b.dataset.s; transFilter = 'all'; renderTransitions(); };
@@ -1260,65 +1925,120 @@ function renderTransitions() {
 /* ── Clusters ── */
 function renderClusters() {
   const data = D.clusters;
-  if (!data || !data.ready || !data.songs || !data.songs.length) {
-    document.getElementById('clusterGraph').innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="' + MUTED + '" font-size="14">אין נתוני אשכולות עדיין</text>';
+  if (!data || !data.songs || !data.songs.length) {
+    document.getElementById('clusterContent').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני שירים שמתנגנים יחד עדיין</div>';
+    return;
+  }
+  // Already rendered by pickRandomClusterSong / onClusterSearch
+  // If no song selected yet, show a placeholder
+  if (!document.getElementById('clusterContent').querySelector('.cluster-hero')) {
+    // Only show placeholder if no active selection
+    const content = document.getElementById('clusterContent');
+    if (!content.dataset.active) {
+      content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div>';
+    }
+  }
+}
+
+function pickRandomClusterSong() {
+  const data = D.clusters;
+  if (!data || !data.songs || !data.songs.length) return;
+  // Filter songs that have top neighbors
+  const songsWithNeighbors = data.songs.filter(s => s.top && s.top.length > 0);
+  if (!songsWithNeighbors.length) return;
+  const pick = songsWithNeighbors[Math.floor(Math.random() * songsWithNeighbors.length)];
+  selectClusterSong(pick);
+}
+
+function selectClusterSong(song) {
+  if (!song) return;
+  const el = document.getElementById('clusterContent');
+  if (!el) return;
+  el.dataset.active = 'true';
+
+  // Find station info - look in stations that played this song
+  let stationInfo = '';
+  if (D.history && D.history.history) {
+    const matches = D.history.history.filter(t =>
+      t.title === song.title && t.artist === song.artist
+    );
+    if (matches.length) {
+      const stationCounts = {};
+      matches.forEach(t => {
+        stationCounts[t.station_slug] = (stationCounts[t.station_slug] || 0) + 1;
+      });
+      stationInfo = Object.entries(stationCounts)
+        .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '×)</span>')
+        .join(' · ');
+    }
+  }
+
+  const neighbors = (song.top || []).slice(0, 5);
+  let h = '';
+  // Hero
+  h += '<div class="cluster-hero">';
+  h += '<div class="cluster-hero-title">🎵 ' + esc(song.title) + '</div>';
+  h += '<div class="cluster-hero-artist">' + esc(song.artist) + '</div>';
+  if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' השמעות</div>';
+  h += '</div>';
+
+  // Neighbors heading
+  h += '<div class="explorer-section-title">🔗 מתנגן יחד עם (' + neighbors.length + '):</div>';
+
+  // Neighbor cards
+  neighbors.forEach((n, i) => {
+    h += '<div class="cluster-card">';
+    h += '<div>';
+    h += '<span class="cluster-card-name">' + esc(n.title) + '</span>';
+    h += '<span class="cluster-card-artist"> — ' + esc(n.artist) + '</span>';
+    h += '</div>';
+    h += '<span class="cluster-card-count">' + (n.count || 0) + '×</span>';
+    h += '</div>';
+  });
+
+  // Station info
+  if (stationInfo) {
+    h += '<div class="cluster-station-info" style="margin-top:8px">📻 גם ב: ' + stationInfo + '</div>';
+  }
+
+  el.innerHTML = h;
+}
+
+function onClusterSearch() {
+  const q = (document.getElementById('clusterSearch').value || '').toLowerCase().trim();
+  const el = document.getElementById('clusterContent');
+  if (!q) {
+    el.dataset.active = '';
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div>';
     return;
   }
 
-  const svg = d3.select('#clusterGraph');
-  svg.selectAll('*').remove();
-  const width = svg.node().clientWidth || 600;
-  const height = 450;
+  const data = D.clusters;
+  if (!data || !data.songs) return;
 
-  const nodes = data.songs.map((s, i) => ({ ...s, id: i }));
-  const links = data.edges.map(e => ({ source: e[0], target: e[1], weight: e[2], bridge: e[3] }));
+  const matches = data.songs.filter(s =>
+    (s.title && s.title.toLowerCase().includes(q)) ||
+    (s.artist && s.artist.toLowerCase().includes(q))
+  );
 
-  // Community colors
-  const communityColors = {};
-  const palette = ['#5ddbb5', '#e36a6a', '#6ab8e3', '#e3c86a', '#c86ae3', '#e38a6a', '#a06ae3', '#e36ac8'];
-  data.communities.forEach((c, i) => { communityColors[c.id] = palette[i % palette.length]; });
+  if (!matches.length) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לא נמצאו שירים</div>';
+    return;
+  }
 
-  const simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(d => 80 / Math.sqrt(d.weight || 1)))
-    .force('charge', d3.forceManyBody().strength(-60))
-    .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(8));
-
-  const link = svg.append('g').selectAll('line').data(links).join('line')
-    .attr('stroke', d => d.bridge ? '#e38a6a' : '#ffffff')
-    .attr('stroke-opacity', d => d.bridge ? 0.4 : 0.1)
-    .attr('stroke-width', d => Math.sqrt(d.weight || 1));
-
-  const node = svg.append('g').selectAll('circle').data(nodes).join('circle')
-    .attr('r', d => Math.max(4, Math.min(12, Math.sqrt(d.plays) * 2)))
-    .attr('fill', d => communityColors[d.community] || ACCENT)
-    .attr('stroke', d => d.is_bridge ? '#e38a6a' : 'none')
-    .attr('stroke-width', 1.5)
-    .attr('cursor', 'pointer')
-    .call(d3.drag()
-      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
-      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
-    );
-
-  node.on('click', (e, d) => {
-    const detail = document.getElementById('clusterDetail');
-    const neighbors = (d.top || []).map(n => esc(n.artist) + ' — ' + esc(n.title)).join('<br>');
-    detail.innerHTML = '<div style="font-size:.82rem"><strong>' + esc(d.artist) + ' — ' + esc(d.title) + '</strong><br><span style="color:var(--muted);font-size:.74rem">מושמע עם:</span><br>' + (neighbors || 'אין') + '</div>';
+  // Show search results as clickable items
+  let h = '<div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">נמצאו ' + matches.length + ' תוצאות:</div>';
+  matches.slice(0, 10).forEach(s => {
+    h += '<div class="explorer-card" onclick="selectClusterSong(D.clusters.songs.find(x => x.title===' + JSON.stringify(s.title) + ' && x.artist===' + JSON.stringify(s.artist) + '))">';
+    h += '<div class="explorer-card-main">';
+    h += '<div><div class="explorer-card-title">' + esc(s.title) + '</div><div class="explorer-card-artist">' + esc(s.artist) + '</div></div>';
+    h += '<span class="explorer-card-stats">' + (s.plays || 0) + '×</span>';
+    h += '</div></div>';
   });
-
-  // Tooltip on hover
-  node.append('title').text(d => d.artist + ' — ' + d.title + ' (' + d.plays + '×)');
-
-  simulation.on('tick', () => {
-    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-    node.attr('cx', d => d.x = Math.max(10, Math.min(width - 10, d.x))).attr('cy', d => d.y = Math.max(10, Math.min(height - 10, d.y)));
-  });
-
-  // Legend
-  document.getElementById('clusterLegend').innerHTML = data.communities.slice(0, 8).map(c =>
-    '<span><span class="sw" style="background:' + (communityColors[c.id] || ACCENT) + '"></span>' + esc(name(c.dominant_station)) + ' (' + c.size + ' שירים)</span>'
-  ).join('');
+  if (matches.length > 10) {
+    h += '<div style="text-align:center;padding:6px;font-size:.72rem;color:var(--muted)">עוד ' + (matches.length - 10) + ' תוצאות... השתמש בחיפוש מדויק יותר</div>';
+  }
+  el.innerHTML = h;
 }
 
 /* ── Redundancy ── */
