@@ -562,7 +562,6 @@ function switchTab(tabName) {
   document.querySelector('.tab-btn[data-tab="' + tabName + '"]').classList.add('active');
   document.getElementById('tab-' + tabName).classList.add('active');
   document.getElementById('pills').style.display = tabName === 'np' ? 'none' : 'flex';
-  activeStation = null;
   renderPills();
   renderAll();
 }
@@ -799,14 +798,19 @@ function renderTopSongs() {
   if (!data || !data.songs || !data.songs.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>'; return; }
 
   let songs = data.songs;
-  if (activeStation) songs = songs.filter(s => s.stations[activeStation]);
+  if (activeStation) {
+    songs = songs
+      .filter(s => s.stations[activeStation])
+      .sort((a, b) => (b.stations[activeStation] || 0) - (a.stations[activeStation] || 0));
+  }
 
   let h = '';
   songs.slice(0, 20).forEach((s, i) => {
-    const trend = s.prev === 0 && s.count > 0 ? '<span class="top-trend new">חדש</span>' :
+    const displayCount = activeStation ? (s.stations[activeStation] || 0) : s.count;
+    const trend = activeStation ? '<span class="top-trend flat">—</span>' : (s.prev === 0 && s.count > 0 ? '<span class="top-trend new">חדש</span>' :
       s.count > s.prev ? '<span class="top-trend up">▲ +' + (s.count - s.prev) + '</span>' :
       s.count < s.prev ? '<span class="top-trend down">▼ ' + (s.count - s.prev) + '</span>' :
-      '<span class="top-trend flat">—</span>';
+      '<span class="top-trend flat">—</span>');
     const stationDots = Object.keys(s.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
     // is_new badge
@@ -822,10 +826,10 @@ function renderTopSongs() {
       }
     }
 
-    h += '<div class="top-row" data-title="' + esc(s.title) + '" data-artist="' + esc(s.artist) + '" data-count="' + s.count + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
+    h += '<div class="top-row" data-title="' + esc(s.title) + '" data-artist="' + esc(s.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(s.title) + newBadge + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
-    h += '<span class="top-count">' + s.count + '×</span>';
+    h += '<span class="top-count">' + displayCount + '×</span>';
     h += trend;
     h += '<a href="' + spotifySearchUrl(s.artist, s.title) + '" target="_blank" class="top-spotify">🎧</a>';
     h += '</div>';
@@ -841,20 +845,25 @@ function renderTopArtists() {
   if (!data || !data.artists || !data.artists.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>'; return; }
 
   let artists = data.artists;
-  if (activeStation) artists = artists.filter(a => a.stations[activeStation]);
+  if (activeStation) {
+    artists = artists
+      .filter(a => a.stations[activeStation])
+      .sort((a, b) => (b.stations[activeStation] || 0) - (a.stations[activeStation] || 0));
+  }
 
   let h = '';
   artists.slice(0, 20).forEach((a, i) => {
-    const trend = a.prev === 0 && a.count > 0 ? '<span class="top-trend new">חדש</span>' :
+    const displayCount = activeStation ? (a.stations[activeStation] || 0) : a.count;
+    const trend = activeStation ? '<span class="top-trend flat">—</span>' : (a.prev === 0 && a.count > 0 ? '<span class="top-trend new">חדש</span>' :
       a.count > a.prev ? '<span class="top-trend up">▲ +' + (a.count - a.prev) + '</span>' :
       a.count < a.prev ? '<span class="top-trend down">▼ ' + (a.count - a.prev) + '</span>' :
-      '<span class="top-trend flat">—</span>';
+      '<span class="top-trend flat">—</span>');
     const stationDots = Object.keys(a.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
-    h += '<div class="top-row" data-artist="' + esc(a.artist) + '" data-count="' + a.count + '" data-stations=\'' + JSON.stringify(a.stations) + '\' data-window="' + topArtistsWindow + '">';
+    h += '<div class="top-row" data-artist="' + esc(a.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(a.stations) + '\' data-window="' + topArtistsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(a.artist) + '</div><div class="top-sub"><span class="top-stations">' + stationDots + '</span></div></div>';
-    h += '<span class="top-count">' + a.count + '×</span>';
+    h += '<span class="top-count">' + displayCount + '×</span>';
     h += trend;
     h += '</div>';
   });
