@@ -550,3 +550,114 @@ class SupabaseDB:
         """Total number of tracks."""
         rows = self._query("SELECT COUNT(*) as cnt FROM tracks")
         return rows[0]["cnt"] if rows else 0
+
+    # ── System Events (uptime tracking) ─────────────────────────────────
+
+    def _ensure_system_events_table(self) -> None:
+        """Create system_events table if it doesn't exist."""
+        self._execute("""
+            CREATE TABLE IF NOT EXISTS system_events (
+                id SERIAL PRIMARY KEY,
+                event_type TEXT NOT NULL,
+                source TEXT,
+                started_at TIMESTAMPTZ NOT NULL,
+                ended_at TIMESTAMPTZ,
+                duration_seconds INT,
+                description TEXT,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )
+        """)
+
+    def record_system_event(
+        self, event_type: str, source: str = "",
+        description: str = "",
+        started_at: str | None = None,
+        ended_at: str | None = None,
+    ) -> bool:
+        """Insert a system event.
+
+        Args:
+            event_type: e.g. 'outage_start', 'outage_end', 'proxy_crash',
+                        'collector_crash', 'restart', 'connection_issue'
+            source: e.g. 'collector', 'galgalatz', 'kan-88', 'watchdog'
+            description: Human-readable description of the event
+            started_at: ISO timestamp (defaults to NOW() if omitted)
+            ended_at: ISO timestamp (optional, for bounded events)
+
+        Returns True on success.
+        """
+        self._ensure_system_events_table()
+        if started_at:
+            sql = """INSERT INTO system_events
+                     (event_type, source, started_at, ended_at, description)
+                     VALUES (%s, %s, %s, %s, %s)"""
+            rc = self._execute(sql, [event_type, source or None,
+                                     started_at, ended_at, description or None])
+        else:
+            sql = """INSERT INTO system_events
+                     (event_type, source, started_at, ended_at, description)
+                     VALUES (%s, %s, NOW(), %s, %s)"""
+            rc = self._execute(sql, [event_type, source or None,
+                                     ended_at, description or None])
+        return rc is not None
+
+    def get_recent_events(
+        self, days: int = 7, limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        """Get recent system events, newest first.
+
+        Args:
+            days: how far back to look
+            limit: max events to return
+
+        Returns list of event dicts (empty list if table doesn't exist or
+        query fails).
+        """
+        self._ensure_system_events_table()
+        return self._query(
+            """SELECT id, event_type, source, started_at, ended_at,
+                      duration_seconds, description, created_at
+               FROM system_events
+               WHERE started_at >= NOW() - INTERVAL '%s days'
+               ORDER BY started_at DESC
+               LIMIT %s""",
+            [days, limit],
+        )
+
+    def get_system_uptime(self, days: int = 7) -> dict[str, Any]:
+        """Calculate uptime percentage over N days.
+
+        Considers any event with event_type in ('outage_start', 'proxy_crash',
+        'collector_crash', 'connection_issue') and a known ended_at as an
+        outage interval. Returns dict with:
+            - uptime_pct: float percentage
+            - total_seconds: total seconds in period
+            - outage_seconds: total seconds of known outages
+            - outage_count: number of distinct outage events
+        """
+        self._ensure_system_events_table()
+        total_seconds = days * 86400
+        rows = self._query(
+            """SELECT COALESCE(SUM(
+                      CASE WHEN ended_at IS NOT NULL
+                           THEN EXTRACT(EPOCH FROM (ended_at - started_at))
+                           ELSE 0 END
+                  ), 0) as outage_seconds,
+                      COUNT(*) as outage_count
+               FROM system_events
+               WHERE started_at >= NOW() - INTERVAL '%s days'
+                 AND event_type IN ('outage_start', 'proxy_crash',
+                                    'collector_crash', 'connection_issue')""",
+            [days],
+        )
+        outage_seconds = rows[0]["outage_seconds"] if rows else 0
+        outage_count = rows[0]["outage_count"] if rows else 0
+        uptime_seconds = max(0, total_seconds - int(outage_seconds))
+        uptime_pct = round(uptime_seconds / total_seconds * 100, 1) if total_seconds > 0 else 100.0
+        return {
+            "uptime_pct": uptime_pct,
+            "total_seconds": total_seconds,
+            "uptime_seconds": uptime_seconds,
+            "outage_seconds": int(outage_seconds),
+            "outage_count": outage_count,
+        }

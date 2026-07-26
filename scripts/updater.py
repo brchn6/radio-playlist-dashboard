@@ -198,6 +198,12 @@ def main() -> None:
         "source": "supabase",
     }), flush=True)
 
+    # Record system event for uptime tracking
+    try:
+        db.record_system_event("collector_start", "collector", "Updater started")
+    except Exception:
+        pass  # best-effort
+
     iteration = 0
 
     while running:
@@ -266,6 +272,13 @@ def main() -> None:
             )
 
             if not ok:
+                # Record supabase error event for uptime tracking
+                try:
+                    db.record_system_event("collector_supabase_error", "collector",
+                                           "Supabase write failed for " + slug)
+                except Exception:
+                    pass  # best-effort
+
                 # Supabase write failed — save to retry queue
                 enqueue_failed_track({
                     "station_id": station_id,
@@ -302,6 +315,12 @@ def main() -> None:
 
         elapsed = time.time() - loop_start
         time.sleep(max(0.5, args.interval - elapsed))
+
+    # Record stop event for uptime tracking
+    try:
+        db.record_system_event("collector_stop", "collector", "Updater stopped")
+    except Exception:
+        pass  # best-effort
 
     db.close()
     print(json.dumps({"event": "updater_stopped"}), flush=True)

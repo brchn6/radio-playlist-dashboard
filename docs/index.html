@@ -219,6 +219,61 @@
       .np-card{padding:10px}
       .np-title{font-size:.85rem}
     }
+
+    /* Radio Dashboard v2 improvements */
+
+    /* Now Playing timestamps */
+    .np-timing{font-size:.7rem;color:var(--muted);margin-top:6px}
+    .np-timing .time-ago.warning{color:#d4b85a}
+    .np-timing .np-duration{margin-right:8px}
+
+    /* New badge in top songs */
+    .new-badge{font-size:.65rem;padding:1px 6px;border-radius:8px;background:#d4b85a33;color:#d4b85a;font-weight:600;margin-right:4px;white-space:nowrap;vertical-align:middle}
+    .new-badge.urgent{background:var(--accent);color:var(--bg)}
+
+    /* Transitions v2 */
+    .trans-context{font-size:.7rem;color:var(--muted);opacity:.6;margin:2px 0}
+    .trans-context-arrow{color:var(--muted);font-size:.65rem}
+    .trans-main{font-weight:600;font-size:.85rem}
+    .trans-prob-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.05);margin:4px 0}
+    .trans-prob-fill{height:100%;border-radius:2px;transition:width .3s}
+    .trans-hour-breakdown{display:flex;gap:3px;margin-top:3px}
+    .trans-hour-seg{height:3px;border-radius:1.5px;flex:1}
+    .meta-card{background:var(--card-hover);border-radius:var(--radius);padding:10px;margin-bottom:10px;font-size:.75rem}
+    .meta-entropy{display:inline-block;font-weight:700}
+    .trans-entry{padding:8px 10px;border-bottom:1px solid rgba(37,41,64,.5)}
+    .trans-entry:last-child{border-bottom:none}
+
+    /* Redundancy math v2 */
+    .redundancy-row{cursor:pointer}
+    .redundancy-row:hover{background:var(--card-hover);border-radius:4px}
+    .redundancy-double-bar{display:flex;gap:12px}
+    .redundancy-bar-group{flex:1}
+    .redundancy-bar-label{font-size:.62rem;color:var(--muted);margin-bottom:2px}
+    .redundancy-expanded{background:var(--card-hover);padding:10px;border-radius:var(--radius);font-size:.75rem;margin:4px 0 8px}
+    .redundancy-formula{font-family:monospace;color:var(--accent);margin:4px 0;font-size:.78rem}
+    .redundancy-top-item{display:flex;justify-content:space-between;padding:2px 0;font-size:.72rem}
+    .redundancy-top-item .top-count{font-size:.7rem}
+    .redundancy-table{overflow-x:auto;margin-top:12px}
+    .redundancy-table table{width:100%;font-size:.72rem;border-collapse:collapse}
+    .redundancy-table th{text-align:center;padding:4px 8px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600}
+    .redundancy-table th:first-child{text-align:right}
+    .redundancy-table td{text-align:center;padding:4px 8px;border-bottom:1px solid rgba(37,41,64,.3)}
+    .redundancy-table td:first-child{text-align:right;font-weight:600}
+    .redundancy-table .tr-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:4px;vertical-align:middle}
+    .sparkline{display:block;margin:4px auto;max-width:100%}
+    .red-legend{display:flex;gap:8px;font-size:.65rem;color:var(--muted);justify-content:center;margin:6px 0}
+
+    /* Uptime card */
+    .uptime-status{font-size:.9rem;font-weight:700;margin-bottom:6px}
+    .uptime-bar{height:10px;border-radius:5px;background:rgba(255,255,255,.05);margin:6px 0;overflow:hidden}
+    .uptime-fill{height:100%;border-radius:5px;transition:width .5s}
+    .uptime-mini-dots{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+    .uptime-mini-dot{width:12px;height:12px;border-radius:3px}
+    .uptime-outage{font-size:.72rem;padding:4px 0;border-bottom:1px solid rgba(37,41,64,.3);display:flex;justify-content:space-between}
+    .uptime-outage:last-child{border-bottom:none}
+    .uptime-outage-source{font-weight:600}
+    .uptime-outage-desc{color:var(--muted);font-size:.65rem;flex:1;text-align:left}
   </style>
 </head>
 <body>
@@ -364,6 +419,15 @@
     </div>
     <div id="redundancyContent"></div>
   </div>
+
+  <!-- Uptime -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">⏱ תפעול המערכת</div>
+      <div class="section-sub">זמינות ומצב הקולטורים</div>
+    </div>
+    <div id="uptimeContent"></div>
+  </div>
 </div>
 
 <footer>
@@ -399,10 +463,12 @@ let topArtistsWindow = '24h';
 let bpmStation = 'all';
 let keyStation = 'all';
 let transStation = 'all';
+let transFilter = 'all';
 let histDedup = true;
 let histReverse = true;
 let histShown = 80;
 let activeHistoryFilter = null;
+let expandedRedundancySlug = null;
 
 function filterByTimeWindow(items, window) {
   const now = Date.now();
@@ -453,6 +519,34 @@ function timeAgo(s) {
   const m = Math.floor(df / 60); if (m < 60) return 'לפני ' + m + ' דק׳';
   const h = Math.floor(m / 60); if (h < 24) return 'לפני ' + h + ' ש׳';
   return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
+}
+
+function formatDuration(sec) {
+  if (!sec || sec < 0) return '—';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+let liveTimerInterval = null;
+function startLiveTimers() {
+  if (liveTimerInterval) return;
+  liveTimerInterval = setInterval(() => {
+    document.querySelectorAll('.time-ago[data-ts]').forEach(el => {
+      const ts = el.dataset.ts;
+      if (!ts) return;
+      const d = parseTs(ts);
+      if (!d) return;
+      const df = Math.floor((Date.now() - d) / 1000);
+      const age = df;
+      if (age < 5) el.textContent = 'עכשיו';
+      else if (age < 60) el.textContent = 'לפני ' + age + ' שנ׳';
+      else if (age < 3600) el.textContent = 'לפני ' + Math.floor(age / 60) + ' דק׳';
+      else if (age < 86400) el.textContent = 'לפני ' + Math.floor(age / 3600) + ' ש׳';
+      else el.textContent = d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short', timeZone: 'Asia/Jerusalem' });
+      if (age > 300) el.classList.add('warning'); else el.classList.remove('warning');
+    });
+  }, 1000);
 }
 
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
@@ -567,6 +661,22 @@ function renderNowPlaying() {
       h += '<div class="np-now-label">◄ מנגן עכשיו</div>';
       h += '<div class="np-title">' + esc(c.title) + '</div>';
       h += '<div class="np-artist">' + esc(c.artist) + '</div>';
+      // Timing info
+      const recogTs = c.recognized_at || '';
+      const durSec = c.duration_seconds || 0;
+      let durationStr = durSec ? formatDuration(durSec) : '—';
+      if (durSec > 300) {
+        const mins = Math.floor(durSec / 60);
+        const secs = durSec % 60;
+        durationStr = mins + ':' + (secs < 10 ? '0' : '') + secs + '+';
+      }
+      let timeAgoStr = recogTs ? timeAgo(recogTs) : '—';
+      const recogDate = parseTs(recogTs);
+      const isOld = recogDate && ((Date.now() - recogDate) / 1000) > 300;
+      h += '<div class="np-timing">';
+      h += '<span class="np-recognized">🕐 זוהה <span class="time-ago' + (isOld ? ' warning' : '') + '" data-ts="' + recogTs + '">' + timeAgoStr + '</span></span>';
+      h += '<span class="np-duration">⏱ רץ <span class="duration-display">' + durationStr + '</span></span>';
+      h += '</div>';
       h += '</div>';
     } else {
       h += '<div class="np-now"><div class="np-now-label">◄ מנגן עכשיו</div><div style="color:var(--muted);font-size:.8rem">אין נתונים</div></div>';
@@ -623,9 +733,22 @@ function renderTopSongs() {
       '<span class="top-trend flat">—</span>';
     const stationDots = Object.keys(s.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
+    // is_new badge
+    let newBadge = '';
+    if (s.is_new) {
+      const fs = s.first_seen ? new Date(s.first_seen) : null;
+      const now = new Date();
+      const daysSince = fs ? Math.round((now - fs) / 86400000) : 999;
+      if (daysSince <= 1) {
+        newBadge = '<span class="new-badge urgent">✨ NEW</span>';
+      } else {
+        newBadge = '<span class="new-badge">🔖 new</span>';
+      }
+    }
+
     h += '<div class="top-row" data-title="' + esc(s.title) + '" data-artist="' + esc(s.artist) + '" data-count="' + s.count + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
-    h += '<div class="top-info"><div class="top-name">' + esc(s.title) + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
+    h += '<div class="top-info"><div class="top-name">' + esc(s.title) + newBadge + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
     h += '<span class="top-count">' + s.count + '×</span>';
     h += trend;
     h += '<a href="' + spotifySearchUrl(s.artist, s.title) + '" target="_blank" class="top-spotify">🎧</a>';
@@ -811,6 +934,13 @@ function loadMoreHistory() { histShown += 80; renderHistory(); }
 
 /* ── BPM Flow ── */
 function renderBpmFlow() {
+  // Update section-sub with lookback info
+  const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
+  if (subEl && D.bpm && D.bpm.lookback) {
+    const lb = D.bpm.lookback;
+    subEl.innerHTML = 'ממוצע BPM ב-' + (lb.days ? lb.days.toFixed(1) : '?') + ' הימים האחרונים — איך הקצב של כל תחנה משתנה במהלך היום';
+  }
+
   // Station pills
   const pillsEl = document.getElementById('bpmStationPills');
   pillsEl.innerHTML = '<button class="window-pill' + (bpmStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
@@ -832,9 +962,14 @@ function renderBpmFlow() {
       const entry = stData.bpm.by_hour.find(e => e.hour === h);
       return entry ? entry.mean_bpm : null;
     });
+    const counts = hours.map(h => {
+      const entry = stData.bpm.by_hour.find(e => e.hour === h);
+      return entry ? (entry.count || entry.samples || 0) : 0;
+    });
     datasets.push({
       label: name(slug),
       data,
+      counts,
       borderColor: color(slug),
       backgroundColor: color(slug) + '20',
       borderWidth: 2,
@@ -849,7 +984,20 @@ function renderBpmFlow() {
     data: { labels: Array.from({ length: 24 }, (_, i) => i + ':00'), datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const ds = ctx.dataset;
+              const idx = ctx.dataIndex;
+              const val = ctx.parsed.y;
+              const cnt = ds.counts ? ds.counts[idx] : 0;
+              return 'ממוצע: ' + (val !== null ? val.toFixed(1) : '—') + ' BPM · דגימות: ' + cnt;
+            }
+          }
+        }
+      },
       scales: {
         x: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' } },
         y: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' }, title: { display: true, text: 'BPM', color: MUTED } },
@@ -916,26 +1064,57 @@ function renderKeyDist() {
   el.innerHTML = h;
 }
 
-/* ── Song Transitions ── */
+/* ── Song Transitions v2 ── */
 function renderTransitions() {
+  // Station pills
   const pillsEl = document.getElementById('transStationPills');
   pillsEl.innerHTML = '<button class="window-pill' + (transStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
     stations.map(s => '<button class="window-pill' + (transStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
-  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; transStation = b.dataset.s; renderTransitions(); };
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; transStation = b.dataset.s; transFilter = 'all'; renderTransitions(); };
 
   const el = document.getElementById('transContent');
   if (!D.transitions) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">נתוני מעברים בבנייה...</div>'; return; }
 
+  // Time-of-day filter pills
+  const timeLabels = { 'all': 'הכל', 'morning': '☀️ בוקר', 'afternoon': '🌤 אחה"צ', 'evening': '🌙 ערב', 'night': '🌜 לילה' };
+  const timeKeys = ['all', 'morning', 'afternoon', 'evening', 'night'];
+  let timePillsHtml = '<div class="window-pills" id="transTimePills" style="margin-bottom:8px">';
+  timeKeys.forEach(k => {
+    timePillsHtml += '<button class="window-pill' + (transFilter === k ? ' active' : '') + '" data-tf="' + k + '">' + timeLabels[k] + '</button>';
+  });
+  timePillsHtml += '</div>';
+
+  // Remove old time pills container if exists, or just prepend
+  const existingTimePills = document.getElementById('transTimePills');
+  if (!existingTimePills) {
+    pillsEl.insertAdjacentHTML('afterend', timePillsHtml);
+    document.getElementById('transTimePills').onclick = e => {
+      const b = e.target.closest('.window-pill'); if (!b) return;
+      transFilter = b.dataset.tf; renderTransitions();
+    };
+  } else {
+    existingTimePills.innerHTML = timeKeys.map(k =>
+      '<button class="window-pill' + (transFilter === k ? ' active' : '') + '" data-tf="' + k + '">' + timeLabels[k] + '</button>'
+    ).join('');
+    existingTimePills.onclick = e => {
+      const b = e.target.closest('.window-pill'); if (!b) return;
+      transFilter = b.dataset.tf; renderTransitions();
+    };
+  }
+
   let transitions = [];
+  let stationMeta = null;
   if (transStation === 'all') {
-    // Aggregate all stations with per-station tracking
     if (D.transitions.stations) {
       const aggMap = {};
       Object.entries(D.transitions.stations).forEach(([slug, stData]) => {
         (stData.transitions || []).forEach(t => {
           const k = (t.from_artist || t.fromartist) + '|' + (t.from_title || t.fromtitle) + '|' + (t.to_artist || '') + '|' + (t.to_title || '');
           if (!aggMap[k]) {
-            aggMap[k] = { from_artist: t.from_artist || t.fromartist, from_title: t.from_title || t.fromtitle, to_artist: t.to_artist, to_title: t.to_title, count: 0, stations: [] };
+            aggMap[k] = { from_artist: t.from_artist || t.fromartist, from_title: t.from_title || t.fromtitle, to_artist: t.to_artist, to_title: t.to_title, count: 0, stations: [], context_before: t.context_before, context_after: t.context_after, hour_buckets: t.hour_buckets, probability: t.probability || 0 };
+          } else {
+            // Merge hour_buckets if present
+            if (t.hour_buckets && !aggMap[k].hour_buckets) aggMap[k].hour_buckets = t.hour_buckets;
           }
           aggMap[k].count += t.count;
           if (!aggMap[k].stations.includes(slug)) aggMap[k].stations.push(slug);
@@ -945,28 +1124,136 @@ function renderTransitions() {
     }
   } else {
     const stData = D.transitions.stations && D.transitions.stations[transStation];
+    stationMeta = stData ? stData.meta : null;
     transitions = stData ? (stData.transitions || []) : [];
+  }
+
+  // Apply time-of-day filter
+  if (transFilter !== 'all') {
+    const filtered = transitions.filter(t => {
+      if (!t.hour_buckets || !t.hour_buckets[transFilter]) return false;
+      // Filter by count in the selected bucket - show transitions that have data in this bucket
+      return t.hour_buckets[transFilter].count > 0;
+    });
+    // Sort by the filtered bucket's count
+    filtered.sort((a, b) => {
+      const aCnt = a.hour_buckets && a.hour_buckets[transFilter] ? a.hour_buckets[transFilter].count : 0;
+      const bCnt = b.hour_buckets && b.hour_buckets[transFilter] ? b.hour_buckets[transFilter].count : 0;
+      return bCnt - aCnt;
+    });
+    transitions = filtered;
   }
 
   if (!transitions.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני מעברים עדיין</div>'; return; }
 
   let h = '';
-  transitions.slice(0, 15).forEach(t => {
+
+  // Station meta card
+  if (stationMeta) {
+    h += '<div class="meta-card">';
+    h += '<div style="font-weight:700;margin-bottom:6px">📊 סטטיסטיקת מעברים — ' + esc(name(transStation)) + '</div>';
+    h += '<div>Transition rate: ' + (stationMeta.transition_rate !== undefined ? (stationMeta.transition_rate * 100).toFixed(1) + '%' : '—') + '</div>';
+    if (stationMeta.total_tracks !== undefined && stationMeta.total_transitions !== undefined) {
+      h += '<div style="font-size:.65rem;color:var(--muted)">(' + stationMeta.total_transitions + ' מעברים מתוך ' + (stationMeta.total_tracks - 1) + ' הזדמנויות)</div>';
+    }
+    if (stationMeta.entropy !== undefined) {
+      h += '<div>Entropy: <span class="meta-entropy">' + stationMeta.entropy + '</span> <span style="font-size:.65rem;color:var(--muted)">(' + (stationMeta.entropy > 4 ? 'מגוון' : stationMeta.entropy > 2 ? 'בינוני' : 'צפוי') + ')</span></div>';
+    }
+    // Hour distribution
+    if (stData && stData.hour_distribution) {
+      const hd = stData.hour_distribution;
+      h += '<div style="margin-top:4px;font-size:.65rem">';
+      const bucketEmoji = { morning: '☀️', afternoon: '🌤', evening: '🌙', night: '🌜' };
+      let distTotal = 0;
+      Object.entries(bucketEmoji).forEach(([bk, emoji]) => {
+        if (hd[bk]) distTotal += hd[bk].pct || 0;
+      });
+      Object.entries(bucketEmoji).forEach(([bk, emoji]) => {
+        if (hd[bk]) {
+          h += emoji + ' ' + (hd[bk].pct ? hd[bk].pct.toFixed(0) : '0') + '% ';
+        }
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  transitions.slice(0, 20).forEach(t => {
     const from = esc(t.from_artist || '') + ' — <em>' + esc(t.from_title || '') + '</em>';
     const to = esc(t.to_artist || '') + ' — <em>' + esc(t.to_title || '') + '</em>';
+    const prob = t.probability || 0;
+    const probColor = prob > 60 ? '#e05555' : prob > 30 ? '#d4b85a' : '#5ddbb5';
+
+    // Station dots
     const dots = transStation === 'all' && t.stations
-      ? '<span class="trans-station-dots">' + t.stations.map(slug =>
+      ? '<span class="trans-station-dots" style="margin-top:3px">' + t.stations.map(slug =>
           '<span class="trans-station-dot" style="background:' + color(slug) + '" title="' + esc(name(slug)) + '"></span>'
         ).join('') + '</span>'
       : '';
-    h += '<div class="trans-item">';
-    h += '<span class="trans-song"><span class="trans-song-name">' + from + '</span></span>';
-    h += '<span class="trans-arrow">→</span>';
-    h += '<span class="trans-song"><span class="trans-song-name">' + to + '</span></span>';
-    h += '<span class="trans-badge">×' + t.count + '</span>';
-    h += dots;
+
+    h += '<div class="trans-entry">';
+
+    // context_before (up to 3 items)
+    if (t.context_before && t.context_before.length) {
+      t.context_before.slice(0, 3).forEach(ctx => {
+        h += '<div class="trans-context">';
+        h += '<span class="trans-context-arrow">←</span> ';
+        h += esc(ctx.artist) + ' — ' + esc(ctx.title);
+        if (ctx.count) h += ' <span style="color:var(--muted)">×' + ctx.count + '</span>';
+        h += '</div>';
+      });
+    }
+
+    // Main transition
+    h += '<div class="trans-main">' + from + ' <span style="color:var(--accent)">→</span> ' + to + '</div>';
+
+    // Count + probability
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px">';
+    h += '<span style="font-size:.78rem;font-weight:700;color:var(--accent);direction:ltr">×' + t.count + '</span>';
+    if (prob > 0) h += '<span style="font-size:.7rem;color:var(--muted);direction:ltr">' + prob + '%</span>';
+    h += '</div>';
+
+    // Probability bar
+    if (prob > 0) {
+      h += '<div class="trans-prob-bar"><div class="trans-prob-fill" style="width:' + prob + '%;background:' + probColor + '"></div></div>';
+    }
+
+    // context_after (up to 3 items)
+    if (t.context_after && t.context_after.length) {
+      t.context_after.slice(0, 3).forEach(ctx => {
+        h += '<div class="trans-context">';
+        h += '<span class="trans-context-arrow">→</span> ';
+        h += esc(ctx.artist) + ' — ' + esc(ctx.title);
+        if (ctx.count) h += ' <span style="color:var(--muted)">×' + ctx.count + '</span>';
+        h += '</div>';
+      });
+    }
+
+    // Hour breakdown
+    if (t.hour_buckets) {
+      const bkEmoji = { morning: '☀️', afternoon: '🌤', evening: '🌙', night: '🌜' };
+      const bkColors = { morning: '#d4b85a', afternoon: '#6ab8e3', evening: '#e38a6a', night: '#8080c0' };
+      h += '<div class="trans-hour-breakdown">';
+      let hasHourData = false;
+      Object.keys(bkEmoji).forEach(bk => {
+        if (t.hour_buckets[bk] && t.hour_buckets[bk].count > 0) {
+          hasHourData = true;
+          const pct = t.hour_buckets[bk].probability || (t.hour_buckets[bk].count / t.count * 100);
+          h += '<div class="trans-hour-seg" style="background:' + bkColors[bk] + ';width:' + pct + '%" title="' + bkEmoji[bk] + ' ' + t.hour_buckets[bk].count + '× (' + pct.toFixed(0) + '%)"></div>';
+        }
+      });
+      if (!hasHourData) {
+        h += '<div style="font-size:.6rem;color:var(--muted)">אין נתוני שעות</div>';
+      }
+      h += '</div>';
+    }
+
+    // Station dots (when "הכל" selected)
+    if (dots) h += dots;
+
     h += '</div>';
   });
+
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
 }
 
@@ -1036,6 +1323,12 @@ function renderClusters() {
 
 /* ── Redundancy ── */
 function renderRedundancy() {
+  // Update section-sub with formula
+  const subEl = document.querySelector('.card:has(#redundancyContent) .section-sub');
+  if (subEl) {
+    subEl.innerHTML = 'כמה כל תחנה חוזרת על עצמה? פחות = יותר גיוון.<br><span style="font-size:.68rem;color:var(--muted)">song_repeat_pct = (total_plays − unique_songs) / total_plays × 100</span>';
+  }
+
   const el = document.getElementById('redundancyContent');
   if (!D.trends || !D.trends.redundancy) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
   const red = D.trends.redundancy;
@@ -1045,19 +1338,194 @@ function renderRedundancy() {
   }
 
   const stationData = red.stations || {};
+  const dailyTrend = red.daily_trend || {};
   const entries = Object.entries(stationData).sort((a, b) => b[1].song_repeat_pct - a[1].song_repeat_pct);
 
-  let h = '';
+  let h = '<div class="red-legend"><span><span style="display:inline-block;width:8px;height:8px;background:#5ddbb5;border-radius:2px"></span> נמוך</span><span><span style="display:inline-block;width:8px;height:8px;background:#d4b85a;border-radius:2px"></span> בינוני</span><span><span style="display:inline-block;width:8px;height:8px;background:#e05555;border-radius:2px"></span> גבוה</span></div>';
+
   entries.forEach(([slug, data]) => {
-    const pct = data.song_repeat_pct;
-    const barColor = pct > 30 ? '#e05555' : pct > 15 ? '#d4b85a' : ACCENT;
-    h += '<div class="redundancy-row">';
+    const songPct = data.song_repeat_pct || 0;
+    const artistPct = data.artist_repeat_pct || 0;
+    const songColor = songPct > 30 ? '#e05555' : songPct > 15 ? '#d4b85a' : '#5ddbb5';
+    const artistColor = artistPct > 40 ? '#e05555' : artistPct > 20 ? '#d4b85a' : '#5ddbb5';
+    const isExpanded = expandedRedundancySlug === slug;
+
+    // Build sparkline if daily trend data exists
+    let sparkSvg = '';
+    const trend = dailyTrend[slug];
+    if (trend && trend.length >= 2) {
+      const svgW = 200, svgH = 30, pad = 2;
+      const vals = trend.map(d => d.song_repeat_pct);
+      const min = Math.min(...vals);
+      const max = Math.max(...vals);
+      const range = Math.max(max - min, 1);
+      const xStep = (svgW - pad * 2) / (vals.length - 1);
+      const yScale = (v) => svgH - pad - ((v - min) / range) * (svgH - pad * 2);
+      let points = vals.map((v, i) => (i * xStep + pad) + ',' + yScale(v));
+      const trendColor = vals[vals.length - 1] > vals[0] ? '#e05555' : '#5ddbb5';
+      sparkSvg = '<svg class="sparkline" width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '">' +
+        '<polyline fill="none" stroke="' + trendColor + '" stroke-width="1.5" points="' + points.join(' ') + '"/>' +
+        '</svg>';
+    }
+
+    h += '<div class="redundancy-row" data-slug="' + slug + '" onclick="toggleRedundancyExpanded(\'' + slug + '\')">';
+    h += '<div style="flex:1;min-width:0">';
     h += '<span class="redundancy-name" style="color:' + color(slug) + '">' + esc(name(slug)) + '</span>';
-    h += '<div class="redundancy-bar"><div class="redundancy-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>';
-    h += '<span class="redundancy-pct">' + pct + '%</span>';
+    // Plays + unique info
+    h += '<div style="font-size:.65rem;color:var(--muted);margin-top:1px">';
+    h += (data.plays || 0) + ' השמעות · ' + (data.unique_songs || 0) + ' שירים ייחודיים · ' + (data.unique_artists || 0) + ' אמנים';
     h += '</div>';
+    // Sparkline
+    if (sparkSvg) h += sparkSvg;
+    h += '</div>';
+
+    // Double bars
+    h += '<div class="redundancy-double-bar" style="flex:2">';
+    // Songs bar
+    h += '<div class="redundancy-bar-group">';
+    h += '<div class="redundancy-bar-label">שירים</div>';
+    h += '<div class="redundancy-bar"><div class="redundancy-fill" style="width:' + songPct + '%;background:' + songColor + '"></div></div>';
+    h += '</div>';
+    // Artists bar
+    h += '<div class="redundancy-bar-group">';
+    h += '<div class="redundancy-bar-label">אמנים</div>';
+    h += '<div class="redundancy-bar"><div class="redundancy-fill" style="width:' + artistPct + '%;background:' + artistColor + '"></div></div>';
+    h += '</div>';
+    h += '</div>';
+
+    // Percentage
+    h += '<div><span class="redundancy-pct">' + songPct + '%</span><br><span style="font-size:.6rem;color:var(--muted)">שירים</span>';
+    h += ' <span class="redundancy-pct" style="margin-top:2px">' + artistPct + '%</span><br><span style="font-size:.6rem;color:var(--muted)">אמנים</span></div>';
+
+    h += '</div>';
+
+    // Expanded section
+    if (isExpanded) {
+      h += '<div class="redundancy-expanded">';
+
+      // Formula calculation
+      const expl = data.explanation || {};
+      h += '<div class="redundancy-formula">שירים: (' + (expl.total_plays || data.plays) + ' − ' + (expl.unique_songs || data.unique_songs) + ') / ' + (expl.total_plays || data.plays) + ' × 100 = ' + songPct + '%</div>';
+      if (data.artist_repeat_pct !== undefined) {
+        h += '<div class="redundancy-formula">אמנים: (' + (expl.total_plays || data.plays) + ' − ' + (expl.unique_artists || data.unique_artists) + ') / ' + (expl.total_plays || data.plays) + ' × 100 = ' + artistPct + '%</div>';
+      }
+
+      // Top repeated songs
+      if (data.top_repeated_songs && data.top_repeated_songs.length) {
+        h += '<div style="font-weight:700;font-size:.72rem;margin-top:6px;margin-bottom:3px">🔁 שירים חוזרים</div>';
+        data.top_repeated_songs.slice(0, 8).forEach(item => {
+          h += '<div class="redundancy-top-item">';
+          h += '<span>' + esc(item.artist) + ' — ' + esc(item.title) + '</span>';
+          const pctOfTotal = data.plays ? ((item.plays || item.count || 0) / data.plays * 100).toFixed(1) : '—';
+          h += '<span class="top-count">' + (item.plays || item.count || 0) + '× (' + pctOfTotal + '%)</span>';
+          h += '</div>';
+        });
+      }
+
+      // Top repeated artists
+      if (data.top_repeated_artists && data.top_repeated_artists.length) {
+        h += '<div style="font-weight:700;font-size:.72rem;margin-top:6px;margin-bottom:3px">🔁 אמנים חוזרים</div>';
+        data.top_repeated_artists.slice(0, 6).forEach(item => {
+          h += '<div class="redundancy-top-item">';
+          h += '<span>' + esc(item.artist) + '</span>';
+          h += '<span class="top-count">' + (item.plays || item.count || 0) + '×</span>';
+          h += '</div>';
+        });
+      }
+
+      h += '</div>';
+    }
   });
+
+  // Comparison table
+  h += '<div class="redundancy-table">';
+  h += '<table>';
+  h += '<thead><tr><th>תחנה</th><th>השמעות</th><th>שירים ייחודיים</th><th>חזרתיות שירים</th><th>אמנים ייחודיים</th><th>חזרתיות אמנים</th><th>מגמה</th></tr></thead>';
+  h += '<tbody>';
+  entries.forEach(([slug, data]) => {
+    const trend = dailyTrend[slug];
+    let trendIcon = '—';
+    if (trend && trend.length >= 2) {
+      const firstVal = trend[0].song_repeat_pct;
+      const lastVal = trend[trend.length - 1].song_repeat_pct;
+      trendIcon = lastVal > firstVal ? '▲ <span style="color:#e05555">' : '▼ <span style="color:#5ddbb5">';
+      trendIcon += Math.abs(lastVal - firstVal).toFixed(1) + '%</span>';
+    }
+    h += '<tr>';
+    h += '<td><span class="tr-dot" style="background:' + color(slug) + '"></span>' + esc(name(slug)) + '</td>';
+    h += '<td>' + (data.plays || 0) + '</td>';
+    h += '<td>' + (data.unique_songs || 0) + '</td>';
+    h += '<td>' + (data.song_repeat_pct || 0) + '%</td>';
+    h += '<td>' + (data.unique_artists || 0) + '</td>';
+    h += '<td>' + (data.artist_repeat_pct || 0) + '%</td>';
+    h += '<td>' + trendIcon + '</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
+}
+
+function toggleRedundancyExpanded(slug) {
+  expandedRedundancySlug = expandedRedundancySlug === slug ? null : slug;
+  renderRedundancy();
+}
+
+/* ── Uptime ── */
+function renderUptime() {
+  const el = document.getElementById('uptimeContent');
+  if (!D.uptime) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">נתוני תפעול בבנייה...</div>'; return; }
+
+  const ut = D.uptime;
+  let h = '';
+
+  // Status indicator
+  const statusMap = { 'up': '🟢 פעיל', 'partial': '🟡 מושבת חלקית', 'down': '🔴 מושבת' };
+  const statusColor = { 'up': '#5ddbb5', 'partial': '#d4b85a', 'down': '#e05555' };
+  const statusLabel = statusMap[ut.status] || '🟡 לא ידוע';
+  h += '<div class="uptime-status" style="color:' + (statusColor[ut.status] || '#d4b85a') + '">' + statusLabel + '</div>';
+
+  // Uptime percentage bar for 7d
+  const uptimePct = ut.uptime_pct_7d || 0;
+  const uptimeColor = uptimePct >= 99.5 ? '#5ddbb5' : uptimePct >= 95 ? '#d4b85a' : '#e05555';
+  h += '<div style="font-size:.72rem;color:var(--muted);margin-bottom:4px">זמינות 7 ימים: ' + uptimePct + '%</div>';
+  h += '<div class="uptime-bar"><div class="uptime-fill" style="width:' + uptimePct + '%;background:' + uptimeColor + '"></div></div>';
+
+  // Collector uptime
+  if (ut.collector_uptime_seconds) {
+    const days = Math.floor(ut.collector_uptime_seconds / 86400);
+    const hours = Math.floor((ut.collector_uptime_seconds % 86400) / 3600);
+    h += '<div style="font-size:.68rem;color:var(--muted);margin-top:4px">⏱ רץ ברציפות: ' + (days > 0 ? days + ' ימים ' : '') + hours + ' שעות</div>';
+  }
+
+  // Per-station mini dots
+  if (ut.per_station) {
+    h += '<div class="uptime-mini-dots">';
+    Object.entries(ut.per_station).forEach(([slug, st]) => {
+      const stUptime = st.uptime_pct_7d || 0;
+      const dotColor = stUptime >= 100 ? '#5ddbb5' : stUptime >= 95 ? '#d4b85a' : '#e05555';
+      h += '<span class="uptime-mini-dot" style="background:' + dotColor + '" title="' + esc(name(slug)) + ': ' + stUptime + '%"></span>';
+    });
+    h += '</div>';
+  }
+
+  // Recent outages
+  if (ut.recent_outages && ut.recent_outages.length) {
+    h += '<div style="font-weight:700;font-size:.72rem;margin-top:10px;margin-bottom:4px">⚠ הפסקות אחרונות</div>';
+    ut.recent_outages.slice(0, 3).forEach(o => {
+      const src = o.source || o.event_type || 'unknown';
+      const dur = o.duration_seconds ? (o.duration_seconds < 60 ? o.duration_seconds + ' שנ׳' : Math.floor(o.duration_seconds / 60) + ' דק׳') : '—';
+      const started = o.started_at ? new Date(o.started_at).toLocaleString('he-IL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' }) : '—';
+      h += '<div class="uptime-outage">';
+      h += '<span class="uptime-outage-source">📻 ' + esc(src) + '</span>';
+      h += '<span class="uptime-outage-desc">' + started + ' (' + dur + ')' + (o.description ? ' — ' + esc(o.description) : '') + '</span>';
+      h += '</div>';
+    });
+  } else {
+    h += '<div style="font-size:.7rem;color:var(--muted);margin-top:6px">✅ אין הפסקות אחרונות</div>';
+  }
+
+  el.innerHTML = h;
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -1081,6 +1549,7 @@ function renderAll() {
     renderTransitions();
     renderClusters();
     renderRedundancy();
+    renderUptime();
   }
 }
 
@@ -1100,6 +1569,7 @@ async function init() {
 
   renderPills();
   renderAll();
+  startLiveTimers();
   // Set initial button states
   document.getElementById('histDedupBtn').classList.add('active');
 

@@ -27,7 +27,23 @@ VENV_PYTHON = SHAZAMIO_DIR / ".venv" / "bin" / "python"
 
 # Import station config
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
-from supabase_db import STATIONS_CONFIG  # noqa: E402
+from supabase_db import STATIONS_CONFIG, SupabaseDB  # noqa: E402
+
+# ── event recording helpers ──────────────────────────────────────────
+try:
+    _event_db = SupabaseDB()
+except Exception:
+    _event_db = None
+
+
+def _record_event(event_type: str, source: str, description: str = "") -> None:
+    """Record a system event in Supabase (best-effort, never crashes)."""
+    if _event_db is None:
+        return
+    try:
+        _event_db.record_system_event(event_type, source, description)
+    except Exception:
+        pass
 
 # Seconds a proxy waits after a successful recognition before sampling again.
 # This is the main lever on Shazam call volume: 8 stations at 20s was ~2k
@@ -133,6 +149,7 @@ def start_one(slug: str) -> dict[str, Any]:
         _pid_file(slug).write_text(str(proc.pid))
         print(json.dumps({"event": "proxy_started", "slug": slug, "port": port, "pid": proc.pid}),
               flush=True)
+        _record_event("proxy_start", slug, f"Proxy {slug} started")
         return {"ok": True, "slug": slug, "port": port, "pid": proc.pid, "status": "started"}
     except Exception as e:
         return {"ok": False, "error": str(e)}
@@ -282,6 +299,7 @@ def main() -> None:
             stop_one(args.slug)
             time.sleep(1)
             result = start_one(args.slug)
+            _record_event("proxy_restart", args.slug, f"Proxy {args.slug} restarted")
         else:
             stop_all()
             time.sleep(2)

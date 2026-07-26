@@ -22,6 +22,7 @@ Files written to docs/data/:
 from __future__ import annotations
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -108,8 +109,14 @@ def song_key(t: dict[str, Any]) -> str:
     return (t["artist"] or "").lower() + "|" + (t["title"] or "").lower()
 
 
-def build_top(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
-    """Top artists/songs per window with previous-window counts for trend arrows."""
+def build_top(tracks: list[dict[str, Any]], now: datetime,
+              first_seen_map: dict[str, str] | None = None) -> dict[str, Any]:
+    """Top artists/songs per window with previous-window counts for trend arrows.
+
+    When first_seen_map is provided, each song/artist entry also gets
+    'first_seen' and 'is_new' fields for the "חדש" badge (new = discovered
+    within last 7 days).
+    """
     windows: dict[str, Any] = {}
     for name, hours in TOP_WINDOWS:
         if hours is None:
@@ -138,9 +145,13 @@ def build_top(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
 
         def finalize(cur_map, prev_map):
             out = []
+            seven_days_ago = (now - timedelta(days=7)).strftime("%Y-%m-%d")
             for key, e in sorted(cur_map.items(), key=lambda kv: -kv[1]["count"])[:TOP_LIMIT]:
                 e["stations"] = dict(e["stations"])
                 e["prev"] = prev_map.get(key, {}).get("count", 0)
+                if first_seen_map:
+                    e["first_seen"] = first_seen_map.get(key, "unknown")
+                    e["is_new"] = e["first_seen"] >= seven_days_ago if e["first_seen"] != "unknown" else False
                 out.append(e)
             return out
 
@@ -602,74 +613,229 @@ def build_bpm_key(tracks: list[dict[str, Any]],
                 "count": len(vals),
             })
 
+    now = datetime.now(timezone.utc)
     return {
         "stations": stations_out,
         "cross_station": {
             "bpm_by_key": bpm_by_key_out,
             "bpm_by_hour": cross_hour_out,
         },
+        "lookback": {
+            "start": REPEAT_DATA_EPOCH.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "end": now_iso(),
+            "days": round((now - REPEAT_DATA_EPOCH).total_seconds() / 86400, 1),
+            "description": "כל הדאטה הזמינה מ-REPEAT_DATA_EPOCH",
+        },
     }
 
 
 def build_transitions(tracks: list[dict[str, Any]], slugs: list[str]) -> dict[str, Any]:
-    """Compute song transitions: which tracks follow which.
-    
-    For each station, find consecutive tracks (within 5 min window) and count
-    how many times track B follows track A. Returns top transitions per station.
+    """Compute song transitions: Markov Chain Radio Programming (v2).
+
+    For each station (repeat-safe tracks only), find consecutive tracks within
+    a 5-minute window and build:
+
+      - transition_counts: A→B with per-transition metadata
+      - probability: P(B|A) = count(A→B) / count(A→*)
+      - context_before: top 3 precursors to A (what leads into this transition)
+      - context_after:  top 3 successors from B (what follows this transition)
+      - hour_buckets:   morning/afternoon/evening/night breakdown per transition
+      - hour_distribution: station-wide time-of-day distribution
+      - meta:           total_tracks, total_transitions, lookback, entropy, formulas
     """
     TRANSITION_WINDOW_MIN = 5
     TOP_N = 20
-    
+
+    safe = repeat_safe(tracks)
+
     by_station: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for t in tracks:
+    for t in safe:
         by_station[t["station_slug"]].append(t)
-    
+
+    # Map song_key → metadata lookup
+    def _hour_bucket(il_hour: int) -> str:
+        if 6 <= il_hour <= 11:
+            return "morning"
+        if 12 <= il_hour <= 17:
+            return "afternoon"
+        if 18 <= il_hour <= 23:
+            return "evening"
+        return "night"
+
     stations_out: dict[str, Any] = {}
     for slug in slugs:
         st = by_station.get(slug, [])
         if len(st) < 2:
             continue
-        
+
         # Sort by time (oldest first)
         st_sorted = sorted(st, key=lambda x: x["_dt"])
-        
-        # Count transitions
-        transition_counts: dict[str, dict[str, Any]] = {}
+
+        # Lookup song metadata from key
+        song_meta: dict[str, dict[str, str]] = {}
+        for t in st_sorted:
+            sk = song_key(t)
+            if sk not in song_meta:
+                song_meta[sk] = {"artist": t["artist"], "title": t["title"]}
+
+        # ── Pass 1: count transitions, from-totals, hour buckets ────────
+        # transition_counts: song_key(A) + "|" + song_key(B) -> {count, hour_buckets}
+        trans_counts: dict[str, dict[str, Any]] = {}
+        # from_total: slug + "|" + song_key(A) -> count of times A was followed by anything
+        from_total: dict[str, int] = defaultdict(int)
+        # Predecessor/successor lookup for context_before/after
+        into_song: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        out_of_song: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        # Station-wide hour distribution
+        hour_dist_raw: dict[str, int] = {"morning": 0, "afternoon": 0, "evening": 0, "night": 0}
+
         for i in range(len(st_sorted) - 1):
             t1 = st_sorted[i]
             t2 = st_sorted[i + 1]
-            
-            # Check if within window
             delta_min = (t2["_dt"] - t1["_dt"]).total_seconds() / 60
             if delta_min > TRANSITION_WINDOW_MIN:
                 continue
-            
-            key = (t1["artist"] or "").lower() + "|" + (t1["title"] or "").lower() + "|" + \
-                  (t2["artist"] or "").lower() + "|" + (t2["title"] or "").lower()
-            
-            if key not in transition_counts:
-                transition_counts[key] = {
+
+            fk = song_key(t1)
+            tk = song_key(t2)
+            trans_key = fk + "||" + tk
+
+            # Increment from_total for the "from" song
+            from_total[slug + "|" + fk] += 1
+
+            if trans_key not in trans_counts:
+                trans_counts[trans_key] = {
                     "from_artist": t1["artist"],
                     "from_title": t1["title"],
                     "to_artist": t2["artist"],
                     "to_title": t2["title"],
                     "count": 0,
+                    "hour_buckets": {"morning": 0, "afternoon": 0, "evening": 0, "night": 0},
                 }
-            transition_counts[key]["count"] += 1
-        
-        # Calculate probabilities and sort
-        transitions = list(transition_counts.values())
-        total_transitions = sum(t["count"] for t in transitions)
-        for t in transitions:
-            t["probability"] = t["count"] / total_transitions if total_transitions > 0 else 0
-        
-        transitions.sort(key=lambda x: -x["count"])
-        
+            trans_counts[trans_key]["count"] += 1
+
+            # Hour bucket for this transition (based on t1's IL hour)
+            bucket = _hour_bucket(t1["_il"].hour)
+            trans_counts[trans_key]["hour_buckets"][bucket] += 1
+            hour_dist_raw[bucket] += 1
+
+            # Predecessor/successor tracking
+            into_song[tk][fk] += 1
+            out_of_song[fk][tk] += 1
+
+        # ── Station-wide hour distribution as percentages ───────────────
+        total_slots = sum(hour_dist_raw.values())
+        hour_distribution: dict[str, dict[str, Any]] = {}
+        for bucket in ["morning", "afternoon", "evening", "night"]:
+            cnt = hour_dist_raw[bucket]
+            hour_distribution[bucket] = {
+                "total": cnt,
+                "pct": round(cnt / total_slots * 100, 1) if total_slots > 0 else 0,
+            }
+
+        if not trans_counts:
+            # No transitions within window — skip station
+            continue
+
+        # ── Pass 2: build enriched transition list ─────────────────────
+        transitions_list: list[dict[str, Any]] = []
+        for trans_key, tc in trans_counts.items():
+            fk, tk = trans_key.split("||", 1)
+
+            # Probability: P(B|A) = count(A→B) / count(A→*)
+            denom = from_total.get(slug + "|" + fk, 0)
+            prob = round(tc["count"] / denom * 100, 1) if denom > 0 else 0
+
+            # Context_before: top 3 precursors to A
+            # P(Z as predecessor of A): count(Z→A) / sum(all→A)
+            into_a = into_song.get(fk, {})
+            into_total = sum(into_a.values())
+            ctx_before = []
+            for pred_key, pred_count in sorted(into_a.items(), key=lambda x: -x[1])[:3]:
+                meta = song_meta.get(pred_key, {"artist": "?", "title": "?"})
+                ctx_before.append({
+                    "artist": meta["artist"],
+                    "title": meta["title"],
+                    "count": pred_count,
+                    "probability": round(pred_count / into_total * 100, 1) if into_total > 0 else 0,
+                })
+
+            # Context_after: top 3 successors from B
+            # P(C as successor of B): count(B→C) / sum(B→*)
+            out_of_b = out_of_song.get(tk, {})
+            out_total = sum(out_of_b.values())
+            ctx_after = []
+            for succ_key, succ_count in sorted(out_of_b.items(), key=lambda x: -x[1])[:3]:
+                meta = song_meta.get(succ_key, {"artist": "?", "title": "?"})
+                ctx_after.append({
+                    "artist": meta["artist"],
+                    "title": meta["title"],
+                    "count": succ_count,
+                    "probability": round(succ_count / out_total * 100, 1) if out_total > 0 else 0,
+                })
+
+            # Hour buckets with probabilities
+            hb = tc["hour_buckets"]
+            hb_total = sum(hb.values())
+            hour_buckets_out: dict[str, dict[str, Any]] = {}
+            for bucket in ["morning", "afternoon", "evening", "night"]:
+                cnt = hb[bucket]
+                hour_buckets_out[bucket] = {
+                    "count": cnt,
+                    "probability": round(cnt / hb_total * 100, 1) if hb_total > 0 else 0,
+                }
+
+            transitions_list.append({
+                "from_artist": tc["from_artist"],
+                "from_title": tc["from_title"],
+                "to_artist": tc["to_artist"],
+                "to_title": tc["to_title"],
+                "count": tc["count"],
+                "probability": prob,
+                "context_before": ctx_before,
+                "context_after": ctx_after,
+                "hour_buckets": hour_buckets_out,
+            })
+
+        # Sort by count descending, take top N
+        transitions_list.sort(key=lambda x: -x["count"])
+        transitions_list = transitions_list[:TOP_N]
+
+        # ── Entropy (Shannon) ───────────────────────────────────────────
+        trans_total = sum(tc["count"] for tc in trans_counts.values())
+        entropy = 0.0
+        for tc in trans_counts.values():
+            p = tc["count"] / trans_total if trans_total > 0 else 0
+            if p > 0:
+                entropy -= p * math.log2(p)
+        entropy = round(entropy, 2)
+
+        # ── Meta block ──────────────────────────────────────────────────
+        total_tracks = len(st_sorted)
+        transition_rate = round(trans_total / (total_tracks - 1), 2) if total_tracks > 1 else 0
+
+        now = datetime.now(timezone.utc)
+        lookback_days = round((now - REPEAT_DATA_EPOCH).total_seconds() / 86400, 1)
+
         stations_out[slug] = {
-            "transitions": transitions[:TOP_N],
-            "total_transitions": total_transitions,
+            "meta": {
+                "total_tracks": total_tracks,
+                "total_transitions": trans_total,
+                "lookback_start": REPEAT_DATA_EPOCH.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "lookback_days": lookback_days,
+                "transition_rate": transition_rate,
+                "entropy": entropy,
+                "formula": {
+                    "probability": "P(B|A) = count(A→B) / count(A→*)",
+                    "context_before": "P(Z|A) = count(Z→A) / count(Z→*)",
+                    "transition_rate": "transitions / (total_tracks - 1)",
+                    "entropy": "H = -Σ P(i) × log₂(P(i))",
+                },
+            },
+            "transitions": transitions_list,
+            "hour_distribution": hour_distribution,
         }
-    
+
     return {"stations": stations_out}
 
 
@@ -697,8 +863,42 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     def public(t: dict[str, Any]) -> dict[str, Any]:
         return {k: v for k, v in t.items() if not k.startswith("_")}
 
+    # ── Build first_seen map from all tracks ──────────────────────
+    first_seen_map: dict[str, str] = {}
+    for t in sorted(tracks, key=lambda x: x["_dt"]):
+        first_seen_map.setdefault(song_key(t), t["_il"].strftime("%Y-%m-%d"))
+
     write_json(output_dir / "stations.json", stations, sizes, "stations.json")
-    write_json(output_dir / "current.json", db.get_all_current_tracks(), sizes, "current.json")
+
+    # ── Now Playing: add first_seen_at and duration_seconds ───────
+    current_tracks = db.get_all_current_tracks()
+    current_annotated = []
+    for ct in current_tracks:
+        # Build station-specific history (sorted oldest first)
+        station_slug = ct.get("station_slug") or ct.get("slug", "")
+        st_tracks = sorted(
+            [t for t in tracks if t["station_slug"] == station_slug],
+            key=lambda x: x["_dt"],
+        )
+        # Walk backwards to find first consecutive play
+        current_key = song_key(ct)
+        first_seen = ct.get("recognized_at", "")
+        for t in reversed(st_tracks):
+            if song_key(t) == current_key:
+                first_seen = t["recognized_at"]
+            else:
+                break  # found a different song, stop
+        # Compute duration
+        duration_seconds = 0
+        if first_seen:
+            dt_first = parse_utc(first_seen)
+            if dt_first:
+                duration_seconds = round((datetime.now(timezone.utc) - dt_first).total_seconds())
+        entry = public(ct)
+        entry["first_seen_at"] = first_seen
+        entry["duration_seconds"] = duration_seconds
+        current_annotated.append(entry)
+    write_json(output_dir / "current.json", current_annotated, sizes, "current.json")
 
     write_json(output_dir / "history.json", {
         "history": [public(t) for t in tracks],
@@ -706,7 +906,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         "returned": len(tracks),
     }, sizes, "history.json")
 
-    write_json(output_dir / "top.json", {"windows": build_top(tracks, now)}, sizes, "top.json")
+    write_json(output_dir / "top.json", {"windows": build_top(tracks, now, first_seen_map)}, sizes, "top.json")
 
     # v2: removed timeline.json, heatmap.json, non_music.json
     trends = build_trends(tracks, now)
@@ -743,20 +943,71 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         top_artists = [{"artist": art_name[k], "plays": c}
                        for k, c in sorted(art_map.items(), key=lambda x: -x[1])[:5]
                        if c > 1]
+        song_rep_pct = round((total - unique_songs) / total * 100, 1)
+        artist_rep_pct = round((total - unique_artists) / total * 100, 1)
         station_rep[slug] = {
             "plays": total,
             "unique_songs": unique_songs,
             "unique_artists": unique_artists,
-            "song_repeat_pct": round((total - unique_songs) / total * 100, 1),
-            "artist_repeat_pct": round((total - unique_artists) / total * 100, 1),
+            "song_repeat_pct": song_rep_pct,
+            "artist_repeat_pct": artist_rep_pct,
             "top_repeated_songs": top_songs,
             "top_repeated_artists": top_artists,
+            "explanation": {
+                "total_plays": total,
+                "unique_songs": unique_songs,
+                "repeated_songs": total - unique_songs,
+                "unique_artists": unique_artists,
+                "repeated_artist_plays": total - unique_artists,
+                "song_repeat_calc": f"({total} - {unique_songs}) / {total} × 100 = {song_rep_pct}%",
+                "artist_repeat_calc": f"({total} - {unique_artists}) / {total} × 100 = {artist_rep_pct}%",
+            },
         }
+
+    # ── Daily redundancy trend (line chart data) ──────────────────
+    daily_rep_dates = sorted(set(
+        t["_il"].strftime("%Y-%m-%d") for t in trusted
+    ))
+    daily_rep_trend: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for date_key in daily_rep_dates:
+        day_filtered = [t for t in trusted if t["_il"].strftime("%Y-%m-%d") == date_key]
+        for slug in slugs:
+            st_day = [t for t in day_filtered if t["station_slug"] == slug]
+            if len(st_day) < 10:
+                continue
+            unique = len(set(song_key(t) for t in st_day))
+            daily_rep_trend[slug].append({
+                "date": date_key,
+                "song_repeat_pct": round((len(st_day) - unique) / len(st_day) * 100, 1),
+                "plays": len(st_day),
+            })
+
     trends["redundancy"] = {
         "ready": ready,
         "hours_collected": round(max(0.0, hours_since), 1),
         "hours_required": MIN_EPOCH_HOURS,
+        "formula": {
+            "song_repeat_pct": {
+                "formula": "(total_plays - unique_songs) / total_plays × 100",
+                "description": "אחוז ההשמעות שהן שירים חוזרים (אותו שיר, אותו אמן)",
+                "total_plays_label": "סך כל ההשמעות בתחנה",
+                "unique_label": "שירים שונים שזוהו",
+                "example": "712 plays, 624 unique → (712-624)/712×100 = 12.3%",
+            },
+            "artist_repeat_pct": {
+                "formula": "(total_plays - unique_artists) / total_plays × 100",
+                "description": "אחוז ההשמעות שהן חזרה על אותו אמן (שיר שונה, אמן זהה)",
+                "total_plays_label": "סך כל ההשמעות בתחנה",
+                "unique_label": "אמנים שונים שזוהו",
+                "example": "712 plays, 412 unique_artists → (712-412)/712×100 = 42.1%",
+            },
+            "lookback": {
+                "from": REPEAT_DATA_EPOCH.isoformat(),
+                "description": "חזרתיות מחושבת רק על דאטה אמין (אחרי תיקון הדדאפ)",
+            },
+        },
         "stations": station_rep,
+        "daily_trend": dict(daily_rep_trend),
     }
     write_json(output_dir / "trends.json", trends, sizes, "trends.json")
     write_json(output_dir / "cross_station.json",
@@ -822,6 +1073,67 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
             "history": [public(t) for t in s_tracks],
             "total": len(s_tracks),
         }, sizes, f"stations/{s['slug']}/history.json")
+
+    # ── Uptime / System Events ────────────────────────────────────
+    uptime_data: dict[str, Any] = {
+        "status": "unknown",
+        "uptime_pct_7d": 100.0,
+        "uptime_pct_30d": 100.0,
+        "recent_outages": [],
+        "per_station": {},
+    }
+    try:
+        recent = db.get_recent_events(days=7, limit=20)
+        uptime_7d = db.get_system_uptime(days=7)
+        uptime_30d = db.get_system_uptime(days=30)
+
+        # Determine current status
+        current_events = [e for e in recent if e.get("ended_at") is None]
+        if current_events:
+            uptime_data["status"] = "down"
+            uptime_data["current_events"] = current_events
+        elif uptime_7d.get("uptime_pct", 100) < 99:
+            uptime_data["status"] = "degraded"
+        else:
+            uptime_data["status"] = "up"
+
+        uptime_data["uptime_pct_7d"] = uptime_7d.get("uptime_pct", 100.0)
+        uptime_data["uptime_pct_30d"] = uptime_30d.get("uptime_pct", 100.0)
+
+        # Recent outages (only closed events with type outage/crash)
+        outages = []
+        for e in recent:
+            if e.get("ended_at") and e.get("event_type") in (
+                "outage_start", "proxy_crash", "collector_crash", "connection_issue"
+            ):
+                outages.append({
+                    "started_at": e["started_at"],
+                    "ended_at": e["ended_at"],
+                    "duration_seconds": e.get("duration_seconds", 0),
+                    "source": e.get("source", ""),
+                    "event_type": e["event_type"],
+                    "description": e.get("description", ""),
+                })
+        uptime_data["recent_outages"] = outages[:5]
+
+        # Per-station stats
+        for s in stations:
+            uptime_data["per_station"][s["slug"]] = {
+                "uptime_pct_7d": 100.0,
+                "last_outage": None,
+            }
+        # Try to compute per-station from events that specify a station source
+        station_slugs_set = set(s["slug"] for s in stations)
+        for e in recent:
+            src = e.get("source", "")
+            if src in station_slugs_set:
+                current_last = uptime_data["per_station"][src].get("last_outage")
+                if current_last is None or e["started_at"] > current_last:
+                    uptime_data["per_station"][src]["last_outage"] = e["started_at"]
+    except Exception as exc:
+        print(f"  [uptime] error building uptime data: {exc}", flush=True)
+
+    write_json(output_dir / "uptime.json", uptime_data, sizes, "uptime.json")
 
     db.close()
     return sizes
