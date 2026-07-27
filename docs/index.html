@@ -336,6 +336,19 @@
     .explorer-empty { text-align: center; padding: 30px; color: var(--muted); font-size: .82rem; }
     .explorer-nav-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
+    /* Cluster/Knowledge graph SVG */
+    .cluster-graph-svg { width: 100%; height: 480px; border-radius: var(--radius); background: var(--card-hover); margin-bottom: 10px; cursor: grab; }
+    .cluster-graph-svg:active { cursor: grabbing; }
+    .cluster-graph-svg .link { stroke: rgba(255,255,255,.15); stroke-width: 1.5; }
+    .cluster-graph-svg .link:hover { stroke: var(--accent); }
+    .cluster-graph-svg .node-center { fill: var(--accent); stroke: #fff; stroke-width: 2; }
+    .cluster-graph-svg .node-neighbor { stroke: rgba(255,255,255,.3); stroke-width: 1; cursor: pointer; }
+    .cluster-graph-svg .node-neighbor:hover { stroke: var(--accent); stroke-width: 2; }
+    .cluster-graph-svg .node-label { font-size: .6rem; fill: var(--muted); pointer-events: none; text-anchor: middle; }
+    .cluster-graph-svg .node-label-center { font-size: .7rem; fill: #fff; font-weight: 700; pointer-events: none; text-anchor: middle; }
+    .cluster-graph-tooltip { position: fixed; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: .75rem; color: var(--fg); pointer-events: none; z-index: 1000; max-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+    .cluster-graph-info { font-size: .7rem; color: var(--muted); text-align: center; margin-top: 6px; gap: 8px; display: flex; flex-wrap: wrap; justify-content: center; }
+
     /* Uptime card */
     .uptime-status{font-size:.9rem;font-weight:700;margin-bottom:6px}
     .uptime-bar{height:10px;border-radius:5px;background:rgba(255,255,255,.05);margin:6px 0;overflow:hidden}
@@ -468,7 +481,8 @@
       <div class="section-title">🔄 חקר מעברים — Transition Explorer</div>
       <div class="section-sub">בנה פלייליסט לפי ההיגיון של תחנת הרדיו — אחרי איזה שיר בא איזה שיר</div>
     </div>
-    <div id="transContent"></div>
+    <div id="transControls"></div>
+    <div id="transResults"></div>
   </div>
 
   <!-- Clusters -->
@@ -479,7 +493,7 @@
     </div>
     <div class="cluster-controls">
       <button class="hist-btn" onclick="pickRandomClusterSong()">🔀 בחר שיר אקראי</button>
-      <input class="cluster-search" id="clusterSearch" placeholder="חפש שיר..." oninput="onClusterSearch()">
+      <input class="cluster-search" id="clusterSearch" dir="auto" placeholder="חפש שיר..." oninput="onClusterSearch()">
     </div>
     <div id="clusterContent"><div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div></div>
   </div>
@@ -1478,44 +1492,50 @@ function renderTransitions() {
 }
 
 function renderTransitionExplorer() {
-  const el = document.getElementById('transContent');
   const map = D.transition_map;
-  if (!map || !map.stations) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">תקלת טעינה...</div>'; return; }
+  if (!map || !map.stations) { document.getElementById('transResults').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">\u05ea\u05e7\u05dc\u05ea \u05d8\u05e2\u05d9\u05e0\u05d4...</div>'; return; }
 
   // Section subtitle with song count
   const totalSongs = Object.values(map.stations).reduce((sum, st) => sum + Object.keys(st.songs || {}).length, 0);
-  const subEl = document.querySelector('.card:has(#transContent) .section-sub');
+  const subEl = document.querySelector('.card:has(#transControls) .section-sub');
   if (subEl && map.meta) {
-    subEl.innerHTML = 'בנה פלייליסט לפי ההיגיון של תחנת הרדיו — ' + (map.meta.total_songs_mapped || totalSongs) + ' שירים ממופים';
+    subEl.innerHTML = '\u05d1\u05e0\u05d4 \u05e4\u05dc\u05d9\u05d9\u05dc\u05d9\u05e1\u05d8 \u05dc\u05e4\u05d9 \u05d4\u05d4\u05d9\u05d2\u05d9\u05d5\u05df \u05e9\u05dc \u05ea\u05d7\u05e0\u05ea \u05d4\u05e8\u05d3\u05d9\u05d5 \u2014 ' + (map.meta.total_songs_mapped || totalSongs) + ' \u05e9\u05d9\u05e8\u05d9\u05dd \u05de\u05de\u05d5\u05e4\u05d9\u05dd';
   }
 
-  let h = '';
-
-  // Controls
-  h += '<div class="explorer-controls">';
-  h += '<button class="explorer-btn" onclick="pickExplorerRandomSong()">🔀 רנדומלי</button>';
-  h += '<input class="explorer-search" id="explorerSearch" placeholder="חפש שיר..." oninput="onExplorerSearch()">';
+  // ---- Controls (only rendered once, written to transControls) ----
+  const ctrlEl = document.getElementById('transControls');
+  let ctrlHtml = '';
+  ctrlHtml += '<div class="explorer-controls">';
+  ctrlHtml += '<button class="explorer-btn" onclick="pickExplorerRandomSong()">\ud83d\udd00 \u05e8\u05e0\u05d3\u05d5\u05de\u05dc\u05d9</button>';
+  ctrlHtml += '<input class="explorer-search" id="explorerSearch" dir="auto" placeholder="\u05d7\u05e4\u05e9 \u05e9\u05d9\u05e8..." oninput="onExplorerSearch()">';
   // Station pills
   const allStations = Object.keys(map.stations);
-  h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-  h += '<button class="window-pill' + (explorerState.currentStation === 'all' ? ' active' : '') + '" onclick="explorerState.currentStation=\'all\';renderTransitionExplorer()">הכל</button>';
+  ctrlHtml += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+  ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === 'all' ? ' active' : '') + '" onclick="explorerState.currentStation=\\'all\\';renderTransitionExplorer()">\u05d4\u05db\u05dc</button>';
   allStations.forEach(slug => {
     const st = stations.find(s => s.slug === slug);
     if (!st) return;
-    h += '<button class="window-pill' + (explorerState.currentStation === slug ? ' active' : '') + '" onclick="explorerState.currentStation=\'' + slug + '\';renderTransitionExplorer()" style="color:' + st.color + '">' + esc(st.name) + '</button>';
+    ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === slug ? ' active' : '') + '" onclick="explorerState.currentStation=\\'' + slug + '\\';renderTransitionExplorer()" style="color:' + st.color + '">' + esc(st.name) + '</button>';
   });
-  h += '</div>';
-  h += '</div>';
+  ctrlHtml += '</div>';
+  ctrlHtml += '</div>';
+
+  // Update controls once
+  if (ctrlEl.innerHTML !== ctrlHtml) { ctrlEl.innerHTML = ctrlHtml; }
+
+  // ---- Results content (fully replaceable) ----
+  const el = document.getElementById('transResults');
+  let h = '';
 
   // Breadcrumb trail
   if (explorerState.history.length > 0) {
     h += '<div class="explorer-breadcrumb">';
     explorerState.history.forEach((item, i) => {
-      if (i > 0) h += '<span class="explorer-breadcrumb-arrow">→</span>';
+      if (i > 0) h += '<span class="explorer-breadcrumb-arrow">\u2192</span>';
       h += '<span class="explorer-breadcrumb-item" onclick="navigateBackTo(' + i + ')">' + esc(item.title) + '</span>';
     });
     if (explorerState.currentSong) {
-      h += '<span class="explorer-breadcrumb-arrow">→</span>';
+      h += '<span class="explorer-breadcrumb-arrow">\u2192</span>';
       h += '<span class="explorer-breadcrumb-item" style="color:var(--fg)">' + esc(explorerState.currentSong.title) + '</span>';
     }
     h += '</div>';
@@ -1523,7 +1543,7 @@ function renderTransitionExplorer() {
 
   // No song selected state
   if (!explorerState.currentSong) {
-    h += '<div class="explorer-empty">בחר שיר כדי להתחיל לחקור<br><span style="font-size:.72rem;color:var(--muted)">לחץ "רנדומלי" או חפש שיר</span></div>';
+    h += '<div class="explorer-empty">\u05d1\u05d7\u05e8 \u05e9\u05d9\u05e8 \u05db\u05d3\u05d9 \u05dc\u05d4\u05ea\u05d7\u05d9\u05dc \u05dc\u05d7\u05e7\u05d5\u05e8<br><span style="font-size:.72rem;color:var(--muted)">\u05dc\u05d7\u05e5 "\u05e8\u05e0\u05d3\u05d5\u05de\u05dc\u05d9" \u05d0\u05d5 \u05d7\u05e4\u05e9 \u05e9\u05d9\u05e8</span></div>';
     el.innerHTML = h;
     return;
   }
@@ -1531,27 +1551,25 @@ function renderTransitionExplorer() {
   // Hero section
   const cs = explorerState.currentSong;
   h += '<div class="explorer-hero">';
-  h += '<div class="explorer-hero-title">🎵 ' + esc(cs.title) + '</div>';
+  h += '<div class="explorer-hero-title">\ud83c\udfb5 ' + esc(cs.title) + '</div>';
   h += '<div class="explorer-hero-artist">' + esc(cs.artist) + '</div>';
   // Station badge if known from last history entry
   if (explorerState.history.length > 0) {
     const lastStation = explorerState.history[explorerState.history.length - 1].station;
     if (lastStation) {
-      h += '<span class="explorer-hero-badge" style="color:' + color(lastStation) + ';border-color:' + color(lastStation) + '40">📻 ' + esc(name(lastStation)) + '</span>';
+      h += '<span class="explorer-hero-badge" style="color:' + color(lastStation) + ';border-color:' + color(lastStation) + '40">\ud83d\udcfb ' + esc(name(lastStation)) + '</span>';
     }
   }
   h += '</div>';
 
-  // "לאן מכאן?" - Outgoing transitions section
-  h += '<div class="explorer-section-title">📍 לאן מכאן?</div>';
+  // Outgoing transitions section
+  h += '<div class="explorer-section-title">\ud83d\udccd \u05dc\u05d0\u05df \u05de\u05db\u05d0\u05df?</div>';
 
   const allOutgoing = [];
-  // Search across all stations (or filtered)
   const stationSlugs = explorerState.currentStation === 'all' ? allStations : [explorerState.currentStation];
   stationSlugs.forEach(slug => {
     const stSongs = map.stations[slug] && map.stations[slug].songs;
     if (!stSongs) return;
-    // The song key format: "title|artist" or "artist|title"? Try both
     const key1 = (cs.title + '|' + cs.artist).toLowerCase();
     const key2 = (cs.artist + '|' + cs.title).toLowerCase();
     const songEntry = stSongs[key1] || stSongs[key2];
@@ -1562,7 +1580,6 @@ function renderTransitionExplorer() {
     }
   });
 
-  // Group by station
   const byStation = {};
   allOutgoing.forEach(t => {
     if (!byStation[t.station]) byStation[t.station] = [];
@@ -1570,21 +1587,20 @@ function renderTransitionExplorer() {
   });
 
   if (Object.keys(byStation).length === 0) {
-    h += '<div style="color:var(--muted);text-align:center;padding:16px;font-size:.82rem">אין מעברים לשיר הזה</div>';
+    h += '<div style="color:var(--muted);text-align:center;padding:16px;font-size:.82rem">\u05d0\u05d9\u05df \u05de\u05e2\u05d1\u05e8\u05d9\u05dd \u05dc\u05e9\u05d9\u05e8 \u05d6\u05d4</div>';
   } else {
-    // Sort stations by number of transitions
     const sortedStations = Object.entries(byStation).sort((a, b) => b[1].length - a[1].length);
     sortedStations.forEach(([slug, transitions]) => {
       const st = stations.find(s => s.slug === slug);
       const stName = st ? st.name : slug;
-      h += '<div class="explorer-station-header" style="color:' + color(slug) + '">📻 ' + esc(stName) + '</div>';
+      h += '<div class="explorer-station-header" style="color:' + color(slug) + '">\ud83d\udcfb ' + esc(stName) + '</div>';
       transitions.sort((a, b) => b.count - a.count).forEach(t => {
         const prob = t.probability || 0;
         const probColor = prob > 60 ? '#e05555' : prob > 30 ? '#d4b85a' : '#5ddbb5';
-        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\'' + slug + '\')">';
+        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\\'' + slug + '\\')">';
         h += '<div class="explorer-card-main">';
-        h += '<div><div class="explorer-card-title">→ ' + esc(t.title) + '</div><div class="explorer-card-artist">' + esc(t.artist) + '</div></div>';
-        h += '<span class="explorer-card-stats">×' + t.count + (prob > 0 ? ' ' + prob + '%' : '') + '</span>';
+        h += '<div><div class="explorer-card-title">\u2192 ' + esc(t.title) + '</div><div class="explorer-card-artist">' + esc(t.artist) + '</div></div>';
+        h += '<span class="explorer-card-stats">\u00d7' + t.count + (prob > 0 ? ' ' + prob + '%' : '') + '</span>';
         h += '</div>';
         if (prob > 0) {
           h += '<div class="explorer-prob-bar"><div class="explorer-prob-fill" style="width:' + prob + '%;background:' + probColor + '"></div></div>';
@@ -1594,12 +1610,11 @@ function renderTransitionExplorer() {
     });
   }
 
-  // Navigation buttons
   h += '<div class="explorer-nav-btns">';
   if (explorerState.history.length > 0) {
-    h += '<button class="explorer-btn" onclick="goBackInPath()">↩ חזרה</button>';
+    h += '<button class="explorer-btn" onclick="goBackInPath()">\u21a9 \u05d7\u05d6\u05e8\u05d4</button>';
   }
-  h += '<button class="explorer-btn" onclick="resetExplorer()">⟳ התחל מחדש</button>';
+  h += '<button class="explorer-btn" onclick="resetExplorer()">\u27f3 \u05d4\u05ea\u05d7\u05dc \u05de\u05d7\u05d3\u05e9</button>';
   h += '</div>';
 
   el.innerHTML = h;
@@ -1676,23 +1691,15 @@ function onExplorerSearch() {
     resultsHtml += '<div style="text-align:center;padding:6px;font-size:.72rem;color:var(--muted)">עוד ' + (results.length - 15) + ' תוצאות...</div>';
   }
 
-  const el = document.getElementById('transContent');
-  // Keep the controls, replace content below
-  const controls = el.querySelector('.explorer-controls');
-  if (controls) {
-    el.innerHTML = controls.outerHTML + resultsHtml;
-    // Re-bind search input
-    const searchInput = el.querySelector('#explorerSearch');
-    if (searchInput) searchInput.oninput = () => onExplorerSearch();
-  } else {
-    el.innerHTML = resultsHtml;
-  }
+  const el = document.getElementById('transResults');
+  el.innerHTML = resultsHtml;
 }
 
 function selectExplorerSong(artist, title) {
   explorerState.currentSong = { artist, title };
   explorerState.history = [];
-  document.getElementById('explorerSearch').value = '';
+  const inp = document.getElementById('explorerSearch');
+  if (inp) inp.value = '';
   renderTransitionExplorer();
 }
 
@@ -1727,7 +1734,8 @@ function resetExplorer() {
   explorerState.currentSong = null;
   explorerState.history = [];
   explorerState.currentStation = 'all';
-  document.getElementById('explorerSearch').value = '';
+  const inp = document.getElementById('explorerSearch');
+  if (inp) inp.value = '';
   renderTransitionExplorer();
 }
 
@@ -1935,16 +1943,14 @@ function renderTransitionsLegacy() {
 function renderClusters() {
   const data = D.clusters;
   if (!data || !data.songs || !data.songs.length) {
-    document.getElementById('clusterContent').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני שירים שמתנגנים יחד עדיין</div>';
+    document.getElementById('clusterContent').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">\u05d0\u05d9\u05df \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d3\u05d9\u05d9\u05df</div>';
     return;
   }
-  // Already rendered by pickRandomClusterSong / onClusterSearch
   // If no song selected yet, show a placeholder
-  if (!document.getElementById('clusterContent').querySelector('.cluster-hero')) {
-    // Only show placeholder if no active selection
-    const content = document.getElementById('clusterContent');
-    if (!content.dataset.active) {
-      content.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div>';
+  const contentEl = document.getElementById('clusterContent');
+  if (!contentEl.querySelector('.cluster-hero') && !contentEl.querySelector('.cluster-graph-svg')) {
+    if (!contentEl.dataset.active) {
+      contentEl.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">\u05dc\u05d7\u05e5 "\u05d1\u05d7\u05e8 \u05e9\u05d9\u05e8 \u05d0\u05e7\u05e8\u05d0\u05d9" \u05d0\u05d5 \u05d7\u05e4\u05e9 \u05e9\u05d9\u05e8</div>';
     }
   }
 }
@@ -1965,7 +1971,18 @@ function selectClusterSong(song) {
   if (!el) return;
   el.dataset.active = 'true';
 
-  // Find station info - look in stations that played this song
+  const neighbors = (song.top || []).slice(0, 12);
+  const hasNeighbors = neighbors.length > 0;
+
+  // Hero section
+  let h = '';
+  h += '<div class="cluster-hero">';
+  h += '<div class="cluster-hero-title">\ud83c\udfb5 ' + esc(song.title) + '</div>';
+  h += '<div class="cluster-hero-artist">' + esc(song.artist) + '</div>';
+  if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' \u05d4\u05e9\u05de\u05e2\u05d5\u05ea</div>';
+  h += '</div>';
+
+  // Station info  
   let stationInfo = '';
   if (D.history && D.history.history) {
     const matches = D.history.history.filter(t =>
@@ -1973,44 +1990,114 @@ function selectClusterSong(song) {
     );
     if (matches.length) {
       const stationCounts = {};
-      matches.forEach(t => {
-        stationCounts[t.station_slug] = (stationCounts[t.station_slug] || 0) + 1;
-      });
+      matches.forEach(t => { stationCounts[t.station_slug] = (stationCounts[t.station_slug] || 0) + 1; });
       stationInfo = Object.entries(stationCounts)
-        .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '×)</span>')
-        .join(' · ');
+        .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '\u00d7)</span>')
+        .join(' \u00b7 ');
     }
   }
 
-  const neighbors = (song.top || []).slice(0, 5);
-  let h = '';
-  // Hero
-  h += '<div class="cluster-hero">';
-  h += '<div class="cluster-hero-title">🎵 ' + esc(song.title) + '</div>';
-  h += '<div class="cluster-hero-artist">' + esc(song.artist) + '</div>';
-  if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' השמעות</div>';
-  h += '</div>';
+  if (!hasNeighbors) {
+    h += '<div style="color:var(--muted);text-align:center;padding:20px">\u05d0\u05d9\u05df \u05e9\u05d9\u05e8\u05d9\u05dd \u05e7\u05e8\u05d5\u05d1\u05d9\u05dd \u05dc\u05e9\u05d9\u05e8 \u05d6\u05d4</div>';
+    if (stationInfo) h += '<div class="cluster-station-info" style="margin-top:8px">\ud83d\udcfb \u05d2\u05dd \u05d1: ' + stationInfo + '</div>';
+    el.innerHTML = h;
+    return;
+  }
 
-  // Neighbors heading
-  h += '<div class="explorer-section-title">🔗 מתנגן יחד עם (' + neighbors.length + '):</div>';
-
-  // Neighbor cards
-  neighbors.forEach((n, i) => {
-    h += '<div class="cluster-card">';
-    h += '<div>';
-    h += '<span class="cluster-card-name">' + esc(n.title) + '</span>';
-    h += '<span class="cluster-card-artist"> — ' + esc(n.artist) + '</span>';
-    h += '</div>';
-    h += '<span class="cluster-card-count">' + (n.count || 0) + '×</span>';
-    h += '</div>';
-  });
-
-  // Station info
+  // D3 Force-directed graph
+  h += '<div class="explorer-section-title">\ud83d\udd17 \u05e8\u05e9\u05ea \u05e7\u05e9\u05e8\u05d9\u05dd</div>';
+  h += '<div id="clusterGraphContainer"><svg class="cluster-graph-svg" id="clusterGraphSvg"></svg></div>';
   if (stationInfo) {
-    h += '<div class="cluster-station-info" style="margin-top:8px">📻 גם ב: ' + stationInfo + '</div>';
+    h += '<div class="cluster-graph-info">\ud83d\udcfb \u05d2\u05dd \u05d1: ' + stationInfo + '</div>';
   }
 
   el.innerHTML = h;
+
+  // Build D3 force graph
+  const container = document.getElementById('clusterGraphContainer');
+  if (!container) return;
+  const width = container.clientWidth || 600;
+  const height = 460;
+
+  const songKey = (song.artist + ' | ' + song.title).toLowerCase();
+  const communityColors = D.clusters && D.clusters.communities
+    ? Object.fromEntries(D.clusters.communities.map(c => [c.id, c.color]))
+    : {};
+
+  const nodes = [{ id: songKey, artist: song.artist, title: song.title, plays: song.plays || 0, isCenter: true }];
+  const links = [];
+  neighbors.forEach(n => {
+    const nk = (n.artist + ' | ' + n.title).toLowerCase();
+    if (nk === songKey) return;
+    nodes.push({ id: nk, artist: n.artist, title: n.title, count: n.count || 0, isCenter: false });
+    links.push({ source: songKey, target: nk, weight: n.count || 1 });
+  });
+
+  const svg = d3.select('#clusterGraphSvg');
+  svg.selectAll('*').remove();
+  svg.attr('viewBox', '0 0 ' + width + ' ' + height);
+
+  const g = svg.append('g');
+  const zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', (event) => { g.attr('transform', event.transform); });
+  svg.call(zoom);
+
+  const tooltip = d3.select('body').append('div').attr('class', 'cluster-graph-tooltip').style('display', 'none');
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(130))
+    .force('charge', d3.forceManyBody().strength(-250))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(d => d.isCenter ? 28 : 10 + Math.min(d.count || 0, 15)));
+
+  const link = g.append('g')
+    .selectAll('line').data(links).join('line')
+    .attr('class', 'link')
+    .attr('stroke-width', d => Math.max(1, Math.min(d.weight, 8)));
+
+  const node = g.append('g')
+    .selectAll('circle').data(nodes).join('circle')
+    .attr('r', d => d.isCenter ? 22 : 6 + Math.min(d.count || 0, 12))
+    .attr('class', d => d.isCenter ? 'node-center' : 'node-neighbor')
+    .attr('fill', d => d.isCenter ? null : (communityColors[song.community] || 'var(--accent)'))
+    .on('mouseover', function(event, d) {
+      if (d.isCenter) return;
+      d3.select(this).attr('stroke-width', 2.5);
+      tooltip.style('display', 'block')
+        .html('<b>' + esc(d.title) + '</b><br>' + esc(d.artist) + '<br>' + d.count + ' \u05de\u05e2\u05d1\u05e8\u05d9\u05dd')
+        .style('left', (event.clientX + 14) + 'px')
+        .style('top', (event.clientY - 10) + 'px');
+    })
+    .on('mouseout', function() {
+      d3.select(this).attr('stroke-width', 1);
+      tooltip.style('display', 'none');
+    })
+    .on('click', function(event, d) {
+      if (d.isCenter) return;
+      tooltip.style('display', 'none');
+      const neighborData = D.clusters && D.clusters.songs
+        ? D.clusters.songs.find(s => s.artist === d.artist && s.title === d.title)
+        : null;
+      if (neighborData) {
+        selectClusterSong(neighborData);
+      } else {
+        explorerState.currentSong = { artist: d.artist, title: d.title };
+        explorerState.history = [];
+        switchTab('deep');
+        setTimeout(() => renderTransitionExplorer(), 50);
+      }
+    });
+
+  const label = g.append('g')
+    .selectAll('text').data(nodes).join('text')
+    .attr('class', d => d.isCenter ? 'node-label-center' : 'node-label')
+    .text(d => d.isCenter ? d.title : (d.title.length > 14 ? d.title.slice(0, 12) + '...' : d.title));
+
+  sim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('cx', d => d.x).attr('cy', d => d.y);
+    label.attr('x', d => d.x).attr('y', d => d.y - (d.isCenter ? 28 : 10 + Math.min(d.count || 0, 12)) - 4);
+  });
 }
 
 function onClusterSearch() {

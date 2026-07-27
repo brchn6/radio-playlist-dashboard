@@ -106,3 +106,19 @@ Dashboard המנטר 8 תחנות רדיו ישראליות בזמן אמת. מ�
 - Staggered intervals confirmed in proxy logs (sleep_next values reflect port offsets)
 - Zero errors in any proxy log since restart
 - Validation pi session scheduled via `at` job on workstation for 2026-07-28 01:18 UTC to re-validate
+
+## 2026-07-27 — Dashboard UI fixes: Transition Explorer search + Knowledge Graph
+
+### Bug 1: Explorer search bar would not accept letters
+**Root cause:** `onExplorerSearch()` replaced `transContent.innerHTML` entirely on every keystroke, destroying the input DOM node and losing focus.
+
+**Fix:** Split `<div id="transContent">` into `#transControls` (rendered once, never replaced) and `#transResults` (fully replaceable). The search input now lives permanently in controls. Added `dir="auto"` to both search inputs to prevent RTL interference.
+
+### Bug 2: "שירים שמתנגנים יחד" switched from card list to D3 force graph
+**What changed:** `selectClusterSong()` now renders a D3 force-directed graph instead of static neighbor cards. The graph shows the selected song as a centered node, connected to up to 12 neighbors with weighted edges. Clicking a neighbor re-centers the graph on that song. Drag, zoom, and hover tooltips supported.
+
+**Data used:** `clusters.json` (1,207 songs, 34,400 edges, 11 communities) — no backend changes needed.
+
+### Files changed
+- `docs/index.html` — Both fixes applied (structure split, JS rewrites, CSS additions)
+- `MEMORY.md` — This entry
