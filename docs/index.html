@@ -593,6 +593,7 @@ const STATION_STREAMS = {
 
 /* ── Helpers ── */
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return esc(String(s)).replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 function spotifySearchUrl(a, t) { return 'https://open.spotify.com/search/' + encodeURIComponent(((a || '') + ' ' + (t || '')).trim()); }
 function loadJSON(u) { return fetch(BASE + u).then(r => r.ok ? r.json() : null).catch(() => null); }
 function stationBySlug(slug) { return stations.find(s => s.slug === slug); }
@@ -1681,7 +1682,7 @@ function onExplorerSearch() {
   // Show search results
   let resultsHtml = '<div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">נמצאו ' + results.length + ' שירים:</div>';
   results.slice(0, 15).forEach(s => {
-    resultsHtml += '<div class="explorer-card" onclick="selectExplorerSong(' + JSON.stringify(s.artist) + ',' + JSON.stringify(s.title) + ')">';
+    resultsHtml += '<div class="explorer-card" data-artist="' + escAttr(s.artist) + '" data-title="' + escAttr(s.title) + '">';
     resultsHtml += '<div class="explorer-card-main">';
     resultsHtml += '<div><div class="explorer-card-title">' + esc(s.title) + '</div><div class="explorer-card-artist">' + esc(s.artist) + '</div></div>';
     resultsHtml += '<span class="explorer-card-stats">' + s.outgoing + ' מעברים</span>';
@@ -1693,6 +1694,15 @@ function onExplorerSearch() {
 
   const el = document.getElementById('transResults');
   el.innerHTML = resultsHtml;
+  el.onclick = function(e) {
+    const card = e.target.closest('.explorer-card');
+    if (!card) return;
+    const artist = card.getAttribute('data-artist');
+    const title = card.getAttribute('data-title');
+    if (artist && title) {
+      selectExplorerSong(artist, title);
+    }
+  };
 }
 
 function selectExplorerSong(artist, title) {
