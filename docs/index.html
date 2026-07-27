@@ -1511,11 +1511,11 @@ function renderTransitionExplorer() {
   // Station pills
   const allStations = Object.keys(map.stations);
   ctrlHtml += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-  ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === 'all' ? ' active' : '') + '" onclick="explorerState.currentStation=\\'all\\';renderTransitionExplorer()">\u05d4\u05db\u05dc</button>';
+  ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === 'all' ? ' active' : '') + '" onclick="explorerState.currentStation=\'all\';renderTransitionExplorer()">\u05d4\u05db\u05dc</button>';
   allStations.forEach(slug => {
     const st = stations.find(s => s.slug === slug);
     if (!st) return;
-    ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === slug ? ' active' : '') + '" onclick="explorerState.currentStation=\\'' + slug + '\\';renderTransitionExplorer()" style="color:' + st.color + '">' + esc(st.name) + '</button>';
+    ctrlHtml += '<button class="window-pill' + (explorerState.currentStation === slug ? ' active' : '') + '" onclick="explorerState.currentStation=\'' + slug + '\';renderTransitionExplorer()" style="color:' + st.color + '">' + esc(st.name) + '</button>';
   });
   ctrlHtml += '</div>';
   ctrlHtml += '</div>';
@@ -1597,7 +1597,7 @@ function renderTransitionExplorer() {
       transitions.sort((a, b) => b.count - a.count).forEach(t => {
         const prob = t.probability || 0;
         const probColor = prob > 60 ? '#e05555' : prob > 30 ? '#d4b85a' : '#5ddbb5';
-        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\\'' + slug + '\\')">';
+        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\'' + slug + '\')">';
         h += '<div class="explorer-card-main">';
         h += '<div><div class="explorer-card-title">\u2192 ' + esc(t.title) + '</div><div class="explorer-card-artist">' + esc(t.artist) + '</div></div>';
         h += '<span class="explorer-card-stats">\u00d7' + t.count + (prob > 0 ? ' ' + prob + '%' : '') + '</span>';
