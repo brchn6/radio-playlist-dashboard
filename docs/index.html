@@ -1638,6 +1638,7 @@ function pickExplorerRandomSong() {
   const pick = allSongs[Math.floor(Math.random() * allSongs.length)];
   explorerState.currentSong = pick;
   explorerState.history = [];
+  explorerState.currentStation = 'all';
   renderTransitionExplorer();
 }
 
@@ -1708,6 +1709,7 @@ function onExplorerSearch() {
 function selectExplorerSong(artist, title) {
   explorerState.currentSong = { artist, title };
   explorerState.history = [];
+  explorerState.currentStation = 'all';
   const inp = document.getElementById('explorerSearch');
   if (inp) inp.value = '';
   renderTransitionExplorer();
@@ -2049,7 +2051,8 @@ function selectClusterSong(song) {
 
   const g = svg.append('g');
   const zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', (event) => { g.attr('transform', event.transform); });
-  svg.call(zoom);
+  // Overlay rect for zoom — keeps circles clickable
+  svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'none').attr('pointer-events', 'all').call(zoom);
 
   const tooltip = d3.select('body').append('div').attr('class', 'cluster-graph-tooltip').style('display', 'none');
 
@@ -2084,16 +2087,18 @@ function selectClusterSong(song) {
     .on('click', function(event, d) {
       if (d.isCenter) return;
       tooltip.style('display', 'none');
+      // Try case-insensitive match in cluster songs
       const neighborData = D.clusters && D.clusters.songs
-        ? D.clusters.songs.find(s => s.artist === d.artist && s.title === d.title)
+        ? D.clusters.songs.find(s =>
+            (s.artist || '').toLowerCase() === (d.artist || '').toLowerCase() &&
+            (s.title || '').toLowerCase() === (d.title || '').toLowerCase()
+          )
         : null;
       if (neighborData) {
         selectClusterSong(neighborData);
       } else {
-        explorerState.currentSong = { artist: d.artist, title: d.title };
-        explorerState.history = [];
-        switchTab('deep');
-        setTimeout(() => renderTransitionExplorer(), 50);
+        // Graceful fallback: re-render graph with minimal data
+        selectClusterSong({ artist: d.artist, title: d.title, plays: d.count || 0, top: [] });
       }
     });
 
