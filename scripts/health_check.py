@@ -39,6 +39,12 @@ STATIONS = {
     8768: ("radio-darom", "https://cdn.cybercdn.live/Darom_97FM/Live/icecast.audio", "רדיו דרום"),
 }
 
+# Referer headers for streams that require them
+REFERERS: dict[int, str] = {
+    8763: "https://99fm.co.il",
+    8764: "https://102fm.co.il",
+}
+
 
 def log(msg: str) -> None:
     ts = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -62,6 +68,9 @@ def start_proxy(port: int, slug: str, stream_url: str) -> bool:
     env = os.environ.copy()
     env["RADIO_STREAM_URL"] = stream_url
     env["SHAZAMIO_PORT"] = str(port)
+    referer = REFERERS.get(port, "")
+    if referer:
+        env["RADIO_STREAM_REFERER"] = referer
 
     log_path = LOG_DIR / f"{slug}.log"
     try:

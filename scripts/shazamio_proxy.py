@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import asyncio
+import fcntl
 import json
 import os
 import random
@@ -26,6 +27,11 @@ DEFAULT_STREAM_URL = "https://radio.streamgates.net/stream/1036kh"
 HOST = os.environ.get("SHAZAMIO_HOST", "127.0.0.1")
 PORT = int(os.environ.get("SHAZAMIO_PORT", "8765"))
 STREAM_URL = os.environ.get("RADIO_STREAM_URL", DEFAULT_STREAM_URL)
+STREAM_REFERER = os.environ.get("RADIO_STREAM_REFERER", "")
+# Token bucket: cross-proxy rate limiter
+TOKEN_BUCKET_MAX = int(os.environ.get("SHAZAMIO_TOKEN_BUCKET_MAX", "4"))
+TOKEN_BUCKET_WINDOW = int(os.environ.get("SHAZAMIO_TOKEN_BUCKET_WINDOW", "10"))
+TOKEN_BUCKET_FILE = Path("/tmp/shazam-token-bucket")
 SAMPLE_SECONDS = int(os.environ.get("SHAZAMIO_SAMPLE_SECONDS", "15"))
 INTERVAL_SECONDS = int(os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "20"))
 RETRY_DELAY = int(os.environ.get("SHAZAMIO_RETRY_DELAY", "5"))
@@ -40,6 +46,41 @@ ERROR_MAX_DELAY = int(os.environ.get("SHAZAMIO_ERROR_MAX_DELAY", "180"))
 # calls from one IP, which is what gets the IP stalled in the first place.
 STARTUP_STAGGER = int(os.environ.get("SHAZAMIO_STARTUP_STAGGER", "5"))
 WORK_DIR = Path(os.environ.get("SHAZAMIO_WORK_DIR", "/tmp/radio-kol-hashfela-shazamio"))
+
+
+def _flock_acquire() -> bool:
+    """Acquire token from shared file-based bucket (thread-safe via flock)."""
+    try:
+        fd = os.open(str(TOKEN_BUCKET_FILE), os.O_CREAT | os.O_RDWR, 0o644)
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        try:
+            now = time.time()
+            data = b""
+            try:
+                if TOKEN_BUCKET_FILE.stat().st_size > 0:
+                    data = os.read(fd, 4096)
+            except OSError:
+                data = b""
+            entries: list[float] = json.loads(data) if data else []
+            entries = [t for t in entries if now - t < TOKEN_BUCKET_WINDOW]
+            if len(entries) >= TOKEN_BUCKET_MAX:
+                return False
+            entries.append(now)
+            os.lseek(fd, 0, os.SEEK_SET)
+            os.write(fd, json.dumps(entries).encode())
+            os.ftruncate(fd, os.lseek(fd, 0, os.SEEK_CUR))
+            return True
+        finally:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            os.close(fd)
+    except Exception:
+        return True  # fail open: better to call Shazam twice than never
+
+
+async def acquire_token() -> bool:
+    """Cross-proxy rate-limit token: max TOKEN_BUCKET_MAX calls per window."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, _flock_acquire)
 
 STATE: dict[str, Any] = {
     "running": False,
@@ -98,6 +139,10 @@ async def run_ffmpeg_capture(stream_url: str, output_file: Path) -> None:
         "-y",
         "-t",
         str(SAMPLE_SECONDS),
+    ]
+    if STREAM_REFERER:
+        cmd.extend(["-headers", f"Referer: {STREAM_REFERER}\r\n"])
+    cmd.extend([
         "-i",
         stream_url,
         "-ac",
@@ -105,7 +150,7 @@ async def run_ffmpeg_capture(stream_url: str, output_file: Path) -> None:
         "-ar",
         "16000",
         str(output_file),
-    ]
+    ])
     proc = await asyncio.create_subprocess_exec(
         *cmd,
         stdout=asyncio.subprocess.PIPE,
@@ -125,6 +170,9 @@ async def recognize_file(path: Path) -> dict[str, Any]:
         STATE["last_started_at"] = now_iso()
         STATE["last_error"] = None
         try:
+            # Acquire cross-proxy rate-limit token before calling Shazam
+            while not await acquire_token():
+                await asyncio.sleep(1)
             raw = await asyncio.wait_for(
                 shazam.recognize(str(path)), timeout=RECOGNIZE_TIMEOUT
             )
@@ -185,8 +233,9 @@ async def station_loop(app: web.Application) -> None:
             result = await recognize_station_once()
             if result.get("found"):
                 consecutive_failures = 0
-                # jitter keeps the proxies from re-converging into lockstep
-                nap = INTERVAL_SECONDS + random.uniform(0, 5)
+                # Stagger by port so 8 proxies never reconverge into lockstep
+                stagger_offset = (PORT % 16) * 3
+                nap = INTERVAL_SECONDS + stagger_offset + random.uniform(0, 5)
                 print(json.dumps({"event": "sleep_next", "seconds": round(nap, 1)}, ensure_ascii=False), flush=True)
                 await asyncio.sleep(nap)
             else:

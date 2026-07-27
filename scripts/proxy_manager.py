@@ -136,6 +136,9 @@ def start_one(slug: str) -> dict[str, Any]:
     env["SHAZAMIO_INTERVAL_SECONDS"] = str(INTERVAL)
     env["SHAZAMIO_RETRY_DELAY"] = "5"
     env["SHAZAMIO_WORK_DIR"] = f"/tmp/1036-proxy-{slug}"
+    referer = station.get("referer", "")
+    if referer:
+        env["RADIO_STREAM_REFERER"] = referer
 
     try:
         with open(log_file, "w") as lf:

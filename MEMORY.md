@@ -76,3 +76,33 @@ Dashboard המנטר 8 תחנות רדיו ישראליות בזמן אמת. מ�
 - **2026-07-14**: Collector moved from workstation to head1. Git push removed from collector.
 - **2026-07-13**: Shazam hung all 8 proxies for 11 minutes. Fixed: 45s timeout, exponential backoff, startup stagger.
 - **2026-07-13**: REPEAT_DATA_EPOCH set. ISRC tracking started.
+## 2026-07-27 — Referer headers + cross-proxy rate limiter
+
+### Problem
+1. **99FM and radio-tlv streams** returned HTTP 403 intermittently because ffmpeg captured without a Referer header. Their CDNs require `Referer: https://99fm.co.il` and `Referer: https://102fm.co.il`.
+2. **Shazam rate limits**: 8 proxies firing independently could still converge into lockstep (even with existing jitter) and trigger Shazam's silent rate limit (no 429, just stops answering). The 45s timeout prevented hangs, but burst calls from one IP could still stall recognition for minutes.
+
+### Changes made
+
+**Referer header** (4 files):
+- `scripts/supabase_db.py` — Added `referer` field to 99fm and radio-tlv station configs
+- `scripts/proxy_manager.py` — `start_one()` reads `referer` from station config and passes as `RADIO_STREAM_REFERER` env var
+- `scripts/health_check.py` — Added `REFERERS` dict mapping port to URL; `start_proxy()` passes it as env var
+- `shazamio/shazamio_proxy.py` (synced to `scripts/shazamio_proxy.py`) — Reads `RADIO_STREAM_REFERER` env var, passes `-headers "Referer: ..."` to ffmpeg when set
+
+**Cross-proxy rate limiter** (1 file):
+- `shazamio/shazamio_proxy.py`:
+  - Added `fcntl`-based token bucket via shared file `/tmp/shazam-token-bucket`
+  - Max 4 Shazam calls per 10s sliding window across all 8 proxies (env vars `SHAZAMIO_TOKEN_BUCKET_MAX`, `SHAZAMIO_TOKEN_BUCKET_WINDOW`)
+  - Token acquired via `flock` before each Shazam call; fail-open if file ops error
+  - Added staggered interval: each proxy adds `(PORT % 16) * 3` seconds to base sleep, permanently out of phase (87s, 90s, 93s, 96s, 99s, 102s, 105s, 60s)
+
+**Validation**:
+- `scripts/validate_deploy.sh` — Standalone validation script for future agent sessions
+
+### Verification
+- All 8 proxies restarted with new code, all healthy on `/health` and `/current`
+- Token bucket active with entries at `/tmp/shazam-token-bucket`
+- Staggered intervals confirmed in proxy logs (sleep_next values reflect port offsets)
+- Zero errors in any proxy log since restart
+- Validation pi session scheduled via `at` job on workstation for 2026-07-28 01:18 UTC to re-validate
