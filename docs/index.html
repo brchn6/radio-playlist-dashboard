@@ -2035,6 +2035,9 @@ function selectClusterSong(song) {
   const communityColors = D.clusters && D.clusters.communities
     ? Object.fromEntries(D.clusters.communities.map(c => [c.id, c.color]))
     : {};
+  const songCommunityMap = D.clusters && D.clusters.songs
+    ? Object.fromEntries(D.clusters.songs.map(s => [(s.artist + ' | ' + s.title).toLowerCase(), s.community]))
+    : {};
 
   const nodes = [{ id: songKey, artist: song.artist, title: song.title, plays: song.plays || 0, isCenter: true }];
   const links = [];
@@ -2051,8 +2054,7 @@ function selectClusterSong(song) {
 
   const g = svg.append('g');
   const zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', (event) => { g.attr('transform', event.transform); });
-  // Overlay rect for zoom — keeps circles clickable
-  svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'none').attr('pointer-events', 'all').call(zoom);
+  svg.call(zoom);
 
   const tooltip = d3.select('body').append('div').attr('class', 'cluster-graph-tooltip').style('display', 'none');
 
@@ -2071,7 +2073,7 @@ function selectClusterSong(song) {
     .selectAll('circle').data(nodes).join('circle')
     .attr('r', d => d.isCenter ? 22 : 6 + Math.min(d.count || 0, 12))
     .attr('class', d => d.isCenter ? 'node-center' : 'node-neighbor')
-    .attr('fill', d => d.isCenter ? null : (communityColors[song.community] || 'var(--accent)'))
+    .attr('fill', d => d.isCenter ? null : communityColors[songCommunityMap[d.id]] || 'var(--accent)')
     .on('mouseover', function(event, d) {
       if (d.isCenter) return;
       d3.select(this).attr('stroke-width', 2.5);
@@ -2140,7 +2142,7 @@ function onClusterSearch() {
   // Show search results as clickable items
   let h = '<div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">נמצאו ' + matches.length + ' תוצאות:</div>';
   matches.slice(0, 10).forEach(s => {
-    h += '<div class="explorer-card" onclick="selectClusterSong(D.clusters.songs.find(x => x.title===' + JSON.stringify(s.title) + ' && x.artist===' + JSON.stringify(s.artist) + '))">';
+    h += '<div class="explorer-card" data-artist="' + escAttr(s.artist) + '" data-title="' + escAttr(s.title) + '">';
     h += '<div class="explorer-card-main">';
     h += '<div><div class="explorer-card-title">' + esc(s.title) + '</div><div class="explorer-card-artist">' + esc(s.artist) + '</div></div>';
     h += '<span class="explorer-card-stats">' + (s.plays || 0) + '×</span>';
@@ -2150,7 +2152,22 @@ function onClusterSearch() {
     h += '<div style="text-align:center;padding:6px;font-size:.72rem;color:var(--muted)">עוד ' + (matches.length - 10) + ' תוצאות... השתמש בחיפוש מדויק יותר</div>';
   }
   el.innerHTML = h;
+  // Click delegation for cluster search results
+  el.onclick = function(e) {
+    const card = e.target.closest('.explorer-card');
+    if (!card) return;
+    const artist = card.getAttribute('data-artist');
+    const title = card.getAttribute('data-title');
+    if (artist && title) {
+      const songData = D.clusters.songs.find(s =>
+        (s.artist || '').toLowerCase() === (artist || '').toLowerCase() &&
+        (s.title || '').toLowerCase() === (title || '').toLowerCase()
+      );
+      if (songData) selectClusterSong(songData);
+    }
+  };
 }
+
 
 /* ── Redundancy ── */
 function renderRedundancy() {
