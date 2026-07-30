@@ -656,7 +656,7 @@ async function fetchManifest() {
 
 async function fetchAll() {
   await fetchManifest();
-  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans, transMap] = await Promise.all([
+  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans, transMap, uptime] = await Promise.all([
     loadTracked('stations.json'),
     loadTracked('current.json'),
     loadTracked('history.json'),
@@ -668,9 +668,10 @@ async function fetchAll() {
     loadTracked('stats.json'),
     loadTracked('transitions.json'),
     loadTracked('transition_map.json'),
+    loadTracked('uptime.json'),
   ]);
   if (st) stations = st;
-  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap };
+  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap, uptime };
 }
 
 /* ── Tabs ── */
@@ -1097,7 +1098,8 @@ function renderBpmRealtime() {
   // Update section-sub
   const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
   if (subEl) {
-    subEl.innerHTML = 'BPM בזמן אמת — קצב השירים ב-48 השעות האחרונות, ברזולוציית 15 דקות';
+    const bucketMin = D.bpm.global ? (D.bpm.global.bucket_minutes || 60) : 60;
+    subEl.innerHTML = 'BPM בזמן אמת — קצב השירים ב-48 השעות האחרונות, ברזולוציית ' + bucketMin + ' דקות';
   }
 
   // Station pills
@@ -1195,6 +1197,8 @@ function renderBpmRealtime() {
         },
       },
       interaction: { mode: 'index', intersect: false },
+      animation: false,
+      transitions: { active: { animation: { duration: 0 } } },
     },
   });
 
@@ -1280,6 +1284,8 @@ function renderBpmLegacy() {
         y: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' }, title: { display: true, text: 'BPM', color: MUTED } },
       },
       interaction: { mode: 'index', intersect: false },
+      animation: false,
+      transitions: { active: { animation: { duration: 0 } } },
     },
   });
 
@@ -1456,7 +1462,7 @@ function renderKeyDistLegacy() {
   // Sort by circle of fifths: C, G, D, A, E, B, F#, C#, Ab, Eb, Bb, F
   const keyOrder = ['C major', 'G major', 'D major', 'A major', 'E major', 'B major', 'F# major', 'C# major',
     'A minor', 'E minor', 'B minor', 'F# minor', 'C# minor', 'G# minor', 'D# minor', 'A# minor',
-    'C minor', 'G minor', 'D minor', 'A minor', 'E minor', 'B minor', 'F minor',
+    'C minor', 'G minor', 'D minor', 'B minor', 'F minor',
     'Db major', 'Eb major', 'F major', 'Ab major', 'Bb major',
     'C# major', 'Eb minor', 'F# minor', 'Ab minor', 'Bb minor'];
   // Simpler: just sort by count

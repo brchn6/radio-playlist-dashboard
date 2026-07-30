@@ -540,6 +540,7 @@ def build_bpm_key(tracks: list[dict[str, Any]],
     key_labels = [
         "C", "G", "D", "A", "E", "B", "F#", "C#", "Ab", "Eb", "Bb", "F",
         "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m",
+        "Fm", "Abm", "Ebm", "Bbm",
     ]
     key_index_map: dict[str, int] = {k: i for i, k in enumerate(key_labels)}
 
@@ -583,17 +584,18 @@ def build_bpm_key(tracks: list[dict[str, Any]],
 
         # ── BPM realtime: 15-min buckets (last 48h) ───────────────────
         st_recent = [t for t in st if t["_dt"] >= cutoff]
-        bucket_bpms: dict[str, list[float]] = defaultdict(list)
+        # Pre-allocate arrays indexed by absolute slot offset (0..total_slots-1)
+        bpm_slot_vals: list[list[float]] = [[] for _ in range(total_slots)]
         for t in st_recent:
-            il = t["_il"]
-            bucket_min = (il.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES
-            bucket_key = f"{il.hour:02d}:{bucket_min:02d}"
-            bucket_bpms[bucket_key].append(t["bpm"])
+            dt = t["_dt"]  # UTC
+            minutes_ago = (bucket_now - dt).total_seconds() / 60.0
+            slot_idx = int(minutes_ago // BPM_BUCKET_MINUTES)
+            if 0 <= slot_idx < total_slots:
+                bpm_slot_vals[slot_idx].append(t["bpm"])
 
         bpm_realtime_data: list[float | None] = []
         bpm_realtime_counts: list[int] = []
-        for slot in all_slots:
-            vals = bucket_bpms.get(slot, [])
+        for vals in bpm_slot_vals:
             if vals:
                 bpm_realtime_data.append(round(float(np.mean(vals)), 1))
                 bpm_realtime_counts.append(len(vals))
@@ -609,8 +611,11 @@ def build_bpm_key(tracks: list[dict[str, Any]],
             is_minor = "minor" in r.lower()
             r = r.lower().replace(" major", "").replace(" minor", "").strip()
             # Map alternative spellings
-            aliases = {"db": "c#", "gb": "f#", "ab": "g#", "eb": "d#", "bb": "a#",
-                       "c#": "c#", "f#": "f#", "g#": "g#", "d#": "d#", "a#": "a#"}
+            aliases = {
+                "c#": "c#", "f#": "f#",
+                "db": "c#", "gb": "f#",
+                "g#": "ab", "d#": "eb", "a#": "bb",
+            }
             r = aliases.get(r, r)
             # Capitalize first letter
             r = r.capitalize() if r else ""
@@ -625,11 +630,10 @@ def build_bpm_key(tracks: list[dict[str, Any]],
                 nk = normalize_key(k)
                 ki = key_index_map.get(nk)
                 if ki is not None:
-                    il = t["_il"]
-                    bucket_min = (il.minute // BPM_BUCKET_MINUTES) * BPM_BUCKET_MINUTES
-                    bucket_key = f"{il.hour:02d}:{bucket_min:02d}"
-                    si = slot_index.get(bucket_key)
-                    if si is not None:
+                    dt = t["_dt"]
+                    minutes_ago = (bucket_now - dt).total_seconds() / 60.0
+                    si = int(minutes_ago // BPM_BUCKET_MINUTES)
+                    if 0 <= si < total_slots:
                         matrix[ki][si] += 1
 
         key_totals: dict[str, int] = {key_labels[ki]: sum(row) for ki, row in enumerate(matrix)}
