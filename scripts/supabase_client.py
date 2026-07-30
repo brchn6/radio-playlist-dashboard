@@ -11,6 +11,7 @@ idempotent backfill (migrate_to_supabase.py) reconciles the gap afterwards.
 """
 
 from __future__ import annotations
+import httpx
 
 import os
 from pathlib import Path
@@ -138,20 +139,28 @@ def upload_json(path: str, payload: bytes, content_type: str = "application/json
     if client is None:
         return False
     try:
-        client.storage.from_(BUCKET).upload(
-            path=path,
-            file=payload,
-            file_options={
-                "content-type": content_type,
-                # Let the CDN revalidate with an ETag instead of re-sending the
-                # body. Paired with dropping the frontend's cache-buster, this
-                # is what keeps egress off the free tier.
+        # The SDK's upload() method breaks on files larger than ~4 MB (returns
+        # an empty 200 response -> JSONDecodeError in the SDK). Work around it
+        # by using the SDK's internal httpx client (which carries the right auth
+        # headers already) to send a raw body POST with x-upsert.
+        storage = client.storage.from_(BUCKET)
+        http = storage._client
+        supabase_url = str(client.supabase_url).rstrip("/")
+        resp = http.post(
+            f"{supabase_url}/storage/v1/object/{BUCKET}/{path}",
+            content=payload,
+            headers={
+                "Content-Type": content_type,
                 "cache-control": "max-age=15",
-                "upsert": "true",
+                "x-upsert": "true",
             },
+            timeout=httpx.Timeout(120.0),
         )
-        return True
-    except Exception as exc:  # noqa: BLE001
+        if resp.is_success:
+            return True
+        print(f"[supabase] upload failed for {path}: HTTP {resp.status_code}", flush=True)
+        return False
+    except Exception as exc:
         print(f"[supabase] upload failed for {path}: {exc}", flush=True)
         return False
 
