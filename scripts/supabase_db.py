@@ -22,7 +22,7 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# ── Station registry (mirrors STATIONS_CONFIG in db.py) ────────────────
+# ── Station registry (canonical; read from code, not the DB) ────────────
 # Kept here so SupabaseDB is self-contained; the stations table in Supabase
 # has the same data but we read from code for speed.
 STATIONS_CONFIG: list[dict[str, Any]] = [

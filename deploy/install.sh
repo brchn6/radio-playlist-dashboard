@@ -11,8 +11,9 @@
 # Prerequisites the script checks for but will not install silently:
 #   - ffmpeg          (sudo apt install -y ffmpeg) — the proxies capture audio with it
 #   - .env            SUPABASE_URL + SUPABASE_SECRET_KEY (copy it in by scp, never git)
-#   - data/playlist.db  optional; copy from the old host with `sqlite3 .backup` so the
-#                       30-minute dedupe window is intact. See the warning below.
+#
+# The collector writes directly to Supabase Postgres — there is no local DB to
+# copy. A new host needs only the repo, .env, venvs, and the systemd units.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -74,11 +75,10 @@ cat <<'EOF'
 Done. Watch it:   journalctl --user -u radio-updater -f
                   tail -f logs/updater.log
 
-⚠  ONE COLLECTOR AT A TIME. Two hosts collecting in parallel produce DUPLICATE
-   plays in Postgres: they keep separate SQLite files, so their dedupe windows
-   cannot see each other, and they sample the same song at slightly different
-   timestamps — so the (station_id, shazam_key, recognized_at) natural key does
-   not collide and nothing catches it. Stop the old collector before starting
-   this one, and copy its playlist.db over AFTER stopping it, or the new host's
-   dedupe window will re-log whatever the old one logged in the meantime.
+⚠  ONE COLLECTOR AT A TIME. The collector writes directly to Supabase Postgres;
+   a second collector would insert duplicate plays because the (station_id,
+   shazam_key, recognized_at) natural key does not collide at slightly different
+   timestamps — nothing catches it. Stop the old collector before starting this
+   one; nothing else needs copying. If you are decommissioning the old host,
+   drain its data/retry_queue.jsonl first, or un-flushed rows are lost.
 EOF

@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Supabase client + .env loader, shared by the daemon, the publisher, and the
-one-time backfill.
+Supabase client + .env loader, shared by the collector (updater.py) and the
+publisher (publish.py).
 
 Design rule that everything here follows: **Supabase is never allowed to stop
-collection.** SQLite is the source of truth; Supabase is the published mirror.
-So every helper degrades to a no-op and logs instead of raising. If the network
-is down, or the keys are missing, the collector keeps writing to SQLite and the
-idempotent backfill (migrate_to_supabase.py) reconciles the gap afterwards.
+collection.** Supabase Postgres (via supabase_db.py) is the source of truth;
+the collector writes each track there directly. If a write fails, updater.py
+queues the row in data/retry_queue.jsonl and flushes it on a later cycle, so
+no track is ever lost.
+
+Every helper here degrades to a no-op and logs instead of raising. If the
+network is down, or the keys are missing, upload_json() skips the upload and
+nothing crashes — the manifest just stays stale until connectivity returns.
 """
 
 from __future__ import annotations
@@ -25,9 +29,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 def load_env() -> dict[str, str]:
     """Parse .env from the project root.
 
-    Lifted verbatim from updater.py so the daemon, publisher and backfill all
-    read the file the same way. Deliberately not python-dotenv: this is six
-    lines and the project has no other need for the dependency.
+    Lifted verbatim from updater.py so the daemon and publisher both read the
+    file the same way. Deliberately not python-dotenv: this is six lines and
+    the project has no other need for the dependency.
     """
     env_path = PROJECT_ROOT / ".env"
     env_vars: dict[str, str] = {}
@@ -58,8 +62,9 @@ _warned = False
 def get_client() -> Any | None:
     """Return a service-role Supabase client, or None if not configured.
 
-    None is a valid, expected state — it means "run SQLite-only". Callers must
-    handle it rather than assuming a client exists.
+    None is a valid, expected state — it means "collecting locally; nothing
+    will be published". Callers must handle it rather than assuming a client
+    exists.
 
     The secret key bypasses RLS, which is what allows writes. It must never be
     shipped to the browser; the frontend reads the public Storage bucket and
@@ -78,7 +83,7 @@ def get_client() -> Any | None:
         if not _warned:
             print(
                 "[supabase] SUPABASE_URL / SUPABASE_SECRET_KEY not set in .env — "
-                "running SQLite-only, nothing will be published.",
+                "collecting locally; nothing will be published.",
                 flush=True,
             )
             _warned = True
@@ -90,36 +95,16 @@ def get_client() -> Any | None:
         return _client
     except Exception as exc:  # noqa: BLE001 - never let this kill the caller
         if not _warned:
-            print(f"[supabase] client init failed ({exc}) — running SQLite-only.", flush=True)
+            print(f"[supabase] client init failed ({exc}) — collecting locally, nothing will be published.", flush=True)
             _warned = True
         return None
-
-
-def insert_track(row: dict[str, Any]) -> bool:
-    """Mirror one recognized track into Postgres. Returns True on success.
-
-    Never raises. A Supabase outage must not crash the collector loop — the
-    track is already safe in SQLite, and the backfill will pick it up later.
-
-    Uses upsert on the natural key (station_id, shazam_key, recognized_at), so a
-    retry or an overlapping backfill cannot duplicate a play.
-    """
-    client = get_client()
-    if client is None:
-        return False
-    try:
-        client.table("tracks").upsert(row, on_conflict="station_id,shazam_key,recognized_at").execute()
-        return True
-    except Exception as exc:  # noqa: BLE001
-        print(f"[supabase] track insert failed (kept in SQLite): {exc}", flush=True)
-        return False
 
 
 def upload_json(path: str, payload: bytes, content_type: str = "application/json") -> bool:
     """Upload one aggregate file to the public Storage bucket. Returns True on success.
 
-    `path` is the object path inside the bucket and mirrors the old docs/data
-    layout exactly (e.g. "history.json", "stations/galgalatz/history.json").
+    `path` is the object path inside the bucket and mirrors the docs/data
+    layout exactly (e.g. "history.json", "top.json").
 
     Uploaded UNCOMPRESSED, on purpose.
 
@@ -133,7 +118,7 @@ def upload_json(path: str, payload: bytes, content_type: str = "application/json
     payloads, that is the same ~5x win, with correct headers and nothing for the
     frontend to know about.
 
-    Never raises, for the same reason as insert_track.
+    Never raises, for the same reason as every other helper here.
     """
     client = get_client()
     if client is None:

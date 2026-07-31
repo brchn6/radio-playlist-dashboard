@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate static JSON data from SQLite for GitHub Pages — Multi-station.
+Generate precomputed JSON aggregates from Supabase Postgres — Multi-station.
 
 All aggregates are precomputed here so the dashboard payload stays bounded
 no matter how large the database grows. Hour-of-day aggregates use Israel
@@ -10,13 +10,14 @@ Files written to docs/data/:
   stations.json        station registry
   current.json         latest track per station
   stats.json           headline stats (only file carrying updated_at)
-  history.json         all tracks (SQLite retention is the only cap)
+  history.json         all tracks (Postgres retention is the only cap)
   top.json             top artists/songs per time window, with prev-window counts
-  timeline.json        compact points for the last TIMELINE_HOURS
-  heatmap.json         station×hour (7d) and day-of-week×hour (30d) matrices
   trends.json          daily activity, discovery rate, rising artists
   cross_station.json   songs heard on 2+ stations
-  stations/<slug>/current.json, history.json
+  bpm_key.json, clusters.json, transitions.json, transition_map.json, uptime.json
+
+Retired v2 artifacts (timeline.json, heatmap.json, non_music.json, stations/)
+are deleted from the output dir on every run — see RETIRED below.
 """
 
 from __future__ import annotations
@@ -43,6 +44,11 @@ from supabase_db import SupabaseDB
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
+
+# Artifacts retired in v2 that must never be generated or shipped again.
+# generate_all() deletes these from the output dir every run so publish.py
+# (which globs every *.json under docs/data/) cannot re-ship them.
+RETIRED = {"heatmap.json", "timeline.json", "non_music.json"}
 
 IL_TZ = ZoneInfo("Asia/Jerusalem")
 
@@ -1213,21 +1219,6 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     stats["updated_at"] = now_iso()
     write_json(output_dir / "stats.json", stats, sizes, "stats.json")
 
-    # per-station files
-    by_station: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for t in tracks:
-        by_station[t["station_slug"]].append(t)
-    for s in stations:
-        sdir = output_dir / "stations" / s["slug"]
-        s_tracks = by_station.get(s["slug"], [])
-        write_json(sdir / "current.json",
-                   public(s_tracks[0]) if s_tracks else None,
-                   sizes, f"stations/{s['slug']}/current.json")
-        write_json(sdir / "history.json", {
-            "history": [public(t) for t in s_tracks],
-            "total": len(s_tracks),
-        }, sizes, f"stations/{s['slug']}/history.json")
-
     # ── Uptime / System Events ────────────────────────────────────
     uptime_data: dict[str, Any] = {
         "status": "unknown",
@@ -1288,6 +1279,25 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         print(f"  [uptime] error building uptime data: {exc}", flush=True)
 
     write_json(output_dir / "uptime.json", uptime_data, sizes, "uptime.json")
+
+    # ── Retire v2 artifacts (durable guard against stale shipments) ──
+    # publish.py collects every *.json under output_dir, so anything left here
+    # gets hashed into the manifest and kept in the bucket forever. Delete
+    # known-retired files (and the dead stations/ tree) on every run.
+    for name in sorted(RETIRED):
+        f = output_dir / name
+        if f.exists():
+            f.unlink()
+            print(f"  [retire] removed {output_dir.relative_to(PROJECT_ROOT) / name}", flush=True)
+    stations_dir = output_dir / "stations"
+    if stations_dir.exists():
+        for p in sorted(stations_dir.rglob("*"), reverse=True):
+            if p.is_dir():
+                p.rmdir()
+            else:
+                p.unlink()
+        stations_dir.rmdir()
+        print(f"  [retire] removed {stations_dir.relative_to(PROJECT_ROOT)}", flush=True)
 
     db.close()
     return sizes
