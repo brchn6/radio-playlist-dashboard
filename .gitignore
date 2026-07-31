@@ -16,3 +16,9 @@ test.env
 
 # Dashboard data lives in Supabase Storage now, never in git.
 docs/data/
+
+# Hermes agent state (plans, sessions) - not source code
+.hermes/
+# Cloudflare Wrangler CLI cache (project config cached by wrangler invocations)
+.wrangler/
+
