@@ -5,15 +5,13 @@
 
 ## Overview
 
-Dashboard המנטר 8 תחנות רדיו ישראליות בזמן אמת. מזהה שירים דרך Shazam via proxies, אוסף ל-SQLite, משכפל ל-Supabase, ומציג דאשבורד ב-GitHub Pages.
+Dashboard המנטר 8 תחנות רדיו ישראליות בזמן אמת. מזהה שירים דרך Shazam via proxies, כותב ישירות ל-Supabase Postgres, ומציג דאשבורד ב-GitHub Pages.
 
 ## Architecture
 
 ```
-8 Proxies (8761-8768)  →  Collector (every 20s)  →  SQLite (data/playlist.db)
+8 Proxies (8761-8768)  →  Collector (every 20s)  →  Supabase Postgres (tracks) ← source of truth
                                                        ↓ best-effort
-                                                  Supabase Postgres (tracks)
-                                                       ↓
                                                   Supabase Storage (aggregates)
                                                        ↓
                                                   GitHub Pages (dashboard)
@@ -57,12 +55,12 @@ Dashboard המנטר 8 תחנות רדיו ישראליות בזמן אמת. מ�
 
 ## Data
 
-- **SQLite**: `data/playlist.db` (source of truth, WAL mode)
-- **Supabase Postgres**: `tracks` table (mirror, best-effort)
+- **Supabase Postgres**: `tracks` table (source of truth — direct psycopg2 via `scripts/supabase_db.py`)
 - **Supabase Storage**: `dashboard/` bucket (aggregates for frontend)
+- **Retry queue**: `data/retry_queue.jsonl` (failed Postgres writes, flushed every cycle)
 - **Retention**: 45 days
 - **Dedupe window**: 30 minutes
-- **Total tracks**: ~7,600+ as of 2026-07-17
+- **Total tracks**: ~35,689 as of 2026-07-31
 
 ### Known Data Issues
 

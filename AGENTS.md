@@ -56,18 +56,19 @@ scripted push loop. If data needs to reach the web, it goes to Supabase.
 **The collector runs on `head1` (100.93.8.110), under systemd. Not on the
 workstation.** Moved there 2026-07-14.
 
-**Never run a second collector anywhere.** Two hosts collecting in parallel keep
-separate SQLite files, so their dedupe windows cannot see each other. They sample
-the same song at slightly different timestamps, so the
+**Never run a second collector anywhere.** Two hosts collecting in parallel
+sample the same song at slightly different timestamps, so the
 `(station_id, shazam_key, recognized_at)` natural key does not collide and nothing
 catches it — you get **duplicate plays in Postgres**, which silently corrupts play
 counts and every repetition metric. This already happened once during the head1
 cutover and 9 rows had to be removed by hand.
 
-If you migrate the collector to another host: stop the old one FIRST, then copy
-`data/playlist.db` over (`sqlite3 .backup`, not `cp` — it is a WAL database), then
-start the new one. Copying the DB before stopping the old collector leaves the new
-host blind to whatever was logged in between, and it re-logs it.
+If you migrate the collector to another host: stop the old one FIRST, then start
+the new one. There is no SQLite file to copy anymore — data lives directly in
+Supabase Postgres (the collector writes there via `scripts/supabase_db.py`). Just
+make sure the new host has the same `.env` (SUPABASE_URL + SUPABASE_SECRET_KEY)
+and drain any leftover `data/retry_queue.jsonl` before decommissioning the old
+host.
 
 ## Quick Reference
 
@@ -96,8 +97,8 @@ systemctl --user restart radio-updater         # safe any time
 # Regenerate + publish the dashboard data by hand
 .venv/bin/python scripts/publish.py
 
-# Reconcile SQLite into Supabase (idempotent upserts — safe to re-run)
-.venv/bin/python scripts/migrate_to_supabase.py
+# Show retry queue size (rows waiting to be written to Supabase)
+wc -l data/retry_queue.jsonl
 ```
 
 Fresh install on a new host: `bash deploy/install.sh` (see `deploy/`).
@@ -118,12 +119,18 @@ that outage could never be diagnosed.
 ## Architecture
 
 - **8 proxies** (ports 8761-8768), one per station
-- **Collector** polls all 8 every 20s → **SQLite** (`data/playlist.db`, still the
-  source of truth) → mirrors each new track into **Supabase Postgres**
-- **generate_data.py** builds the precomputed aggregates (heatmap matrices, MDS
-  cluster embedding, windowed leaderboards, redundancy) into `site-data/`
-  (gitignored). These are NOT expressible as a PostgREST query — that is why
-  they stay precomputed files rather than becoming table reads.
+- **Collector** polls all 8 every 20s → writes each new track **directly into
+  Supabase Postgres** (`scripts/supabase_db.py`, psycopg2 — no SQLite, no REST
+  client). Postgres `tracks` is the source of truth. Failed writes go to
+  `data/retry_queue.jsonl` and are retried every cycle.
+- **generate_data.py** reads Postgres and builds the precomputed aggregates
+  (heatmap matrices, MDS cluster embedding, windowed leaderboards, redundancy)
+  into `docs/data/` (gitignored). These are NOT expressible as a PostgREST
+  query — that is why they stay precomputed files rather than becoming table
+  reads.
+- **publish.py** uploads only the aggregates whose content hash changed to the
+  public Supabase Storage bucket, plus a `manifest.json` of those hashes. The
+  hash state lives in `site-data/.publish-state.json`.
 - **publish.py** uploads only the aggregates whose content hash changed, gzipped,
   to the public Supabase Storage bucket, plus a `manifest.json` of those hashes.
 - **Frontend** (`docs/index.html`) polls `manifest.json` and refetches a file only
@@ -139,13 +146,13 @@ that outage could never be diagnosed.
 - **non_music_log** table is owned by the separate talk/ads-segment agent;
   generate_data.py reads it defensively (tolerates absence/schema change)
 
-### Supabase is best-effort, SQLite is not
+### Collection is always-on; Supabase failures go to the retry queue
 
-Every call into Supabase (track insert, file upload) is wrapped and **never
-raises**. If Supabase is down the collector keeps writing to SQLite and logs the
-failure; `migrate_to_supabase.py` is an idempotent upsert, so re-running it
-backfills whatever was missed. Do not "fix" this by letting a network error
-propagate — always-collecting is the whole point of the project.
+Every call into Supabase (track insert via `supabase_db.py`, file upload via
+`supabase_client.py`) is wrapped and **never raises**. If Supabase is down the
+collector logs the failure and enqueues the row to `data/retry_queue.jsonl`,
+which is flushed on every cycle — no data is lost. Do not "fix" this by letting
+a network error propagate — always-collecting is the whole point of the project.
 
 ## Critical Bugs Already Fixed
 
@@ -232,7 +239,7 @@ Planned feature to export station track history to Spotify playlists. Full plann
 - 🚫 **This deploys the frontend only.** Data does NOT go through git.
 
 ### 4. Data Publish to Supabase — MUST run on head1
-- Data (JSON aggregates in `site-data/`) is published to **Supabase Storage** via `publish.py`
+- Data (JSON aggregates in `docs/data/`) is published to **Supabase Storage** via `publish.py`
 - The collector machine **head1** (100.93.8.110) runs the updater, which periodically
   calls `publish.py`
 - **Whenever the backend changes** (especially `generate_data.py`), you must:
@@ -277,7 +284,9 @@ Planned feature to export station track history to Spotify playlists. Full plann
 | `scripts/generate_data.py` | **Backend** — builds all JSON aggregates (timeline, heatmap, clusters, etc.) |
 | `scripts/publish.py` | **Publisher** — generates data + uploads to Supabase Storage |
 | `scripts/supabase_client.py` | **Supabase client** — handles uploads, idempotent |
-| `scripts/updater.py` | **Collector daemon** — runs on head1, polls proxies → SQLite → Supabase |
+| `scripts/updater.py` | **Collector daemon** — runs on head1, polls proxies → Supabase Postgres (direct), retry queue on failure |
+| `scripts/supabase_db.py` | **Data layer** — psycopg2 direct Postgres client (insert/query/dedupe), station config |
+| `scripts/supabase_client.py` | **Storage uploader** — upload_json to Supabase Storage (httpx direct, avoids SDK 0-byte bug on >4MB) |
 | `scripts/proxy_manager.py` | **Proxy manager** — starts/stops ShazamIO proxies |
 | `.github/workflows/deploy.yml` | CI — validates JS + deploys to Pages on push |
 | `AGENTS.md` | **This file** — agent instructions & project rules |
