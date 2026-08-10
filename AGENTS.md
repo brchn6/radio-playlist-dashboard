@@ -136,6 +136,19 @@ that outage could never be diagnosed.
 - **Frontend** (`docs/index.html`) polls `manifest.json` and refetches a file only
   when its hash moves. Idle cost ~3 KB/poll instead of ~750 KB. It embeds **no
   API key** — the bucket is public.
+- **History is sharded by day (2026-08-10)**: the old single `history.json`
+  (all tracks, ~28 MB) changed its content hash on every new track, so every
+  open tab re-downloaded it every poll and blew the free-tier egress quota
+  (10 GB in ~a month). Now generate_data.py writes:
+  - `recent.json` — last 300 tracks, tiny, changes each cycle
+  - `history_index.json` — day list + totals, changes once a day
+  - `history/YYYY-MM-DD.json` — immutable per-day shards; only today changes
+  The frontend merges recent on every poll (dedup by id) and lazy-loads day
+  shards when the History tab scrolls past recent or a search/drill-down needs
+  full history. `transition_map.json` (~6.8 MB, Deep tab explorer) is now
+  regenerated at most every 24 h like clusters.json.
+ Idle cost ~3 KB/poll instead of ~750 KB. It embeds **no
+  API key** — the bucket is public.
 - **Pages deploy**: `deploy.yml` on push. It serves the static frontend only.
   Keep it — it *is* the Pages deployer; deleting it takes the site down.
 - **Now Playing** tab fetches `http://127.0.0.1:<proxy_port>/current`. That only

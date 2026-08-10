@@ -530,7 +530,7 @@
 
 const SUPABASE_URL = 'https://ktewdeaegtukbosrgxmw.supabase.co';
 const BASE = SUPABASE_URL + '/storage/v1/object/public/dashboard/';
-const POLL = 15000;
+const POLL = 30000;
 
 const ACCENT = '#5ddbb5';
 const MUTED = '#9898b0';
@@ -656,10 +656,11 @@ async function fetchManifest() {
 
 async function fetchAll() {
   await fetchManifest();
-  const [st, cur, hist, top, cross, bpm, clust, trends, stats, trans, transMap, uptime] = await Promise.all([
+  const [st, cur, hist, hIdx, top, cross, bpm, clust, trends, stats, trans, transMap, uptime] = await Promise.all([
     loadTracked('stations.json'),
     loadTracked('current.json'),
-    loadTracked('history.json'),
+    loadTracked('recent.json'),
+    loadTracked('history_index.json'),
     loadTracked('top.json'),
     loadTracked('cross_station.json'),
     loadTracked('bpm_key.json'),
@@ -671,7 +672,49 @@ async function fetchAll() {
     loadTracked('uptime.json'),
   ]);
   if (st) stations = st;
-  D = { current: cur, history: hist, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap, uptime };
+  if (hist && hist.history) mergeTracks(hist.history);
+  D = { current: cur, history: { history: historyState.merged, total: hist ? hist.total : 0 }, historyIndex: hIdx, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap, uptime };
+}
+
+/* ── History sharding (2026-08-10) ──
+   The old history.json (all tracks, ~28 MB) changed its hash every cycle, so
+   every open tab re-downloaded it every poll and burned the egress quota.
+   Now the collector publishes recent.json (last 300 tracks, small) plus
+   immutable per-day shards history/YYYY-MM-DD.json. This page merges recent
+   tracks on every poll (dedup by id) and lazy-loads older day shards only
+   when the user scrolls the History tab or searches.
+*/
+const historyState = { merged: [], ids: new Set(), loadedDays: new Set(), fullyLoaded: false };
+let historyLoadingAll = false;
+
+function mergeTracks(list) {
+  if (!list) return;
+  let added = 0;
+  for (const t of list) {
+    if (!t || t.id == null || historyState.ids.has(t.id)) continue;
+    historyState.ids.add(t.id);
+    historyState.merged.push(t);
+    added++;
+  }
+  if (added) historyState.merged.sort((a, b) => (b.recognized_at || '').localeCompare(a.recognized_at || ''));
+}
+
+async function loadDayShard(day) {
+  const f = await loadTracked('history/' + day + '.json');
+  if (f && f.history) { mergeTracks(f.history); historyState.loadedDays.add(day); }
+}
+
+async function loadAllHistory() {
+  if (historyState.fullyLoaded || historyLoadingAll) return;
+  historyLoadingAll = true;
+  try {
+    const days = (D.historyIndex && D.historyIndex.days) || [];
+    for (let i = days.length - 1; i >= 0; i--) {
+      const day = days[i];
+      if (!historyState.loadedDays.has(day)) await loadDayShard(day);
+    }
+    historyState.fullyLoaded = true;
+  } finally { historyLoadingAll = false; }
 }
 
 /* ── Tabs ── */
@@ -995,6 +1038,18 @@ function renderHistory() {
   let items = D.history.history.slice();
   const q = (document.getElementById('histSearch').value || '').toLowerCase();
 
+  // Full-history search / drill-down needs every day shard loaded. Load them
+  // once (they are immutable, so this is a single download per session, then
+  // cached) and show a "loading full history" note while it fetches.
+  // Triggered by: a search query, or any Top-tab drill-down filter (its time
+  // window can need more than the ~3h of recent tracks we hold by default).
+  const needsFull = q || !!activeHistoryFilter;
+  if (needsFull && !historyState.fullyLoaded) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען היסטוריה מלאה...</div>';
+    loadAllHistory().then(() => renderHistory());
+    return;
+  }
+
   // If filter is set but search is empty, clear the filter
   if (activeHistoryFilter && !q) {
     activeHistoryFilter = null;
@@ -1057,7 +1112,9 @@ function renderHistory() {
   });
   el.innerHTML = bannerHtml + (h || '<div style="color:var(--muted);text-align:center;padding:20px">' +
     (activeHistoryFilter ? 'לא נמצאו תוצאות לטווח הזמן הזה' : 'לא נמצאו תוצאות') + '</div>');
-  document.getElementById('histMoreBtn').style.display = items.length > histShown ? 'inline-block' : 'none';
+  // Show "load more" while there are more loaded items OR more day shards to fetch.
+  const moreDays = (D.historyIndex && D.historyIndex.days || []).some(d => !historyState.loadedDays.has(d));
+  document.getElementById('histMoreBtn').style.display = (items.length > histShown || moreDays) ? 'inline-block' : 'none';
 }
 
 function clearHistoryFilter() {
@@ -1077,7 +1134,16 @@ function toggleHistReverse() {
   document.getElementById('histReverseBtn').classList.toggle('active', !histReverse);
   renderHistory();
 }
-function loadMoreHistory() { histShown += 80; renderHistory(); }
+async function loadMoreHistory() {
+  // Fetch the next older day shard (newest unloaded day first), then show more.
+  const days = (D.historyIndex && D.historyIndex.days) || [];
+  for (let i = days.length - 1; i >= 0; i--) {
+    const day = days[i];
+    if (!historyState.loadedDays.has(day)) { await loadDayShard(day); break; }
+  }
+  histShown += 80;
+  renderHistory();
+}
 
 /* ══════════════════════════════════════════════════════════════════════
    TAB 3: DEEP
@@ -2000,19 +2066,14 @@ function selectClusterSong(song) {
   if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' \u05d4\u05e9\u05de\u05e2\u05d5\u05ea</div>';
   h += '</div>';
 
-  // Station info  
+  // Station info — uses the per-song station play counts shipped inside
+  // clusters.json (48h window). No full-history scan needed (history is
+  // sharded now; a full scan would pull every day shard).
   let stationInfo = '';
-  if (D.history && D.history.history) {
-    const matches = D.history.history.filter(t =>
-      t.title === song.title && t.artist === song.artist
-    );
-    if (matches.length) {
-      const stationCounts = {};
-      matches.forEach(t => { stationCounts[t.station_slug] = (stationCounts[t.station_slug] || 0) + 1; });
-      stationInfo = Object.entries(stationCounts)
-        .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '\u00d7)</span>')
-        .join(' \u00b7 ');
-    }
+  if (song.stations && Object.keys(song.stations).length) {
+    stationInfo = Object.entries(song.stations)
+      .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '\u00d7)</span>')
+      .join(' \u00b7 ');
   }
 
   if (!hasNeighbors) {

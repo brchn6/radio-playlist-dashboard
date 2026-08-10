@@ -10,11 +10,18 @@ Files written to docs/data/:
   stations.json        station registry
   current.json         latest track per station
   stats.json           headline stats (only file carrying updated_at)
-  history.json         all tracks (Postgres retention is the only cap)
+  recent.json          last RECENT_LIMIT tracks (tiny, changes every cycle)
+  history_index.json   list of per-day shards + totals (changes once a day)
+  history/YYYY-MM-DD.json  per-day immutable track shards (only today changes)
   top.json             top artists/songs per time window, with prev-window counts
   trends.json          daily activity, discovery rate, rising artists
   cross_station.json   songs heard on 2+ stations
   bpm_key.json, clusters.json, transitions.json, transition_map.json, uptime.json
+
+Egress discipline: the old single history.json (all tracks, ~28 MB) changed
+its content-hash every cycle, so every open tab re-downloaded it every poll.
+Now only recent.json (small) and today's day-shard change; all older day
+shards are immutable and cached by CDN + browser forever.
 
 Retired v2 artifacts (timeline.json, heatmap.json, non_music.json, stations/)
 are deleted from the output dir on every run — see RETIRED below.
@@ -48,13 +55,24 @@ DATA_DIR = PROJECT_ROOT / "docs" / "data"
 # Artifacts retired in v2 that must never be generated or shipped again.
 # generate_all() deletes these from the output dir every run so publish.py
 # (which globs every *.json under docs/data/) cannot re-ship them.
-RETIRED = {"heatmap.json", "timeline.json", "non_music.json"}
+# history.json was retired by the sharding change (2026-08-10): it was a
+# single all-tracks file whose hash moved every cycle, burning egress.
+RETIRED = {"heatmap.json", "timeline.json", "non_music.json", "history.json"}
 
 IL_TZ = ZoneInfo("Asia/Jerusalem")
 
 TIMELINE_HOURS = 48
 CLUSTER_HOURS = 48        # how far back the cluster graph looks
 CLUSTER_REFRESH_HOURS = 24  # regenerate clusters only this often (meta-analysis)
+
+# ── History sharding ────────────────────────────────────────────────────
+# The old single history.json carried EVERY track, so its content hash moved
+# on every new track and every open tab re-downloaded ~28 MB each poll. Now:
+#   recent.json          last RECENT_LIMIT tracks, newest first (changes each cycle)
+#   history_index.json   tiny manifest of day shards
+#   history/YYYY-MM-DD.json  immutable per-day shards (only today changes)
+RECENT_LIMIT = 300
+TRANSITION_MAP_REFRESH_HOURS = 24  # 6.8MB explorer map — meta-analysis, refresh rarely
 TOP_LIMIT = 50                # per window; client re-ranks for station filter
 TOP_WINDOWS = [("1h", 1), ("24h", 24), ("7d", 168), ("30d", 720), ("all", None)]
 HEATMAP_STATION_DAYS = 2   # was 7 — user wants mean over 48h, not 7 days
@@ -1017,11 +1035,50 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         current_annotated.append(entry)
     write_json(output_dir / "current.json", current_annotated, sizes, "current.json")
 
-    write_json(output_dir / "history.json", {
-        "history": [public(t) for t in tracks],
+    # ── History sharding (see RECENT_LIMIT docstring): small recent file +
+    # immutable per-day shards instead of one all-tracks history.json.
+    # tracks is newest-first (get_history DESC), so recent = first N.
+    recent_tracks = [public(t) for t in tracks[:RECENT_LIMIT]]
+    write_json(output_dir / "recent.json", {
+        "history": recent_tracks,
         "total": total_count,
-        "returned": len(tracks),
-    }, sizes, "history.json")
+        "returned": len(recent_tracks),
+    }, sizes, "recent.json")
+
+    # Group ALL tracks by IL day (oldest day first for deterministic output)
+    by_day: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for t in tracks:
+        day = t["_il"].strftime("%Y-%m-%d")
+        by_day[day].append(public(t))
+    history_days = sorted(by_day.keys())  # ascending: 2026-07-13, ..., today
+
+    # Write each day as an immutable shard: history/YYYY-MM-DD.json
+    # Only today's shard changes during the day; older shards never change
+    # again, so their content hash is stable and CDN/browser cache them.
+    # Within a shard keep the same newest-first order as get_history.
+    history_dir = output_dir / "history"
+    for day in history_days:
+        day_tracks = by_day[day]
+        write_json(history_dir / f"{day}.json", {
+            "history": day_tracks,
+            "total": len(day_tracks),
+            "day": day,
+        }, sizes, f"history/{day}.json")
+
+    # Prune shards for days that no longer exist in the DB (retention).
+    # Keeps the manifest small and stops stale days being re-served.
+    if history_dir.exists():
+        existing = set(history_days)
+        for p in sorted(history_dir.glob("*.json")):
+            if p.stem not in existing:
+                p.unlink()
+                print(f"  [shard] pruned stale {p.name}", flush=True)
+
+    write_json(output_dir / "history_index.json", {
+        "days": history_days,
+        "total": total_count,
+        "recent": RECENT_LIMIT,
+    }, sizes, "history_index.json")
 
     write_json(output_dir / "top.json", {"windows": build_top(tracks, now, first_seen_map)}, sizes, "top.json")
 
@@ -1180,13 +1237,34 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
             transition_map_songs_mapped += 1
         transition_map_stations[slug] = {"songs": song_entries}
 
-    write_json(output_dir / "transition_map.json", {
-        "stations": transition_map_stations,
-        "meta": {
-            "total_songs_mapped": transition_map_songs_mapped,
-            "formula": {"probability": "P(B|A) = count(A→B) / count(A→*)"},
-        },
-    }, sizes, "transition_map.json")
+    # ── Transition explorer map ────────────────────────────────────
+    # This map (~6.8 MB) is only used by the Deep-tab explorer. It is rebuilt
+    # from ALL transitions, so it used to change every cycle and every open
+    # tab re-downloaded it. Regenerate only every TRANSITION_MAP_REFRESH_HOURS
+    # (same pattern as clusters.json). transitions.json (small) stays fresh.
+    transition_map_path = output_dir / "transition_map.json"
+    if transition_map_path.exists():
+        mtime = datetime.fromtimestamp(transition_map_path.stat().st_mtime, tz=timezone.utc)
+        age_h = (now - mtime).total_seconds() / 3600
+        if age_h < TRANSITION_MAP_REFRESH_HOURS:
+            sizes["transition_map.json"] = transition_map_path.stat().st_size
+            print(f"  [transition_map] skipped — {age_h:.1f}h old (< {TRANSITION_MAP_REFRESH_HOURS}h refresh)", flush=True)
+        else:
+            write_json(transition_map_path, {
+                "stations": transition_map_stations,
+                "meta": {
+                    "total_songs_mapped": transition_map_songs_mapped,
+                    "formula": {"probability": "P(B|A) = count(A→B) / count(A→*)"},
+                },
+            }, sizes, "transition_map.json")
+    else:
+        write_json(transition_map_path, {
+            "stations": transition_map_stations,
+            "meta": {
+                "total_songs_mapped": transition_map_songs_mapped,
+                "formula": {"probability": "P(B|A) = count(A→B) / count(A→*)"},
+            },
+        }, sizes, "transition_map.json")
 
     # headline stats — the only file that always changes (updated_at heartbeat)
     stats = db.get_stats()
