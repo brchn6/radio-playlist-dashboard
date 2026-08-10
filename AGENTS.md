@@ -136,6 +136,15 @@ that outage could never be diagnosed.
 - **Frontend** (`docs/index.html`) polls `manifest.json` and refetches a file only
   when its hash moves. Idle cost ~3 KB/poll instead of ~750 KB. It embeds **no
   API key** — the bucket is public.
+- **Local track mirror stops DB egress (2026-08-10)**: generate_data.py used to
+  re-pull ALL tracks from Supabase Postgres every 20s cycle (~15 MB × 180/h =
+  ~2.7 GB/h of database egress). It now keeps an append-only local mirror at
+  `data/tracks_mirror.jsonl` (gitignored) + checkpoint `data/mirror_state.json`,
+  and only fetches the delta via `get_history_since()` (a few KB/cycle). First
+  run does a one-time full pull. Retention prune (45d) runs at most every 6h.
+  `data_generated` log events report `mirror_count`/`mirror_last_ts` - verify
+  these stay in sync with the DB (they should match; if the mirror is ever
+  wiped, the next cycle self-heals with a full pull).
 - **History is sharded by day (2026-08-10)**: the old single `history.json`
   (all tracks, ~28 MB) changed its content hash on every new track, so every
   open tab re-downloaded it every poll and blew the free-tier egress quota
@@ -213,8 +222,17 @@ When generating JavaScript code from Python (e.g. in scripts or heredocs):
 - This applies to ANY escape sequence (`\t`, `\"`, `\\`, etc.)
 - When in doubt, write the output to a file first and inspect it
 
-## Memory File
-Full project memory at `~/.memory/radio-playlist-dashboard.md` — **READ BEFORE making any changes**.
+## Memory Files (READ at session start, UPDATE at session end)
+
+Project memory follows the global convention — three git-tracked files in `.memory/`:
+
+| File | Purpose |
+|------|---------|
+| `.memory/progress.md` | Where things stand: current state, session log, next steps, git state |
+| `.memory/decisions.md` | Closed decisions — do not re-litigate without strong reason |
+| `.memory/lessons.md` | What failed and why — append, never erase |
+
+**READ all three before making any changes.** Update `progress.md` when meaningful work is done; append to `decisions.md` after a significant decision; append to `lessons.md` after fixing a bug from a wrong assumption or a wrong approach that cost time. Memory travels with the repo (git-tracked).
 
 ## Deployment Architecture Decisions
 Full analysis, failed attempts, and final solution documented in `.planning/DEPLOY-ARCHITECTURE.md` — read this before making any changes to the deploy pipeline.
