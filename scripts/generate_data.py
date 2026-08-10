@@ -73,6 +73,154 @@ CLUSTER_REFRESH_HOURS = 24  # regenerate clusters only this often (meta-analysis
 #   history/YYYY-MM-DD.json  immutable per-day shards (only today changes)
 RECENT_LIMIT = 300
 TRANSITION_MAP_REFRESH_HOURS = 24  # 6.8MB explorer map — meta-analysis, refresh rarely
+
+# ── Local track mirror (Option A incremental egress fix) ────────────────
+# Every generate cycle used to re-pull ALL tracks from Supabase Postgres
+# (~15 MB × 180/h = ~2.7 GB/h of database egress). That single read was the
+# dominant ongoing egress cost. Now we keep an append-only local mirror of
+# every track on the collector host and only query the DB for rows newer than
+# our last checkpoint (a handful of KB). Postgres stays the durable source of
+# truth; the mirror is a local cache that makes the aggregates cheap to build.
+#
+# Files (both under data/, which is gitignored):
+#   data/tracks_mirror.jsonl  append-only, one JSON track per line
+#   data/mirror_state.json    {"last_ts": ISO, "count": N} checkpoint
+MIRROR_PATH = PROJECT_ROOT / "data" / "tracks_mirror.jsonl"
+MIRROR_STATE_PATH = PROJECT_ROOT / "data" / "mirror_state.json"
+MIRROR_BACKUP_SUFFIX = ".bak"
+
+
+def load_mirror() -> list[dict[str, Any]]:
+    """Read the local mirror (all tracks, newest first). Fast, no network."""
+    if not MIRROR_PATH.exists():
+        return []
+    tracks = []
+    with MIRROR_PATH.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                tracks.append(json.loads(line))
+            except ValueError:
+                continue  # skip a torn tail line from a crash
+    return tracks
+
+
+def read_mirror_state() -> dict[str, Any]:
+    try:
+        return json.loads(MIRROR_STATE_PATH.read_text("utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def write_mirror_state(last_ts: str, count: int) -> None:
+    try:
+        MIRROR_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        MIRROR_STATE_PATH.write_text(
+            json.dumps({"last_ts": last_ts, "count": count}), "utf-8")
+    except OSError as exc:
+        print(f"[mirror] could not save state: {exc}", flush=True)
+
+
+def append_mirror(new_tracks: list[dict[str, Any]]) -> None:
+    """Append rows to the mirror file (crash-safe: torn tail is skipped on read)."""
+    if not new_tracks:
+        return
+    MIRROR_PATH.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with MIRROR_PATH.open("a", encoding="utf-8") as f:
+            for t in new_tracks:
+                f.write(json.dumps(t, ensure_ascii=False) + "\n")
+    except OSError as exc:
+        print(f"[mirror] append failed: {exc}", flush=True)
+
+
+def prune_mirror(retention_days: int = 45) -> None:
+    """Drop mirror rows older than retention (DB has the same cap).
+
+    Only actually rewrites when something is removed. To avoid re-scanning the
+    file every 20s cycle, it checks the state file's last_prune timestamp and
+    scans at most once per 6 hours (matching the DB cleanup cadence).
+    """
+    if not MIRROR_PATH.exists():
+        return
+    state = read_mirror_state()
+    last_prune = state.get("last_prune", "")
+    if last_prune:
+        try:
+            age_h = (datetime.now(timezone.utc) - datetime.fromisoformat(last_prune)).total_seconds() / 3600
+            if age_h < 6:
+                return
+        except ValueError:
+            pass
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=retention_days)).isoformat()
+    kept: list[dict[str, Any]] = []
+    removed = 0
+    with MIRROR_PATH.open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                t = json.loads(line)
+            except ValueError:
+                continue
+            if t.get("recognized_at", "") < cutoff:
+                removed += 1
+            else:
+                kept.append(t)
+    state["last_prune"] = datetime.now(timezone.utc).isoformat()
+    if removed:
+        tmp = MIRROR_PATH.with_suffix(MIRROR_PATH.suffix + MIRROR_BACKUP_SUFFIX)
+        try:
+            tmp.write_text("".join(json.dumps(t, ensure_ascii=False) + "\n" for t in kept), "utf-8")
+            tmp.replace(MIRROR_PATH)
+            state["count"] = len(kept)
+            print(f"[mirror] pruned {removed} rows older than {retention_days}d", flush=True)
+        except OSError as exc:
+            print(f"[mirror] prune failed: {exc}", flush=True)
+    try:
+        MIRROR_STATE_PATH.write_text(json.dumps(state), "utf-8")
+    except OSError:
+        pass
+
+
+def sync_mirror(db: SupabaseDB, retention_days: int = 45) -> list[dict[str, Any]]:
+    """Return the full track list, fetching only the delta from Postgres.
+
+    First run (no mirror): full pull once. Afterwards: read the local mirror
+    (fast) + query get_history_since(last_ts) (tiny) + merge + checkpoint.
+    """
+    local = load_mirror()
+    if local:
+        # Mirror is authoritative for what we already have; last_ts = newest row.
+        # (We trust the file over the state file; state is just a sanity aid.)
+        newest = max(t["recognized_at"] for t in local if t.get("recognized_at"))
+        state = read_mirror_state()
+        last_ts = state.get("last_ts") or newest
+        last_ts = max(last_ts, newest)
+        delta = db.get_history_since(last_ts)
+        if not delta:
+            return local
+        known_ids = {t.get("id") for t in local}
+        fresh = [t for t in delta if t.get("id") not in known_ids]
+        if fresh:
+            append_mirror(fresh)
+            local.extend(fresh)
+        # newest-first ordering to match get_history()
+        local.sort(key=lambda t: t.get("recognized_at", ""), reverse=True)
+        newest = max((t["recognized_at"] for t in local if t.get("recognized_at")), default="")
+        write_mirror_state(newest, len(local))
+        return local
+
+    # First run (or mirror wiped): one-time full pull, then incremental forever.
+    total_count = db.get_all_tracks_count()
+    full = db.get_history(limit=total_count or 1)
+    append_mirror(full)
+    newest = max((t["recognized_at"] for t in full if t.get("recognized_at")), default="")
+    write_mirror_state(newest, len(full))
+    return full
 TOP_LIMIT = 50                # per window; client re-ranks for station filter
 TOP_WINDOWS = [("1h", 1), ("24h", 24), ("7d", 168), ("30d", 720), ("all", None)]
 HEATMAP_STATION_DAYS = 2   # was 7 — user wants mean over 48h, not 7 days
@@ -983,8 +1131,11 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     now = datetime.now(timezone.utc)
     sizes: dict[str, int] = {}
 
-    # one pass over all tracks (newest first), annotated with parsed datetimes
-    tracks = db.get_history(limit=total_count or 1)
+    # Load the full track list from the LOCAL mirror, fetching only the delta
+    # from Postgres (Option A egress fix). Prune old rows first so the mirror
+    # stays bounded (retention matches the DB).
+    prune_mirror()
+    tracks = sync_mirror(db)
     annotated = []
     for t in tracks:
         dt = parse_utc(t["recognized_at"])
@@ -1383,10 +1534,13 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
 
 def main() -> None:
     sizes = generate_all()
+    state = read_mirror_state()
     print(json.dumps({
         "event": "data_generated",
         "files": len(sizes),
         "total_bytes": sum(sizes.values()),
+        "mirror_count": state.get("count", 0),
+        "mirror_last_ts": state.get("last_ts", ""),
     }), flush=True)
 
 

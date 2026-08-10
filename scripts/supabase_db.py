@@ -311,6 +311,30 @@ class SupabaseDB:
         params.extend([limit, offset])
         return self._query(sql, params)
 
+    def get_history_since(
+        self, ts: str, station_id: int | None = None, limit: int = 100000,
+    ) -> list[dict[str, Any]]:
+        """Tracks recognized strictly after an ISO timestamp, newest first.
+
+        This is the incremental read used by the local mirror: instead of
+        pulling ALL tracks every cycle, the collector fetches only what has
+        arrived since its last checkpoint (a handful of rows, ~KB, instead of
+        ~15 MB). Ties on the boundary are safe: the mirror dedupes by id, so
+        re-fetching the same second costs nothing.
+        """
+        sql = """SELECT t.*, s.slug as station_slug, s.name as station_name,
+                        s.color as station_color
+                 FROM tracks t
+                 JOIN stations s ON s.id = t.station_id
+                 WHERE t.recognized_at > %s"""
+        params: list[Any] = [ts]
+        if station_id:
+            sql += " AND t.station_id = %s"
+            params.append(station_id)
+        sql += " ORDER BY t.recognized_at DESC LIMIT %s"
+        params.append(limit)
+        return self._query(sql, params)
+
     def get_hype_tracks(
         self, station_id: int | None = None,
         min_count: int = 1, limit: int = 50,
