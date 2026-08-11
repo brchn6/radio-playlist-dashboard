@@ -2395,7 +2395,7 @@ function renderUptime() {
   let h = '';
 
   // Status indicator
-  const statusMap = { 'up': '🟢 פעיל', 'partial': '🟡 מושבת חלקית', 'down': '🔴 מושבת' };
+  const statusMap = { 'up': '🟢 פעיל', 'degraded': '🟡 מושבת חלקית', 'down': '🔴 מושבת' };
   const statusColor = { 'up': '#5ddbb5', 'partial': '#d4b85a', 'down': '#e05555' };
   const statusLabel = statusMap[ut.status] || '🟡 לא ידוע';
   h += '<div class="uptime-status" style="color:' + (statusColor[ut.status] || '#d4b85a') + '">' + statusLabel + '</div>';

@@ -1496,8 +1496,14 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         uptime_7d = db.get_system_uptime(days=7)
         uptime_30d = db.get_system_uptime(days=30)
 
-        # Determine current status
-        current_events = [e for e in recent if e.get("ended_at") is None]
+        # Determine current status: only OUTAGE-TYPE events still open count as
+        # down. Lifecycle events (collector_start, proxy_start, watchdog_recovery,
+        # collector_stop) never carry ended_at - they are records, not outages,
+        # and must not flip the dashboard to red.
+        current_events = [
+            e for e in recent
+            if e.get("ended_at") is None and e.get("event_type") in OUTAGE_TYPES
+        ]
         if current_events:
             uptime_data["status"] = "down"
             uptime_data["current_events"] = current_events
@@ -1542,7 +1548,8 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     except Exception as exc:
         print(f"  [uptime] error building uptime data: {exc}", flush=True)
 
-    write_json(output_dir / "uptime.json", uptime_data, sizes, "uptime.json")
+    maybe_write_json(output_dir / "uptime.json", "uptime.json",
+                     lambda: uptime_data, sizes, SLOW_REFRESH_SECONDS, now)
 
     # ── Retire v2 artifacts (durable guard against stale shipments) ──
     # publish.py collects every *.json under output_dir, so anything left here
