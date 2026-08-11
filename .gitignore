@@ -22,3 +22,6 @@ docs/data/
 # Cloudflare Wrangler CLI cache (project config cached by wrangler invocations)
 .wrangler/
 
+
+# Transient Wayfinder/agent work tickets - not source code
+.scratch/

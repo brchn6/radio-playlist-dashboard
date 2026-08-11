@@ -112,6 +112,15 @@ Shazam cannot identify audio after the fact. `radio-proxies-heal.timer` does the
 same job for the proxies every 2 minutes (`proxy_manager start` is idempotent: it
 skips healthy proxies, so it cannot fire 8 simultaneous Shazam calls).
 
+**Never stop or restart the collector without explicit user confirmation.**
+The subagent that implemented the egress-optimization (2026-08-10) stopped
+`radio-updater.service` for ~4 minutes to take a clean measurement. Even small
+airtime gaps are unrecoverable - Shazam cannot identify audio after the fact -
+and an unconfirmed stop is how a 4-minute gap becomes a 4-hour one. There is
+always a non-invasive way to measure (diff two consecutive `docs/data/`
+generations, read the `published` events in `logs/updater.log`, or run
+`publish.py --dry-run` right after a cycle). Ask first.
+
 **Never redirect the log with `>`.** Use `>>`. A restart with `>` truncated
 `logs/updater.log` and destroyed the only record of why the collector died, so
 that outage could never be diagnosed.

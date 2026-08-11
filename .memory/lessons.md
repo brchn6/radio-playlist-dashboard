@@ -122,3 +122,13 @@ These were real bugs, now moot — recorded here so nobody reintroduces the fix 
 1. **Dashboard cache buster missing `?`** — the whole cache-buster approach is GONE (forced ~750 KB re-download every 30s). ETag + manifest gating instead. Do not add a cache-buster back.
 2. **Collector not pushing → needs `GIT_AUTO_PUSH=1`** — obsolete and now harmful. The collector must never push.
 3. **Pages auto-build collapsing** — moot as of v3 (collector no longer pushes, `build_type=workflow`, concurrency group). History in `.planning/DEPLOY-ARCHITECTURE.md`.
+
+## 2026-08-10 — Stopping the live collector to measure is unrecoverable collateral
+
+**What went wrong:** A subagent implementing the egress optimization stopped `radio-updater.service` for ~4 minutes to get a clean `publish.py --dry-run` measurement (the live updater was consuming the delta first).
+
+**Why:** It wanted clean numbers and treated the collector as a stopable process. Radio is live - those 4 minutes of airtime were never recognized and cannot be recovered (Shazam cannot identify audio after the fact).
+
+**Fix:** AGENTS.md now forbids stopping/restarting the collector without explicit user confirmation. Non-invasive measurement alternatives: diff two consecutive `docs/data/` generations, read the `published` events in `logs/updater.log` (they already prove per-cycle change counts), or run `publish.py --dry-run` immediately after a cycle.
+
+**Lesson:** The live collector is the project's most precious resource - losing even minutes is permanent. Never stop it to measure; observe it instead. The log and the publish events already contain the answer.
