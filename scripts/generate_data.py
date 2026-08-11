@@ -73,6 +73,10 @@ CLUSTER_REFRESH_HOURS = 24  # regenerate clusters only this often (meta-analysis
 #   history/YYYY-MM-DD.json  immutable per-day shards (only today changes)
 RECENT_LIMIT = 300
 TRANSITION_MAP_REFRESH_HOURS = 24  # 6.8MB explorer map — meta-analysis, refresh rarely
+SLOW_REFRESH_SECONDS = 300  # 5 min: slow aggregates (top/transitions/bpm/trends/cross/stats)
+# Event types that actually indicate downtime (lifecycle events like
+# collector_start/proxy_start/watchdog_recovery are records, not outages).
+OUTAGE_TYPES = ("outage_start", "proxy_crash", "collector_crash", "connection_issue")
 
 # ── Local track mirror (Option A incremental egress fix) ────────────────
 # Every generate cycle used to re-pull ALL tracks from Supabase Postgres
@@ -279,6 +283,26 @@ def write_json(path: Path, payload: Any, sizes: dict[str, int], rel: str) -> Non
         "utf-8",
     )
     sizes[rel] = path.stat().st_size
+
+
+def maybe_write_json(path: Path, rel: str, build, sizes: dict[str, int],
+                     min_age_s: int, now: datetime) -> None:
+    """Write path only if it is older than min_age_s (or missing).
+
+    Slow aggregates (meta-analysis) do not need per-cycle freshness. Rewriting
+    them every collector cycle moves their content hash, so every open tab
+    re-downloads them on every poll — that is the egress leak. If the file is
+    still fresh we record its existing size so the manifest stays stable and
+    skip the build entirely. build is a zero-arg callable returning the payload.
+    """
+    if path.exists():
+        mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+        age_s = (now - mtime).total_seconds()
+        if age_s < min_age_s:
+            sizes[rel] = path.stat().st_size
+            print(f"  [{rel}] skipped — {age_s/60:.1f} min old (< {min_age_s/60:.0f} min refresh)", flush=True)
+            return
+    write_json(path, build(), sizes, rel)
 
 
 def song_key(t: dict[str, Any]) -> str:
@@ -1231,7 +1255,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         "recent": RECENT_LIMIT,
     }, sizes, "history_index.json")
 
-    write_json(output_dir / "top.json", {"windows": build_top(tracks, now, first_seen_map)}, sizes, "top.json")
+    maybe_write_json(output_dir / "top.json", "top.json",
+                     lambda: {"windows": build_top(tracks, now, first_seen_map)},
+                     sizes, SLOW_REFRESH_SECONDS, now)
 
     # v2: removed timeline.json, heatmap.json, non_music.json
     trends = build_trends(tracks, now)
@@ -1334,7 +1360,8 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         "stations": station_rep,
         "daily_trend": dict(daily_rep_trend),
     }
-    write_json(output_dir / "trends.json", trends, sizes, "trends.json")
+    maybe_write_json(output_dir / "trends.json", "trends.json",
+                     lambda: trends, sizes, SLOW_REFRESH_SECONDS, now)
     # ── Cross-station: enrich with per-station play counts ──────────
     station_song_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     for tr in tracks:
@@ -1358,8 +1385,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
             for slug, count in per_station.items()
         } if total > 0 else {}
 
-    write_json(output_dir / "cross_station.json",
-               {"tracks": cross_tracks}, sizes, "cross_station.json")
+    maybe_write_json(output_dir / "cross_station.json", "cross_station.json",
+                     lambda: {"tracks": cross_tracks},
+                     sizes, SLOW_REFRESH_SECONDS, now)
     # Cluster graph is a meta-analysis: only regenerate every CLUSTER_REFRESH_HOURS.
     # The 30-second poll shouldn't shuffle the force graph — it's confusing and wasteful.
     cluster_path = output_dir / "clusters.json"
@@ -1373,9 +1401,15 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
             write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
     else:
         write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
-    write_json(output_dir / "bpm_key.json", build_bpm_key(tracks, slugs), sizes, "bpm_key.json")
+    maybe_write_json(output_dir / "bpm_key.json", "bpm_key.json",
+                     lambda: build_bpm_key(tracks, slugs),
+                     sizes, SLOW_REFRESH_SECONDS, now)
+    # transitions_result stays unconditional: transition_map.json (24h gate)
+    # below consumes its _from_song_map. Only the transitions.json WRITE is gated.
     transitions_result = build_transitions(tracks, slugs)
-    write_json(output_dir / "transitions.json", {"stations": transitions_result["stations"]}, sizes, "transitions.json")
+    maybe_write_json(output_dir / "transitions.json", "transitions.json",
+                     lambda: {"stations": transitions_result["stations"]},
+                     sizes, SLOW_REFRESH_SECONDS, now)
 
     # ── Transition explorer map ────────────────────────────────────
     from_song_map = transitions_result.get("_from_song_map", {})
@@ -1446,7 +1480,8 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     stats["most_active_station_today"] = (
         max(station_today, key=station_today.get) if station_today else None)
     stats["updated_at"] = now_iso()
-    write_json(output_dir / "stats.json", stats, sizes, "stats.json")
+    maybe_write_json(output_dir / "stats.json", "stats.json",
+                     lambda: stats, sizes, SLOW_REFRESH_SECONDS, now)
 
     # ── Uptime / System Events ────────────────────────────────────
     uptime_data: dict[str, Any] = {
