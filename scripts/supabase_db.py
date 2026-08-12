@@ -307,7 +307,7 @@ class SupabaseDB:
         if station_id:
             sql += " WHERE t.station_id = %s"
             params.append(station_id)
-        sql += " ORDER BY t.recognized_at DESC LIMIT %s OFFSET %s"
+        sql += " ORDER BY t.recognized_at DESC, t.id DESC LIMIT %s OFFSET %s"
         params.extend([limit, offset])
         return self._query(sql, params)
 
@@ -331,7 +331,7 @@ class SupabaseDB:
         if station_id:
             sql += " AND t.station_id = %s"
             params.append(station_id)
-        sql += " ORDER BY t.recognized_at DESC LIMIT %s"
+        sql += " ORDER BY t.recognized_at DESC, t.id DESC LIMIT %s"
         params.append(limit)
         return self._query(sql, params)
 

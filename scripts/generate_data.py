@@ -190,11 +190,25 @@ def prune_mirror(retention_days: int = 45) -> None:
         pass
 
 
+def track_order_key(t: dict[str, Any]) -> tuple[str, int]:
+    """Deterministic total order for track rows: (recognized_at, id).
+
+    DB reads truncate timestamps to seconds ('YYYY-MM-DDTHH:MM:SSZ'), so 8
+    stations routinely share the same second. Sorting on recognized_at alone
+    leaves those ties in whatever order the source returned them; breaking on
+    id makes the order stable across cycles, so unchanged data produces
+    byte-identical aggregates (see the history day shards).
+    """
+    return t.get("recognized_at", ""), t.get("id") or 0
+
+
 def sync_mirror(db: SupabaseDB, retention_days: int = 45) -> list[dict[str, Any]]:
     """Return the full track list, fetching only the delta from Postgres.
 
     First run (no mirror): full pull once. Afterwards: read the local mirror
     (fast) + query get_history_since(last_ts) (tiny) + merge + checkpoint.
+    The returned list is always in deterministic (recognized_at, id)
+    newest-first order, independent of whether the delta was empty.
     """
     local = load_mirror()
     if local:
@@ -205,15 +219,18 @@ def sync_mirror(db: SupabaseDB, retention_days: int = 45) -> list[dict[str, Any]
         last_ts = state.get("last_ts") or newest
         last_ts = max(last_ts, newest)
         delta = db.get_history_since(last_ts)
-        if not delta:
-            return local
         known_ids = {t.get("id") for t in local}
         fresh = [t for t in delta if t.get("id") not in known_ids]
         if fresh:
             append_mirror(fresh)
             local.extend(fresh)
-        # newest-first ordering to match get_history()
-        local.sort(key=lambda t: t.get("recognized_at", ""), reverse=True)
+        # Deterministic newest-first ordering, whether or not new rows arrived.
+        # Sorting on recognized_at alone would leave second-level ties (8
+        # stations share seconds constantly) in whatever order the delta or the
+        # file happened to hold them, making the aggregates alternate between
+        # two states and publish.py re-upload ~2.5 MB of shards every cycle. (An empty
+        # delta used to return the raw mirror-file order here.)
+        local.sort(key=track_order_key, reverse=True)
         newest = max((t["recognized_at"] for t in local if t.get("recognized_at")), default="")
         write_mirror_state(newest, len(local))
         return local
@@ -1230,10 +1247,15 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     # Write each day as an immutable shard: history/YYYY-MM-DD.json
     # Only today's shard changes during the day; older shards never change
     # again, so their content hash is stable and CDN/browser cache them.
-    # Within a shard keep the same newest-first order as get_history.
+    # Within a shard keep the same newest-first order as get_history, but
+    # ALWAYS sort explicitly: second-level ties (8 stations share seconds)
+    # must resolve on id, or the shard bytes oscillate with the DB's
+    # arbitrary tie order and every cycle re-uploads ~2.5 MB. Do not rely on
+    # sync_mirror having sorted (it returns file order on an empty delta).
     history_dir = output_dir / "history"
     for day in history_days:
         day_tracks = by_day[day]
+        day_tracks.sort(key=track_order_key, reverse=True)
         write_json(history_dir / f"{day}.json", {
             "history": day_tracks,
             "total": len(day_tracks),

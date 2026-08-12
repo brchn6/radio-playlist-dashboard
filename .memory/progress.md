@@ -91,3 +91,26 @@ Two fixes cut Supabase egress ~44x on the publish path and eliminated the ~2.7 G
 - **Uncommitted on head1**: `AGENTS.md` (modified), `scripts/spotify_add_to_playlist.py` (untracked).
 - **Workstation copy** `/home/barc/dev/radio-playlist-dashboard`: 28 commits BEHIND origin/main + has its own uncommitted changes — do not work from it; use head1.
 - Deploy: GitHub Actions on push to `main` → Pages (`build_type=workflow`, concurrency group `pages`, cancel-in-progress: false). Frontend only; data never travels through git.
+
+---
+
+## 2026-08-12 - Ticket 06: deterministic history shard ordering (dev box)
+
+Implemented + committed on node1lab: `fix: deterministic history shard ordering (kill ~2.5MB/cycle re-uploads)`.
+
+- Root cause: `sync_mirror()` returned raw mirror-file order on empty-delta cycles while
+  non-empty-delta cycles returned sorted order, so history shards flipped between two
+  orderings every cycle and publish.py re-uploaded ~2.5 MB (median 2.3 MB/cycle, ~4.1 GB/day).
+  `get_history_since` used `ORDER BY recognized_at DESC` with arbitrary Postgres tie order
+  (DB stores second-precision timestamps; 835 same-second tie groups in 64K rows).
+- Fix: `track_order_key(t) = (recognized_at, id)`; `sync_mirror` always sorts DESC (no more
+  empty-delta early return); day-shard writer always sorts explicitly; DB queries now
+  `ORDER BY recognized_at DESC, id DESC`.
+- Test: `scripts/tests/shard_order_test.py` — runs real `generate_all()` against a fake DB
+  (first-run / delta / empty-delta cycles), PASS on new code, FAIL on old code with the
+  exact production symptom. Red-checked via git stash.
+- Real-data confirmation: read-only SELECT on Supabase via head1 (dev box rpd env lacks
+  psycopg2; nothing installed). Old tie order non-deterministic (8/10 sampled seconds not
+  id-ordered); new order is deterministic id-DESC.
+- NOT deployed: head1 is a pure server, user confirms deploys. Follow-up: `git pull` +
+  restart confirmation on head1, then watch `logs/updater.log` published bytes (target ~4 KB/cycle).
