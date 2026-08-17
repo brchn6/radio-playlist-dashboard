@@ -34,28 +34,20 @@ import httpx
 
 PORT = 9900
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+
+from env_config import get_env  # noqa: E402
 
 # ── Credentials ──────────────────────────────────────────────────────────
-def _load_env() -> None:
-    """Load .env file if SPOTIFY_CLIENT_ID not already set."""
-    if os.environ.get("SPOTIFY_CLIENT_ID"):
-        return
-    env_file = PROJECT_ROOT / ".env"
-    if not env_file.exists():
-        return
-    for line in env_file.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        os.environ.setdefault(key.strip(), val.strip())
-
-
-_load_env()
-
-CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID", "")
-CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET", "")
-REDIRECT_URI = os.environ.get("SPOTIFY_REDIRECT_URI", f"http://127.0.0.1:{PORT}/")
+# .env parsing lives in env_config.py (the single project loader). Real
+# environment variables win over .env values, matching the old behaviour.
+CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID") or get_env("SPOTIFY_CLIENT_ID") or ""
+CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET") or get_env("SPOTIFY_CLIENT_SECRET") or ""
+REDIRECT_URI = (
+    os.environ.get("SPOTIFY_REDIRECT_URI")
+    or get_env("SPOTIFY_REDIRECT_URI")
+    or f"http://127.0.0.1:{PORT}/"
+)
 
 if not CLIENT_ID or not CLIENT_SECRET:
     print(

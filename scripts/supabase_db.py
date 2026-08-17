@@ -9,18 +9,24 @@ Design:
 - Direct Postgres connection (psycopg2), NOT the REST client — lower latency,
   full SQL, server-side cursors.
 - Every query is wrapped to never raise: failure logs and returns empty/null.
+- Startup failures are loud: a missing psycopg2 driver raises SystemExit (a
+  fresh install must install requirements.txt first).
 - The caller (updater.py) maintains a retry queue for writes that fail.
 """
 
 from __future__ import annotations
 
 import json
-import os
-from datetime import datetime, timedelta, timezone
+import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from env_config import get_env, db_host_from_url  # noqa: E402
 
 # ── Station registry (canonical; read from code, not the DB) ────────────
 # Kept here so SupabaseDB is self-contained; the stations table in Supabase
@@ -40,20 +46,8 @@ STATIONS_BY_SLUG = {s["slug"]: s for s in STATIONS_CONFIG}
 STATIONS_BY_PORT = {s["proxy_port"]: s for s in STATIONS_CONFIG}
 
 
-# ── .env loader (lightweight, no external deps) ────────────────────────
-
-def _load_env() -> dict[str, str]:
-    env_path = PROJECT_ROOT / ".env"
-    env_vars: dict[str, str] = {}
-    if env_path.exists():
-        for line in env_path.read_text("utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" in line:
-                k, _, v = line.partition("=")
-                env_vars[k.strip()] = v.strip().strip("'\"").strip()
-    return env_vars
+# ── .env ────────────────────────────────────────────────────────────────
+# Parsing lives in env_config.py (the single project loader); see imports above.
 
 
 # ── Connection ─────────────────────────────────────────────────────────
@@ -82,20 +76,37 @@ class SupabaseDB:
         try:
             import psycopg2  # noqa: F811
         except ImportError:
-            print("[supabase_db] psycopg2 not installed — cannot connect", flush=True)
+            raise SystemExit(
+                "[supabase_db] psycopg2 is not installed - add 'psycopg2-binary' "
+                "to requirements.txt and re-run deploy/install.sh before "
+                "starting the collector (every track write goes through it)"
+            )
+
+        password = get_env("SUPABASE_DB_PASSWORD") or ""
+        if not password:
+            print(
+                "[supabase_db] SUPABASE_DB_PASSWORD not found in .env "
+                "(see .env.example: Dashboard -> Project Settings -> Database)",
+                flush=True,
+            )
             self._connected = False
             return
 
-        env = _load_env()
-        password = env.get("SUPABASE_DB_PASSWORD", "")
-        if not password:
-            print("[supabase_db] SUPABASE_DB_PASSWORD not found in .env", flush=True)
+        host = get_env("SUPABASE_DB_HOST") or db_host_from_url(
+            get_env("SUPABASE_URL") or ""
+        )
+        if not host or host == "db.":
+            print(
+                "[supabase_db] cannot derive DB host: SUPABASE_URL missing in .env "
+                "(or set SUPABASE_DB_HOST explicitly)",
+                flush=True,
+            )
             self._connected = False
             return
 
         try:
             self._conn = psycopg2.connect(
-                host="db.ktewdeaegtukbosrgxmw.supabase.co",
+                host=host,
                 port=5432,
                 dbname="postgres",
                 user="postgres",
@@ -108,6 +119,7 @@ class SupabaseDB:
             )
             self._conn.autocommit = True
             self._connected = True
+            self._seed_stations_if_empty()
         except Exception as exc:
             print(f"[supabase_db] connect failed: {exc}", flush=True)
             self._connected = False
@@ -117,6 +129,29 @@ class SupabaseDB:
         if self._conn is None or self._conn.closed:
             self._connect()
         return self._connected
+
+    def _seed_stations_if_empty(self) -> None:
+        """Best-effort: if the stations table has no rows, insert STATIONS_CONFIG.
+
+        The registry is read from code (get_stations()), so this is only to
+        keep the SQL table populated for JOINs and anything that reads it
+        directly on a fresh DB. Never raises.
+        """
+        try:
+            with self._conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM stations")
+                if cur.fetchone()[0] == 0:
+                    for s in STATIONS_CONFIG:
+                        cur.execute(
+                            """INSERT INTO stations
+                                   (slug, name, stream_url, proxy_port, color, website, enabled)
+                               VALUES (%s, %s, %s, %s, %s, %s, TRUE)
+                               ON CONFLICT (slug) DO NOTHING""",
+                            [s["slug"], s["name"], s["stream_url"], s["proxy_port"],
+                             s.get("color", "#6ae3c1"), s.get("website", "")],
+                        )
+        except Exception as exc:
+            print(f"[supabase_db] stations seed skipped: {exc}", flush=True)
 
     def close(self) -> None:
         if self._conn and not self._conn.closed:
@@ -173,11 +208,13 @@ class SupabaseDB:
     # ── Stations ───────────────────────────────────────────────────────
 
     def get_stations(self) -> list[dict[str, Any]]:
-        """Return stations list — reads from STATIONS_CONFIG (code), not DB."""
-        return self._query(
-            "SELECT id, slug, name, stream_url, proxy_port, color, website, enabled "
-            "FROM stations ORDER BY id"
-        ) or [
+        """Return the station registry.
+
+        Reads STATIONS_CONFIG (code) directly — the registry is code, not the
+        DB. The positional id (1..N) is synthesized to line up with the
+        schema's preserved ids (1-8), keeping tracks.station_id FKs aligned.
+        """
+        return [
             {"id": i + 1, **s, "enabled": True, "website": s.get("website", "")}
             for i, s in enumerate(STATIONS_CONFIG)
         ]
@@ -192,16 +229,14 @@ class SupabaseDB:
         musical_key: str | None = None,
         station_slug: str = "",
     ) -> bool:
-        """Insert one track into Supabase Postgres. Returns True on success."""
-        slug = station_slug or STATIONS_BY_SLUG.get(
-            next((s["slug"] for s in STATIONS_CONFIG if s.get("id") == station_id), ""), {}
-        ).get("slug", "")
+        """Insert one track into Supabase Postgres. Returns True on success.
 
-        if not slug:
-            for s in STATIONS_CONFIG:
-                if s.get("id") == station_id:
-                    slug = s["slug"]
-                    break
+        station_slug is required from callers — there is no id->slug lookup:
+        the registry is read from code and STATIONS_CONFIG has no 'id' keys,
+        so any fallback would always miss and insert empty slugs.
+        """
+        # No fallback lookup here — see docstring.
+        slug = station_slug
 
         sql = """
             INSERT INTO tracks
@@ -335,40 +370,6 @@ class SupabaseDB:
         params.append(limit)
         return self._query(sql, params)
 
-    def get_hype_tracks(
-        self, station_id: int | None = None,
-        min_count: int = 1, limit: int = 50,
-    ) -> list[dict[str, Any]]:
-        """Most frequently played tracks, optionally by station."""
-        if station_id:
-            rows = self._query(
-                """SELECT t.artist, t.title, t.text, COUNT(*) as play_count,
-                          MIN(t.recognized_at) as first_seen,
-                          MAX(t.recognized_at) as last_seen,
-                          s.slug as station_slug, s.name as station_name,
-                          s.color as station_color
-                   FROM tracks t
-                   JOIN stations s ON s.id = t.station_id
-                   WHERE t.station_id = %s
-                   GROUP BY LOWER(t.artist), LOWER(t.title), t.artist, t.title,
-                            t.text, s.slug, s.name, s.color
-                   HAVING COUNT(*) >= %s
-                   ORDER BY play_count DESC LIMIT %s""",
-                [station_id, min_count, limit],
-            )
-        else:
-            rows = self._query(
-                """SELECT t.artist, t.title, t.text, COUNT(*) as play_count,
-                          MIN(t.recognized_at) as first_seen,
-                          MAX(t.recognized_at) as last_seen
-                   FROM tracks t
-                   GROUP BY LOWER(t.artist), LOWER(t.title), t.artist, t.title, t.text
-                   HAVING COUNT(*) >= %s
-                   ORDER BY play_count DESC LIMIT %s""",
-                [min_count, limit],
-            )
-        return rows
-
     def get_cross_station_tracks(
         self, min_stations: int = 2, limit: int = 30,
     ) -> list[dict[str, Any]]:
@@ -389,24 +390,6 @@ class SupabaseDB:
                LIMIT %s""",
             [min_stations, limit],
         )
-
-    def get_scatter_data(
-        self, station_id: int | None = None,
-    ) -> list[dict[str, Any]]:
-        """Time-based data for scatterplot."""
-        sql = """SELECT t.artist, t.title, t.text, t.recognized_at,
-                        s.slug as station_slug, s.color as station_color,
-                        EXTRACT(DOW FROM t.recognized_at) as day_of_week,
-                        EXTRACT(HOUR FROM t.recognized_at) as hour,
-                        TO_CHAR(t.recognized_at, 'YYYY-MM-DD') as date
-                 FROM tracks t
-                 JOIN stations s ON s.id = t.station_id"""
-        params: list[Any] = []
-        if station_id:
-            sql += " WHERE t.station_id = %s"
-            params.append(station_id)
-        sql += " ORDER BY t.recognized_at ASC"
-        return self._query(sql, params)
 
     def get_stats(self, station_id: int | None = None) -> dict[str, Any]:
         """Aggregate statistics, optionally by station."""
@@ -444,22 +427,26 @@ class SupabaseDB:
         self, station_id: int | None = None,
         days: int = 45,
     ) -> list[dict[str, Any]]:
-        """Tracks grouped by date."""
-        if station_id:
-            return self._query(
-                """SELECT TO_CHAR(recognized_at, 'YYYY-MM-DD') as date,
+        """Tracks grouped by date, oldest first.
+
+        When days is not None, counts only tracks from the last N days
+        (recognized_at >= NOW() - INTERVAL 'N days').
+        """
+        sql = """SELECT TO_CHAR(recognized_at, 'YYYY-MM-DD') as date,
                           COUNT(*) as count
-                   FROM tracks
-                   WHERE station_id = %s
-                   GROUP BY date ORDER BY date ASC""",
-                [station_id],
-            )
-        return self._query(
-            """SELECT TO_CHAR(recognized_at, 'YYYY-MM-DD') as date,
-                      COUNT(*) as count
-               FROM tracks
-               GROUP BY date ORDER BY date ASC"""
-        )
+                   FROM tracks"""
+        where: list[str] = []
+        params: list[Any] = []
+        if station_id:
+            where.append("station_id = %s")
+            params.append(station_id)
+        if days is not None:
+            where.append("recognized_at >= NOW() - INTERVAL '%s days'")
+            params.append(days)
+        if where:
+            sql += " WHERE " + " AND ".join(where)
+        sql += " GROUP BY date ORDER BY date ASC"
+        return self._query(sql, params)
 
     # ── Non-music logging ──────────────────────────────────────────────
 

@@ -10,7 +10,8 @@
 #
 # Prerequisites the script checks for but will not install silently:
 #   - ffmpeg          (sudo apt install -y ffmpeg) — the proxies capture audio with it
-#   - .env            SUPABASE_URL + SUPABASE_SECRET_KEY (copy it in by scp, never git)
+#   - .env            SUPABASE_URL + SUPABASE_SECRET_KEY + SUPABASE_DB_PASSWORD
+#                     (copy it in by scp, never git)
 #
 # The collector writes directly to Supabase Postgres — there is no local DB to
 # copy. A new host needs only the repo, .env, venvs, and the systemd units.
@@ -22,14 +23,15 @@ cd "$ROOT"
 
 echo "==> checks"
 command -v ffmpeg >/dev/null || { echo "FATAL: ffmpeg missing — sudo apt install -y ffmpeg"; exit 1; }
-[ -f .env ] || { echo "FATAL: .env missing — needs SUPABASE_URL and SUPABASE_SECRET_KEY"; exit 1; }
+[ -f .env ] || { echo "FATAL: .env missing — needs SUPABASE_URL, SUPABASE_SECRET_KEY and SUPABASE_DB_PASSWORD"; exit 1; }
 grep -q '^SUPABASE_SECRET_KEY=' .env || { echo "FATAL: .env has no SUPABASE_SECRET_KEY"; exit 1; }
+grep -q '^SUPABASE_DB_PASSWORD=' .env || { echo "FATAL: .env has no SUPABASE_DB_PASSWORD (Supabase Dashboard -> Project Settings -> Database)"; exit 1; }
 chmod 600 .env
 echo "    ffmpeg: $(command -v ffmpeg)"
 echo "    .env:   present (mode $(stat -c %a .env))"
 
 echo "==> venvs"
-# Collector: supabase + numpy + scikit-learn.
+# Collector: as declared in requirements.txt (supabase, psycopg2-binary, numpy, networkx, python-louvain).
 [ -d .venv ] || python3 -m venv .venv
 .venv/bin/pip install -q --upgrade pip
 .venv/bin/pip install -q -r requirements.txt

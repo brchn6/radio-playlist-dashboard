@@ -1,14 +1,15 @@
 # Collector daemon + data pipeline.
 # The shazamio proxies have their own deps in shazamio/requirements.txt.
 
-# Supabase: Postgres mirror of the track history, and Storage for the
-# precomputed dashboard JSON. Replaces the old git-push data path.
+# Supabase: Postgres mirror of the track history (direct psycopg2 connection),
+# and Storage for the precomputed dashboard JSON. Replaces the old git-push
+# data path.
 supabase>=2.31.0
+psycopg2-binary>=2.9   # direct Postgres driver used by scripts/supabase_db.py
 
 # generate_data.py has always imported these — they were simply never declared,
 # so a fresh clone could not actually run the pipeline.
 numpy>=1.26
-scikit-learn>=1.4          # sklearn.manifold.MDS — the song-cluster embedding
-networkx>=3.0               # graph for Louvain community detection
-python-louvain>=0.16        # community detection algorithm
-tzdata                     # zoneinfo needs it for Asia/Jerusalem on some systems
+networkx>=3.0          # graph for Louvain community detection
+python-louvain>=0.16   # community detection algorithm
+tzdata                # zoneinfo needs it for Asia/Jerusalem on some systems

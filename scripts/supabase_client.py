@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-Supabase client + .env loader, shared by the collector (updater.py) and the
-publisher (publish.py).
+Supabase Storage client, used by the publisher (publish.py) for the
+precomputed dashboard JSON uploads.
+
+The collector (updater.py) does NOT use this module: it writes each track
+directly to Supabase Postgres via supabase_db.py.
 
 Design rule that everything here follows: **Supabase is never allowed to stop
-collection.** Supabase Postgres (via supabase_db.py) is the source of truth;
-the collector writes each track there directly. If a write fails, updater.py
-queues the row in data/retry_queue.jsonl and flushes it on a later cycle, so
+collection.** If a write fails, updater.py queues the row in
+data/retry_queue.jsonl and flushes it on a later cycle via supabase_db.py, so
 no track is ever lost.
 
 Every helper here degrades to a no-op and logs instead of raising. If the
@@ -18,37 +20,23 @@ from __future__ import annotations
 import httpx
 
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+from env_config import get_env  # noqa: E402
 
 
-# ── .env ───────────────────────────────────────────────────────────────
+# ── settings ───────────────────────────────────────────────────────────
 
-def load_env() -> dict[str, str]:
-    """Parse .env from the project root.
-
-    Lifted verbatim from updater.py so the daemon and publisher both read the
-    file the same way. Deliberately not python-dotenv: this is six lines and
-    the project has no other need for the dependency.
-    """
-    env_path = PROJECT_ROOT / ".env"
-    env_vars: dict[str, str] = {}
-    if env_path.exists():
-        for line in env_path.read_text("utf-8").splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if "=" in line:
-                k, _, v = line.partition("=")
-                env_vars[k.strip()] = v.strip().strip("'\"")
-    return env_vars
-
-
-def get_setting(name: str) -> str:
-    """Read a setting from .env, falling back to the real environment."""
-    return load_env().get(name) or os.environ.get(name, "")
+def _setting(name: str) -> str:
+    """Read a setting from .env (via env_config), falling back to the real
+    environment - same precedence the old loader had."""
+    return get_env(name) or os.environ.get(name, "")
 
 
 # ── client ─────────────────────────────────────────────────────────────
@@ -74,11 +62,11 @@ def get_client() -> Any | None:
     if _client is not None:
         return _client
 
-    url = get_setting("SUPABASE_URL")
+    url = _setting("SUPABASE_URL")
     # New-style Supabase keys are `sb_secret_...` / `sb_publishable_...`; the older
     # projects use service_role / anon JWTs. Accept either name so the collector
     # works on both, preferring the current one.
-    key = get_setting("SUPABASE_SECRET_KEY") or get_setting("SUPABASE_SERVICE_KEY")
+    key = _setting("SUPABASE_SECRET_KEY") or _setting("SUPABASE_SERVICE_KEY")
     if not url or not key:
         if not _warned:
             print(
@@ -152,5 +140,5 @@ def upload_json(path: str, payload: bytes, content_type: str = "application/json
 
 def public_url(path: str) -> str:
     """Public (keyless) URL for an object in the bucket."""
-    url = get_setting("SUPABASE_URL").rstrip("/")
+    url = _setting("SUPABASE_URL").rstrip("/")
     return f"{url}/storage/v1/object/public/{BUCKET}/{path}"

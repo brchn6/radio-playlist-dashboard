@@ -11,15 +11,19 @@ case "$cmd" in
   start)
     echo "=== Starting 1036 Multi-Station Dashboard ==="
 
-    # Start all 7 proxies
-    echo "[1/3] Starting 7 ShazamIO proxies..."
+    # Start all proxies (count comes from STATIONS_CONFIG - the single
+    # source of truth for the station registry, not a hardcoded number)
+    STATION_COUNT=$(cd "$ROOT" && python -c \
+      "import sys; sys.path.insert(0, 'scripts'); from supabase_db import STATIONS_CONFIG; print(len(STATIONS_CONFIG))")
+    echo "[1/3] Starting $STATION_COUNT ShazamIO proxies..."
     cd "$ROOT" && python scripts/proxy_manager.py start
 
     echo ""
     echo "[2/3] Starting multi-station updater..."
     cd "$ROOT"
-    # No GIT_AUTO_PUSH: the updater no longer touches git. It writes to SQLite
-    # and publishes to Supabase. See .planning/DEPLOY-ARCHITECTURE.md (v3).
+    # No GIT_AUTO_PUSH: the updater no longer touches git. It writes directly
+    # to Supabase Postgres (scripts/supabase_db.py). See
+    # .planning/DEPLOY-ARCHITECTURE.md (v3).
     #
     # APPEND (>>), never truncate (>). On 2026-07-14 the collector died on its own
     # and a restart with `>` wiped the log, destroying the only record of why —
@@ -33,13 +37,29 @@ case "$cmd" in
     echo ""
     echo "[3/3] Starting Spotify API service..."
     cd "$ROOT"
-    echo "=== spotify_api start $(date -Is) ===" >> "$LOG_DIR/spotify_api.log"
-    nohup python scripts/spotify_api.py \
-      >> "$LOG_DIR/spotify_api.log" 2>&1 &
-    echo "[OK] Spotify API PID: $!"
+    # Optional service: only started when the credentials are in .env (see
+    # .env.example). spotify_api.py exits(1) without them, so gating here
+    # keeps "All services started" honest.
+    if grep -q '^SPOTIFY_CLIENT_ID=' .env && grep -q '^SPOTIFY_CLIENT_SECRET=' .env; then
+        echo "=== spotify_api start $(date -Is) ===" >> "$LOG_DIR/spotify_api.log"
+        nohup python scripts/spotify_api.py \
+          >> "$LOG_DIR/spotify_api.log" 2>&1 &
+        SPOTIFY_PID=$!
+        echo "[OK] Spotify API PID: $SPOTIFY_PID"
+    else
+        SPOTIFY_PID=""
+        echo "[SKIP] SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not in .env - Spotify API not started (optional service, see .env.example)"
+    fi
 
     echo ""
     echo "=== All services started ==="
+    echo "  Proxies:  $STATION_COUNT ShazamIO proxies (see status below)"
+    echo "  Updater:  running"
+    if [ -n "$SPOTIFY_PID" ]; then
+        echo "  Spotify:  running (PID $SPOTIFY_PID)"
+    else
+        echo "  Spotify:  NOT started (SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET missing from .env)"
+    fi
     python "$ROOT/scripts/proxy_manager.py" status
     ;;
 

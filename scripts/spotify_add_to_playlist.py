@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
 """Add tracks to a Spotify playlist. Handles OAuth PKCE flow automatically."""
-import hashlib, base64, secrets, urllib.parse, webbrowser, http.server, sys, json, os
+import hashlib, base64, secrets, urllib.parse, webbrowser, http.server, sys, json
+from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 
-# Credentials come from .env (gitignored) - never hardcode them.
-def _load_env():
-    env = {}
-    try:
-        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env')
-        for line in open(env_path, encoding='utf-8'):
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                k, _, v = line.partition('=')
-                env[k.strip()] = v.strip()
-    except FileNotFoundError:
-        pass
-    return env
+# Credentials come from .env (gitignored) via the single project loader -
+# never hardcode them.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from env_config import get_env  # noqa: E402
 
-_env = _load_env()
-CLIENT_ID = _env.get('SPOTIFY_CLIENT_ID')
-CLIENT_SECRET = _env.get('SPOTIFY_CLIENT_SECRET')
+CLIENT_ID = get_env("SPOTIFY_CLIENT_ID")
+CLIENT_SECRET = get_env("SPOTIFY_CLIENT_SECRET")
 if not CLIENT_ID or not CLIENT_SECRET:
     sys.exit('SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET missing from .env - see .env.example')
 REDIRECT_PORT = 9000
