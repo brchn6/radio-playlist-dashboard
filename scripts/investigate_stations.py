@@ -206,8 +206,13 @@ def print_report(results: list[StationCandidate]) -> None:
     print()
 
 
-def json_report(results: list[StationCandidate], path: str = "docs/data/stations.json") -> None:
-    """Write a JSON report for the dashboard to consume."""
+def json_report(results: list[StationCandidate], path: str = "data/station-candidates.json") -> None:
+    """Write a JSON report of candidates.
+
+    Defaults to data/station-candidates.json (a scratch path) so a dev run can
+    never overwrite docs/data/stations.json — the publisher's live registry
+    (codebase review issue 33).
+    """
     report = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "total_candidates": len(results),
@@ -227,7 +232,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Investigate Israeli radio station streams")
     parser.add_argument("--url", help="Test a specific stream URL")
     parser.add_argument("--name", help="Station name (with --url)")
-    parser.add_argument("--json", default="docs/data/stations.json", help="Output JSON path")
+    parser.add_argument("--json", default="data/station-candidates.json", help="Output JSON path")
     parser.add_argument("--timeout", type=int, default=10, help="Timeout per station in seconds")
     args = parser.parse_args()
 

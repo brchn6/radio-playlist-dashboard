@@ -11,5 +11,10 @@ ExecStart=%h/dev/radio-playlist-dashboard/.venv/bin/python scripts/proxy_manager
 ExecStop=%h/dev/radio-playlist-dashboard/.venv/bin/python scripts/proxy_manager.py stop
 TimeoutStartSec=120
 
+# 60s recognition interval is the single truth (proxy_manager passes it to every
+# child as SHAZAMIO_INTERVAL_SECONDS; the unit pins it so CLI/manual starts agree).
+Environment=SHAZAMIO_INTERVAL=60
+Environment=SHAZAMIO_INTERVAL_SECONDS=60
+
 [Install]
 WantedBy=default.target

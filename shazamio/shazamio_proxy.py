@@ -33,7 +33,10 @@ TOKEN_BUCKET_MAX = int(os.environ.get("SHAZAMIO_TOKEN_BUCKET_MAX", "4"))
 TOKEN_BUCKET_WINDOW = int(os.environ.get("SHAZAMIO_TOKEN_BUCKET_WINDOW", "10"))
 TOKEN_BUCKET_FILE = Path("/tmp/shazam-token-bucket")
 SAMPLE_SECONDS = int(os.environ.get("SHAZAMIO_SAMPLE_SECONDS", "15"))
-INTERVAL_SECONDS = int(os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "20"))
+# 60s default — the single truth for recognition cadence. proxy_manager always
+# passes SHAZAMIO_INTERVAL_SECONDS explicitly, so this default only applies when
+# the proxy is started bare (e.g. manual debugging). 20s got the IP stalled.
+INTERVAL_SECONDS = int(os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "60"))
 RETRY_DELAY = int(os.environ.get("SHAZAMIO_RETRY_DELAY", "5"))
 # shazam.recognize() has no timeout of its own: when Shazam stalls the
 # connection (its usual response to too many calls from one IP — no HTTP 429,

@@ -50,7 +50,10 @@ def _record_event(event_type: str, source: str, description: str = "") -> None:
 # calls/station/day and got the IP stalled (Shazam does not send 429 — it
 # simply stops answering). Songs run 3+ minutes, so 60s still catches every
 # track while cutting call volume ~3x. Raise it further before adding stations.
-INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL", "60"))
+# SHAZAMIO_INTERVAL_SECONDS is accepted as an alias so every entry point (units,
+# CLI, watchdog/health_check delegation) can set the same single truth.
+INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL",
+                              os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "60")))
 
 
 def _pid_file(slug: str) -> Path:
@@ -133,6 +136,9 @@ def start_one(slug: str) -> dict[str, Any]:
     env["SHAZAMIO_PORT"] = str(port)
     env["RADIO_STREAM_URL"] = stream_url
     env["SHAZAMIO_SAMPLE_SECONDS"] = "15"
+    # Always pass the interval explicitly so the child runs the fleet's 60s
+    # cadence instead of falling back to its own default (single truth = INTERVAL).
+    env["SHAZAMIO_INTERVAL"] = str(INTERVAL)
     env["SHAZAMIO_INTERVAL_SECONDS"] = str(INTERVAL)
     env["SHAZAMIO_RETRY_DELAY"] = "5"
     env["SHAZAMIO_WORK_DIR"] = f"/tmp/1036-proxy-{slug}"
@@ -141,7 +147,9 @@ def start_one(slug: str) -> dict[str, Any]:
         env["RADIO_STREAM_REFERER"] = referer
 
     try:
-        with open(log_file, "w") as lf:
+        # Append (a), never truncate: a restart must not destroy the only record
+        # of why the previous instance died (AGENTS.md append-only rule).
+        with open(log_file, "a") as lf:
             proc = subprocess.Popen(
                 [python, str(SHAZAMIO_SCRIPT)],
                 env=env,

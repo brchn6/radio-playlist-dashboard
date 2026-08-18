@@ -3,7 +3,10 @@
 # Runs all checks and outputs a JSON report
 set -euo pipefail
 
-cd /home/barc/dev/radio-playlist-dashboard
+# Resolve paths relative to this script — never hardcode a host path.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_ROOT"
 
 REPORT=""
 FAIL=0
@@ -68,15 +71,44 @@ for port in 8761 8762 8763 8764 8765 8766 8767 8768; do
 done
 
 # 6. Supabase data flow (tracks being added)
-log "--- 6. Data Flow ---"
-TRACKS=$(sqlite3 data/playlist.db "SELECT COUNT(*) FROM tracks WHERE recognized_at > datetime('now', '-1 hour');" 2>/dev/null || echo "?")
-if [ "$TRACKS" != "?" ] && [ "$TRACKS" -gt 0 ] 2>/dev/null; then
-    log "  ✅ $TRACKS tracks in last hour"
-elif [ "$TRACKS" = "?" ]; then
-    log "  ⚠️  Could not query SQLite (sqlite3 not installed?)"
-else
+# SQLite is gone (removed architecture). Read SUPABASE_URL + SUPABASE_SECRET_KEY
+# at RUNTIME from the live project's .env (never embedded in this script) and
+# COUNT tracks recognized in the last hour via the PostgREST endpoint.
+log "--- 6. Data Flow (Supabase) ---"
+ENV_FILE="${RADIO_DASH_ENV:-$HOME/dev/radio-playlist-dashboard/.env}"
+if [ ! -f "$ENV_FILE" ]; then
     FAIL=1
-    log "  ❌ No tracks in last hour (collector may be down)"
+    log "  ❌ .env not found at $ENV_FILE — cannot validate collector freshness"
+else
+    set +e
+    set -a
+    # shellcheck disable=SC1091
+    source "$ENV_FILE" 2>/dev/null
+    SOURCE_RC=$?
+    set +a
+    set -e
+    if [ "$SOURCE_RC" -ne 0 ]; then
+        FAIL=1
+        log "  ❌ Could not source $ENV_FILE — cannot validate collector freshness"
+    elif [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+        FAIL=1
+        log "  ❌ SUPABASE_URL / SUPABASE_SECRET_KEY missing from $ENV_FILE — cannot validate collector freshness"
+    else
+        SINCE=$(date -u -d '1 hour ago' '+%Y-%m-%dT%H:%M:%SZ')
+        COUNT=$(curl -sfG --max-time 15 "$SUPABASE_URL/rest/v1/tracks" \
+            --data-urlencode "select=count" \
+            --data-urlencode "recognized_at=gt.$SINCE" \
+            -H "apikey: $SUPABASE_SECRET_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SECRET_KEY" \
+            2>/dev/null \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['count'])" 2>/dev/null || echo "")
+        if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ] 2>/dev/null; then
+            log "  ✅ $COUNT tracks recognized in the last hour"
+        else
+            FAIL=1
+            log "  ❌ No tracks recognized in the last hour (collector may be down)"
+        fi
+    fi
 fi
 
 # 7. Updater service running

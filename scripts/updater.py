@@ -31,7 +31,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
-from supabase_db import SupabaseDB, STATIONS_CONFIG, STATIONS_BY_PORT  # noqa: E402
+from supabase_db import SupabaseDB  # noqa: E402
 from publish import generate_and_publish  # noqa: E402
 
 RETRY_QUEUE_PATH = PROJECT_ROOT / "data" / "retry_queue.jsonl"
@@ -39,7 +39,9 @@ RETRY_QUEUE_PATH = PROJECT_ROOT / "data" / "retry_queue.jsonl"
 # ── defaults ───────────────────────────────────────────────────────────
 DEFAULT_INTERVAL = 20
 RETENTION_DAYS = int(os.environ.get("RETENTION_DAYS", "45"))
-CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))  # every 6h at 30s poll
+# Every 4h at the default 20s poll: CLEANUP_INTERVAL 720 x DEFAULT_INTERVAL 20s = 14,400s.
+# Scales linearly with the poll interval (e.g. ~6h at a 30s poll).
+CLEANUP_INTERVAL = int(os.environ.get("CLEANUP_INTERVAL", "720"))
 DEDUPE_WINDOW_MINUTES = int(os.environ.get("DEDUPE_WINDOW_MINUTES", "30"))
 
 running = True
@@ -188,7 +190,6 @@ def main() -> None:
     db = SupabaseDB()
     stations = db.get_stations()
     station_map = {s["proxy_port"]: s["id"] for s in stations}
-    slug_map = {s["slug"]: s for s in STATIONS_CONFIG}
 
     print(json.dumps({
         "event": "updater_start",
@@ -222,11 +223,11 @@ def main() -> None:
             track = extract_track(proxy_state)
 
             if not track:
-                # No song detected — log as non-music
+                # No song detected — log as non-music. ONLY start when none is
+                # open: continuous silence must extend one interval, not
+                # flip-flop start/end on every poll (codebase review issue 5).
                 open_event = db.get_open_non_music_event(station_id)
-                if open_event:
-                    db.end_non_music_event(station_id)
-                else:
+                if not open_event:
                     db.start_non_music_event(station_id, reason="unknown")
                 continue
 

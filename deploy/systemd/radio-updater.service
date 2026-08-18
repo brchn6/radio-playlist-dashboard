@@ -1,5 +1,5 @@
 [Unit]
-Description=Radio Dashboard — collector daemon (SQLite + Supabase)
+Description=Radio Dashboard — collector daemon (Supabase Postgres)
 After=network-online.target radio-proxies.service
 Wants=network-online.target
 Requires=radio-proxies.service
