@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Radio → Spotify</title>
+<script src="https://cdn.jsdelivr.net/npm/js-sha256@0.11.0/src/sha256.min.js"></script>
+<style>
+:root{--bg:#0b0e1a;--fg:#e8e8f0;--muted:#9898b0;--accent:#1db954;--card:#151829;--border:#252940;--font:system-ui,-apple-system,sans-serif;--radius:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;padding:16px;max-width:800px;margin:0 auto}
+h1{font-size:1.4rem;margin-bottom:4px}
+.sub{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:600}
+select{width:100%;margin-bottom:16px;background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:.9rem;font-family:var(--font)}
+.range-row{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.range-row span{font-size:.85rem;color:var(--accent);min-width:80px;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent);height:6px}
+.row2{display:flex;gap:12px}.row2>*{flex:1}
+.btn{padding:12px 24px;border:none;border-radius:var(--radius);font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;width:100%;margin-bottom:8px}
+.btn-spotify{background:#1db954;color:#000}.btn-spotify:hover{background:#1ed760}
+.btn-disconnect{background:transparent;color:var(--muted);border:1px solid var(--border);font-size:.8rem}.btn-disconnect:hover{color:var(--fg);border-color:var(--fg)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.user-info{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border-radius:var(--radius);margin-bottom:16px;font-size:.85rem}
+.user-info img{width:32px;height:32px;border-radius:50%}
+.track-list{list-style:none;margin:16px 0}
+.track{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius);margin-bottom:4px;background:var(--card);border:1px solid var(--border);font-size:.85rem;transition:background .1s}
+.track:hover{background:#1c2038}
+.track.found{border-color:rgba(29,185,84,.3)}
+.track.not-found{opacity:.5}
+.track-num{color:var(--muted);min-width:28px;text-align:right;font-size:.75rem}
+.track-info{flex:1;min-width:0}
+.track-artist{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-title{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem}
+.track-plays{color:var(--accent);font-size:.75rem;font-weight:700;min-width:40px;text-align:right}
+.track-status{font-size:.75rem;min-width:20px;text-align:center}
+.status-ok{color:var(--accent)}.status-fail{color:#e05555}
+.summary{padding:12px;background:var(--card);border-radius:var(--radius);margin:16px 0;font-size:.85rem;border:1px solid var(--border)}
+.summary b{color:var(--accent)}
+.progress{height:4px;background:var(--border);border-radius:2px;margin:12px 0;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);transition:width .3s;width:0}
+.hidden{display:none}
+.pl-link{display:inline-block;margin-top:8px;color:var(--accent);text-decoration:none;font-weight:700}.pl-link:hover{text-decoration:underline}
+.error{color:#e05555;padding:12px;background:rgba(224,85,85,.1);border-radius:var(--radius);margin:12px 0;font-size:.85rem}
+.debug{color:var(--muted);font-size:.75rem;padding:8px;background:var(--card);border-radius:var(--radius);margin:8px 0;font-family:monospace;white-space:pre-wrap;max-height:120px;overflow-y:auto}
+</style>
+</head>
+<body>
+<h1>Radio → Spotify</h1>
+<p class="sub">Build a playlist inherited from what Israeli radio stations actually play.</p>
+
+<div id="debugLog" class="debug hidden"></div>
+
+<label>Station</label>
+<select id="station"></select>
+
+<div class="row2">
+<div>
+<label>Days back</label>
+<select id="daysBack">
+<option value="1">Last 1 day</option>
+<option value="3">Last 3 days</option>
+<option value="7">Last 7 days</option>
+<option value="14">Last 14 days</option>
+<option value="21" selected>Last 21 days</option>
+</select>
+</div>
+<div>
+<label>Hours (Israel time)</label>
+<div class="range-row">
+<input type="range" id="hourFrom" min="0" max="23" value="6">
+<span id="hourLabel">06:00 - 23:00</span>
+<input type="range" id="hourTo" min="0" max="23" value="23">
+</div>
+</div>
+</div>
+
+<div id="trackCount" style="color:var(--muted);font-size:.85rem;margin-bottom:16px"></div>
+<ul id="trackList" class="track-list"></ul>
+
+<div id="step2" class="hidden">
+<div id="userBox" class="user-info hidden"></div>
+<div id="authBtn" class="btn btn-spotify">Connect to Spotify</div>
+<div id="disconnectBtn" class="btn btn-disconnect hidden">Disconnect</div>
+</div>
+
+<div id="step3" class="hidden">
+<label>Playlist name</label>
+<input type="text" id="plName" style="width:100%;padding:10px;background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:var(--radius);font-size:.9rem;font-family:var(--font);margin-bottom:12px">
+<button id="createBtn" class="btn btn-spotify">Create Playlist on Spotify</button>
+<div id="progressWrap" class="hidden">
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+<div id="progressText" style="color:var(--muted);font-size:.8rem"></div>
+</div>
+<div id="result"></div>
+</div>
+
+<script>
+const CLIENT_ID = 'e10c4a24fb644c90b08e69d72261c970';
+const REDIRECT_URI = window.location.origin + window.location.pathname;
+const SCOPES = 'playlist-modify-public playlist-modify-private user-read-private';
+const STORAGE_BASE = 'https://ktewdeaegtukbosrgxmw.supabase.co/storage/v1/object/public/dashboard/';
+const JINGLE_KEYWORDS = ['LukHash', 'The Other Side'];
+const OUTLIER_THRESHOLD = 50;
+
+const STATIONS = {
+  'kol-hashfela': 'קול השפלה 103.6FM',
+  'galgalatz': 'גלגלצ',
+  '99fm': '99FM',
+  'radio-tlv': 'רדיו תל אביב 102FM',
+  'kan-88': 'כאן 88',
+  'kan-bet': 'כאן ב',
+  'galil': 'קול הגליל העליון',
+  'radio-darom': 'רדיו דרום 97FM',
+};
+
+const $ = s => document.querySelector(s);
+const debugLog = $('#debugLog');
+
+function log(msg) {
+  debugLog.classList.remove('hidden');
+  debugLog.textContent += new Date().toLocaleTimeString() + ' ' + msg + '\n';
+  debugLog.scrollTop = debugLog.scrollHeight;
+  console.log('[R2S]', msg);
+}
+
+// Populate selectors
+Object.entries(STATIONS).forEach(([k, v]) => {
+  const opt = document.createElement('option');
+  opt.value = k; opt.textContent = `${v} (${k})`;
+  $('#station').appendChild(opt);
+});
+
+// ---- Load track data ----
+let allTracks = [];
+
+async function loadTracks() {
+  const daysBack = parseInt($('#daysBack').value);
+  $('#trackCount').textContent = 'Loading...';
+  $('#trackList').innerHTML = '';
+  log('Loading tracks, days=' + daysBack);
+
+  let index;
+  try {
+    const indexResp = await fetch(STORAGE_BASE + 'history_index.json');
+    index = await indexResp.json();
+  } catch (e) {
+    log('ERROR loading history_index.json: ' + e.message);
+    $('#trackCount').textContent = 'Failed to load data';
+    return;
+  }
+
+  const days = index.shards || index.days || [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - daysBack);
+  const relevant = days.filter(d => new Date(d.date || d) >= cutoff);
+  log('Day shards to load: ' + relevant.length);
+
+  allTracks = [];
+  const seen = new Set();
+
+  for (const day of relevant) {
+    const dateStr = day.date || day;
+    try {
+      const resp = await fetch(STORAGE_BASE + 'history/' + dateStr + '.json');
+      if (!resp.ok) { log('SKIP ' + dateStr + ' (HTTP ' + resp.status + ')'); continue; }
+      const data = await resp.json();
+      const history = data.history || [];
+      let added = 0;
+      for (const t of history) {
+        if (seen.has(t.id)) continue;
+        seen.add(t.id);
+        allTracks.push(t);
+        added++;
+      }
+      log(dateStr + ': ' + added + ' tracks');
+    } catch (e) {
+      log('ERROR ' + dateStr + ': ' + e.message);
+    }
+  }
+
+  log('Total loaded: ' + allTracks.length + ' tracks');
+  updatePlaylist();
+}
+
+function getFilteredTracks() {
+  const station = $('#station').value;
+  const hFrom = parseInt($('#hourFrom').value);
+  const hTo = parseInt($('#hourTo').value);
+
+  const filtered = allTracks.filter(t => {
+    if (t.station_slug !== station) return false;
+    const a = (t.artist || '').toLowerCase();
+    const ti = (t.title || '').toLowerCase();
+    if (JINGLE_KEYWORDS.some(k => a.includes(k.toLowerCase()) || ti.includes(k.toLowerCase()))) return false;
+    const d = new Date(t.recognized_at);
+    const h = parseInt(new Intl.DateTimeFormat('en', { hour: 'numeric', hour12: false, timeZone: 'Asia/Jerusalem' }).format(d));
+    return h >= hFrom && h <= hTo;
+  });
+
+  const agg = {};
+  for (const t of filtered) {
+    const key = (t.artist || '') + '|||' + (t.title || '');
+    if (!agg[key]) agg[key] = { artist: t.artist, title: t.title, plays: 0 };
+    agg[key].plays++;
+  }
+
+  return Object.values(agg).filter(t => t.plays <= OUTLIER_THRESHOLD).sort((a, b) => b.plays - a.plays);
+}
+
+function updatePlaylist() {
+  const hFrom = parseInt($('#hourFrom').value);
+  const hTo = parseInt($('#hourTo').value);
+  $('#hourLabel').textContent = `${String(hFrom).padStart(2,'0')}:00 - ${String(hTo).padStart(2,'0')}:00`;
+
+  const tracks = getFilteredTracks();
+  $('#trackCount').textContent = `${tracks.length} unique songs (${allTracks.length} total plays loaded)`;
+
+  const station = STATIONS[$('#station').value] || $('#station').value;
+  $('#plName').value = `${station} ${String(hFrom).padStart(2,'0')}:00-${String(hTo).padStart(2,'0')}`;
+
+  $('#trackList').innerHTML = tracks.map((t, i) =>
+    `<li class="track" data-artist="${esc(t.artist)}" data-title="${esc(t.title)}">
+      <span class="track-num">${i + 1}</span>
+      <div class="track-info">
+        <div class="track-artist">${esc(t.artist)}</div>
+        <div class="track-title">${esc(t.title)}</div>
+      </div>
+      <span class="track-plays">${t.plays}x</span>
+      <span class="track-status"></span>
+    </li>`
+  ).join('');
+
+  if (tracks.length > 0) {
+    $('#step2').classList.remove('hidden');
+    $('#step3').classList.remove('hidden');
+  }
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+$('#hourFrom').addEventListener('input', updatePlaylist);
+$('#hourTo').addEventListener('input', updatePlaylist);
+$('#station').addEventListener('change', updatePlaylist);
+$('#daysBack').addEventListener('change', loadTracks);
+
+// ---- Spotify PKCE ----
+function generateVerifier() {
+  const arr = new Uint8Array(32);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function generateChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const hash = sha256.array(data);
+  return btoa(String.fromCharCode(...hash)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function doAuth() {
+  try {
+    log('Starting PKCE auth...');
+    log('Redirect URI: ' + REDIRECT_URI);
+    const verifier = generateVerifier();
+    const challenge = await generateChallenge(verifier);
+    sessionStorage.setItem('pkce_verifier', verifier);
+    const params = new URLSearchParams({
+      client_id: CLIENT_ID,
+      response_type: 'code',
+      redirect_uri: REDIRECT_URI,
+      code_challenge_method: 'S256',
+      code_challenge: challenge,
+      scope: SCOPES,
+    });
+    const url = 'https://accounts.spotify.com/authorize?' + params;
+    log('Redirecting to Spotify...');
+    window.location = url;
+  } catch (e) {
+    log('ERROR in doAuth: ' + e.message);
+  }
+}
+
+async function exchangeCode(code) {
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  if (!verifier) { log('ERROR: no pkce_verifier in sessionStorage'); return null; }
+  log('Exchanging code for token...');
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      code_verifier: verifier,
+    }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) {
+    log('ERROR token exchange: ' + resp.status + ' ' + (data.error_description || data.error || 'unknown'));
+    return null;
+  }
+  log('Token exchange OK, expires in ' + data.expires_in + 's');
+  return data;
+}
+
+async function refreshAccessToken() {
+  const refresh = localStorage.getItem('spotify_refresh');
+  if (!refresh) { log('No refresh token'); return null; }
+  log('Refreshing access token...');
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refresh,
+      client_id: CLIENT_ID,
+    }),
+  });
+  if (!resp.ok) { log('Refresh failed: ' + resp.status); return null; }
+  const data = await resp.json();
+  localStorage.setItem('spotify_access', data.access_token);
+  if (data.refresh_token) localStorage.setItem('spotify_refresh', data.refresh_token);
+  log('Token refreshed');
+  return data.access_token;
+}
+
+async function getAccessToken() {
+  let token = localStorage.getItem('spotify_access');
+  if (token) return token;
+  return await refreshAccessToken();
+}
+
+async function showUser(token) {
+  const resp = await fetch('https://api.spotify.com/v1/me', { headers: { Authorization: 'Bearer ' + token } });
+  if (!resp.ok) { log('Failed to get user: ' + resp.status); disconnect(); return; }
+  const me = await resp.json();
+  log('Logged in as: ' + me.display_name);
+  $('#userBox').innerHTML = `<img src="${me.images?.[0]?.url || ''}" alt=""><div><b>${me.display_name}</b><br><span style="color:var(--muted);font-size:.8rem">${me.product}</span></div>`;
+  $('#userBox').classList.remove('hidden');
+  $('#authBtn').classList.add('hidden');
+  $('#disconnectBtn').classList.remove('hidden');
+  $('#step3').classList.remove('hidden');
+}
+
+function disconnect() {
+  localStorage.removeItem('spotify_access');
+  localStorage.removeItem('spotify_refresh');
+  $('#userBox').classList.add('hidden');
+  $('#disconnectBtn').classList.add('hidden');
+  $('#authBtn').classList.remove('hidden');
+  log('Disconnected');
+}
+
+async function handleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+  if (error) {
+    log('Spotify auth error: ' + error);
+    $('#result').innerHTML = `<div class="error">Spotify denied access: ${error}</div>`;
+    window.history.replaceState({}, '', window.location.pathname);
+    return true;
+  }
+  if (!code) return false;
+  window.history.replaceState({}, '', window.location.pathname);
+  const tokens = await exchangeCode(code);
+  if (tokens) {
+    localStorage.setItem('spotify_access', tokens.access_token);
+    localStorage.setItem('spotify_refresh', tokens.refresh_token);
+    await showUser(tokens.access_token);
+  } else {
+    $('#result').innerHTML = `<div class="error">Token exchange failed. Check debug log below.</div>`;
+  }
+  return true;
+}
+
+// ---- Search + Create ----
+async function searchTrack(token, artist, title) {
+  const q = encodeURIComponent('track:' + title + ' artist:' + artist);
+  let resp = await fetch('https://api.spotify.com/v1/search?q=' + q + '&type=track&limit=1', {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (resp.status === 401) {
+    token = await refreshAccessToken();
+    if (!token) return null;
+    resp = await fetch('https://api.spotify.com/v1/search?q=' + q + '&type=track&limit=1', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+  }
+  if (!resp.ok) return null;
+  const data = await resp.json();
+  if (data.tracks?.items?.length > 0) return data.tracks.items[0];
+  // Fallback
+  const q2 = encodeURIComponent(artist + ' ' + title);
+  const resp2 = await fetch('https://api.spotify.com/v1/search?q=' + q2 + '&type=track&limit=1', {
+    headers: { Authorization: 'Bearer ' + token }
+  });
+  if (!resp2.ok) return null;
+  return (await resp2.json()).tracks?.items?.[0] || null;
+}
+
+async function createPlaylist() {
+  let token = await getAccessToken();
+  if (!token) { doAuth(); return; }
+
+  const tracks = getFilteredTracks();
+  const name = $('#plName').value || 'Radio Playlist';
+
+  $('#createBtn').disabled = true;
+  $('#progressWrap').classList.remove('hidden');
+  $('#result').innerHTML = '';
+  log('Creating playlist: ' + name);
+
+  let resp = await fetch('https://api.spotify.com/v1/me/playlists', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, public: false, description: 'Inherited from Israeli radio station programming' }),
+  });
+
+  if (resp.status === 401) {
+    token = await refreshAccessToken();
+    if (!token) { doAuth(); return; }
+    resp = await fetch('https://api.spotify.com/v1/me/playlists', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, public: false, description: 'Inherited from Israeli radio station programming' }),
+    });
+  }
+
+  const plData = await resp.json();
+  if (!plData.id) {
+    log('ERROR creating playlist: ' + JSON.stringify(plData.error || plData));
+    $('#result').innerHTML = `<div class="error">Failed: ${plData.error?.message || 'unknown'}</div>`;
+    $('#createBtn').disabled = false;
+    return;
+  }
+
+  log('Playlist created: ' + plData.external_urls?.spotify);
+  let added = 0, notFound = 0;
+  const uris = [];
+  const items = $('#trackList').querySelectorAll('.track');
+
+  for (let i = 0; i < tracks.length; i++) {
+    const t = tracks[i];
+    const pct = ((i + 1) / tracks.length * 100).toFixed(0);
+    $('#progressBar').style.width = pct + '%';
+    $('#progressText').textContent = `${i + 1}/${tracks.length} - found: ${added}, missing: ${notFound}`;
+
+    const result = await searchTrack(token, t.artist, t.title);
+    if (result) {
+      uris.push(result.uri);
+      items[i]?.classList.add('found');
+      if (items[i]) items[i].querySelector('.track-status').innerHTML = '<span class="status-ok">✓</span>';
+      added++;
+    } else {
+      items[i]?.classList.add('not-found');
+      if (items[i]) items[i].querySelector('.track-status').innerHTML = '<span class="status-fail">✗</span>';
+      notFound++;
+    }
+    await new Promise(r => setTimeout(r, 50));
+  }
+
+  for (let i = 0; i < uris.length; i += 100) {
+    await fetch('https://api.spotify.com/v1/playlists/' + plData.id + '/tracks', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uris: uris.slice(i, i + 100) }),
+    });
+  }
+
+  $('#progressBar').style.width = '100%';
+  $('#progressText').textContent = `Done! ${added} added, ${notFound} not found`;
+  $('#result').innerHTML = `<a class="pl-link" href="${plData.external_urls?.spotify || '#'}" target="_blank">Open playlist in Spotify →</a>`;
+  log('Done: ' + added + ' added, ' + notFound + ' not found');
+  $('#createBtn').disabled = false;
+}
+
+$('#authBtn').addEventListener('click', doAuth);
+$('#disconnectBtn').addEventListener('click', disconnect);
+$('#createBtn').addEventListener('click', createPlaylist);
+
+(async () => {
+  log('Init, redirect_uri=' + REDIRECT_URI);
+  const handled = await handleCallback();
+  if (!handled) {
+    const token = await getAccessToken();
+    if (token) await showUser(token);
+  }
+  await loadTracks();
+})();
+</script>
+</body>
+</html>
