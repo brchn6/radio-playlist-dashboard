@@ -578,6 +578,10 @@ function switchTab(tabName) {
   document.getElementById('pills').style.display = tabName === 'np' ? 'none' : 'flex';
   renderPills();
   renderAll();
+  if (tabName === 'deep' && !deepDataLoaded) {
+    deepDataLoaded = true;
+    fetchAll().then(() => { if (document.querySelector('.tab-btn.active')?.dataset.tab === 'deep') renderAll(); });
+  }
 }
 
 const STATION_STREAMS = {
@@ -595,7 +599,7 @@ const STATION_STREAMS = {
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function escAttr(s) { return esc(String(s)).replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 function spotifySearchUrl(a, t) { return 'https://open.spotify.com/search/' + encodeURIComponent(((a || '') + ' ' + (t || '')).trim()); }
-function loadJSON(u) { return fetch(BASE + u).then(r => r.ok ? r.json() : null).catch(() => null); }
+function loadJSON(u) { return fetch(BASE + u, { signal: AbortSignal.timeout(25000) }).then(r => r.ok ? r.json() : null).catch(() => null); }
 function stationBySlug(slug) { return stations.find(s => s.slug === slug); }
 function color(slug) { const s = stationBySlug(slug); return s ? s.color : ACCENT; }
 function name(slug) { const s = stationBySlug(slug); return s ? s.name : slug; }
@@ -654,9 +658,14 @@ async function fetchManifest() {
   if (m) manifest = m.files || {};
 }
 
+/* Deep-tab payloads (clusters.json ~0.5MB, transition_map.json ~10MB) are
+   fetched lazily on the first Deep tab visit instead of blocking startup.
+   Once loaded they stay hash-gated, so polls only refetch when they change. */
+let deepDataLoaded = false;
+
 async function fetchAll() {
   await fetchManifest();
-  const [st, cur, hist, hIdx, top, cross, bpm, clust, trends, stats, trans, transMap, uptime] = await Promise.all([
+  const [st, cur, hist, hIdx, top, cross, bpm, trends, stats, trans, uptime] = await Promise.all([
     loadTracked('stations.json'),
     loadTracked('current.json'),
     loadTracked('recent.json'),
@@ -664,16 +673,22 @@ async function fetchAll() {
     loadTracked('top.json'),
     loadTracked('cross_station.json'),
     loadTracked('bpm_key.json'),
-    loadTracked('clusters.json'),
     loadTracked('trends.json'),
     loadTracked('stats.json'),
     loadTracked('transitions.json'),
-    loadTracked('transition_map.json'),
     loadTracked('uptime.json'),
   ]);
   if (st) stations = st;
   if (hist && hist.history) mergeTracks(hist.history);
-  D = { current: cur, history: { history: historyState.merged, total: hist ? hist.total : 0 }, historyIndex: hIdx, top, cross, bpm, clusters: clust, trends, stats, transitions: trans, transition_map: transMap, uptime };
+  D = { current: cur, history: { history: historyState.merged, total: hist ? hist.total : 0 }, historyIndex: hIdx, top, cross, bpm, clusters: D.clusters, trends, stats, transitions: trans, transition_map: D.transition_map, uptime };
+  if (deepDataLoaded) {
+    const [clust, transMap] = await Promise.all([
+      loadTracked('clusters.json'),
+      loadTracked('transition_map.json'),
+    ]);
+    D.clusters = clust;
+    D.transition_map = transMap;
+  }
 }
 
 /* ── History sharding (2026-08-10) ──
@@ -1670,7 +1685,7 @@ function renderTransitionExplorer() {
       transitions.sort((a, b) => b.count - a.count).forEach(t => {
         const prob = t.probability || 0;
         const probColor = prob > 60 ? '#e05555' : prob > 30 ? '#d4b85a' : '#5ddbb5';
-        h += '<div class="explorer-card" onclick="navigateToSong(' + JSON.stringify(t.artist) + ',' + JSON.stringify(t.title) + ',\'' + slug + '\')">';
+        h += '<div class="explorer-card" data-artist="' + escAttr(t.artist) + '" data-title="' + escAttr(t.title) + '" data-station="' + escAttr(slug) + '">';
         h += '<div class="explorer-card-main">';
         h += '<div><div class="explorer-card-title">\u2192 ' + esc(t.title) + '</div><div class="explorer-card-artist">' + esc(t.artist) + '</div></div>';
         h += '<span class="explorer-card-stats">\u00d7' + t.count + (prob > 0 ? ' ' + prob + '%' : '') + '</span>';
@@ -1691,6 +1706,23 @@ function renderTransitionExplorer() {
   h += '</div>';
 
   el.innerHTML = h;
+  // Delegated navigation for transition cards (inline onclick broke on
+  // titles/artists containing double quotes - JSON.stringify terminated the
+  // HTML attribute, so every card click threw a SyntaxError).
+  el.onclick = explorerResultsClick;
+}
+
+function explorerResultsClick(e) {
+  const card = e.target.closest('.explorer-card');
+  if (!card) return;
+  const artist = card.getAttribute('data-artist');
+  const title = card.getAttribute('data-title');
+  if (!artist || !title) return;
+  // Transition cards carry data-station and navigate (append to path);
+  // search-result cards (no data-station) select the clicked song.
+  const station = card.getAttribute('data-station');
+  if (station !== null) navigateToSong(artist, title, station);
+  else selectExplorerSong(artist, title);
 }
 
 function pickExplorerRandomSong() {
@@ -1745,10 +1777,10 @@ function onExplorerSearch() {
 
   if (!results.length) {
     renderTransitionExplorer();
-    // Override content with search results message
-    const el = document.getElementById('transContent');
-    const h = el.innerHTML;
-    el.innerHTML = h + '<div style="color:var(--muted);text-align:center;padding:16px">לא נמצאו תוצאות עבור "' + esc(q) + '"</div>';
+    // Override content with search results message (transResults always exists;
+    // the old #transContent target was removed from the DOM and crashed here)
+    const el = document.getElementById('transResults');
+    if (el) el.insertAdjacentHTML('beforeend', '<div style="color:var(--muted);text-align:center;padding:16px">לא נמצאו תוצאות עבור "' + esc(q) + '"</div>');
     return;
   }
 
@@ -1767,15 +1799,7 @@ function onExplorerSearch() {
 
   const el = document.getElementById('transResults');
   el.innerHTML = resultsHtml;
-  el.onclick = function(e) {
-    const card = e.target.closest('.explorer-card');
-    if (!card) return;
-    const artist = card.getAttribute('data-artist');
-    const title = card.getAttribute('data-title');
-    if (artist && title) {
-      selectExplorerSong(artist, title);
-    }
-  };
+  el.onclick = explorerResultsClick;
 }
 
 function selectExplorerSong(artist, title) {
@@ -1839,6 +1863,7 @@ function renderTransitionsLegacy() {
   pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; transStation = b.dataset.s; transFilter = 'all'; renderTransitions(); };
 
   const el = document.getElementById('transContent');
+  if (!el) return; // legacy container removed from the DOM - explorer path renders instead
   if (!D.transitions) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">נתוני מעברים בבנייה...</div>'; return; }
 
   // Time-of-day filter pills
@@ -2479,6 +2504,18 @@ async function init() {
   await fetchAll();
 
   clearInterval(loadingInterval);
+  // If the critical startup files failed (network / Supabase down), surface an
+  // error with a retry instead of rendering an empty dashboard forever.
+  if (!stations.length || !D.current) {
+    counterEl.textContent = '0';
+    const failEl = document.createElement('div');
+    failEl.style.cssText = 'color:#e05555;font-size:.9rem;margin-top:16px;cursor:pointer;text-decoration:underline';
+    failEl.textContent = 'טעינת הנתונים נכשלה - לחץ לניסיון חוזר';
+    failEl.onclick = () => location.reload();
+    document.getElementById('loadingScreen').appendChild(failEl);
+    return;
+  }
+
   document.getElementById('loadingScreen').classList.add('hidden');
   setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 600);
 
