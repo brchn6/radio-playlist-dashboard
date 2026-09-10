@@ -132,3 +132,60 @@ These were real bugs, now moot — recorded here so nobody reintroduces the fix 
 **Fix:** AGENTS.md now forbids stopping/restarting the collector without explicit user confirmation. Non-invasive measurement alternatives: diff two consecutive `docs/data/` generations, read the `published` events in `logs/updater.log` (they already prove per-cycle change counts), or run `publish.py --dry-run` immediately after a cycle.
 
 **Lesson:** The live collector is the project's most precious resource - losing even minutes is permanent. Never stop it to measure; observe it instead. The log and the publish events already contain the answer.
+
+## 2026-08-19 - harfile Python module truncated a 48MB HAR file to 0 bytes
+
+**What went wrong:** Tried to parse a HAR file using the `harfile` Python module. The module opened the file in write/truncate mode instead of read mode, destroying the 48MB file.
+
+**Why:** The `harfile` module is designed for writing HAR files, not reading them. Its `open()` function defaults to write mode.
+
+**Correct approach:** Use standard `json.load()` to parse HAR files (they are JSON). If the file is truncated, use a manual brace-counting parser to recover complete entries. Never use third-party HAR libraries without checking their read/write mode defaults.
+
+**Files involved:** `/home/barc/Weizmann Institute Dropbox/Bar Cohen/DEL/blue-goat-51e.notion.site.har` (destroyed)
+
+
+## 2026-08-19 - Spotify Dev Mode blocks playlist write, SoundCloud does not
+
+**What we learned:** Spotify Development Mode silently blocks all write endpoints (POST /playlists/{id}/tracks, PUT /me/tracks, POST /me/player/queue) with 403 Forbidden. The tokens are valid, scopes are granted, but the endpoints are restricted server-side. No workaround exists for single users.
+
+**Correct approach:** Use SoundCloud API instead. Same workflow (search tracks, create playlist, add tracks) works without restrictions. SoundCloud requires client_secret for token exchange (unlike Spotify PKCE), but the API is fully open.
+
+**Alternative approach:** Automate the Spotify web player via browser automation (chrome-devtools-mcp). The web UI allows manual playlist management; automate the clicks to bypass API restrictions.
+
+
+## 2026-08-19 - Spotify cookie export does NOT work for session reuse
+
+**What went wrong:** Exported sp_dc/sp_t/sp_key cookies (EditThisCookie format) and injected them via CDP Network.setCookies into both the automation browser and curl. Result: 401 from api.spotify.com/v1/me in every case, even though the browser's cookie store showed the cookies present with full values.
+
+**Why:** Spotify binds web sessions to the originating browser/device fingerprint at issuance time (device tokens are invisible to cookie exports). The cookies alone cannot authenticate from another client.
+
+**Correct approach:** Real login in the automation browser (once per daemon lifetime), then never kill the daemon - the session lives in memory. Or use SoundCloud API (fully open, no session binding).
+
+**Files involved:** ~/.pi/agent/skills/spotify-web-playlist/ (SKILL.md documents this failure as a "do not" rule)
+
+## 2026-08-19 - chrome-devtools daemon spawns BROWSER, login is memory-only on Linux
+
+**What went wrong:** Spent many cycles trying to make Spotify login survive daemon restarts (visible→headless). Killed the daemon each time hoping the persistent profile would restore the session; it never did.
+
+**Why:** On Linux, Chrome/Brave encrypts cookies with a key from the OS keyring (KWallet). A browser instance started from a different context (systemd service vs interactive shell) can't decrypt cookies written by another. Even with the same profile dir, os_crypt key is missing → cookies pruned. Only a live browser keeps the session.
+
+**Correct approach:** Keep ONE daemon alive for the whole automated run. Only restart when a fresh login is acceptable. Log in visible (chrome-devtools start --headless false --userDataDir ~/.config/spotify-automation), then run adds in the same daemon; never `chrome-devtools stop` mid-run.
+
+## 2026-09-10 - Inline onclick built with JSON.stringify shreds the HTML attribute
+
+**What went wrong:** Transition explorer cards were rendered with
+`onclick="navigateToSong("Title","Artist",...)"` - JSON.stringify emits double
+quotes, which terminate the surrounding double-quoted HTML attribute. The
+browser then parses the rest of the call as garbage attributes; every card
+click threw SyntaxError and navigation silently died.
+
+**Why:** String-built HTML with inline JS handlers cannot safely embed
+JSON.stringify output. Any title/artist with a quote (or simply the JSON
+quotes themselves) breaks the attribute.
+
+**Correct approach:** Use data-* attributes (escaped with escAttr) plus a
+delegated click handler on the container. Never embed JS calls with
+stringified arguments in inline event attributes.
+
+**Files/commands involved:** docs/index.html renderTransitionExplorer;
+repro: `chrome-devtools` + `.explorer-card` outerHTML inspection.

@@ -114,3 +114,136 @@ Implemented + committed on node1lab: `fix: deterministic history shard ordering 
   id-ordered); new order is deterministic id-DESC.
 - NOT deployed: head1 is a pure server, user confirms deploys. Follow-up: `git pull` +
   restart confirmation on head1, then watch `logs/updater.log` published bytes (target ~4 KB/cycle).
+
+---
+
+## 2026-08-19 - SoundCloud API + Spotify Dev Mode investigation
+
+### Spotify API - BLOCKED
+- Dev Mode blocks all write endpoints (playlist add, save to library, queue)
+- Extended Quota Mode requires 250k MAUs - not feasible
+- No workaround exists for single users
+- Auth flow works (PKCE), tokens are valid, but write operations return 403
+
+### SoundCloud API - WORKING
+- App "SoundGraph-Relate" fully functional
+- OAuth 2.1 with PKCE, requires client_secret for token exchange
+- Successfully: search tracks, create playlists, add tracks
+- Created test playlist: https://soundcloud.com/brcode42/sets/kol-hashfela-7-day-inherited (17 tracks)
+- Scripts: /tmp/sc_build.py (non-interactive), /tmp/sc_full_flow.py (interactive)
+
+### Browser Automation Approach (IN PROGRESS)
+- Idea: automate Spotify web player (bypass API restriction)
+- chrome-devtools-mcp controls Brave on fedora-lab
+- Spotify login page opened, user not logged in yet
+- Window visibility issue: Brave runs in background, user cant see it
+- Next: make window visible, test with 2 songs
+
+### Streamlit App
+- Built: scripts/playlist_explorer.py (hourly periodicity, playlist builder)
+- Renamed scripts/watchdog.py → scripts/radio_watchdog.py (package conflict)
+- Not currently running on head1
+
+### Music Discovery Resources
+- 50 tools extracted from Notion page
+- Saved: .context/music-discovery-resources.json
+- Key tools: Cosinemap, Cosine.club, Spore.fm (sonic similarity)
+
+### Data Architecture Understanding
+- One source of truth: Supabase Postgres (tracks table, 78k+ rows)
+- Local mirror: data/tracks_mirror.jsonl (38MB, append-only cache)
+- Storage bucket: dashboard (~46MB, precomputed JSON)
+- Egress optimized: day-sharded history + local mirror
+
+
+## 2026-08-19 (afternoon) - Spotify browser automation WORKING
+
+### Browser automation (proven)
+- Spotify web player automation WORKS for adding tracks to playlists
+- Flow: playlist page → "Find more songs" → search "Title Artist" → verify correct row (album match) → click per-row "Add to Playlist" → close → count increments
+- Successfully added 4 new tracks to "קול השפלה 103.6FM 06:00-06" playlist (5JoXZ7D6FLInew30orNhMw): Level 42 - Lessons In Love, Five - When the Lights Go Out, Ricky Martin - Nobody Wants to Be Lonely, Lady Gaga - Paparazzi. Playlist at 6 songs total.
+- Tool: chrome-devtools CLI controlling Brave, profile at ~/.config/spotify-automation (dedicated, never touches user's real Brave)
+- Skill created: ~/.pi/agent/skills/spotify-web-playlist/ (SKILL.md + scripts/login.py + scripts/add-tracks.py)
+
+### Hard-won session rules
+- Login lives in browser MEMORY. Killing the daemon/chrome-devtools loses it. Never kill between login and adds.
+- Cookie injection (sp_dc export paste → CDP Network.setCookies) FAILS: Spotify returns 401, sessions are device/browser-bound.
+- Cookie encryption is keyring-bound; headless/visible restarts cannot restore login from disk (os_crypt key mismatch).
+- Radio track picker: ssh head1 'python3 /tmp/pick_tracks.py' → "Artist - Title" lines from tracks_mirror.jsonl (kol-hashfela).
+
+### Remaining (from the 10-track test)
+- Added 4 of 10 picked tracks; 6 remain: Soul II Soul - Back To Life, The Idan Raichel Project - רוב השעות, Queen - Another One Bites The Dust, R.E.M. - Losing My Religion, Pixies - Here Comes Your Man, Uri Banai - Parparim
+- To finish: relogin once (visible), keep daemon alive, batch the 6 tracks, verify "12 songs"
+
+## 2026-08-19 - Playlist Selector: frequency + co-occurrence graph ranking
+
+### What was built
+- `scripts/playlist_selector.py` - Core analysis engine (pure stdlib, no pip installs). Combines:
+  - **Frequency score**: how many unique days a track appears in a time slot (normalized to max days)
+  - **Co-occurrence graph**: directed edges between tracks played sequentially within 3-15 minutes
+  - **PageRank centrality**: tracks embedded in strong musical neighborhoods score higher
+  - **Combined score**: `alpha * frequency + (1-alpha) * pagerank`
+- `docs/playlist-explorer.html` - Interactive dashboard with station filter, time range, alpha slider, sortable table, checkboxes, export
+- `docs/playlist-candidates-all.json` - Pre-computed 240 candidates across all 8 stations (morning+evening slot 06-22, min 2 days)
+
+### Results (kol-hashfela 06:00-12:00, alpha=0.5, min 3 days)
+- 293 unique songs in slot, 1909 graph nodes, 2486 edges
+- Top candidates: LukHash - The Other Side (10d, 25 plays, pr=1.0), Dimples D. - Sucker DJ (13d, 17 plays), Mad World (8d, Sia 3x neighbor), Meir Ariel (7d, Whitney+Chicago neighbors)
+- Co-occurrence pairs validated: Bruno Mars + Westlife 6x, A$AP Rocky + Moby 4x
+
+### Flow: analysis -> dashboard -> export -> Spotify automation
+1. `python3 scripts/playlist_selector.py --station X --start-hour 6 --end-hour 12` -> JSON
+2. `docs/playlist-explorer.html` loads JSON, user selects tracks
+3. Export downloads `selected_tracks.txt` (Title - Artist format)
+4. `scripts/add-tracks.py <PLAYLIST_ID> selected_tracks.txt` adds via chrome-devtools
+
+### Files
+- scripts/playlist_selector.py (new, core engine)
+- docs/playlist-explorer.html (new, dashboard)
+- docs/playlist-candidates-all.json (new, all-stations data)
+- docs/README-playlist-selector.md (new, usage docs)
+
+### Next
+- Push to GitHub (needs user approval)
+- Add to existing Spotify playlist or create new one
+- Optional: regenerate candidates periodically as new data comes in
+- Optional: adjust alpha/time slot and re-export
+
+## 2026-09-10 - Site bug diagnostics + frontend fixes deployed
+
+### Reported symptom
+Colleague viewed the site on mobile and hit bugs loading + navigating. Full
+diagnostics (browser + data layer + repo) found 5 verified issues; 4 fixed.
+
+### What was fixed (commit 8f3adf1b, deployed via Pages, verified live)
+1. **10.3MB blocking startup payload** - clusters.json (~0.5MB) +
+   transition_map.json (~10MB) were fetched eagerly by fetchAll(); now
+   lazy-loaded on first Deep tab visit (hash-gated afterward).
+2. **Every Deep-tab explorer card click threw SyntaxError** - inline onclick
+   built with JSON.stringify; double quotes terminated the HTML attribute.
+   Now data attributes + delegated click handler (explorerResultsClick).
+3. **Empty search crash** - appended to removed DOM id #transContent
+   (TypeError). Now appends to #transResults.
+4. **Loading resilience** - fetch() got AbortSignal.timeout(25s); failed
+   critical startup files show a retry message instead of infinite loading.
+5. scripts/watchdog.py deleted (was wired to nothing, issues #6/#32).
+
+Verified red-to-green in headless Chrome (mobile viewport) locally and live.
+
+### Deployed but worth knowing
+- The unpushed PKCE spotify.html commit (74196f5f) is now live too.
+- docs/spotify.html has UNCOMMITTED local changes that REMOVE the PKCE auth -
+  looks like an older pre-PKCE draft. Not committed; Bar should confirm
+  discard or keep.
+
+### Open caveats (not fixed, need Bar's decision)
+- **#11 uptime.json is fabricated** (hardcoded 100%, sequential fake
+  last_outage stamps) and displayed publicly - false public data.
+- **#16 cluster graph colors inert** (frontend reads communities[].color,
+  generator never emits it).
+- Playlist/graph tool pages (playlist-explorer.html, cooccurrence-graph.html,
+  markov-graph.html + ~25MB graph JSONs) remain LOCAL ONLY (untracked,
+  live-404). They fetch data relative; proper deploy needs Supabase-bucket
+  upload + BASE fetches. Kept out of this push deliberately.
+- updater.log is 49MB, no rotation, contains binary bytes.
+- 36 open GitHub review issues; most are code-hygiene, not user-facing.
