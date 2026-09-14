@@ -304,3 +304,33 @@ finding, not cosmetics - `total` vs distinct ids is what surfaced this.
 `--apply` (448 duplicate lines removed, 221 rows restored, 0 mirror-only ids
 dropped), and a second dry run reporting 0 duplicates / 0 missing with the mirror
 at 135,534 distinct ids, exactly the DB count.
+
+## 2026-09-14 - A stylesheet refactor is silently defeated by inline styles
+
+**What went wrong:** the UI redesign raised the whole type scale to a 12px floor
+via CSS and my audit reported 0 failures. Reviewing the *deployed* artifact then
+found **25 `font-size` declarations in inline styles** in the HTML and in
+JS-generated markup, still at 9.6-11.5px. Inline styles beat the stylesheet, so
+the floor never applied there: the exact density the redesign existed to fix was
+still on screen. The CSS-only audit could not see it because it parsed the
+`<style>` block.
+
+**Why:** the audit's scope was "the stylesheet", but the UI's real type values
+live in two places. Grep-based verification that only covers one of them reports
+success while the defect is untouched.
+
+**Correct approach:** when restyling a UI, grep for the property being changed
+across the WHOLE file, not just the stylesheet, and treat inline declarations as
+part of the surface. All 25 now use `var(--fs-*)` tokens, and the audit fails on
+any raw `font-size` outside the stylesheet.
+
+**Lesson:** a refactor is only as complete as its detection. Before trusting a
+green check, ask what the check cannot see. Related: my own test harness was wrong
+four separate times in this session (missing DOM methods, stubs on the wrong
+object, assertions hardcoded for one theme, a threshold of 3:1 where the text
+requirement was 4.5:1) - each time the failure looked like an app bug until
+checked. Verify the verifier before believing it.
+
+**Files/commands involved:** `docs/index.html` (inline styles in the HTML body and
+`<script>`); `python3 /tmp/audit_ui.py` (sections 2b/2c: canvas fonts, inline
+fonts), `node /tmp/verify_theme.js`.

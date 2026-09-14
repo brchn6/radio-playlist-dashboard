@@ -149,3 +149,32 @@ dry-run by default, backs up the original to
 `os.replace`), then calls `sync_mirror()` to re-fetch whatever the collector
 appended during the rewrite (the rewrite races with it). Same self-heal path used
 when the mirror is wiped.
+
+## 2026-09-14 - UI: light-first design system, teal brand kept, no external fonts
+
+**Decision:** Rebuilt the dashboard's visual layer as a token system with light as
+the default theme, dark following the OS or an explicit choice, and a header
+sun/moon toggle. Adopted Linear's *structure* (flat near-neutral surfaces, ultra
+subtle borders, generous spacing, crisp type scale, restrained accent) but kept
+the project's teal as the brand accent and kept the original status hues in dark.
+
+**Rationale:** the dashboard was dark-only and dense (41 declarations below 12px,
+6px gaps) and had no theme toggle at all, which violated the global rule that
+every dashboard ships one with a persisted, system-defaulting choice. Linear's
+approach targets exactly this problem set: a dense data UI that still reads calm.
+
+**Implementation notes worth keeping:**
+- `--accent` is per-theme: light uses teal-700 `#0f766e` (5.47:1 on white), dark
+  keeps the original mint `#5ddbb5` (10.3:1). The brand hue survives both.
+- Station colours come from the DB as pastels chosen for a dark canvas. `ink()`
+  keeps the hue and darkens in a loop until the colour genuinely reaches 4.5:1 on
+  the light canvas, rather than clamping to a magic lightness, so any station
+  colour added later stays readable.
+- **No external webfonts.** The skills suggest Inter, but Inter lacks reliable
+  Hebrew coverage and this UI is Hebrew-first, so a webfont would produce mixed
+  typography. The system stack plus `Noto Sans Hebrew` is used instead, with
+  `font-variant-numeric: tabular-nums` for numbers.
+- Canvas charts cannot read CSS variables, so `ACCENT`/`MUTED`/`GRID` are
+  mirrored as real colour strings, refreshed on theme change, then re-rendered.
+- Light/dark is defined twice in CSS on purpose (system media query + explicit
+  attribute) so the first paint is correct with no JS and no flash.

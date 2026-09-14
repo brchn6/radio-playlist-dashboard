@@ -410,3 +410,44 @@ the next publish will upload a bigger `transition_map.json`. Measure then.
   breakdown and window label, and 1 of 2 plays is listed. Fixture note: the two
   plays must be on different stations, or `histDedup` (on by default, keyed on
   artist|title|station) masks the window and the test passes for the wrong reason.
+
+## 2026-09-14 - UI redesign shipped (light-first + theme toggle + type scale)
+
+**Branch:** `feat/ui-redesign`, merged to `main` and deployed. Live on Pages
+(~30s per deploy), verified by fetching the deployed file and re-running the whole
+suite against it.
+
+**Requested by Bar:** "make the UI/UX of the radio dashboard really nice on the
+eye, now it's dark and dense", using the `frontend-refresh`, `web-ui-audit` and
+`popular-web-designs` skills (read from `~/.hermes/skills`, not registered in
+pi's loader).
+
+**Built:** token system (surfaces/text/lines/status/type/spacing/radii/shadows),
+light-first with dark for the OS or an explicit choice, header theme toggle
+(persisted, follows OS changes), type floor of 12px with 14-15px body, 12px row
+padding, 20px card padding, 44px hit areas on touch viewports, breakpoints at
+480/768/1024, tabular numerals, reduced-motion support, :focus-visible rings.
+Removed 16 provably-dead CSS classes and 5 unused tokens.
+
+**Verified (no browser on this host, so every check is source-level):**
+`/tmp/audit_ui.py` - 38 checks, 0 warnings, 0 failures: every var() defined, type
+floor (CSS, canvas AND inline), contrast for both themes including tinted pairs
+and accent fills, breakpoints, hit areas, dead CSS, brace balance.
+`/tmp/verify_theme.js` - toggle/persistence/explicit-beats-OS/palette refresh and
+4.5:1 for all 8 station colours in both themes, in system-light and system-dark.
+`/tmp/verify_nobulk.js`, `/tmp/verify_drilldown.js` - no regressions.
+
+**Review #1 (pre-deploy) found 6 issues, all fixed:** light `--warn` on
+`--warn-soft` was 4.39:1 (darkened to #92400e); `.top-spotify:hover` dropped to
+3.08:1 (now inverts with a new `--spotify-contrast`); canvas tick fonts still
+9-10px (raised to 12px); body gradient banded against the flat sticky pill bar
+(body now flat); `background-attachment:fixed` dropped (mobile Safari jank); 5
+dead tokens removed.
+
+**Review #2 (post-deploy) found the big one:** 25 inline font-sizes at 9.6-11.5px
+that bypassed the stylesheet entirely (see `.memory/lessons.md` 2026-09-14). Fixed
+and the audit now fails on any raw font-size outside the stylesheet.
+
+**Bar to do:** look at it on his phone. Both the public URL and the Tailscale
+preview (`http://100.93.8.110:8099/`) serve the redesigned version. The theme
+follows the phone's system setting unless he taps the sun/moon in the header.
