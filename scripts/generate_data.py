@@ -140,7 +140,7 @@ def append_mirror(new_tracks: list[dict[str, Any]]) -> None:
         print(f"[mirror] append failed: {exc}", flush=True)
 
 
-def prune_mirror(retention_days: int = 45) -> None:
+def prune_mirror(retention_days: int = 36500) -> None:
     """Drop mirror rows older than retention (DB has the same cap).
 
     Only actually rewrites when something is removed. To avoid re-scanning the
@@ -202,7 +202,7 @@ def track_order_key(t: dict[str, Any]) -> tuple[str, int]:
     return t.get("recognized_at", ""), t.get("id") or 0
 
 
-def sync_mirror(db: SupabaseDB, retention_days: int = 45) -> list[dict[str, Any]]:
+def sync_mirror(db: SupabaseDB, retention_days: int = 36500) -> list[dict[str, Any]]:
     """Return the full track list, fetching only the delta from Postgres.
 
     First run (no mirror): full pull once. Afterwards: read the local mirror
@@ -1506,17 +1506,32 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
                      lambda: stats, sizes, SLOW_REFRESH_SECONDS, now)
 
     # ── Uptime / System Events ────────────────────────────────────
+    # Uptime is MEASURED, not assumed: a 5-minute bucket with no track from
+    # any station means the feed was down (collector dead or all proxies
+    # dead). The old code hardcoded 100% and labeled proxy boot times as
+    # "last outage" - both removed (issue #11).
+    def _coverage_pct(days: int, bucket: int = 300) -> float | None:
+        rows = db._query(
+            """SELECT COUNT(DISTINCT FLOOR(EXTRACT(EPOCH FROM recognized_at) / %s))::int AS filled
+               FROM tracks WHERE recognized_at >= NOW() - INTERVAL '%s days'""",
+            [bucket, days],
+        )
+        if not rows or rows[0]["filled"] is None:
+            return None
+        total = days * 86400 // bucket
+        return round(rows[0]["filled"] / total * 100, 1) if total else None
+
     uptime_data: dict[str, Any] = {
         "status": "unknown",
-        "uptime_pct_7d": 100.0,
-        "uptime_pct_30d": 100.0,
+        "uptime_pct_7d": None,
+        "uptime_pct_30d": None,
         "recent_outages": [],
         "per_station": {},
     }
     try:
         recent = db.get_recent_events(days=7, limit=20)
-        uptime_7d = db.get_system_uptime(days=7)
-        uptime_30d = db.get_system_uptime(days=30)
+        uptime_7d = {"uptime_pct": _coverage_pct(7)}
+        uptime_30d = {"uptime_pct": _coverage_pct(30)}
 
         # Determine current status: only OUTAGE-TYPE events still open count as
         # down. Lifecycle events (collector_start, proxy_start, watchdog_recovery,
@@ -1529,9 +1544,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         if current_events:
             uptime_data["status"] = "down"
             uptime_data["current_events"] = current_events
-        elif uptime_7d.get("uptime_pct", 100) < 99:
+        elif uptime_7d.get("uptime_pct") is not None and uptime_7d["uptime_pct"] < 99:
             uptime_data["status"] = "degraded"
-        else:
+        elif uptime_7d.get("uptime_pct") is not None:
             uptime_data["status"] = "up"
 
         uptime_data["uptime_pct_7d"] = uptime_7d.get("uptime_pct", 100.0)
@@ -1553,17 +1568,16 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
                 })
         uptime_data["recent_outages"] = outages[:5]
 
-        # Per-station stats
-        for s in stations:
-            uptime_data["per_station"][s["slug"]] = {
-                "uptime_pct_7d": 100.0,
-                "last_outage": None,
-            }
-        # Try to compute per-station from events that specify a station source
+        # Per-station: last_outage ONLY from real outage-type events with a
+        # station source. proxy_start/lifecycle events are not outages.
         station_slugs_set = set(s["slug"] for s in stations)
+        for s in stations:
+            uptime_data["per_station"][s["slug"]] = {"last_outage": None}
         for e in recent:
             src = e.get("source", "")
-            if src in station_slugs_set:
+            if (src in station_slugs_set
+                    and e.get("event_type") in OUTAGE_TYPES
+                    and e.get("started_at")):
                 current_last = uptime_data["per_station"][src].get("last_outage")
                 if current_last is None or e["started_at"] > current_last:
                     uptime_data["per_station"][src]["last_outage"] = e["started_at"]
