@@ -237,8 +237,9 @@ def main() -> int:
     after = db._query("SELECT COUNT(*) AS n, MIN(recognized_at) AS lo FROM tracks")
     if after:
         print(f"[backfill] DB now: {after[0]['n']} tracks, earliest {after[0]['lo']}")
-    print("\n[backfill] DONE. The collector's next cycle regenerates the day shards; "
-          "run scripts/publish.py --force to publish immediately.")
+    print("\n[backfill] DONE. The collector's next cycle regenerates and publishes the day "
+          "shards within ~20s. To do it now: scripts/publish.py (no --force needed - "
+          "publish hashes files, so new shards and the changed index upload as changed).")
     return 0
 
 

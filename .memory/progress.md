@@ -339,3 +339,42 @@ still been 45, `cleanup_old_tracks` would have deleted the restored rows again.
 **Publish note:** `publish.py` hashes each file, so the new day shards and the
 changed `history_index.json` upload as changed. `--force` is NOT needed for a
 day-set change and would re-upload every shard (~68 MB of free-tier egress).
+
+### APPLIED and verified (same day)
+
+Bar approved merge -> apply -> push, done in the order: push branches (safety net
+before the write), merge the frontend fix, then apply the backfill.
+
+- Frontend fix (`fix/history-search-no-bulk-download`, merged as `34d3f896`) is
+  **live on Pages** - no-bulk-download and the partial-scope note are deployed.
+- Backfill **applied**: `inserted into Postgres: 35670`, exactly the dry-run
+  figure and zero failures. It also healed a 119-row gap the mirror had inside the
+  overlap window.
+- `history_index.json` went from 46 days (07-31+) to **63 days (2026-07-13 ..
+  2026-09-14)**, local and published. The old near-empty shards were overwritten
+  with real days: `history/2026-07-20.json` 998 B -> 1.03 MB.
+- DB now 135,527 tracks, earliest 2026-07-13T13:27:34Z. Mirror 135,754 lines.
+- Collector stayed `active` with `NRestarts=0` throughout (it regenerated the
+  shards by itself within ~45s; never stopped).
+
+**Integrity check post-apply:** the backfill created **0 duplicate ids** (the
+lowest restored id is 157,998; every one of the 448 duplicate ids in the mirror is
+below it, so they all pre-existed).
+
+**Two pre-existing mirror defects found (NOT caused by the backfill, still open):**
+1. **448 duplicate ids in `data/tracks_mirror.jsonl`** (448 extra lines). Nothing
+   dedupes the mirror: `sync_mirror` only filters the *delta* by id, never the
+   file, and `load_mirror` returns every line. Those plays are therefore counted
+   twice in the aggregates (~0.33% of plays).
+2. **220 DB rows are absent from the mirror**, so the dashboard slightly
+   under-counts. `history_index.json`'s `total` comes from
+   `db.get_all_tracks_count()` (135,527) while the aggregates use the mirror
+   (135,307 distinct ids), so the two disagree.
+
+Both want one mirror hygiene pass: dedupe by id and reconcile against the DB
+(insert missing, report the rest). Small, insert-only, but not yet agreed.
+
+**Watch:** `clusters.json` (0.91 MB) and `transition_map.json` (9.48 MB) are
+daily-gated and were still built from the 46-day set at apply time. When that gate
+next fires they will be rebuilt over 63 days, so the Deep tab payload will grow and
+the next publish will upload a bigger `transition_map.json`. Measure then.
