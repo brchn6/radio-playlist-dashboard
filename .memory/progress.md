@@ -308,3 +308,34 @@ verified live on Pages (~30s after push: live shows the fix, old function gone).
 2026-07-24 gap) survive only in the bucket's old `history.json` (59,178 rows,
 27.7 MB, 2026-07-13..2026-08-10). Pruned from Postgres and the mirror by the old
 45-day retention. Backfill script to be built on its own branch with a dry run.
+
+## 2026-09-14 - Early-history backfill tooling built, dry run clean
+
+**Branch:** `chore/backfill-early-history` (branched from `main` after both
+frontend fixes landed). Not applied at the time of writing.
+
+**Built:** `scripts/backfill_history.py` (dry run by default, `--apply` to write,
+insert-only, deduped on the natural key `(station_id, shazam_key, recognized_at)`)
+plus `SupabaseDB.insert_tracks_bulk()` using `psycopg2.extras.execute_values`
+(reuses the collector's own ON CONFLICT clause; batched because per-row inserts
+over the network would be ~59k round trips). README documents the recovery with
+exact commands and the expected dry-run output.
+
+**Dry run result (from the bucket's old `history.json`):**
+- source 59,178 rows, 2026-07-13 .. 2026-08-10
+- DB was 99,849 tracks, 2026-07-31T04:09:29Z .. 2026-09-14 (the 45-day floor)
+- overlap: 23,508 already present, **23,508/23,508 matched on the natural key**
+  (so no duplicate can be created), which also independently proved the
+  SQLite-era station_id mapping equals the Postgres registry (1..8) and that
+  `recognized_at` is already seconds-Z
+- **to insert: 35,670** across 07-13..07-30 plus the 355 early-morning rows of
+  07-31 that predate the DB's earliest row
+- 2026-07-24 is genuinely empty (no source rows) and cannot be restored
+
+**Pre-flight verified:** the live `radio-updater` unit runs with
+`Environment=RETENTION_DAYS=36500`, so a backfill cannot be re-pruned. Had it
+still been 45, `cleanup_old_tracks` would have deleted the restored rows again.
+
+**Publish note:** `publish.py` hashes each file, so the new day shards and the
+changed `history_index.json` upload as changed. `--force` is NOT needed for a
+day-set change and would re-upload every shard (~68 MB of free-tier egress).

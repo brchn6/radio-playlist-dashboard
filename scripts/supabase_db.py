@@ -252,6 +252,55 @@ class SupabaseDB:
         ])
         return rc is not None
 
+    def insert_tracks_bulk(self, rows: list[dict[str, Any]]) -> int:
+        """Insert many tracks at once, skipping ones that already exist.
+
+        Backfill path only: the collector keeps writing one row at a time via
+        insert_track(). Same table, same natural key and same
+        ON CONFLICT DO NOTHING, so a backfill can never duplicate a play and
+        re-running is a no-op. Batched because a one-off backfill of tens of
+        thousands of rows over the network would otherwise be one round trip
+        per row. Returns the number of rows actually inserted.
+        """
+        if not rows or not self.connected():
+            return 0
+        try:
+            from psycopg2.extras import execute_values
+        except ImportError:
+            print("[supabase_db] psycopg2.extras missing - bulk insert skipped", flush=True)
+            return 0
+
+        sql = """
+            INSERT INTO tracks
+                (station_id, station_slug, artist, title, text, url,
+                 shazam_key, isrc, bpm, musical_key, recognized_at)
+            VALUES %s
+            ON CONFLICT (station_id, shazam_key, recognized_at) DO NOTHING
+        """
+        values = [
+            (r["station_id"], r.get("station_slug"), r["artist"], r["title"],
+             r.get("text") or None, r.get("url") or None,
+             r.get("shazam_key") or None, r.get("isrc") or None,
+             r.get("bpm"), r.get("musical_key"), r["recognized_at"])
+            for r in rows
+        ]
+        inserted = 0
+        try:
+            with self.conn.cursor() as cur:
+                for i in range(0, len(values), 1000):
+                    batch = values[i:i + 1000]
+                    # page_size == len(batch) forces ONE statement per call, so
+                    # cur.rowcount is that batch's count. With pagination it
+                    # would report only the final page's count.
+                    execute_values(cur, sql, batch, page_size=len(batch))
+                    if cur.rowcount and cur.rowcount > 0:
+                        inserted += cur.rowcount
+                self.conn.commit()
+        except Exception as exc:
+            print(f"[supabase_db] bulk insert failed: {exc}", flush=True)
+            self._conn.rollback()
+        return inserted
+
     def track_exists(
         self, station_id: int, shazam_key: str,
         artist: str, title: str,

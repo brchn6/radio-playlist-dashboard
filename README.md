@@ -98,6 +98,54 @@ Full reasoning and tuning knobs: [`.planning/DEPLOY-ARCHITECTURE.md`](.planning/
 | `python scripts/publish.py` | Regenerate aggregates + publish to Supabase once |
 | `python scripts/publish.py --local` | Generate into `site-data/`, upload nothing (dev) |
 | `python scripts/migrate_to_supabase.py` | Reconcile SQLite → Supabase (idempotent) |
+| `python scripts/backfill_history.py` | Dry-run restore of pre-prune history (see below) |
+| `python scripts/backfill_history.py --apply` | Actually restore those rows (insert-only) |
+
+### 🚑 Restoring history that the old 45-day retention pruned
+
+Until 2026-09-14 the collector deleted tracks older than `RETENTION_DAYS` (45).
+That removed **2026-07-13 .. 2026-07-30** from Postgres and from the local mirror,
+so `history_index.json` starts at 2026-07-31 and the dashboard cannot show the
+first 18 days of the project. Those rows still exist in one place: the
+pre-sharding `history.json` that `publish.py` uploaded to the public Storage
+bucket, which only ever adds files and never deletes them.
+
+```bash
+cd ~/dev/radio-playlist-dashboard
+
+# 1. Dry run (the default — writes nothing). Reports exactly what would change
+#    and refuses to proceed unless the overlap matches on the natural key.
+.venv/bin/python scripts/backfill_history.py
+
+# 2. Apply. Insert-only; deduped on (station_id, shazam_key, recognized_at),
+#    so re-running is a no-op and the already-present overlap cannot duplicate.
+.venv/bin/python scripts/backfill_history.py --apply
+
+# 3. Verify: the same dry run should now report "to insert: 0".
+.venv/bin/python scripts/backfill_history.py
+
+# 4. Publish the regenerated shards immediately (otherwise the collector's next
+#    cycle does it within seconds). Do NOT use --force here: publish hashes each
+#    file, so the 18 new day shards and the changed history_index.json upload as
+#    changed. --force is only for a JSON *format* change and would needlessly
+#    re-upload every shard (~68 MB, real egress on the free tier).
+.venv/bin/python scripts/publish.py
+```
+
+What a correct dry run looks like (numbers from the actual 2026-09-14 recovery):
+
+```
+[backfill] source rows: 59178
+[backfill] already in DB (will skip): 23508
+[backfill] overlap check: 23508/23508 ... matched on the natural key (no duplicates)
+[backfill] to insert:                 35670
+```
+
+Safety properties, all deliberate: nothing is ever deleted; the collector keeps
+running throughout (this is an extra writer of new rows, never a second
+collector); `--apply` is required to write anything; and a station_id mapping
+that does not match the DB registry aborts before any write. Note the real
+2026-07-24 gap — zero tracks that day, so no script can restore it.
 
 ## 📻 Stations
 
