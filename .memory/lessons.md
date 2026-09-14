@@ -265,3 +265,42 @@ an unbounded one. And a partial result must always say it is partial.
 `loadAllHistory`); verified by `/tmp/verify_nobulk.js`, which asserts a search
 fetches ZERO day shards (main fetched 3/3 in the fixture, 46/46 in production)
 and that the partial note renders.
+
+## 2026-09-14 - The track mirror was never deduped, and nothing noticed for a month
+
+**What went wrong:** `data/tracks_mirror.jsonl` held **448 duplicated ids** (448
+extra lines). Every published aggregate reads that file, so those plays were
+counted twice - about 0.33% of all plays - and nobody could see it, because there
+is no check that compares the mirror against Postgres. A second defect: **221 DB
+rows were missing from the mirror**, so those plays were under-counted.
+`history_index.json`'s `total` comes from `db.get_all_tracks_count()` (Postgres)
+while the aggregates come from the mirror, so the two numbers disagreed
+(135,527 vs 135,307) and that disagreement was the only visible symptom.
+
+**Why:** `sync_mirror()` filters the *delta* by id - `known_ids` is built from the
+local file and used to drop already-seen rows from the incoming batch - but
+nothing ever deduped the file itself, and `load_mirror()` returned every line it
+read. So a row appended twice for any historical reason (a crash mid-append, a
+retry, an overlapping delta) stayed duplicated forever. Nothing wrote a
+reconciliation check either, so a mirror that drifted from the DB stayed drifted.
+
+**Correct approach:** dedupe on read (`load_mirror` keeps the first line per id),
+because the read path must be correct regardless of file state, and compact the
+file separately with `scripts/repair_mirror.py`, which rebuilds it from Postgres
+(the source of truth), keeps the original as a timestamped backup, and never drops
+a mirror-only id. The repair races with the collector's appends, so it calls
+`sync_mirror()` afterwards - the same self-heal path used when the mirror is
+wiped.
+
+**Lesson:** an append-only file that is the read path for derived metrics needs a
+dedupe on read AND a reconciliation check against its source of truth. "The
+mirror is authoritative for what we already have" is fine for deciding what to
+fetch, but it silently makes the mirror, not the DB, the source of truth for every
+published number. When two counters for the same thing disagree, that is a
+finding, not cosmetics - `total` vs distinct ids is what surfaced this.
+
+**Files/commands involved:** `scripts/generate_data.py` (`load_mirror`),
+`scripts/repair_mirror.py`, `scripts/sync_mirror`. Verified: dry run then
+`--apply` (448 duplicate lines removed, 221 rows restored, 0 mirror-only ids
+dropped), and a second dry run reporting 0 duplicates / 0 missing with the mirror
+at 135,534 distinct ids, exactly the DB count.

@@ -95,19 +95,34 @@ MIRROR_BACKUP_SUFFIX = ".bak"
 
 
 def load_mirror() -> list[dict[str, Any]]:
-    """Read the local mirror (all tracks, newest first). Fast, no network."""
+    """Read the local mirror (all tracks, newest first). Fast, no network.
+
+    Dedupes by id on read. The file is append-only, so any row that was ever
+    appended twice would otherwise be counted twice by every aggregate that
+    reads the mirror. 448 such duplicate lines were found on 2026-09-14 (from
+    before this guard existed), which inflated those plays in the published
+    counts. The guard makes the read path correct regardless of file state;
+    scripts/repair_mirror.py compacts the file itself.
+    """
     if not MIRROR_PATH.exists():
         return []
     tracks = []
+    seen_ids: set[Any] = set()
     with MIRROR_PATH.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
             try:
-                tracks.append(json.loads(line))
+                t = json.loads(line)
             except ValueError:
                 continue  # skip a torn tail line from a crash
+            tid = t.get("id")
+            if tid is not None:
+                if tid in seen_ids:
+                    continue  # duplicate id - keep the first copy only
+                seen_ids.add(tid)
+            tracks.append(t)
     return tracks
 
 

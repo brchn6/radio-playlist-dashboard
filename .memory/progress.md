@@ -378,3 +378,35 @@ Both want one mirror hygiene pass: dedupe by id and reconcile against the DB
 daily-gated and were still built from the 46-day set at apply time. When that gate
 next fires they will be rebuilt over 63 days, so the Deep tab payload will grow and
 the next publish will upload a bigger `transition_map.json`. Measure then.
+
+## 2026-09-14 - Mirror repaired; drill-down filter bug fixed
+
+**Branch `fix/mirror-dedupe-and-reconcile`:**
+- `load_mirror()` now dedupes by id on read (defence in depth: aggregates are
+  correct even before the file is compacted).
+- New `scripts/repair_mirror.py`: dry run by default, `--apply` to rewrite,
+  rebuilds from Postgres, keeps a timestamped backup, keeps (never drops) a
+  mirror-only id, then `sync_mirror()` to re-fetch anything the collector
+  appended during the rewrite.
+- **Applied:** 448 duplicate lines removed, 221 missing rows restored.
+  `in mirror but not in DB: 0` - nothing was dropped. Backup:
+  `data/tracks_mirror.jsonl.bak-20260914-154936` (64.9 MB).
+  Verified: second dry run reports **0 duplicates, 0 missing**, mirror at
+  **135,534 distinct ids = the DB count exactly**. Collector stayed active,
+  `NRestarts=0`.
+- README: corrected every stale SQLite-era reference (the flagged
+  `data/ # SQLite database (source of truth)` line, the `scripts/` listing that
+  named the deleted `db.py` and `migrate_to_supabase.py`, quick-start step 6
+  which told a human to run that deleted script, the matching Commands row, the
+  intro sentence, and the cost table row), plus a runbook for `repair_mirror.py`.
+
+**Branch `fix/history-drilldown-time-window`:**
+- Deleted the two consecutive identical-condition `if` blocks in `renderHistory`
+  and the now-unused `q`. `activeHistoryFilter` is explicit state cleared only by
+  its own ✕, so the drill-down banner renders and the time window is applied.
+- Verified by driving the real `onTopRowClick` + `renderHistory`: before, the
+  filter was lost, no banner, and a 24h drill-down listed 2 of 2 plays (the window
+  silently ignored); after, the filter survives, the banner renders with station
+  breakdown and window label, and 1 of 2 plays is listed. Fixture note: the two
+  plays must be on different stations, or `histDedup` (on by default, keyed on
+  artist|title|station) masks the window and the test passes for the wrong reason.

@@ -129,3 +129,23 @@ comment left in their place records why the path must not return.
 query fetch only the 1-3 relevant shards and keep full-history search. That is
 the fix if searching old songs turns out to be missed; it is not needed for
 fluency. See `.memory/progress.md` 2026-09-14.
+
+## 2026-09-14 - Mirror hygiene: dedupe on read, compact from Postgres, never drop a mirror-only row
+
+**Decision:** `load_mirror()` dedupes by id (first line per id wins) and
+`scripts/repair_mirror.py` compacts the file by rebuilding it from Postgres.
+A row that exists only in the mirror is kept and reported, never dropped.
+
+**Rationale:** the mirror is the read path for every published aggregate but was
+append-only with no dedupe, so 448 duplicate ids were inflating ~0.33% of plays
+and 221 DB rows were missing from it (under-counting). Deduping on read makes the
+read path correct regardless of file state; compaction fixes the file. Rebuilding
+from Postgres keeps the one-source-of-truth rule intact, while keeping
+mirror-only rows avoids the repair ever deleting collected data.
+
+**Implementation:** `load_mirror` keeps a `seen_ids` set. `repair_mirror.py` is
+dry-run by default, backs up the original to
+`data/tracks_mirror.jsonl.bak-<timestamp>`, writes atomically (temp +
+`os.replace`), then calls `sync_mirror()` to re-fetch whatever the collector
+appended during the rewrite (the rewrite races with it). Same self-heal path used
+when the mirror is wiped.
