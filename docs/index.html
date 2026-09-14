@@ -1049,7 +1049,6 @@ function renderHistory() {
   if (!D.history || !D.history.history) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
 
   let items = D.history.history.slice();
-  const q = (document.getElementById('histSearch').value || '').toLowerCase();
 
   // Search and drill-down filter only what this session has loaded. We do not
   // fetch every shard to answer a query (see the note above loadDayShard).
@@ -1057,17 +1056,14 @@ function renderHistory() {
   const allDays = (D.historyIndex && D.historyIndex.days) || [];
   const moreDays = allDays.some(d => !historyState.loadedDays.has(d));
 
-  // If filter is set but search is empty, clear the filter
-  if (activeHistoryFilter && !q) {
-    activeHistoryFilter = null;
-  }
-
-  // If filter is active, populate search if empty
-  if (activeHistoryFilter && !q) {
-    const term = activeHistoryFilter.title || activeHistoryFilter.artist || '';
-    document.getElementById('histSearch').value = term;
-  }
-
+  // activeHistoryFilter is the drill-down context of a tapped top row: it draws
+  // the banner below and it is the ONLY thing that applies the time window. It is
+  // cleared only by its own ✕ (clearHistoryFilter). It used to be wiped right
+  // here whenever the search box happened to be empty - which is exactly the
+  // state on the render that switchTab() triggers, before onTopRowClick fills
+  // the box. So the banner never appeared and the 24h/7d window was silently
+  // dropped, leaving the list disagreeing with the count the user tapped. Two
+  // identical `if` blocks followed, the second unreachable, which hid it.
   const effectiveQ = (document.getElementById('histSearch').value || '').toLowerCase();
   if (effectiveQ) items = items.filter(t => (t.artist + ' ' + t.title).toLowerCase().includes(effectiveQ));
   if (activeStation) items = items.filter(t => t.station_slug === activeStation);
