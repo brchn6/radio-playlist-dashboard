@@ -721,17 +721,35 @@ async function loadDayShard(day) {
   if (f && f.history) { mergeTracks(f.history); historyState.loadedDays.add(day); }
 }
 
-async function loadAllHistory() {
-  if (historyState.fullyLoaded || historyLoadingAll) return;
-  historyLoadingAll = true;
-  try {
-    const days = (D.historyIndex && D.historyIndex.days) || [];
-    for (let i = days.length - 1; i >= 0; i--) {
-      const day = days[i];
-      if (!historyState.loadedDays.has(day)) await loadDayShard(day);
+let historyLoadPromise = null;
+
+function loadAllHistory() {
+  // Return the promise of the load that is ALREADY running, never an
+  // already-resolved one. This used to be an `async` function that
+  // early-returned while a load was in flight: an async early return hands
+  // back a resolved promise, so a caller doing
+  // `loadAllHistory().then(renderHistory)` re-entered on the very next
+  // microtask with unchanged flags, forever. A microtask loop never yields
+  // to a macrotask, so the day-shard fetches this load is waiting on could
+  // never resolve either - the main thread was starved permanently and the
+  // Insights tab froze hard on mobile.
+  if (historyState.fullyLoaded) return Promise.resolve();
+  if (historyLoadPromise) return historyLoadPromise;
+  historyLoadPromise = (async () => {
+    historyLoadingAll = true;
+    try {
+      const days = (D.historyIndex && D.historyIndex.days) || [];
+      for (let i = days.length - 1; i >= 0; i--) {
+        const day = days[i];
+        if (!historyState.loadedDays.has(day)) await loadDayShard(day);
+      }
+      historyState.fullyLoaded = true;
+    } finally {
+      historyLoadingAll = false;
+      historyLoadPromise = null;
     }
-    historyState.fullyLoaded = true;
-  } finally { historyLoadingAll = false; }
+  })();
+  return historyLoadPromise;
 }
 
 /* ── Tabs ── */
@@ -1063,7 +1081,9 @@ function renderHistory() {
   const needsFull = q || !!activeHistoryFilter;
   if (needsFull && !historyState.fullyLoaded) {
     el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען היסטוריה מלאה...</div>';
-    loadAllHistory().then(() => renderHistory());
+    // Only the caller that starts the load re-renders when it finishes.
+    // Callers arriving mid-load just show the note above and wait for it.
+    if (!historyLoadingAll) loadAllHistory().then(() => renderHistory());
     return;
   }
 

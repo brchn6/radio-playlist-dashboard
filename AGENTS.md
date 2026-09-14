@@ -207,6 +207,19 @@ a network error propagate — always-collecting is the whole point of the projec
    instead of `.join('\n')`. The entire dashboard JS failed to parse. Fix was to
    double-escape or use raw strings when generating JS from Python.
 
+10. **Insights tab freeze on mobile** — 2026-09-14: `loadAllHistory()` was
+   `async` and early-returned while a load was in flight, so
+   `loadAllHistory().then(() => renderHistory())` got an **already-resolved**
+   promise and re-entered `renderHistory` on the next microtask forever
+   (`fullyLoaded` false, `historyLoadingAll` true, unchanged). A microtask loop
+   starves macrotasks, so the day-shard fetches it waited on could never resolve
+   and the freeze was permanent: 1,363,022 renders in 3.0s, an immediate
+   `setTimeout` never fired. Triggered by any top-row drill-down in תובנות
+   (`onTopRowClick` calls `renderHistory()` twice, the second mid-load);
+   introduced with day sharding (`a606cafd`). Fix: `loadAllHistory()` returns the
+   shared in-flight `historyLoadPromise`, and `renderHistory()` only starts a
+   load when `!historyLoadingAll`.
+
 ## ⚠️ JS Syntax Check — MUST run before every push
 
 **Run this before every push to `docs/index.html`:**

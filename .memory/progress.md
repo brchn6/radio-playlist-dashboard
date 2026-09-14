@@ -247,3 +247,41 @@ Verified red-to-green in headless Chrome (mobile viewport) locally and live.
   upload + BASE fetches. Kept out of this push deliberately.
 - updater.log is 49MB, no rotation, contains binary bytes.
 - 36 open GitHub review issues; most are code-hygiene, not user-facing.
+
+## 2026-09-14 - Insights tab freeze fixed on branch `fix/insights-fullhistory-microtask-loop`
+
+**Reported:** Bar - the site on his phone froze ("not responding") after 2-3
+taps in the תובנות (Insights) section.
+
+**Root cause:** microtask infinite loop. `loadAllHistory()` was `async` and
+early-returned while a load was in flight, handing `renderHistory()` an
+already-resolved promise; `loadAllHistory().then(() => renderHistory())` then
+re-entered forever with unchanged flags, and being microtask-only it also starved
+the shard fetches it was waiting on, so the freeze was permanent. Introduced in
+`a606cafd` (day sharding, 2026-08-10). Any top-row drill-down in תובנות hits it
+because `onTopRowClick` calls `renderHistory()` twice and the second call always
+lands mid-load. Retention being raised 45d -> 36500d (`840e0996`) widened the
+window, since "full history" is now unbounded.
+
+**Fix (frontend only):** `loadAllHistory()` returns the shared in-flight
+`historyLoadPromise` instead of an early-returned resolved promise;
+`renderHistory()` only kicks off a load when `!historyLoadingAll`. 3 lines plus
+comments.
+
+**Verified:** pre-fix harness reproduces 1,363,022 renders in 3.0s with an
+immediate macrotask never firing; post-fix 4 renders, event loop alive, each day
+shard fetched exactly once, and a track that exists only in a day shard still
+renders through a search. JS syntax check passes. Same harness fails on
+`HEAD:docs/index.html` (LOOP DETECTED) and passes on the fixed file.
+
+**State:** committed on branch `fix/insights-fullhistory-microtask-loop`.
+NOT pushed. Pages deploy ships the frontend on push; no head1 re-publish needed.
+
+**Still open (flagged, not fixed - Bar to decide):**
+- Dead code + lost drill-down banner in `renderHistory`: the line that clears
+  `activeHistoryFilter` (`if (activeHistoryFilter && !q) activeHistoryFilter =
+  null;`) sits immediately before the branch that would consume it, so the
+  "populate search from filter" path is unreachable and the filter banner never
+  renders for a top-row drill-down.
+- Unbounded full-history download now that retention is 36500 days; on mobile
+  "load every day shard" wants a cap or pagination.

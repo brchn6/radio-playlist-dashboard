@@ -189,3 +189,48 @@ stringified arguments in inline event attributes.
 
 **Files/commands involved:** docs/index.html renderTransitionExplorer;
 repro: `chrome-devtools` + `.explorer-card` outerHTML inspection.
+
+## 2026-09-14 - An `async` early return handed back a RESOLVED promise and froze the Insights tab
+
+**What went wrong:** The תובנות (Insights) tab froze hard on mobile - "not
+responding" - after 2-3 taps. Root cause: `loadAllHistory()` was `async` and
+early-returned while a load was already running, and `renderHistory()` waited on
+it with `loadAllHistory().then(() => renderHistory())`. An `async` early return
+yields an **already-resolved** promise, so the `.then` continuation re-entered
+`renderHistory` on the very next microtask with `fullyLoaded` still false and
+`historyLoadingAll` still true - forever. A microtask loop never yields to a
+macrotask, so the day-shard fetches the load was waiting on could never resolve
+either: the flags could never change and the freeze was permanent.
+
+**Why it was easy to miss:** the guard `if (fullyLoaded || historyLoadingAll)
+return;` reads as correct "already loading, do nothing" logic. The bug is not the
+guard, it is that `async` wraps that `return` in a resolved promise which the
+caller chains a re-render onto.
+
+**Trigger:** `onTopRowClick` (tap a top song/artist row) calls `renderHistory()`
+twice - once via `switchTab` -> `renderAll`, once explicitly after filling the
+search box. The second call always lands mid-load, so every top-row drill-down
+froze the page. Introduced with the day-sharding work (`a606cafd`, 2026-08-10).
+
+**Fix:** `loadAllHistory()` is no longer `async`; it returns the **shared
+in-flight promise** (`historyLoadPromise`) so a second caller gets the same
+promise instead of a resolved lie, and `renderHistory()` only starts a load when
+`!historyLoadingAll` (so only the initiating caller re-renders).
+
+**Measured:** driving the real `renderHistory` from `docs/index.html` twice via
+`onTopRowClick`: 1,363,022 renders in 3.0s pre-fix with a `setTimeout(...,0)`
+scheduled before the trigger **never firing** (event loop starved); post-fix 4
+renders, event loop alive, each day shard fetched exactly once, searched track
+from a shard still rendered.
+
+**Lesson:** Never chain a re-render (or any retry) onto a promise that an
+`async` function may early-return from while work is in flight - return the
+in-flight promise instead. And recall that `async` early returns are *resolved*,
+not pending. A microtask-only loop is worse than a slow path: it starves
+macrotasks too, so the network/flag change you are waiting for can never arrive.
+
+**Files/commands involved:** `docs/index.html` (`loadAllHistory`,
+`renderHistory`, `onTopRowClick`); repro harness `/tmp/repro_freeze.js` and
+`/tmp/verify_fix.js` (extract the inline `<script>`, run in a Node VM with a DOM
+stub; `esc()` needs a `createElement().textContent` -> `innerHTML` stub or all
+text renders empty).
