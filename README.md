@@ -60,7 +60,7 @@ plays in Postgres — their dedupe windows can't see each other. See `AGENTS.md`
   │  8× ShazamIO proxies (ports 8761-8768, one per station)             │
   │          │  polled every 20s                                        │
   │          ▼                                                          │
-  │     updater.py ──► SQLite (data/playlist.db — local source of truth)│
+  │     updater.py ──► Supabase Postgres (tracks — source of truth)│
   │          │                                                          │
   │          ├──► new tracks ───────────► Supabase Postgres (tracks)    │
   │          │                                                          │
