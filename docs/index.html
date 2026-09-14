@@ -17,7 +17,6 @@
     :root {
       /* brand accent: same teal family, darkened for light backgrounds */
       --accent: #0f766e;
-      --accent-strong: #115e59;
       --accent-soft: rgba(15,118,110,.10);
       --accent-tint: rgba(15,118,110,.28);
       --accent-contrast: #ffffff;
@@ -46,14 +45,15 @@
 
       /* status (contrast-checked on light surfaces) */
       --ok: #12805c;
-      --ok-soft: rgba(18,128,92,.10);
-      --warn: #b45309;
-      --warn-soft: rgba(180,83,9,.10);
+      /* amber-800, not amber-700: --warn text also sits on --warn-soft
+         (badges, the partial-search note), where 700 measured only 4.39:1. */
+      --warn: #92400e;
+      --warn-soft: rgba(146,64,14,.10);
       --bad: #c0392b;
-      --bad-soft: rgba(192,57,43,.10);
       --unknown: #6b7280;
       --spotify: #1a7f37;
       --spotify-soft: rgba(26,127,55,.35);
+      --spotify-contrast: #ffffff;
       --minor: #2f6fb5;
 
       /* type scale: nothing below 12px anywhere */
@@ -68,12 +68,11 @@
 
       /* spacing scale (4px base) */
       --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
-      --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+      --sp-5: 20px; --sp-6: 24px;
 
       /* shape, depth, motion */
       --radius: 12px;
       --radius-sm: 8px;
-      --radius-lg: 16px;
       --radius-pill: 999px;
       --shadow-sm: 0 1px 2px rgba(15,16,17,.05);
       --shadow-md: 0 4px 16px rgba(15,16,17,.08);
@@ -93,7 +92,6 @@
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --accent: #5ddbb5;
-        --accent-strong: #7ee7c7;
         --accent-soft: rgba(93,219,181,.12);
         --accent-tint: rgba(93,219,181,.30);
         --accent-contrast: #06231b;
@@ -114,14 +112,14 @@
         --divider: rgba(255,255,255,.07);
         --track: rgba(255,255,255,.07);
         --ok: #3fb950;
-        --ok-soft: rgba(63,185,80,.12);
         --warn: #d4b85a;
         --warn-soft: rgba(212,184,90,.12);
         --bad: #e05555;
-        --bad-soft: rgba(224,85,85,.12);
         --unknown: #8a8f98;
         --spotify: #1DB954;
         --spotify-soft: rgba(29,185,84,.35);
+      --spotify-contrast: #06231b;
+        --spotify-contrast: #06231b;
         --minor: #6ab8e3;
         --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
         --shadow-md: 0 4px 16px rgba(0,0,0,.5);
@@ -131,7 +129,6 @@
     /* Dark chosen explicitly by the user (same values as above). */
     :root[data-theme="dark"] {
       --accent: #5ddbb5;
-      --accent-strong: #7ee7c7;
       --accent-soft: rgba(93,219,181,.12);
       --accent-tint: rgba(93,219,181,.30);
       --accent-contrast: #06231b;
@@ -152,11 +149,9 @@
       --divider: rgba(255,255,255,.07);
       --track: rgba(255,255,255,.07);
       --ok: #3fb950;
-      --ok-soft: rgba(63,185,80,.12);
       --warn: #d4b85a;
       --warn-soft: rgba(212,184,90,.12);
       --bad: #e05555;
-      --bad-soft: rgba(224,85,85,.12);
       --unknown: #8a8f98;
       --spotify: #1DB954;
       --spotify-soft: rgba(29,185,84,.35);
@@ -167,7 +162,7 @@
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-    body{font-family:var(--font);background:linear-gradient(170deg,var(--bg-grad-1) 0%,var(--bg-grad-2) 100%);background-attachment:fixed;color:var(--fg);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
     /* Numbers in a dense dashboard read much better when digits align. */
 .top-count,.hist-time,.np-duration,.explorer-card-stats,.redundancy-pct,.stats-pill,.key-count,.loading-counter,.footer-stats{font-variant-numeric:tabular-nums}
     /* Keyboard users get a visible ring; pointer users do not. */
@@ -262,7 +257,7 @@
     .top-stations{display:flex;gap:3px;margin-top:2px}
     .top-station-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
     .top-spotify{font-size:.65rem;padding:2px 8px;border-radius:10px;border:1px solid var(--spotify-soft);color:var(--spotify);text-decoration:none;flex-shrink:0;transition:all .15s}
-    .top-spotify:hover{background:var(--spotify-soft);border-color:var(--spotify)}
+    .top-spotify:hover{background:var(--spotify);border-color:var(--spotify);color:var(--spotify-contrast)}
 
     /* Cross-station */
     .cross-row{padding:10px;border-bottom:1px solid var(--divider)}
@@ -540,7 +535,7 @@
     .top-stations{gap:var(--sp-1);margin-top:var(--sp-1)}
     .top-station-dot{width:7px;height:7px}
     .top-spotify{font-size:var(--fs-xs);padding:5px 10px;min-height:30px;display:inline-flex;align-items:center;border-radius:var(--radius-pill);border-color:var(--spotify-soft);color:var(--spotify)}
-    .top-spotify:hover{background:var(--spotify-soft)}
+    .top-spotify:hover{background:var(--spotify);border-color:var(--spotify);color:var(--spotify-contrast)}
 
     .hist-controls{gap:var(--sp-2);margin-bottom:var(--sp-3)}
     .hist-search{font-size:var(--fs-base);padding:10px 14px;min-height:44px;border-radius:var(--radius-sm);background:var(--card)}
@@ -1729,11 +1724,11 @@ function renderBpmRealtime() {
       },
       scales: {
         x: {
-          ticks: { color: MUTED, font: { size: 9 }, maxTicksLimit: 20 },
+          ticks: { color: MUTED, font: { size: 12 }, maxTicksLimit: 20 },
           grid: { color: GRID + '40' },
         },
         y: {
-          ticks: { color: MUTED, font: { size: 10 } },
+          ticks: { color: MUTED, font: { size: 12 } },
           grid: { color: GRID + '40' },
           title: { display: true, text: 'BPM', color: MUTED },
         },
@@ -1822,8 +1817,8 @@ function renderBpmLegacy() {
         }
       },
       scales: {
-        x: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' } },
-        y: { ticks: { color: MUTED, font: { size: 10 } }, grid: { color: GRID + '40' }, title: { display: true, text: 'BPM', color: MUTED } },
+        x: { ticks: { color: MUTED, font: { size: 12 } }, grid: { color: GRID + '40' } },
+        y: { ticks: { color: MUTED, font: { size: 12 } }, grid: { color: GRID + '40' }, title: { display: true, text: 'BPM', color: MUTED } },
       },
       interaction: { mode: 'index', intersect: false },
       animation: false,
