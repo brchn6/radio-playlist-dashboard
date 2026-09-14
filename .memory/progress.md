@@ -285,3 +285,26 @@ NOT pushed. Pages deploy ships the frontend on push; no head1 re-publish needed.
   renders for a top-row drill-down.
 - Unbounded full-history download now that retention is 36500 days; on mobile
   "load every day shard" wants a cap or pagination.
+
+## 2026-09-14 (later) - Bulk-download removal built on its own branch
+
+**Branch:** `fix/history-search-no-bulk-download` (from `main` after the freeze
+fix merged). Not merged yet - Bar evaluates it on the Tailscale preview first.
+
+**Built:** removed the implicit "search downloads every day shard" path;
+deleted `loadAllHistory`/`historyLoadPromise`/`historyLoadingAll`/`fullyLoaded`
+(all dead once the auto-trigger went); `renderHistory` now states the scope of a
+partial result via `.hist-partial-note`. 27 insertions, 47 deletions.
+
+**Verified:** `/tmp/verify_nobulk.js` drives the real functions. Search: 0 shards
+fetched (main: 3/3 in fixture), match found, partial note rendered, 2 renders.
+Drill-down: 0 shards, 2 renders. "הצג עוד": exactly 1 older day, its track
+rendered. No loop anywhere (6 total renders). JS syntax check passes.
+
+**Also done:** the freeze fix merged to `main` (fast-forward `bf7cc37b`) and
+verified live on Pages (~30s after push: live shows the fix, old function gone).
+
+**Recovery still open:** 18 early days (2026-07-13..2026-07-30, minus a real
+2026-07-24 gap) survive only in the bucket's old `history.json` (59,178 rows,
+27.7 MB, 2026-07-13..2026-08-10). Pruned from Postgres and the mirror by the old
+45-day retention. Backfill script to be built on its own branch with a dry run.

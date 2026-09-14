@@ -162,6 +162,7 @@
     .trans-station-dots{display:flex;gap:2px;flex-shrink:0}
     .trans-station-dot{width:6px;height:6px;border-radius:50%}
     .hist-filter-banner{background:var(--card-hover);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.hist-partial-note{background:rgba(212,184,90,.08);border:1px solid rgba(212,184,90,.3);color:#d4b85a;border-radius:var(--radius);padding:8px 10px;margin-bottom:10px;font-size:.74rem;line-height:1.5}
     .hist-filter-title{font-weight:700;font-size:.9rem;margin-bottom:4px}
     .hist-filter-range{font-size:.72rem;color:var(--muted);margin-bottom:8px}
     .hist-filter-stations{display:flex;gap:6px;flex-wrap:wrap}
@@ -701,8 +702,7 @@ async function fetchAll() {
    tracks on every poll (dedup by id) and lazy-loads older day shards only
    when the user scrolls the History tab or searches.
 */
-const historyState = { merged: [], ids: new Set(), loadedDays: new Set(), fullyLoaded: false };
-let historyLoadingAll = false;
+const historyState = { merged: [], ids: new Set(), loadedDays: new Set() };
 
 function mergeTracks(list) {
   if (!list) return;
@@ -721,36 +721,14 @@ async function loadDayShard(day) {
   if (f && f.history) { mergeTracks(f.history); historyState.loadedDays.add(day); }
 }
 
-let historyLoadPromise = null;
-
-function loadAllHistory() {
-  // Return the promise of the load that is ALREADY running, never an
-  // already-resolved one. This used to be an `async` function that
-  // early-returned while a load was in flight: an async early return hands
-  // back a resolved promise, so a caller doing
-  // `loadAllHistory().then(renderHistory)` re-entered on the very next
-  // microtask with unchanged flags, forever. A microtask loop never yields
-  // to a macrotask, so the day-shard fetches this load is waiting on could
-  // never resolve either - the main thread was starved permanently and the
-  // Insights tab froze hard on mobile.
-  if (historyState.fullyLoaded) return Promise.resolve();
-  if (historyLoadPromise) return historyLoadPromise;
-  historyLoadPromise = (async () => {
-    historyLoadingAll = true;
-    try {
-      const days = (D.historyIndex && D.historyIndex.days) || [];
-      for (let i = days.length - 1; i >= 0; i--) {
-        const day = days[i];
-        if (!historyState.loadedDays.has(day)) await loadDayShard(day);
-      }
-      historyState.fullyLoaded = true;
-    } finally {
-      historyLoadingAll = false;
-      historyLoadPromise = null;
-    }
-  })();
-  return historyLoadPromise;
-}
+/* Older day shards are loaded ONLY on demand, one day per "הצג עוד" click.
+   There is deliberately no "load the whole history" path: search and
+   drill-down filter whatever this session has already loaded (recent.json plus
+   the days the user pulled in). Auto-downloading every shard to answer a query
+   cost ~1 MB per day of history - unbounded since RETENTION_DAYS=36500 - and
+   handed the entire dataset to any visitor who typed one character into the
+   search box. It was also the in-flight load that the 2026-09-14 microtask-loop
+   freeze re-entered. Do not reintroduce it; see .memory/lessons.md 2026-09-14. */
 
 /* ── Tabs ── */
 document.getElementById('tabBar').onclick = e => {
@@ -1073,19 +1051,11 @@ function renderHistory() {
   let items = D.history.history.slice();
   const q = (document.getElementById('histSearch').value || '').toLowerCase();
 
-  // Full-history search / drill-down needs every day shard loaded. Load them
-  // once (they are immutable, so this is a single download per session, then
-  // cached) and show a "loading full history" note while it fetches.
-  // Triggered by: a search query, or any Top-tab drill-down filter (its time
-  // window can need more than the ~3h of recent tracks we hold by default).
-  const needsFull = q || !!activeHistoryFilter;
-  if (needsFull && !historyState.fullyLoaded) {
-    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען היסטוריה מלאה...</div>';
-    // Only the caller that starts the load re-renders when it finishes.
-    // Callers arriving mid-load just show the note above and wait for it.
-    if (!historyLoadingAll) loadAllHistory().then(() => renderHistory());
-    return;
-  }
+  // Search and drill-down filter only what this session has loaded. We do not
+  // fetch every shard to answer a query (see the note above loadDayShard).
+  // Computed here so the partial-result notice below can state the real scope.
+  const allDays = (D.historyIndex && D.historyIndex.days) || [];
+  const moreDays = allDays.some(d => !historyState.loadedDays.has(d));
 
   // If filter is set but search is empty, clear the filter
   if (activeHistoryFilter && !q) {
@@ -1138,6 +1108,17 @@ function renderHistory() {
       '</div>';
   }
 
+  // Never let a partial result look complete: if a query is active and days
+  // are still unloaded, state exactly what was searched.
+  let partialNote = '';
+  if ((effectiveQ || activeHistoryFilter) && moreDays) {
+    partialNote = '<div class="hist-partial-note">'
+      + 'החיפוש מכסה ' + historyState.merged.length + ' שירים שנטענו'
+      + ' (' + historyState.loadedDays.size + ' מתוך ' + allDays.length + ' ימים)'
+      + ' · לחץ "הצג עוד" כדי לכלול ימים קדומים יותר'
+      + '</div>';
+  }
+
   const shown = items.slice(0, histShown);
   let h = '';
   shown.forEach(t => {
@@ -1147,10 +1128,9 @@ function renderHistory() {
     h += '<span class="hist-time">' + timeAgo(t.recognized_at) + '</span>';
     h += '</div>';
   });
-  el.innerHTML = bannerHtml + (h || '<div style="color:var(--muted);text-align:center;padding:20px">' +
+  el.innerHTML = bannerHtml + partialNote + (h || '<div style="color:var(--muted);text-align:center;padding:20px">' +
     (activeHistoryFilter ? 'לא נמצאו תוצאות לטווח הזמן הזה' : 'לא נמצאו תוצאות') + '</div>');
   // Show "load more" while there are more loaded items OR more day shards to fetch.
-  const moreDays = (D.historyIndex && D.historyIndex.days || []).some(d => !historyState.loadedDays.has(d));
   document.getElementById('histMoreBtn').style.display = (items.length > histShown || moreDays) ? 'inline-block' : 'none';
 }
 

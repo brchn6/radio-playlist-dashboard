@@ -234,3 +234,34 @@ macrotasks too, so the network/flag change you are waiting for can never arrive.
 `/tmp/verify_fix.js` (extract the inline `<script>`, run in a Node VM with a DOM
 stub; `esc()` needs a `createElement().textContent` -> `innerHTML` stub or all
 text renders empty).
+
+## 2026-09-14 - "Search everything" implemented as "download everything", with the truncation silent
+
+**What went wrong:** the History search downloaded every day shard on the first
+keystroke (`oninput="renderHistory()"`) and held ~100k tracks in browser memory.
+Two distinct faults, not one: (a) the data was unbounded (retention had just been
+raised to 36500 days, ~1 MB per day), and (b) results were silently partial
+whenever the load had not finished, so the list looked complete while it was not.
+
+**Why:** the dashboard is static files in a public bucket with no query API, so
+"search all history" was implemented as "fetch all history, filter locally". That
+was defensible when history was ~10 days and a few MB. Raising retention turned a
+bounded, cheap fetch into an unbounded, expensive one without anyone revisiting
+the fetch. Fault (b) is the `silent defaults over missing data` anti-pattern: a
+consumer had no way to tell "no matches" from "matches not loaded yet".
+
+**Correct approach:** if a corpus is unbounded, a query must not fetch the corpus.
+Load on demand and state the scope of a partial result explicitly. Deleted the
+auto-load path entirely rather than capping it, so there is no silent fallback;
+`renderHistory` now renders a `.hist-partial-note` naming loaded tracks and days.
+If full-history search is wanted later, build a term -> days index so a query
+fetches 1-3 shards instead of all of them.
+
+**Lesson:** when you change a retention/lifetime policy, re-check every read path
+that scales with it. "Keep all history" silently converted a 10-day download into
+an unbounded one. And a partial result must always say it is partial.
+
+**Files/commands involved:** `docs/index.html` (`renderHistory`, deleted
+`loadAllHistory`); verified by `/tmp/verify_nobulk.js`, which asserts a search
+fetches ZERO day shards (main fetched 3/3 in the fixture, 46/46 in production)
+and that the partial note renders.

@@ -100,3 +100,32 @@
 **Rationale:** v1/v2 attempts (API-triggered legacy builds, `[skip ci]`) exceeded the 10 legacy-builds/hour quota and built on wrong premises. Full analysis in `.planning/DEPLOY-ARCHITECTURE.md`.
 
 **Implementation:** `.github/workflows/deploy.yml` validates JS syntax then deploys `docs/`. Keep it — deleting it takes the site down.
+
+## 2026-09-14 - History search never bulk-downloads; search scope is always stated
+
+**Decision:** Removed the "load every day shard" path. History search and
+top-row drill-down filter only the tracks the session has loaded
+(`recent.json` + day shards the user pulled in with "הצג עוד"). Older days load
+strictly on demand, one day per click. Whenever a query is active and days
+remain unloaded, the UI states the scope ("החיפוש מכסה N שירים שנטענו (D מתוך T
+ימים)").
+
+**Rationale:** the old path downloaded every listed day shard on the FIRST
+keystroke in the search box (`oninput="renderHistory()"`), then kept all ~100k
+tracks in memory. At ~1 MB per day and 46 days that was ~46 MB per search, and
+unbounded after `RETENTION_DAYS=36500` (~365 MB after a year). It also silently
+handed the entire dataset to any visitor who typed one character, which is not
+the intent for public exposure (URL-guessable data is fine; a one-keystroke bulk
+fetch is not). It was additionally the in-flight load the 2026-09-14 freeze loop
+re-entered. Silent truncation was not acceptable either, hence the stated scope.
+
+**Implementation:** `loadAllHistory()`, `historyLoadPromise`, `historyLoadingAll`
+and `historyState.fullyLoaded` deleted (all dead once the auto-trigger went). The
+comment left in their place records why the path must not return.
+`renderHistory()` computes `allDays`/`moreDays` up front and renders
+`.hist-partial-note` when a query is active and days are unloaded.
+
+**Deliberately not built yet:** a search index (term -> days) that would let a
+query fetch only the 1-3 relevant shards and keep full-history search. That is
+the fix if searching old songs turns out to be missed; it is not needed for
+fluency. See `.memory/progress.md` 2026-09-14.
