@@ -580,7 +580,8 @@ function switchTab(tabName) {
   renderAll();
   if (tabName === 'deep' && !deepDataLoaded) {
     deepDataLoaded = true;
-    fetchAll().then(() => { if (document.querySelector('.tab-btn.active')?.dataset.tab === 'deep') renderAll(); });
+    deepDataPromise = fetchAll().catch(() => {});
+    deepDataPromise.then(() => { if (document.querySelector('.tab-btn.active')?.dataset.tab === 'deep') renderAll(); });
   }
 }
 
@@ -662,6 +663,7 @@ async function fetchManifest() {
    fetched lazily on the first Deep tab visit instead of blocking startup.
    Once loaded they stay hash-gated, so polls only refetch when they change. */
 let deepDataLoaded = false;
+let deepDataPromise = null;
 
 async function fetchAll() {
   await fetchManifest();
@@ -1746,7 +1748,14 @@ function pickExplorerRandomSong() {
   renderTransitionExplorer();
 }
 
+let explorerSearchTimer = null;
 function onExplorerSearch() {
+  // Debounce: the search scans ~30k song entries per call; firing on
+  // every keystroke janks the main thread while typing.
+  clearTimeout(explorerSearchTimer);
+  explorerSearchTimer = setTimeout(doExplorerSearch, 250);
+}
+function doExplorerSearch() {
   const q = (document.getElementById('explorerSearch').value || '').toLowerCase().trim();
   const map = D.transition_map;
   if (!map || !map.stations || !q) {
@@ -2442,9 +2451,11 @@ function renderUptime() {
   if (ut.per_station) {
     h += '<div class="uptime-mini-dots">';
     Object.entries(ut.per_station).forEach(([slug, st]) => {
-      const stUptime = st.uptime_pct_7d || 0;
-      const dotColor = stUptime >= 100 ? '#5ddbb5' : stUptime >= 95 ? '#d4b85a' : '#e05555';
-      h += '<span class="uptime-mini-dot" style="background:' + dotColor + '" title="' + esc(name(slug)) + ': ' + stUptime + '%"></span>';
+      const stUptime = st.uptime_pct_7d;
+      // No per-station measurement yet -> gray dot, not a fake green 100%.
+      const dotColor = stUptime == null ? '#555b73' : stUptime >= 100 ? '#5ddbb5' : stUptime >= 95 ? '#d4b85a' : '#e05555';
+      const tip = stUptime == null ? esc(name(slug)) : esc(name(slug)) + ': ' + stUptime + '%';
+      h += '<span class="uptime-mini-dot" style="background:' + dotColor + '" title="' + tip + '"></span>';
     });
     h += '</div>';
   }
@@ -2524,6 +2535,15 @@ async function init() {
   startLiveTimers();
   // Set initial button states
   document.getElementById('histDedupBtn').classList.add('active');
+
+  // Preload Deep-tab payloads in the background so the first Deep visit
+  // doesn't block on the ~10MB transition_map download + JSON.parse.
+  // loadTracked() is hash-gated, so unchanged files are not re-downloaded.
+  setTimeout(() => {
+    if (deepDataLoaded) return;
+    deepDataLoaded = true;
+    deepDataPromise = fetchAll().catch(() => {});
+  }, 5000);
 
   // Poll
   setInterval(async () => {
