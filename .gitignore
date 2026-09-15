@@ -25,3 +25,21 @@ docs/data/
 
 # Transient Wayfinder/agent work tickets - not source code
 .scratch/
+
+# ── Playlist-coherence research lane (2026-08-19) ────────────────────
+# The analysis SOURCE is committed (scripts/radio_utils.py, playlist_selector.py,
+# markov_analysis.py, export_graph.py, app.py, playlist_explorer.py, and the two
+# docs/*.md write-ups). The derived data below is regenerable from the mirror and
+# stays out of git for the same reason docs/data/ does - it is data, not source.
+#
+# The HTML pages are local-only for now: they fetch the JSON with relative paths,
+# so publishing them would ship four pages that render empty. Finishing them means
+# uploading the JSON to the public storage bucket and switching the pages to BASE
+# fetches - see docs/README-playlist-selector.md ("Data pipeline").
+/docs/graph-*.json
+/docs/markov-graph-*.json
+/docs/playlist-candidates-all.json
+/docs/playlist-explorer.html
+/docs/cooccurrence-graph.html
+/docs/markov-graph.html
+/docs/soundcloud.html

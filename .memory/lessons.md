@@ -363,3 +363,30 @@ harnesses, fixtures, and measurement scripts alike.
 **Files/commands involved:** `tests/README.md` (the runbook),
 `tests/ui_audit.py`, `tests/verify_nobulk.js`, `tests/verify_drilldown.js`,
 `tests/verify_theme.js`.
+
+## 2026-09-14 - `git add -A <dir>` swept a whole untracked feature into an unrelated commit
+
+**What went wrong:** the mirror-repair commit used `git add -A scripts` instead of
+naming the one new file it was about. That staged seven untracked files from the
+2026-08-19 playlist-analysis session (1,859 lines), which landed in commit
+`5384955b` - a commit whose message is entirely about the track mirror. For weeks
+of future `git log`/`git blame` reading, 1,859 lines of analysis code were
+attributed to a mirror fix. Bar spotted the dirty tree before I did.
+
+**Why:** `-A` means "everything not ignored under this path", and this repo keeps
+deliberately-untracked work in the tree (analysis scripts, tool pages, 21 MB of
+derived data). In that setting `-A` is not a convenience, it is a grab bag.
+
+**Correct approach:** name every path you intend to commit. `git add -A` is only
+safe in a repo with no untracked files you did not create, which is not this one.
+When a feature should be tracked, commit it deliberately with its own message and
+its own docs. The fix used here: `git rm --cached` the files (index only, disk
+untouched), then re-add them in a dedicated commit that explains what they are.
+
+**Detection:** `git show --stat <commit>` should mention every file you touched
+and nothing else. If the file count is higher than expected, the stage step was
+too broad. Worth running before every commit in a repo that carries untracked
+work.
+
+**Files/commands involved:** `git add -A scripts` in commit `5384955b`; corrected
+by `61c05beb` (un-track) plus the research-lane commit that follows it.

@@ -530,3 +530,23 @@ These were previously in `/tmp` and were lost when `/tmp` was cleaned - see
 Look at the redesign on his phone and say what to tune. He likes it as of
 2026-09-14, and the token system makes tuning a one-value change. The theme
 follows the phone's system setting unless he taps the sun/moon in the header.
+
+## 2026-09-14 - HEAD cleaned up; playlist-coherence lane committed properly
+
+Bar noticed HEAD was not clean. Two separate causes, both resolved:
+
+1. **My mistake.** `5384955b` (mirror repair) had swallowed 7 untracked analysis
+   scripts via `git add -A scripts`. Fixed in `61c05beb` (`git rm --cached`, files
+   untouched on disk) and then re-added deliberately in the research-lane commit,
+   so `git log -- scripts/playlist_selector.py` now points at a commit that
+   actually describes it. See `.memory/lessons.md` 2026-09-14.
+2. **23 untracked `docs/` files (22 MB)** from the 2026-08-19 session. Now
+   gitignored with an explanatory comment: the 21 MB of graph JSON is derived data
+   (same rule as `docs/data/`), and the four HTML tool pages are local-only until
+   their data is served from the storage bucket. The two markdown write-ups are
+   committed, because they are the lane's runbook and roadmap.
+
+**State:** `git status` is clean, `main` matches origin. The playlist-coherence
+lane's source and documentation are in the repo; its data path (upload the JSON to
+the bucket, switch the pages to `BASE` fetches) is the remaining work if Bar wants
+those pages live.

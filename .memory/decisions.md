@@ -245,3 +245,34 @@ advises a cache-buster (`?Date.now()`) - `AGENTS.md` forbids re-adding one (it
 caused a 10 GB egress blowout); and it generates mock data, which this project
 never does because real data is always present. Its Inter webfont suggestion is
 also declined: Hebrew-first UI, and Inter has no reliable Hebrew coverage.
+
+## 2026-09-14 - Second research lane: playlist coherence (committed, data excluded)
+
+**Decision (Bar):** the playlist-coherence analysis is a real research lane of
+this project, not scratch work, so its **source is committed**: `radio_utils.py`,
+`playlist_selector.py`, `markov_analysis.py`, `export_graph.py`, `app.py`,
+`playlist_explorer.py` and the two write-ups (`docs/README-playlist-selector.md`,
+`docs/RESEARCH-PLAYLIST-SELECTION.md`). Its **derived data is not** (21 MB of
+graph JSON), for the same reason `docs/data/` is not: it is regenerable output,
+and this project's rule is that data lives in Supabase Storage, never in git.
+
+**What the lane is:** finding coherent playlists from airplay data - which tracks
+are both frequent and embedded in a station's musical flow. `playlist_selector.py`
+scores frequency + PageRank on co-occurrence edges; `markov_analysis.py` adds
+transition probabilities, communities and entropy; `app.py`/`playlist_explorer.py`
+are Streamlit front-ends; `export_graph.py` emits vis.js data.
+`docs/RESEARCH-PLAYLIST-SELECTION.md` catalogues 10 approaches with 3 done and 7
+open - that document is the lane's roadmap.
+
+**Known gap:** the four HTML pages (`playlist-explorer.html`,
+`cooccurrence-graph.html`, `markov-graph.html`, `soundcloud.html`) are gitignored
+and therefore local-only, because they fetch their JSON with relative paths. They
+were 404 on the live site and stay that way until the data is uploaded to the
+storage bucket and the pages switch to `BASE` fetches (the pipeline section of
+`docs/README-playlist-selector.md`). Committing the pages before that would
+publish four pages that render empty.
+
+**Also committed, with a caveat:** `radio_watchdog.py` is NOT wired to anything.
+Cron runs `~/.hermes/scripts/radio-watchdog.sh` every 5 minutes instead, so
+editing the `.py` version changes nothing at runtime. Its stale usage line was
+corrected. Either wire it (systemd or cron) or delete it; do not assume it runs.
