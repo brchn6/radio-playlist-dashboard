@@ -43,6 +43,19 @@ RETRY_DELAY = int(os.environ.get("SHAZAMIO_RETRY_DELAY", "5"))
 # it just never answers) the await never returns, the recognition lock is held
 # forever, and the proxy is dead until restarted. Always bound it.
 RECOGNIZE_TIMEOUT = int(os.environ.get("SHAZAMIO_RECOGNIZE_TIMEOUT", "45"))
+# ffmpeg has no read timeout of its own either. If a stream accepts the TCP
+# connection and then goes quiet, the socket read blocks forever, the station
+# loop awaits it forever, and the proxy still looks alive (PID present, HTTP
+# 200) while recognising nothing. radio-darom sat frozen for 5h19m this way on
+# 2026-09-15 and only resumed when the CDN happened to start sending again.
+# Two independent bounds, because either alone can be fooled:
+#   FFMPEG_RW_TIMEOUT - ffmpeg abandons a stalled socket itself
+#   CAPTURE_TIMEOUT   - Python backstop; kills ffmpeg whatever it is doing
+FFMPEG_RW_TIMEOUT = int(os.environ.get("SHAZAMIO_FFMPEG_RW_TIMEOUT", "10"))  # seconds
+CAPTURE_TIMEOUT = int(os.environ.get("SHAZAMIO_CAPTURE_TIMEOUT", "30"))  # seconds
+# A cycle that cannot finish inside this is a bug, not a slow stream. Guarantees
+# the loop always returns to a decision point instead of freezing silently.
+CYCLE_TIMEOUT = CAPTURE_TIMEOUT + RECOGNIZE_TIMEOUT + 30
 # Back off hard on errors — a stalled Shazam means retrying fast makes it worse.
 ERROR_MAX_DELAY = int(os.environ.get("SHAZAMIO_ERROR_MAX_DELAY", "180"))
 # Stagger the fleet: restarting N proxies at once fires N simultaneous Shazam
@@ -92,6 +105,11 @@ STATE: dict[str, Any] = {
     "interval_seconds": INTERVAL_SECONDS,
     "last_started_at": None,
     "last_finished_at": None,
+    # Heartbeat: set at the top of every loop iteration, before anything that can
+    # block. last_started_at only moves once a capture has succeeded, so it
+    # cannot distinguish "mid-backoff" from "frozen" - this can. A supervisor
+    # that watches only last_finished_at sees a stalled proxy as healthy.
+    "last_loop_at": None,
     "last_error": None,
     "last_result": None,
 }
@@ -102,6 +120,19 @@ shazam = Shazam()
 
 def now_iso() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+
+def log_event(event: str, **fields: Any) -> None:
+    """Emit one JSON log line, stamped with the time it happened.
+
+    Every record carries its own UTC timestamp because without one an outage
+    cannot be attributed. The radio-darom freeze (2026-09-15) left the log
+    ending on a bare `station_sample_start` with no timestamp: the process had
+    been dead for 3.5 hours by the time anyone could see it, and pinning down
+    *when* it stopped took longer than finding the cause.
+    """
+    print(json.dumps({"ts": now_iso(), "event": event, **fields},
+                     ensure_ascii=False), flush=True)
 
 
 def parse_shazam_result(raw: Any) -> dict[str, Any]:
@@ -140,6 +171,12 @@ async def run_ffmpeg_capture(stream_url: str, output_file: Path) -> None:
         "-loglevel",
         "error",
         "-y",
+        # -rw_timeout is in microseconds, and must precede -i to apply to the
+        # input. Without it a stream that goes silent mid-read blocks forever
+        # (unlike -t, which only limits how much input is read, not how long we
+        # wait for it).
+        "-rw_timeout",
+        str(FFMPEG_RW_TIMEOUT * 1_000_000),
         "-t",
         str(SAMPLE_SECONDS),
     ]
@@ -159,7 +196,22 @@ async def run_ffmpeg_capture(stream_url: str, output_file: Path) -> None:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout, stderr = await proc.communicate()
+    try:
+        stdout, stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=CAPTURE_TIMEOUT
+        )
+    except asyncio.TimeoutError:
+        raise RuntimeError(
+            f"ffmpeg capture timed out after {CAPTURE_TIMEOUT}s "
+            f"(stream stalled: no data read, ffmpeg rw_timeout={FFMPEG_RW_TIMEOUT}s)"
+        ) from None
+    finally:
+        # Never leave ffmpeg behind. An orphaned child keeps the stream socket
+        # open and, before the bound above existed, kept the loop blocked for
+        # hours. Also covers cancellation (proxy restart mid-capture).
+        if proc.returncode is None:
+            proc.kill()
+            await proc.wait()
     if proc.returncode != 0:
         raise RuntimeError(
             "ffmpeg capture failed: "
@@ -189,22 +241,20 @@ async def recognize_file(path: Path) -> dict[str, Any]:
                     result["musical_key"] = audio.get("musical_key")
             except Exception as exc:
                 # BPM/key are best-effort; never let analysis break recognition.
-                print(json.dumps({"event": "audio_analysis_error",
-                                  "error": str(exc)}, ensure_ascii=False), flush=True)
+                log_event("audio_analysis_error", error=str(exc))
             STATE["last_result"] = result
             STATE["last_finished_at"] = now_iso()
-            print(json.dumps({"event": "recognized", **result}, ensure_ascii=False), flush=True)
+            log_event("recognized", **result)
             return result
         except asyncio.TimeoutError as exc:
             STATE["last_error"] = f"recognize timed out after {RECOGNIZE_TIMEOUT}s"
             STATE["last_finished_at"] = now_iso()
-            print(json.dumps({"event": "recognition_timeout",
-                              "timeout_seconds": RECOGNIZE_TIMEOUT}), flush=True)
+            log_event("recognition_timeout", timeout_seconds=RECOGNIZE_TIMEOUT)
             raise
         except Exception as exc:
             STATE["last_error"] = str(exc)
             STATE["last_finished_at"] = now_iso()
-            print(json.dumps({"event": "recognition_error", "error": str(exc)}, ensure_ascii=False), flush=True)
+            log_event("recognition_error", error=str(exc))
             raise
         finally:
             STATE["running"] = False
@@ -226,27 +276,29 @@ async def station_loop(app: web.Application) -> None:
     # Spread the fleet out: without this, restarting all proxies together sends
     # one simultaneous burst of Shazam calls per cycle, forever.
     stagger = (PORT % 10) * STARTUP_STAGGER + random.uniform(0, STARTUP_STAGGER)
-    print(json.dumps({"event": "startup_stagger", "seconds": round(stagger, 1)}), flush=True)
+    log_event("startup_stagger", seconds=round(stagger, 1))
     await asyncio.sleep(1 + stagger)
 
     consecutive_failures = 0
     while True:
+        STATE["last_loop_at"] = now_iso()
         try:
-            print(json.dumps({"event": "station_sample_start", "url": STREAM_URL}, ensure_ascii=False), flush=True)
-            result = await recognize_station_once()
+            log_event("station_sample_start", url=STREAM_URL)
+            result = await asyncio.wait_for(
+                recognize_station_once(), timeout=CYCLE_TIMEOUT
+            )
             if result.get("found"):
                 consecutive_failures = 0
                 # Stagger by port so 8 proxies never reconverge into lockstep
                 stagger_offset = (PORT % 16) * 3
                 nap = INTERVAL_SECONDS + stagger_offset + random.uniform(0, 5)
-                print(json.dumps({"event": "sleep_next", "seconds": round(nap, 1)}, ensure_ascii=False), flush=True)
+                log_event("sleep_next", seconds=round(nap, 1))
                 await asyncio.sleep(nap)
             else:
                 consecutive_failures += 1
                 delay = min(RETRY_DELAY * consecutive_failures, 30)
-                print(json.dumps({"event": "retry_soon", "reason": "not_found",
-                                  "consecutive_failures": consecutive_failures,
-                                  "retry_delay": delay}, ensure_ascii=False), flush=True)
+                log_event("retry_soon", reason="not_found",
+                          consecutive_failures=consecutive_failures, retry_delay=delay)
                 await asyncio.sleep(delay)
         except asyncio.CancelledError:
             raise
@@ -258,9 +310,9 @@ async def station_loop(app: web.Application) -> None:
             # lockstep is worst of all.
             delay = min(RETRY_DELAY * 2 ** (consecutive_failures - 1), ERROR_MAX_DELAY)
             delay += random.uniform(0, delay * 0.3)
-            print(json.dumps({"event": "station_sample_error", "error": str(exc),
-                              "consecutive_failures": consecutive_failures,
-                              "retry_delay": round(delay, 1)}, ensure_ascii=False), flush=True)
+            log_event("station_sample_error", error=str(exc),
+                      consecutive_failures=consecutive_failures,
+                      retry_delay=round(delay, 1))
             await asyncio.sleep(delay)
 
 
@@ -333,6 +385,7 @@ if __name__ == "__main__":
     print(
         json.dumps(
             {
+                "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "event": "startup",
                 "host": HOST,
                 "port": PORT,

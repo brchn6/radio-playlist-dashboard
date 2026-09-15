@@ -550,3 +550,70 @@ Bar noticed HEAD was not clean. Two separate causes, both resolved:
 lane's source and documentation are in the repo; its data path (upload the JSON to
 the bucket, switch the pages to `BASE` fetches) is the remaining work if Bar wants
 those pages live.
+
+## 2026-09-15 - The recognition engine could freeze for hours, and every check said it was fine
+
+Bar noticed רדיו דרום showed "last recognised 3 hours ago". It was not a missed
+track: the station loop was **completely frozen** and had been for hours. Two
+separate freezes that day, 5h19m in total, and the fleet restart from a
+user-systemd-session restart at 13:33 did **not** fix it (the new process froze
+again on the same stalled stream).
+
+**Root cause.** `run_ffmpeg_capture()` awaited `proc.communicate()` with no
+timeout, and ffmpeg itself has no read timeout. The CDN accepted the TCP
+connection and then stopped sending, so ffmpeg sat in `poll()` forever, the
+station loop awaited it forever, and an orphan ffmpeg held the socket.
+`-t 15` does not help: it bounds how much input is read, not how long to wait
+for it.
+
+**Why nothing noticed (three layers, all blind).**
+`is_running()` proved a PID existed; `/health` is a hardcoded `ok: true`; the
+15-minute `health_check.py` proved a TCP connect succeeded. The 2-minute
+`radio-proxies-heal.timer` therefore logged `already_running` for a proxy that
+was dead for 5+ hours. `proxy_manager health` also returned `all_healthy: true`
+the whole time.
+
+**Fixed, in three steps (all verified):**
+
+1. **Bound the capture** (`shazamio/shazamio_proxy.py`): `-rw_timeout 10s` so
+   ffmpeg abandons a stalled socket itself, `CAPTURE_TIMEOUT=30s` as a Python
+   backstop that kills the child (`finally`, so cancellation cannot orphan it
+   either), `CYCLE_TIMEOUT` on the entire iteration, and a `last_loop_at`
+   heartbeat written at the top of every loop pass and published in `/current`.
+   Measured: a healthy 15s sample is ~0.7s; a stalled one now fails in 3-10s
+   instead of never.
+2. **A staleness net** (`scripts/proxy_manager.py`): `loop_status()` reads the
+   heartbeat, `_loop_verdict()` classifies ok / heartbeat_age / no_heartbeat /
+   no_response, and `start_one()` restarts a proxy whose loop has been silent
+   for `RADIO_PROXY_STALL_SECONDS=420` (one restart per
+   `RADIO_PROXY_RESTART_COOLDOWN=600` per station). `health` now means
+   "recognising", not "answering HTTP", so `proxy_manager health` exits non-zero
+   on a stall. `stop_one()` signals the process group (guarded by
+   `getpgid(pid) == pid`) so a hung ffmpeg cannot outlive a restart, and treats
+   a zombie as dead instead of waiting out its full timeout.
+3. **Make silence visible**: every proxy log line carries `ts` (the freeze left
+   the log ending on an untimestamped `station_sample_start`, which is why
+   attributing it took longer than diagnosing it), and a detected stall is
+   recorded as a **bounded `proxy_crash`** event (started_at = last heartbeat,
+   ended_at = now), so the dashboard uptime panel shows the dead air instead of
+   a silent gap.
+
+**Important operational detail:** the net is live for the *running* fleet
+already, with no restart needed, because both heal paths (`radio-proxies-heal`
+timer every 2 min, `health_check.py` every 15 min) shell out to a fresh
+`proxy_manager` process, which loads the new file. The 8 running proxies still
+load the pre-fix `shazamio_proxy.py` in memory; a restart (staggered, via
+`proxy_manager restart`) is what applies the actual bounds. A frozen proxy is
+also self-migrating: when the net restarts it, it comes up on the new code.
+
+**Verification:** `tests/verify_capture_timeout.py` (10/10, incl. a live stream
+capture of exactly 64078 bytes) and `tests/verify_proxy_healing.py` (15/15, with
+a genuinely frozen proxy as the fixture). Both were also run as controls against
+the pre-fix behaviour: with bounds disabled the loop never starts a cycle and
+orphan ffmpeg processes accumulate, and with the net the same frozen proxy is
+restarted and cycles again. Full suite (7 files incl. the 5 frontend ones) green.
+
+**Measured impact of the underlying stall:** radio-darom alone lost ~4,000 min
+of coverage in the 7 days before this; kan-bet ~6,500 min; the fleet ~16,400 min.
+Those numbers include stream errors and backoff, not only freezes, but the
+freeze class is the one that never recovers on its own.

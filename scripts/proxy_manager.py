@@ -15,6 +15,7 @@ import signal
 import subprocess
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -36,12 +37,21 @@ except Exception:
     _event_db = None
 
 
-def _record_event(event_type: str, source: str, description: str = "") -> None:
-    """Record a system event in Supabase (best-effort, never crashes)."""
+def _record_event(event_type: str, source: str, description: str = "",
+                  started_at: str | None = None,
+                  ended_at: str | None = None) -> None:
+    """Record a system event in Supabase (best-effort, never crashes).
+
+    started_at/ended_at are what make a stall a *bounded outage*: the dashboard
+    uptime panel only renders OUTAGE_TYPES (proxy_crash, collector_crash, ...)
+    with an end time. A freeze recorded as a lifecycle event alone would never
+    appear as downtime anywhere (see generate_data.py OUTAGE_TYPES).
+    """
     if _event_db is None:
         return
     try:
-        _event_db.record_system_event(event_type, source, description)
+        _event_db.record_system_event(event_type, source, description,
+                                      started_at=started_at, ended_at=ended_at)
     except Exception:
         pass
 
@@ -54,6 +64,21 @@ def _record_event(event_type: str, source: str, description: str = "") -> None:
 # CLI, watchdog/health_check delegation) can set the same single truth.
 INTERVAL = int(os.environ.get("SHAZAMIO_INTERVAL",
                               os.environ.get("SHAZAMIO_INTERVAL_SECONDS", "60")))
+
+# A proxy whose station loop has stopped making progress is "frozen", not
+# "slow". The worst *legitimate* gap between heartbeats is one failed capture
+# plus a recognition timeout plus the error backoff cap (30 + 45 + 180 = 255s),
+# so a loop that has not touched its heartbeat for 420s is not coming back.
+# Why this exists: on 2026-09-15 the radio-darom loop froze in a stalled ffmpeg
+# read for 5h19m while every check reported healthy -- is_running() only proved
+# the PID existed, /health only proved HTTP answered, and the 2-minute heal
+# sweep kept saying "already_running". A process answering HTTP is not the same
+# as a process recognising anything.
+STALL_SECONDS = int(os.environ.get("RADIO_PROXY_STALL_SECONDS", "420"))
+# Restarting a frozen proxy is the only way back (it holds its port), but a
+# station that just came up must not be restarted again while its first cycle
+# is still in flight.
+RESTART_COOLDOWN_SECONDS = int(os.environ.get("RADIO_PROXY_RESTART_COOLDOWN", "600"))
 
 
 def _pid_file(slug: str) -> Path:
@@ -105,6 +130,115 @@ def is_running(slug: str) -> tuple[bool, int]:
     return True, pid
 
 
+def _port_for(slug: str) -> int | None:
+    for s in STATIONS_CONFIG:
+        if s["slug"] == slug:
+            return s["proxy_port"]
+    return None
+
+
+def _process_state(pid: int) -> str | None:
+    """Process state letter from /proc ("Z" for zombie), or None if gone.
+
+    A killed child stays visible to os.kill(pid, 0) until it is reaped, so a
+    liveness test that only uses signal 0 waits out its whole timeout on a
+    corpse.
+    """
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_text()
+    except OSError:
+        return None
+    try:
+        return stat.rsplit(")", 1)[-1].split()[0]
+    except IndexError:
+        return None
+
+
+def _spawn_time(slug: str) -> datetime | None:
+    """When this proxy's pid file was written, i.e. when it was last started."""
+    try:
+        return datetime.fromtimestamp(_pid_file(slug).stat().st_mtime, tz=timezone.utc)
+    except OSError:
+        return None
+
+
+def _seconds_since_spawn(slug: str) -> float | None:
+    """Seconds since this proxy's pid file was written (None if missing)."""
+    spawned = _spawn_time(slug)
+    return None if spawned is None else (datetime.now(timezone.utc) - spawned).total_seconds()
+
+
+def _fetch_current(port: int, timeout: float = 5.0) -> tuple[dict[str, Any] | None, str | None]:
+    """GET /current from a proxy. Returns (state, error); error is None on success."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(f"http://127.0.0.1:{port}/current")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read().decode()), None
+    except Exception as e:
+        return None, str(e)[:80]
+
+
+def _parse_ts(value: Any) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def _iso(moment: datetime | None) -> str | None:
+    return None if moment is None else moment.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _loop_verdict(slug: str, state: dict[str, Any] | None, error: str | None) -> dict[str, Any]:
+    """Decide whether the station loop is alive, from /current.
+
+    A proxy answering HTTP is not the same as a proxy recognising: a frozen
+    loop serves /health and /current forever. Only the heartbeat separates the
+    two, and that is the whole reason a 5h19m freeze went unnoticed.
+
+    last_loop_at is the current heartbeat. The older code has no such field and
+    only moves last_finished_at, which is enough to spot a freeze but cannot
+    tell "frozen" from "mid-backoff" -- hence the generous threshold.
+    """
+    if state is None:
+        return {"stale": True, "reason": "no_response", "age_seconds": None,
+                "error": error or "no response", "last_beat": None,
+                "spawned_at": _iso(_spawn_time(slug))}
+    beats = [_parse_ts(state.get(k))
+             for k in ("last_loop_at", "last_finished_at", "last_started_at")]
+    beats = [b for b in beats if b is not None]
+    if beats:
+        newest = max(beats)
+        age = (datetime.now(timezone.utc) - newest).total_seconds()
+        stale = age > STALL_SECONDS
+        return {"stale": stale, "reason": "heartbeat_age" if stale else "ok",
+                "age_seconds": round(age, 1), "last_beat": _iso(newest),
+                "spawned_at": _iso(_spawn_time(slug))}
+    # Never completed a cycle yet. Not stale until it has been up longer than the
+    # threshold (a fresh proxy is mid-startup-stagger, not frozen).
+    age = _seconds_since_spawn(slug)
+    if age is None:
+        return {"stale": False, "reason": "starting", "age_seconds": None,
+                "last_beat": None, "spawned_at": None}
+    stale = age > STALL_SECONDS
+    return {"stale": stale, "reason": "no_heartbeat" if stale else "starting",
+            "age_seconds": round(age, 1), "last_beat": None,
+            "spawned_at": _iso(_spawn_time(slug))}
+
+
+def loop_status(slug: str) -> dict[str, Any]:
+    """Is this proxy's station loop actually running, or only its HTTP server?"""
+    running, pid = is_running(slug)
+    port = _port_for(slug)
+    state, error = _fetch_current(port) if port else (None, "unknown station")
+    verdict = _loop_verdict(slug, state, error)
+    return {"slug": slug, "running": running, "pid": pid if running else None,
+            "port": port, **verdict}
+
+
 def start_one(slug: str) -> dict[str, Any]:
     """Start a single proxy by slug. Returns result dict."""
     ensure_dirs()
@@ -120,7 +254,31 @@ def start_one(slug: str) -> dict[str, Any]:
 
     running, pid = is_running(slug)
     if running:
-        return {"ok": True, "slug": slug, "pid": pid, "status": "already_running"}
+        verdict = loop_status(slug)
+        if not verdict["stale"]:
+            return {"ok": True, "slug": slug, "pid": pid, "status": "already_running"}
+        since = _seconds_since_spawn(slug)
+        if since is not None and since < RESTART_COOLDOWN_SECONDS:
+            # Just started (or already restarted for this): let it finish a cycle.
+            return {"ok": True, "slug": slug, "pid": pid, "status": "stale_cooldown",
+                    "loop": verdict, "seconds_since_spawn": round(since, 1)}
+        print(json.dumps({"event": "proxy_stale_restart", "slug": slug, "pid": pid,
+                          "reason": verdict["reason"],
+                          "heartbeat_age_seconds": verdict["age_seconds"],
+                          "threshold_seconds": STALL_SECONDS}, ensure_ascii=False), flush=True)
+        _record_event("proxy_stale_restart", slug,
+                      f"Proxy {slug} loop frozen ({verdict['reason']}, heartbeat "
+                      f"{verdict['age_seconds']}s old) - restarting")
+        # A bounded outage, not just a lifecycle note: the uptime panel renders
+        # OUTAGE_TYPES with an end time, so the frozen window becomes visible
+        # dead air instead of a silent gap in the tracks.
+        _record_event("proxy_crash", slug,
+                      f"station loop frozen ({verdict['reason']}, last heartbeat "
+                      f"{verdict['last_beat'] or 'never'}); auto-restarted",
+                      started_at=verdict.get("last_beat") or verdict.get("spawned_at"),
+                      ended_at=_iso(datetime.now(timezone.utc)))
+        stop_one(slug)
+        time.sleep(1)  # let the listening socket go before rebinding the port
 
     # Verify shazamio script exists
     if not SHAZAMIO_SCRIPT.exists():
@@ -174,11 +332,25 @@ def stop_one(slug: str, sig: int = signal.SIGTERM) -> dict[str, Any]:
         return {"ok": True, "slug": slug, "status": "not_running"}
 
     try:
-        os.kill(pid, sig)
+        # The proxy is spawned with start_new_session=True, so it leads its own
+        # process group and any ffmpeg child belongs to it. Signal the group so
+        # a hung capture cannot outlive the restart. Guard on getpgid(pid) == pid
+        # so a manually started proxy (whose group is the operator's shell) can
+        # never take the shell down with it.
+        try:
+            pgid = os.getpgid(pid)
+            if pgid == pid:
+                os.killpg(pgid, sig)
+            else:
+                os.kill(pid, sig)
+        except (ProcessLookupError, PermissionError):
+            os.kill(pid, sig)
         # Give it time to shut down
         for _ in range(10):
             try:
-                os.kill(pid, 0)
+                state = _process_state(pid)
+                if state is None or state == "Z":
+                    break
                 time.sleep(0.3)
             except ProcessLookupError:
                 break
@@ -198,16 +370,15 @@ def stop_one(slug: str, sig: int = signal.SIGTERM) -> dict[str, Any]:
 def status_one(slug: str) -> dict[str, Any]:
     """Get status of a single proxy."""
     running, pid = is_running(slug)
-    port = None
-    for s in STATIONS_CONFIG:
-        if s["slug"] == slug:
-            port = s["proxy_port"]
-            break
+    port = _port_for(slug)
+    state, error = _fetch_current(port) if port else (None, "unknown station")
     return {
         "slug": slug,
         "running": running,
         "pid": pid if running else None,
         "port": port,
+        "loop": _loop_verdict(slug, state, error),
+        "last_error": (state or {}).get("last_error"),
     }
 
 
@@ -260,18 +431,26 @@ def status_all() -> list[dict[str, Any]]:
 
 
 def health_all() -> dict[str, Any]:
-    """Check HTTP health of all proxies."""
-    import urllib.request
+    """Check every proxy is *recognising*, not merely answering HTTP.
+
+    "ok" means the station loop is making progress. A frozen proxy reports
+    ok=false with a reason, so `proxy_manager health` (and validate_deploy.sh,
+    and anything else reading it) fails on a stall instead of lying.
+    """
     results = {}
     for s in STATIONS_CONFIG:
-        port = s["proxy_port"]
-        try:
-            req = urllib.request.Request(f"http://127.0.0.1:{port}/health")
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                data = json.loads(resp.read().decode())
-                results[s["slug"]] = {"ok": True, **data}
-        except Exception as e:
-            results[s["slug"]] = {"ok": False, "error": str(e)[:80]}
+        slug, port = s["slug"], s["proxy_port"]
+        state, error = _fetch_current(port)
+        verdict = _loop_verdict(slug, state, error)
+        entry: dict[str, Any] = {"ok": not verdict["stale"], "service": "shazamio-proxy",
+                                 "loop": verdict}
+        if state is not None:
+            entry.update(state)
+        if verdict["stale"]:
+            entry["error"] = (f"loop frozen ({verdict['reason']}, "
+                              f"{verdict['age_seconds']}s since last heartbeat, "
+                              f"threshold {STALL_SECONDS}s)")
+        results[slug] = entry
     return results
 
 

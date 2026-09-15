@@ -276,3 +276,37 @@ publish four pages that render empty.
 Cron runs `~/.hermes/scripts/radio-watchdog.sh` every 5 minutes instead, so
 editing the `.py` version changes nothing at runtime. Its stale usage line was
 corrected. Either wire it (systemd or cron) or delete it; do not assume it runs.
+
+## 2026-09-15 - A frozen proxy is a bounded outage, and health means "recognising"
+
+**Decision:** a proxy's health is its **loop heartbeat**, not its PID or its HTTP
+port. `shazamio_proxy.py` publishes `last_loop_at` in `/current`;
+`proxy_manager._loop_verdict()` calls a proxy stale when the newest heartbeat is
+older than `RADIO_PROXY_STALL_SECONDS` (420s), and `start_one()` restarts it
+(no more than once per station per `RADIO_PROXY_RESTART_COOLDOWN` = 600s).
+
+**Why 420s:** the worst *legitimate* silence is one failed capture plus a
+recognition timeout plus the error-backoff cap: 30 + 45 + 180 = 255s. 420s
+leaves headroom for jitter without ever being slow enough to hide an outage of
+the size that motivated it (5h19m).
+
+**Why the heartbeat and not `last_finished_at`:** a completed cycle is not the
+same as progress. A proxy in a long backoff is working; a proxy blocked in an
+await is not, and only a heartbeat written *before* the blocking call separates
+them. Pre-fix proxies publish no `last_loop_at`, so the verdict falls back to
+`last_finished_at` and still catches them.
+
+**Why a bounded `proxy_crash` event:** `generate_data.py` renders only
+`OUTAGE_TYPES` with an `ended_at` in the uptime panel, so a stall recorded as a
+lifecycle note would be invisible to Bar. The event uses the last heartbeat as
+`started_at` and the restart as `ended_at`, which turns the freeze into real
+dead air on the dashboard.
+
+**Bounds, not one bound:** ffmpeg gets `-rw_timeout` (10s) *and* Python gets
+`CAPTURE_TIMEOUT` (30s) *and* the loop gets `CYCLE_TIMEOUT`. Either alone can be
+fooled: ffmpeg's option only covers a blocked socket, and a Python timeout on
+its own cannot reap the child unless it kills it explicitly.
+
+**Restart discipline unchanged:** the net restarts one station at a time and
+only when frozen; the fleet is never restarted at once (startup stagger inside
+the child is the safeguard against N simultaneous Shazam calls).

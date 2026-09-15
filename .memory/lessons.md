@@ -390,3 +390,80 @@ work.
 
 **Files/commands involved:** `git add -A scripts` in commit `5384955b`; corrected
 by `61c05beb` (un-track) plus the research-lane commit that follows it.
+
+## 2026-09-15 - Health checks that only prove "something is listening" lie
+
+**What went wrong:** radio-darom's station loop froze for 5h19m and three
+independent health checks reported it healthy the whole time. `is_running()`
+checked that a PID existed; `/health` returned a hardcoded `{"ok": true}`; the
+15-minute `health_check.py` opened a TCP connection and closed it again. The
+2-minute heal timer therefore logged `"status": "already_running"` for a proxy
+that had recognised nothing for hours, and `proxy_manager health` printed
+`all_healthy: true`. Nothing in the system was capable of noticing, so the only
+detector was Bar looking at the site.
+
+**Why:** each check answers "is the process up?", which is not the question that
+matters. For a daemon whose whole job is to keep producing output, the only
+honest signal is *progress*: a heartbeat that stops moving. Availability of the
+socket is a proxy metric, not a liveness one, and it is exactly the metric that
+stays green while the work is stopped.
+
+**Correct approach:** make the thing publish a heartbeat immediately before the
+call that can block, and make the supervisor's verdict depend on that heartbeat.
+Here: `last_loop_at` in `/current`, `_loop_verdict()` with an explicit stale
+threshold, and `start_one()` restarting on staleness instead of returning
+`already_running`. Then verify the supervisor against a *genuinely* frozen
+fixture, not a mock: `tests/verify_proxy_healing.py` runs a real proxy with its
+bounds disabled against a stalling server.
+
+**Files/commands involved:** `shazamio/shazamio_proxy.py` (`STATE["last_loop_at"]`,
+`log_event`), `scripts/proxy_manager.py` (`loop_status`, `_loop_verdict`,
+`start_one`), `tests/verify_proxy_healing.py`.
+
+## 2026-09-15 - ffmpeg's `-t` does not bound a stalled read, and `-rw_timeout` does
+
+**What went wrong:** `run_ffmpeg_capture()` recorded a 15s sample with `-t 15`
+and awaited `proc.communicate()` with no timeout. The flags look like bounds and
+are not: `-t` limits how much input is *read*, so when the stream accepted the
+TCP connection and sent nothing, ffmpeg blocked in `poll()` indefinitely. The
+Python side then blocked on it indefinitely. The loop did not crash, did not
+log, and did not recover; it waited 5h19m for the CDN to start sending again.
+
+**Why:** every timeout in the file was on Shazam (`RECOGNIZE_TIMEOUT=45`) and
+none on the capture, because the capture "finishes in 15 seconds". A layered
+lesson: the same reasoning that added a Shazam timeout in July was never applied
+to ffmpeg, which is a separate process whose stall looks identical to a slow
+network.
+
+**Correct approach:** bound the child process *and* the await, and kill the
+child explicitly (`finally` on cancellation too, or a restart orphans it).
+`-rw_timeout 10000000` makes ffmpeg fail with "Connection timed out" in ~5s
+instead of never; `CAPTURE_TIMEOUT` covers everything else. Verified with a
+local server that accepts and goes silent, which reproduces the freeze
+deterministically in 3-6s instead of needing another 5-hour outage.
+
+**Files/commands involved:** `shazamio/shazamio_proxy.py::run_ffmpeg_capture`,
+`tests/verify_capture_timeout.py`; reproduction:
+`python3 -c "socket server that accepts and never sends"` then run the real
+function against it with `SHAZAMIO_FFMPEG_RW_TIMEOUT` raised out of the way.
+
+## 2026-09-15 - A log line without a timestamp costs more than it saves
+
+**What went wrong:** the darom freeze left `logs/proxy-radio-darom.log` ending on
+a bare `{"event": "station_sample_start"}` line with no time on it. Working out
+*when* the loop had stopped meant reasoning from process start times, `ps`
+elapsed times and state files, and the answer ("5h19m ago") is what turned a
+"missing track" report into a real incident. Diagnosis of *when* took comparable
+time to diagnosis of *why*.
+
+**Why:** the proxy's JSON events carried no `ts`. `recognized_at` existed only on
+completed cycles, so the very line that marked the moment of failure was the one
+line with no time on it.
+
+**Correct approach:** stamp every emitted event with UTC at emission
+(`log_event()` in `shazamio_proxy.py`). Cheap, and it makes gap analysis a
+one-liner instead of an excavation. Same reasoning as the `AGENTS.md` rule about
+never truncating that log: the record is only useful if it can be placed in time.
+
+**Files/commands involved:** `shazamio/shazamio_proxy.py::log_event`,
+`logs/proxy-*.log`.
