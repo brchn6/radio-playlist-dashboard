@@ -467,3 +467,25 @@ never truncating that log: the record is only useful if it can be placed in time
 
 **Files/commands involved:** `shazamio/shazamio_proxy.py::log_event`,
 `logs/proxy-*.log`.
+
+## 2026-09-15 - The UI audit reads CSS class names as substrings, so concatenated class names look dead
+
+**What went wrong:** the new `secTag(id, variant)` helper built its class with
+`'sec-tag' + (variant ? ' sec-tag-' + variant : '')`, and `ui_audit.py`'s
+dead-CSS check immediately reported `sec-tag-inline` as "never used outside the
+style block" - even though the page uses it at runtime. `sec-tag-flow` escaped
+the same fate only because a static `class="sec-tag sec-tag-flow"` happened to
+exist in the markup.
+
+**Why:** that check is a substring search (`c not in outside_css`), not a parser.
+It cannot follow string concatenation. A class name that exists only as a runtime
+concatenation is therefore indistinguishable from dead CSS - and the honest fix
+is to make the source say what it means, not to weaken the audit.
+
+**Correct approach:** spell the variant class names out in the code
+(`variant === 'flow' ? 'sec-tag sec-tag-flow' : ...`). The audit can then see
+them, a typo cannot invent a class that no rule defines, and the check keeps its
+zero-warning posture. Same reasoning applies to any generated class name.
+
+**Files/commands involved:** `docs/index.html::secTag`, `tests/ui_audit.py`
+(dead-CSS section), `python3 tests/ui_audit.py`.

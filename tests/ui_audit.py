@@ -263,6 +263,27 @@ for sel in INTERACTIVE:
     elif px < 44:
         warn(f"{sel}: {px}px (fine for AA, below the 44px comfort target)")
 
+# ── 5b. small affordances: WCAG 2.5.8 AA (24px), not the 44px comfort target ─
+# The section tags are labels for humans and agents, not primary controls, so
+# they are held to the AA minimum instead of the comfort target above. They are
+# still enforced: an unverifiable hit area is a failure here, not a warning.
+SMALL_TARGETS = ['.sec-tag']
+for sel in SMALL_TARGETS:
+    found = []
+    for rule in re.finditer(r'([^{}]+)\{([^{}]*)\}', css):
+        sels, body = rule.group(1), rule.group(2)
+        if sels.strip().startswith('@'):
+            continue
+        parts = [x.strip() for x in sels.split(',')]
+        if any(re.search(r'(^|[\s>+~])' + re.escape(sel) + r'(:|$|[\s>+~.\[])', part) for part in parts):
+            found += [int(x) for x in re.findall(r'(?:min-height|height)\s*:\s*(\d+)px', body)]
+    if not found:
+        fail(f"{sel}: no explicit min-height, the 24px AA target is unverifiable")
+    elif max(found) < 24:
+        fail(f"{sel}: {max(found)}px is below the WCAG 2.5.8 AA minimum of 24px")
+    else:
+        note(f"{sel}: {max(found)}px target (2.5.8 AA minimum is 24px)")
+
 # ── 6. dead CSS ──────────────────────────────────────────────────────
 css_classes = set(re.findall(r'\.([a-zA-Z][\w-]+)', css))
 dead = sorted(c for c in css_classes if c not in outside_css)

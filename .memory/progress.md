@@ -617,3 +617,48 @@ restarted and cycles again. Full suite (7 files incl. the 5 frontend ones) green
 of coverage in the 7 days before this; kan-bet ~6,500 min; the fleet ~16,400 min.
 Those numbers include stream errors and backoff, not only freezes, but the
 freeze class is the one that never recovers on its own.
+
+## 2026-09-15 - Section tags: a pointing vocabulary for this page
+
+**Branch:** `feat/section-tags` (from `main` at `70fb8e9b`), committed, NOT
+pushed. Frontend only: no `publish.py` run and no head1 data work needed.
+
+**Asked for by Bar:** "add to the dashboard at each section an English tag, so I
+could point you to a specific section for work", `subject:thing` structure, upper
+left of each part. Chose **option C**: always visible (public) plus click-to-copy.
+
+**Built:**
+
+| Piece | Where |
+|---|---|
+| Tag markup + copy + toast | `docs/index.html` (`secTag()`, `copySectionTag()`, `legacyCopy()`, `showToast()`, one delegated click listener) |
+| Placement CSS, three variants | `docs/index.html` `.sec-tag` (corner), `.sec-tag-flow` (own line, flush left), `.sec-tag-inline` (rides a control row), plus `.sec-toast` |
+| The registry (19 tags) | `docs/SECTIONS.md` |
+| The guard | `tests/verify_section_tags.js` (17 checks) |
+| Small-target check (24px AA) | `tests/ui_audit.py`, new `SMALL_TARGETS` list |
+
+**19 tags:** `shell:header`, `shell:tabs`, `shell:stations`, `shell:footer`,
+`now:stations`, `now:station-<slug>` (generated, one per station card),
+`insights:top-songs`, `insights:top-artists`, `insights:cross-station`,
+`insights:history`, `insights:history-list`, `deep:bpm`, `deep:keys`,
+`deep:transitions`, `deep:transitions-results`, `deep:transitions-chain`,
+`deep:clusters`, `deep:redundancy`, `deep:uptime`.
+
+**Design decisions worth keeping:** tags are real `<button>`s (keyboard
+focusable, `min-height:24px` = WCAG 2.5.8 AA); ids are stable and documented so
+"fix `deep:redundancy`" resolves without a grep; at <= 768px every tag becomes a
+flow line because a corner tag can touch the longest Hebrew title
+("🔄 חקר מעברים - Transition Explorer"), above that it costs no vertical space;
+`--font-num` (existing token) does the monospace, no new font token.
+
+**Verified:** JS syntax check; `ui_audit.py` 41 passed / 0 warnings / 0 failures;
+`verify_nobulk.js`, `verify_drilldown.js`, `verify_theme.js` (both OS scenarios)
+pass unchanged; `verify_section_tags.js` 17/17. Red-checked: renaming a tag in a
+copy fails the harness on both sides ("every documented tag exists in the page" +
+"every tag in the page is documented"), and shrinking the tag to 12px fails the
+audit. Not verified: how it *looks* - head1 has no browser, so the visual pass is
+Bar's.
+
+**Next:** push approval (Pages deploys the frontend on push, ~30s), then Bar
+looks at it on his phone. The Tailscale preview on head1 (port 8099) serves the
+file straight from disk, so it needs no restart.

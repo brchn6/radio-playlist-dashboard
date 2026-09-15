@@ -496,10 +496,40 @@
     .pills-sticky{top:52px;padding:var(--sp-2) 0;background:var(--bg)}
 
     /* ── Cards: air, softer edges, quieter borders ── */
-    .card{padding:var(--sp-5);margin-bottom:var(--sp-4);border-radius:var(--radius);border-color:var(--border-soft);box-shadow:var(--shadow-sm)}
+    .card{position:relative;padding:var(--sp-5);margin-bottom:var(--sp-4);border-radius:var(--radius);border-color:var(--border-soft);box-shadow:var(--shadow-sm)}
     .section-header{margin-bottom:var(--sp-4)}
     .section-title{font-size:var(--fs-lg);font-weight:650;letter-spacing:-.2px;gap:var(--sp-2)}
     .section-sub{font-size:var(--fs-sm);margin-top:var(--sp-1);line-height:1.5}
+
+    /* ── Section tags ─────────────────────────────────────────────────
+       Every labelled region carries a stable English id in "subject:thing"
+       form, shown in its upper-left corner, so a human can point an agent at
+       one exact block ("fix deep:redundancy") instead of describing it.
+       Clicking one copies its id. Inventory: docs/SECTIONS.md, asserted by
+       tests/verify_section_tags.js, so a tag cannot silently disappear. */
+    .sec-tag{position:absolute;top:var(--sp-2);left:var(--sp-2);z-index:2;
+      display:inline-flex;align-items:center;min-height:24px;
+      padding:0 2px;background:none;border:0;cursor:pointer;
+      font-family:var(--font-num);font-size:var(--fs-xs);line-height:1;
+      color:var(--muted);direction:ltr;unicode-bidi:isolate;opacity:.75;
+      touch-action:manipulation;
+      transition:color var(--transition),opacity var(--transition)}
+    .sec-tag:hover,.sec-tag:focus-visible{color:var(--fg);opacity:1}
+    /* flow: the tag takes a line of its own, flush to the visual left edge.
+       Physical margins, not logical ones, because the page is RTL: an auto
+       START margin would push the box right, which is where the content is. */
+    .sec-tag-flow{position:static;display:flex;width:max-content;margin:0 auto var(--sp-1) 0}
+    /* inline: rides along a control row (the station pills) */
+    .sec-tag-inline{position:static;margin:0;padding:0}
+    /* Confirmation chip for click-to-copy. Inverted fg/card, so it needs no
+       per-theme colours: it is legible in both by construction. */
+    .sec-toast{position:fixed;left:50%;bottom:var(--sp-6);z-index:2000;
+      transform:translate(-50%,8px);opacity:0;pointer-events:none;
+      padding:9px var(--sp-4);border-radius:var(--radius-pill);
+      background:var(--fg);color:var(--card);box-shadow:var(--shadow-lg);
+      font-family:var(--font-num);font-size:var(--fs-xs);direction:ltr;
+      transition:opacity var(--transition),transform var(--transition)}
+    .sec-toast.show{opacity:1;transform:translate(-50%,0)}
 
     /* ── Station pills ── */
     .station-pills{gap:var(--sp-2);margin-bottom:var(--sp-4)}
@@ -650,7 +680,7 @@
     .uptime-outage-desc{font-size:var(--fs-xs)}
 
     /* ── Footer ── */
-    footer{margin-top:var(--sp-6);padding:var(--sp-5) 0}
+    footer{position:relative;margin-top:var(--sp-6);padding:var(--sp-5) 0}
     .footer-stats{font-size:var(--fs-sm);line-height:1.7}
 
     /* ── Loading screen ── */
@@ -681,6 +711,11 @@
       .station-pills::-webkit-scrollbar{display:none}
       .pill{flex-shrink:0;scroll-snap-align:start}
       .top-trend{min-width:40px}
+      /* Below a comfortable desktop width a corner tag can touch the longest
+         Hebrew section title ("🔄 חקר מעברים - Transition Explorer"), so every
+         tag takes its own line, flush left, above its region. */
+      .sec-tag{position:static;display:flex;width:max-content;margin:0 auto var(--sp-1) 0;opacity:.9}
+      .sec-tag-inline{display:inline-flex;width:auto;margin:0}
     }
     @media (max-width:480px){
       /* Touch-sized viewport: the compact controls used on desktop get a full
@@ -718,6 +753,11 @@
 </div>
 <div class="container">
 
+<!-- Section tags: stable English ids ("subject:thing") so a human can point an
+     agent at one exact block of this page. Click one to copy its id.
+     Inventory: docs/SECTIONS.md, asserted by tests/verify_section_tags.js. -->
+<button type="button" class="sec-tag sec-tag-flow" data-sec="shell:header" title="shell:header - click to copy">shell:header</button>
+
 <header>
   <div class="header-left">
     <span class="status-dot off" id="statusDot"></span>
@@ -728,6 +768,8 @@
     <button class="theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="החלף מצב תצוגה" title="מצב תצוגה">🌙</button>
   </div>
 </header>
+
+<button type="button" class="sec-tag sec-tag-flow" data-sec="shell:tabs" title="shell:tabs - click to copy">shell:tabs</button>
 
 <div class="tabs" id="tabBar">
   <button class="tab-btn active" data-tab="np">🎵 עכשיו</button>
@@ -740,6 +782,7 @@
 
 <!-- ═══ Tab 1: Now Playing ═══ -->
 <div class="tab-content active" id="tab-np">
+  <button type="button" class="sec-tag sec-tag-flow" data-sec="now:stations" title="now:stations - click to copy">now:stations</button>
   <div class="np-grid" id="npGrid">
     <div class="skeleton" style="height:120px"></div>
     <div class="skeleton" style="height:120px"></div>
@@ -753,6 +796,7 @@
 
   <!-- Top Songs -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="insights:top-songs" title="insights:top-songs - click to copy">insights:top-songs</button>
     <div class="section-header">
       <div class="section-title">🏆 שירים מובילים</div>
       <div class="section-sub">השירים שמושמעים הכי הרבה — עכשיו, היום, השבוע, הכל</div>
@@ -763,6 +807,7 @@
 
   <!-- Top Artists -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="insights:top-artists" title="insights:top-artists - click to copy">insights:top-artists</button>
     <div class="section-header">
       <div class="section-title">🎤 אמנים מובילים</div>
       <div class="section-sub">האמנים שהתחנות לא מפסיקות לנגן</div>
@@ -773,6 +818,7 @@
 
   <!-- Cross-Station -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="insights:cross-station" title="insights:cross-station - click to copy">insights:cross-station</button>
     <div class="section-header">
       <div class="section-title">🔄 חוצי תחנות</div>
       <div class="section-sub">שירים שבורחים מתחנה אחת ומתנגנים בכמה תחנות</div>
@@ -782,6 +828,7 @@
 
   <!-- History -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="insights:history" title="insights:history - click to copy">insights:history</button>
     <div class="section-header">
       <div class="section-title">📋 היסטוריה</div>
       <div class="section-sub">חיפוש בכל השירים שזוהו אי פעם</div>
@@ -791,6 +838,7 @@
       <button class="hist-btn" id="histDedupBtn" onclick="toggleHistDedup()">✓ ייחודי</button>
       <button class="hist-btn" id="histReverseBtn" onclick="toggleHistReverse()">↓ חדש→ישן</button>
     </div>
+    <button type="button" class="sec-tag sec-tag-flow" data-sec="insights:history-list" title="insights:history-list - click to copy">insights:history-list</button>
     <div id="historyList"></div>
     <div class="hist-more"><button class="hist-btn" id="histMoreBtn" style="display:none" onclick="loadMoreHistory()">הצג עוד</button></div>
   </div>
@@ -801,6 +849,7 @@
 
   <!-- BPM Flow -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:bpm" title="deep:bpm - click to copy">deep:bpm</button>
     <div class="section-header">
       <div class="section-title">🎵 זרימת BPM</div>
       <div class="section-sub">איך הקצב של כל תחנה משתנה לאורך היום</div>
@@ -812,6 +861,7 @@
 
   <!-- Key Distribution -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:keys" title="deep:keys - click to copy">deep:keys</button>
     <div class="section-header">
       <div class="section-title">🎼 התפלגות סולמות</div>
       <div class="section-sub">הטביעה המוזיקלית של כל תחנה — שמח (מז׳ור) או עגום (מינור)?</div>
@@ -826,16 +876,19 @@
 
   <!-- Song Transitions -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:transitions" title="deep:transitions - click to copy">deep:transitions</button>
     <div class="section-header">
       <div class="section-title">🔄 חקר מעברים — Transition Explorer</div>
       <div class="section-sub">בנה פלייליסט לפי ההיגיון של תחנת הרדיו — אחרי איזה שיר בא איזה שיר</div>
     </div>
     <div id="transControls"></div>
+    <button type="button" class="sec-tag sec-tag-flow" data-sec="deep:transitions-results" title="deep:transitions-results - click to copy">deep:transitions-results</button>
     <div id="transResults"></div>
   </div>
 
   <!-- Clusters -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:clusters" title="deep:clusters - click to copy">deep:clusters</button>
     <div class="section-header">
       <div class="section-title">🔗 שירים שמתנגנים יחד</div>
       <div class="section-sub">שירים שנמצאים יחד באותו פלייליסט — לפי קרבה בזמן ובתחנה</div>
@@ -849,6 +902,7 @@
 
   <!-- Redundancy -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:redundancy" title="deep:redundancy - click to copy">deep:redundancy</button>
     <div class="section-header">
       <div class="section-title">🔁 חזרתיות</div>
       <div class="section-sub">כמה כל תחנה חוזרת על עצמה? פחות = יותר גיוון</div>
@@ -858,6 +912,7 @@
 
   <!-- Uptime -->
   <div class="card">
+    <button type="button" class="sec-tag" data-sec="deep:uptime" title="deep:uptime - click to copy">deep:uptime</button>
     <div class="section-header">
       <div class="section-title">⏱ תפעול המערכת</div>
       <div class="section-sub">זמינות ומצב הקולטורים</div>
@@ -866,7 +921,10 @@
   </div>
 </div>
 
+<div class="sec-toast" id="secToast" role="status" aria-live="polite"></div>
+
 <footer>
+  <button type="button" class="sec-tag" data-sec="shell:footer" title="shell:footer - click to copy">shell:footer</button>
   <div class="footer-stats" id="footerStats"></div>
 </footer>
 
@@ -1059,6 +1117,61 @@ const STATION_STREAMS = {
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function escAttr(s) { return esc(String(s)).replace(/'/g, '&#39;').replace(/"/g, '&quot;'); }
 function spotifySearchUrl(a, t) { return 'https://open.spotify.com/search/' + encodeURIComponent(((a || '') + ' ' + (t || '')).trim()); }
+
+/* ── Section tags ──────────────────────────────────────────────────────
+   Every labelled region carries a stable English id in "subject:thing" form,
+   shown in its upper-left corner. They exist so a human can point an agent at
+   one exact block of this page ("fix deep:redundancy") instead of describing
+   it in prose. Clicking one copies its id.
+   The inventory lives in docs/SECTIONS.md and is asserted by
+   tests/verify_section_tags.js, so a tag cannot silently disappear.
+   variant: '' = corner of the region, 'flow' = own line flush left,
+            'inline' = rides along a control row. */
+function secTag(id, variant) {
+  // Variant classes are spelled out rather than concatenated, so the UI audit's
+  // dead-CSS check can see them and a typo cannot invent a class.
+  const cls = variant === 'flow' ? 'sec-tag sec-tag-flow'
+    : variant === 'inline' ? 'sec-tag sec-tag-inline'
+    : 'sec-tag';
+  return '<button type="button" class="' + cls + '" data-sec="' + id + '" title="' + id + ' - click to copy">' + id + '</button>';
+}
+function copySectionTag(id) {
+  const done = () => showToast('\u2713 ' + id);
+  // writeText needs a secure context: over plain http (the LAN and Tailscale
+  // previews) navigator.clipboard is undefined, hence the fallback.
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(id).then(done).catch(() => { if (legacyCopy(id)) done(); });
+    return;
+  }
+  if (legacyCopy(id)) done();
+}
+function legacyCopy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    const copied = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return copied;
+  } catch (e) { return false; }
+}
+let secToastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('secToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(secToastTimer);
+  secToastTimer = setTimeout(() => el.classList.remove('show'), 1500);
+}
+document.addEventListener('click', e => {
+  const t = e.target && e.target.closest && e.target.closest('.sec-tag');
+  if (t && t.dataset.sec) copySectionTag(t.dataset.sec);
+});
 function loadJSON(u) { return fetch(BASE + u, { signal: AbortSignal.timeout(25000) }).then(r => r.ok ? r.json() : null).catch(() => null); }
 function stationBySlug(slug) { return stations.find(s => s.slug === slug); }
 function color(slug) { const s = stationBySlug(slug); return s ? s.color : ACCENT; }
@@ -1198,7 +1311,7 @@ document.getElementById('tabBar').onclick = e => {
 /* ── Station Pills ── */
 function renderPills() {
   const el = document.getElementById('pills');
-  let h = '<button class="pill' + (!activeStation ? ' active' : '') + '" data-slug="">הכל</button>';
+  let h = secTag('shell:stations', 'inline') + '<button class="pill' + (!activeStation ? ' active' : '') + '" data-slug="">הכל</button>';
   stations.forEach(s => {
     h += '<button class="pill' + (activeStation === s.slug ? ' active' : '') + '" data-slug="' + s.slug + '"><span class="dot-sm" style="background:' + s.color + '"></span>' + esc(s.name) + '</button>';
   });
@@ -1259,6 +1372,7 @@ function renderNowPlaying() {
     const stream = STATION_STREAMS[s.slug];
 
     h += '<div class="np-card" style="background:linear-gradient(180deg,' + col + '15,var(--card));border-color:' + col + '40">';
+    h += secTag('now:station-' + s.slug);
     h += '<div class="np-station" style="color:' + col + '"><span class="radio-icon">📻</span> ' + esc(s.name) + '</div>';
 
     if (c) {
@@ -2107,6 +2221,7 @@ function renderTransitionExplorer() {
   h += '</div>';
 
   // Outgoing transitions section
+  h += secTag('deep:transitions-chain', 'flow');
   h += '<div class="explorer-section-title">\ud83d\udccd \u05dc\u05d0\u05df \u05de\u05db\u05d0\u05df?</div>';
 
   const allOutgoing = [];

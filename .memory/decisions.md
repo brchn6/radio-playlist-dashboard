@@ -310,3 +310,32 @@ its own cannot reap the child unless it kills it explicitly.
 **Restart discipline unchanged:** the net restarts one station at a time and
 only when frozen; the fleet is never restarted at once (startup stagger inside
 the child is the safeguard against N simultaneous Shazam calls).
+
+## 2026-09-15 - Section tags are the pointing vocabulary (public, documented, enforced)
+
+**Decision (Bar):** every labelled region of the dashboard carries a visible
+English id in `subject:thing` form in its upper-left corner, and clicking one
+copies it. The tags are **always visible on the public site** (option C, chosen
+over a `?labels=1`-gated variant) and are registered in `docs/SECTIONS.md`.
+
+**Rationale:** the whole point is that a human can point an agent at one exact
+block from wherever he is, including his phone. A label hidden behind a URL flag
+is a label he will not use. The page is a public tool, not marketing, so a small
+muted monospace id costs nothing socially and buys precise delegation.
+
+**Enforcement, not convention:** `tests/verify_section_tags.js` reconciles the
+registry against the page in both directions, checks the `subject:thing` shape,
+uniqueness, and that each card tag still sits on the card it names; it also
+drives the real `secTag()`, `renderPills()`, `renderNowPlaying()` and the real
+click handler (including the insecure-context copy fallback, which matters
+because the LAN/Tailscale previews are plain http). Adding a region without a tag
+fails the suite, so the vocabulary cannot rot silently.
+
+**Tag ids are stable.** If a UI label is renamed in Hebrew or English, the id
+stays: an id that moves is an id nobody can rely on.
+
+**Accessibility choices, deliberate:** tags are `<button type="button">` with a
+24px minimum target (WCAG 2.5.8 AA) rather than the 44px comfort target used for
+primary controls, which is why `ui_audit.py` got a separate `SMALL_TARGETS` list
+instead of being added to `INTERACTIVE`. Below 768px every tag becomes a flow
+line so it cannot overlap a Hebrew section title.
