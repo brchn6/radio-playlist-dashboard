@@ -296,7 +296,7 @@ deleted `loadAllHistory`/`historyLoadPromise`/`historyLoadingAll`/`fullyLoaded`
 (all dead once the auto-trigger went); `renderHistory` now states the scope of a
 partial result via `.hist-partial-note`. 27 insertions, 47 deletions.
 
-**Verified:** `/tmp/verify_nobulk.js` drives the real functions. Search: 0 shards
+**Verified:** `tests/verify_nobulk.js` drives the real functions. Search: 0 shards
 fetched (main: 3/3 in fixture), match found, partial note rendered, 2 renders.
 Drill-down: 0 shards, 2 renders. "הצג עוד": exactly 1 older day, its track
 rendered. No loop anywhere (6 total renders). JS syntax check passes.
@@ -430,12 +430,12 @@ padding, 20px card padding, 44px hit areas on touch viewports, breakpoints at
 Removed 16 provably-dead CSS classes and 5 unused tokens.
 
 **Verified (no browser on this host, so every check is source-level):**
-`/tmp/audit_ui.py` - 38 checks, 0 warnings, 0 failures: every var() defined, type
+`tests/ui_audit.py` - 40 checks, 0 warnings, 0 failures: every var() defined, type
 floor (CSS, canvas AND inline), contrast for both themes including tinted pairs
 and accent fills, breakpoints, hit areas, dead CSS, brace balance.
-`/tmp/verify_theme.js` - toggle/persistence/explicit-beats-OS/palette refresh and
+`tests/verify_theme.js` - toggle/persistence/explicit-beats-OS/palette refresh and
 4.5:1 for all 8 station colours in both themes, in system-light and system-dark.
-`/tmp/verify_nobulk.js`, `/tmp/verify_drilldown.js` - no regressions.
+`tests/verify_nobulk.js`, `tests/verify_drilldown.js` - no regressions.
 
 **Review #1 (pre-deploy) found 6 issues, all fixed:** light `--warn` on
 `--warn-soft` was 4.39:1 (darkened to #92400e); `.top-spotify:hover` dropped to
@@ -450,4 +450,83 @@ and the audit now fails on any raw font-size outside the stylesheet.
 
 **Bar to do:** look at it on his phone. Both the public URL and the Tailscale
 preview (`http://100.93.8.110:8099/`) serve the redesigned version. The theme
+follows the phone's system setting unless he taps the sun/moon in the header.
+
+## 2026-09-14 - END OF SESSION STATE (read this first next time)
+
+Everything below was done in one session. `main` is deployed, all suites pass,
+the collector was never stopped.
+
+### Shipped (all on `main`, all deployed)
+
+| Change | Commit | Verified by |
+|---|---|---|
+| תובנות freeze fixed (async early return -> resolved promise -> microtask loop) | `bf7cc37b` | bounded renders, event loop alive |
+| History search no longer bulk-downloads; partial scope stated | `34d3f896` | 0 shards fetched on search (was 46) |
+| Early history backfilled: **18 days, 35,670 rows** restored | `2ef25337` | dry run now reports 0 to insert |
+| Drill-down keeps its filter (banner + time window) | `1450a2d2` | banner + 1-of-2 plays listed |
+| Mirror repaired: 448 duplicate ids removed, 221 rows restored | `5384955b` | mirror == DB exactly |
+| UI redesign: light-first, theme toggle, 12px type floor | `a446f503` + 2 review fixes | see below |
+
+### Verification lives in the repo now
+
+```bash
+python3 tests/ui_audit.py && \
+node tests/verify_nobulk.js && \
+node tests/verify_drilldown.js && \
+node tests/verify_theme.js "" system-light && \
+node tests/verify_theme.js "" system-dark && echo ALL SUITES PASSED
+```
+
+`tests/README.md` documents every check, how to run them against the DEPLOYED
+file, and what they cannot see (anything visual). Current state: audit **40
+passed / 0 warnings / 0 failures**; all JS suites pass in both theme scenarios.
+
+These were previously in `/tmp` and were lost when `/tmp` was cleaned - see
+`.memory/lessons.md` 2026-09-14 ("Verification tooling in /tmp evaporated").
+
+### Facts worth not re-deriving
+
+- **The project started 2026-07-13**, not 07-31 and not June. 07-31 was the old
+  45-day retention boundary. Earliest row: `2026-07-13T13:27:34Z`. No June data
+  ever existed in this system (checked repo, git history, mirror, Postgres,
+  bucket).
+- **2026-07-24 has zero tracks** and cannot be restored; the collector was down.
+- DB and mirror now agree exactly (~135.7k tracks and climbing), and
+  `RETENTION_DAYS=36500` means nothing prunes any more.
+- The dataset is public **by Bar's decision** - see `.memory/decisions.md`
+  2026-09-14.
+
+### Open items (flagged, deliberately not fixed)
+
+1. **`RETENTION_DAYS` is hardcoded in three places**:
+   `deploy/systemd/radio-updater.service` (env), `prune_mirror()` default and
+   `sync_mirror()` default in `generate_data.py`. Changing retention means
+   editing three files; a single source would be better. From the first review of
+   this session, still open.
+2. **`_coverage_pct()` in `generate_data.py` uses `db._query()`** (a private
+   method) from a nested closure inside the already-long `generate_all()`. Works,
+   but it is the kind of thing that makes `generate_all` hard to test. Same
+   review, still open.
+3. **Daily-gated aggregates will grow.** `clusters.json` and
+   `transition_map.json` (9.5 MB) are rebuilt at most every 24h, so they were
+   still built from the 46-day set when the 63-day backfill landed. Expect the
+   Deep tab payload, and the next publish, to be larger. Measure rather than be
+   surprised.
+4. **`data/tracks_mirror.jsonl.bak-20260914-154936`** (64.9 MB) is the
+   pre-repair mirror. Safe to delete once the numbers have been trusted for a
+   day; nothing reads it.
+5. **Untracked files in the repo root** from an earlier playlist-selector session
+   (`docs/playlist-explorer.html`, `docs/*-graph*.json`, `scripts/playlist_selector.py`,
+   `scripts/markov_analysis.py`, and friends, ~25 MB of data). They 404 on the
+   live site because they are not committed. Either commit, move, or delete -
+   Bar's call.
+6. **Two Tailscale preview servers** are running on head1 for phone testing
+   (`python3 -m http.server` on 8099 and 8501, serving `docs/`). They are
+   harmless; stop with `pkill -f "http.server 8099"` when done.
+
+### Bar to do
+
+Look at the redesign on his phone and say what to tune. He likes it as of
+2026-09-14, and the token system makes tuning a one-value change. The theme
 follows the phone's system setting unless he taps the sun/moon in the header.

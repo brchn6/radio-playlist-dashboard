@@ -230,10 +230,10 @@ not pending. A microtask-only loop is worse than a slow path: it starves
 macrotasks too, so the network/flag change you are waiting for can never arrive.
 
 **Files/commands involved:** `docs/index.html` (`loadAllHistory`,
-`renderHistory`, `onTopRowClick`); repro harness `/tmp/repro_freeze.js` and
-`/tmp/verify_fix.js` (extract the inline `<script>`, run in a Node VM with a DOM
-stub; `esc()` needs a `createElement().textContent` -> `innerHTML` stub or all
-text renders empty).
+`renderHistory`, `onTopRowClick`); the equivalent harnesses now live in the
+repo as `tests/verify_nobulk.js` and `tests/verify_drilldown.js` (they extract
+the inline `<script>`, run it in a Node VM with a DOM stub; `esc()` needs a
+`createElement().textContent` -> `innerHTML` stub or all text renders empty).
 
 ## 2026-09-14 - "Search everything" implemented as "download everything", with the truncation silent
 
@@ -262,7 +262,7 @@ that scales with it. "Keep all history" silently converted a 10-day download int
 an unbounded one. And a partial result must always say it is partial.
 
 **Files/commands involved:** `docs/index.html` (`renderHistory`, deleted
-`loadAllHistory`); verified by `/tmp/verify_nobulk.js`, which asserts a search
+`loadAllHistory`); verified by `tests/verify_nobulk.js`, which asserts a search
 fetches ZERO day shards (main fetched 3/3 in the fixture, 46/46 in production)
 and that the partial note renders.
 
@@ -332,5 +332,34 @@ requirement was 4.5:1) - each time the failure looked like an app bug until
 checked. Verify the verifier before believing it.
 
 **Files/commands involved:** `docs/index.html` (inline styles in the HTML body and
-`<script>`); `python3 /tmp/audit_ui.py` (sections 2b/2c: canvas fonts, inline
-fonts), `node /tmp/verify_theme.js`.
+`<script>`); `python3 tests/ui_audit.py` (sections 2b/2c: canvas fonts, inline
+fonts), `node tests/verify_theme.js`.
+
+## 2026-09-14 - Verification tooling in /tmp evaporated, invalidating the memory that referenced it
+
+**What went wrong:** the whole session's verification harnesses (`audit_ui.py`,
+`verify_nobulk.js`, `verify_drilldown.js`, `verify_theme.js`) were written to
+`/tmp`, and `.memory/progress.md` and `.memory/lessons.md` cited those paths as
+the evidence for shipped work. Mid-session `/tmp` was cleaned and every file was
+gone - the documented commands no longer ran. Nothing in the repo could reproduce
+the verification that justified four merged commits.
+
+**Why:** `/tmp` was treated as scratch space for something that was actually a
+deliverable. A check that cannot be re-run is not evidence, it is a claim. The
+documentation rule ("a human who never saw the session can execute it from the
+docs alone") applies to verification scripts exactly as it applies to the code
+they verify.
+
+**Correct approach:** harnesses live in the repo under `tests/`, with a README of
+exact commands, and memory references those paths. They also take an optional
+path argument so they can audit the deployed artifact, and exit non-zero so they
+compose with `&&`. All four were rewritten into `tests/` and re-run to confirm
+they pass.
+
+**Lesson:** anything cited as evidence must live somewhere durable. If a future
+session cannot re-run the check, treat the claim as unverified. Applies to
+harnesses, fixtures, and measurement scripts alike.
+
+**Files/commands involved:** `tests/README.md` (the runbook),
+`tests/ui_audit.py`, `tests/verify_nobulk.js`, `tests/verify_drilldown.js`,
+`tests/verify_theme.js`.

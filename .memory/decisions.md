@@ -178,3 +178,70 @@ approach targets exactly this problem set: a dense data UI that still reads calm
   mirrored as real colour strings, refreshed on theme change, then re-rendered.
 - Light/dark is defined twice in CSS on purpose (system media query + explicit
   attribute) so the first paint is correct with no JS and no flash.
+
+## 2026-09-14 - Track data stays public; no privacy work, but no bulk-download affordance
+
+**Decision (Bar, explicit):** the Supabase Storage bucket stays public and the
+dataset stays fetchable by anyone who knows the URL. No auth, no private bucket,
+no token-gated API. The counterpart rule: the UI must not offer a one-action way
+to pull the whole dataset.
+
+**Rationale, in Bar's words:** "if it's on GitHub, maybe I don't mind... I don't
+want to have a button for them to do it. If people know how to do it, let them."
+URL-guessable exposure is acceptable; handing it over in one keystroke is not.
+
+**What this settles:** the 46+ published day shards (`history/YYYY-MM-DD.json`,
+~1 MB each) and `history_index.json` are public by design. Anyone can enumerate
+them. This is not a leak to be fixed; it is the architecture. Aggregates
+(`top.json`, `stats.json`, heatmaps, clusters) are public for the same reason.
+
+**What it changed in the UI:** the implicit bulk download was removed - see
+"History search never bulk-downloads" above. `renderHistory` no longer fetches
+every shard on a keystroke; older days load one at a time via "הצג עוד", and the
+scope of a partial search is stated on screen.
+
+**If this is ever revisited:** the options are (a) Tailscale-only dashboard, (b)
+aggregates public but raw rows private, (c) auth in front of the data. All cost
+either the public link or a login on phones, which is why Bar chose to keep it as
+is. Do not re-open without a new instruction.
+
+## 2026-09-14 - Verification harnesses live in tests/, never in /tmp
+
+**Decision:** every verification harness for the frontend is committed under
+`tests/` with a README of exact commands, and memory references those paths.
+
+**Rationale:** on 2026-09-14 the harnesses (`audit_ui.py`, `verify_*.js`) were
+written to `/tmp` and referenced from `.memory/`. Mid-session `/tmp` was cleaned
+and every one of them vanished, leaving memory pointing at commands that no
+longer worked - the exact failure the documentation rule exists to prevent.
+`/tmp` is not durable storage on this host.
+
+**Implementation:** `tests/ui_audit.py`, `tests/verify_nobulk.js`,
+`tests/verify_drilldown.js`, `tests/verify_theme.js`, `tests/README.md`. All
+accept an optional path so they can audit the DEPLOYED artifact rather than only
+the local file, and all exit non-zero so they chain with `&&`.
+
+## 2026-09-14 - Design skills are read from ~/.hermes/skills, not registered in pi
+
+**Decision:** the UI work used `frontend-refresh`, `web-ui-audit` and
+`popular-web-designs` by reading them directly from `~/.hermes/skills/`. They were
+not promoted into pi's skill loader.
+
+**Rationale:** those skills live in the Hermes library; pi's loader reads
+`~/.pi/agent/skills/` and `~/.agents/skills/` (symlinks into
+`~/dev/Lord_of_the_agents/skills/`). Registering them properly means adding them
+to the canonical repo and running `sync_agents`, which is a cross-machine change
+that needs a separate decision and a push. Reading them was sufficient.
+
+**Where they are:** `~/.hermes/skills/software-development/frontend-refresh/`,
+`~/.hermes/skills/software-development/web-ui-audit/`,
+`~/.hermes/skills/creative/popular-web-designs/` (54 real design systems as
+HTML/CSS). Related but project-local: `~/dev/TripTico/.agents/skills/dashboard-designer`.
+fedora-lab also has a richer set under `~/.config/opencode/skill-libraries/design/`
+(`web-design-guidelines`, `ui-ux-designer`, `design-spells`, and more).
+
+**Two skill recommendations that this repo must NOT follow:** `frontend-refresh`
+advises a cache-buster (`?Date.now()`) - `AGENTS.md` forbids re-adding one (it
+caused a 10 GB egress blowout); and it generates mock data, which this project
+never does because real data is always present. Its Inter webfont suggestion is
+also declined: Hebrew-first UI, and Inter has no reliable Hebrew coverage.
