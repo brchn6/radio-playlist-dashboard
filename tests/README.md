@@ -27,6 +27,7 @@ node tests/verify_drilldown.js                  # drill-down keeps its filter
 node tests/verify_theme.js "" system-light       # theme system, light OS
 node tests/verify_theme.js "" system-dark        # theme system, dark OS
 node tests/verify_section_tags.js               # section tags vs docs/SECTIONS.md
+node tests/verify_deep_clusters.js              # deep:clusters overview + drill-down
 
 # proxy engine (lower-level interpreters, see notes in each file)
 .venv/bin/python tests/verify_proxy_healing.py          # frozen proxy is detected + healed
@@ -42,6 +43,7 @@ node tests/verify_drilldown.js && \
 node tests/verify_theme.js "" system-light && \
 node tests/verify_theme.js "" system-dark && \
 node tests/verify_section_tags.js && \
+node tests/verify_deep_clusters.js && \
 .venv/bin/python tests/verify_proxy_healing.py && \
 shazamio/.venv/bin/python tests/verify_capture_timeout.py --live && \
 echo "ALL SUITES PASSED"
@@ -64,6 +66,7 @@ node tests/verify_nobulk.js /tmp/live.html
 node tests/verify_drilldown.js /tmp/live.html
 node tests/verify_theme.js /tmp/live.html system-dark
 node tests/verify_section_tags.js /tmp/live.html
+node tests/verify_deep_clusters.js /tmp/live.html
 ```
 
 Also worth checking that the deploy actually shipped what you committed:
@@ -82,6 +85,7 @@ diff -q /tmp/live.html /tmp/committed.html && echo "live == main"
 | `verify_drilldown.js` | Tapping a top song keeps its filter: the banner renders with the station breakdown and window label, and the time window is actually applied (only the in-window play is listed). ✕ clears it. |
 | `verify_theme.js` | Toggle sets and persists the theme; an explicit choice beats the OS; the canvas palette refreshes; the icon offers the opposite theme; and all 8 station colours reach 4.5:1 as text in **both** themes. Run once per OS scenario. |
 | `verify_section_tags.js` | The section tags (the English `subject:thing` ids in the corner of every region) match `docs/SECTIONS.md` in both directions, follow the shape, are unique, and sit on the card they name. Drives the real `secTag()`, `renderPills()` and `renderNowPlaying()`, then fires the real click handler to prove id -> clipboard -> toast, including the insecure-context (plain http) fallback. |
+| `verify_deep_clusters.js` | `deep:clusters` lands on an overview with no click: hero, stat cards, one card per song group with its top songs and a cross-station share bar. Groups that share a dominant station (three were all `radio-tlv`) get distinct names (station + signature artists by plays, escalating to a third artist when the top two tie). Tapping a group opens the drill-down for that group, a refresh keeps it, back returns to the overview; song rows, search and the empty state still work. Synthetic clusters.json fixture. |
 | `verify_capture_timeout.py` | A stalled stream (accepts the connection, then goes silent) cannot freeze a station loop: ffmpeg gives up on its own via `-rw_timeout`; if it will not, the Python `CAPTURE_TIMEOUT` kills it; a cancelled capture leaves no orphan ffmpeg; and a healthy stream still captures exactly the expected WAV. This is the bug that cost radio-darom 5h19m of airtime on 2026-09-15. |
 | `verify_proxy_healing.py` | `_loop_verdict()` tells frozen from mid-backoff from never-started; a genuinely frozen proxy (bounds disabled, stalled stream) is reported stale even though its HTTP server answers; `start_one()` restarts it (not `already_running`), the restart is bounded by the cooldown, it is recorded as a **bounded outage** for the uptime panel, and a healthy proxy is left alone. |
 

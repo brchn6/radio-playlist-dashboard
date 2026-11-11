@@ -706,6 +706,40 @@
     .cluster-hero-title{font-size:var(--fs-xl)}
     .cluster-hero-artist{font-size:var(--fs-base)}
     .cluster-station-info{font-size:var(--fs-sm)}
+    /* Overview: one card per song group (community), stacked on a phone */
+    .cluster-legend{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2);
+      font-size:var(--fs-xs);color:var(--muted);margin:0 0 var(--sp-2)}
+    .cluster-legend-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--fg-2)}
+    .cluster-legend-swatch.shared{background:var(--track);border:1px solid var(--border)}
+    .cluster-group,.cluster-context{--grp:var(--accent)} /* per-group station colour, overridden inline */
+    .cluster-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));
+      gap:var(--sp-3);margin-bottom:var(--sp-3)}
+    .cluster-group{min-width:0;padding:var(--sp-3);border-radius:var(--radius-sm);background:var(--card-hover);
+      border:1px solid var(--border-soft);border-inline-start:4px solid var(--grp);cursor:pointer}
+    .cluster-group:hover{border-color:var(--border)}
+    .cluster-group-open{display:block;width:100%;min-height:44px;padding:0;border:0;background:none;
+      color:var(--fg);font-family:var(--font);text-align:start;cursor:pointer;touch-action:manipulation}
+    .cluster-group-name{font-size:var(--fs-md);font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+    .cluster-group-meta{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-1);
+      font-size:var(--fs-xs);color:var(--muted)}
+    .cluster-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--grp);flex-shrink:0}
+    .cluster-share{display:flex;align-items:center;gap:var(--sp-2);margin:var(--sp-2) 0}
+    .cluster-share-bar{flex:1;display:flex;height:8px;border-radius:var(--radius-pill);overflow:hidden;background:var(--track)}
+    .cluster-share-own{height:100%;background:var(--grp)}
+    .cluster-songs{display:flex;flex-direction:column}
+    .cluster-song{display:flex;align-items:center;gap:var(--sp-2);width:100%;min-height:44px;padding:var(--sp-1) 0;
+      border:0;border-top:1px solid var(--divider);background:none;color:var(--fg);font-family:var(--font);
+      text-align:start;cursor:pointer;touch-action:manipulation}
+    .cluster-song:hover .cluster-song-title{color:var(--accent)}
+    .cluster-song-text{flex:1;min-width:0}
+    .cluster-song-title{display:block;font-size:var(--fs-sm);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cluster-song-artist{display:block;font-size:var(--fs-xs);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cluster-song-plays{font-family:var(--font-num);font-size:var(--fs-sm);font-weight:700;color:var(--accent);direction:ltr;flex-shrink:0}
+    /* Drill-down: way back + which group this song belongs to */
+    .cluster-back-row{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+    .cluster-back{min-height:44px}
+    .cluster-context{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-sm);color:var(--fg-2);min-width:0}
+    .cluster-empty{color:var(--muted);text-align:center;padding:var(--sp-5);font-size:var(--fs-base)}
 
     /* ── Redundancy ── */
     .redundancy-row{padding:12px 0;min-height:48px;gap:var(--sp-3);border-bottom:1px solid var(--divider)}
@@ -955,13 +989,13 @@
     <button type="button" class="sec-tag" data-sec="deep:clusters" title="deep:clusters - click to copy">deep:clusters</button>
     <div class="section-header">
       <div class="section-title">🔗 שירים שמתנגנים יחד</div>
-      <div class="section-sub">שירים שנמצאים יחד באותו פלייליסט — לפי קרבה בזמן ובתחנה</div>
+      <div class="section-sub">קבוצות של שירים שהתחנות משמיעות סמוך זה לזה, ומי עומד מאחורי כל קבוצה</div>
     </div>
     <div class="cluster-controls">
-      <button class="hist-btn" onclick="pickRandomClusterSong()">🔀 בחר שיר אקראי</button>
-      <input class="cluster-search" id="clusterSearch" dir="auto" placeholder="חפש שיר..." oninput="onClusterSearch()">
+      <button class="hist-btn" onclick="pickRandomClusterSong()">🔀 שיר אקראי</button>
+      <input class="cluster-search" id="clusterSearch" dir="auto" placeholder="חפש שיר או אמן..." oninput="onClusterSearch()">
     </div>
-    <div id="clusterContent"><div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div></div>
+    <div id="clusterContent"><div class="cluster-empty">טוען...</div></div>
   </div>
 
   <!-- Redundancy -->
@@ -2772,20 +2806,155 @@ function renderTransitionsLegacy() {
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
 }
 
-/* ── Clusters ── */
-function renderClusters() {
+/* ── Clusters ──
+   Landing state is the OVERVIEW: the song groups (Louvain communities from
+   clusters.json) as cards, no click needed. A card or a song opens the song
+   drill-down (hero + co-play graph); a back button returns to the overview.
+   clusterGroups() derives everything the cards show from clusters.json. */
+const CLUSTER_SAME_MIN = 30, CLUSTER_CROSS_MIN = 5;   // mirror build_song_clusters()
+function clusterTipTogether(hours) {
+  return 'שני שירים "מתנגנים יחד" כשאותה תחנה משמיעה אותם בהפרש של עד ' + CLUSTER_SAME_MIN +
+    ' דקות, או כששתי תחנות משמיעות אותם באותן ' + CLUSTER_CROSS_MIN + ' דקות. הקבוצות נמצאות אוטומטית מתוך ' +
+    (hours || 48) + ' השעות האחרונות, רק שירים שהושמעו פעמיים ומעלה.';
+}
+const CLUSTER_TIP_SHARED = 'אחוז השירים בקבוצה שהושמעו ביותר מתחנה אחת. נמוך: קבוצה ייחודית לתחנה. גבוה: שירים שכל התחנות משמיעות.';
+const CLUSTER_TIP_NAME = 'כל קבוצה נקראת על שם התחנה שהשמיעה ממנה הכי הרבה, ועל שם האמנים הבולטים בה (לפי מספר השמעות).';
+const CLUSTER_TIP_BRIDGE = 'שיר גשר: שיר שמתנגן לפחות פעמיים ליד שירים מקבוצה אחרת, ולכן מחבר בין קבוצות.';
+
+let clusterGroupsSrc = null, clusterGroupsCache = [];
+function clusterGroups() {
   const data = D.clusters;
-  if (!data || !data.songs || !data.songs.length) {
-    document.getElementById('clusterContent').innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">\u05d0\u05d9\u05df \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e2\u05d3\u05d9\u05d9\u05df</div>';
+  if (!data || !data.communities || !data.songs) return [];
+  if (data === clusterGroupsSrc) return clusterGroupsCache;
+  const members = {};
+  data.songs.forEach((s, i) => { (members[s.community] = members[s.community] || []).push(i); });
+  const groups = data.communities.map(c => {
+    const idx = (members[c.id] || []).slice().sort((a, b) => (data.songs[b].plays || 0) - (data.songs[a].plays || 0));
+    const byArtist = new Map();
+    idx.forEach(i => { const s = data.songs[i]; byArtist.set(s.artist, (byArtist.get(s.artist) || 0) + (s.plays || 0)); });
+    const artists = [...byArtist.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0]).filter(Boolean);
+    const station = c.dominant_station || c.label;
+    return { id: c.id, size: c.size || idx.length, cross_pct: c.cross_pct || 0, station,
+             songIdx: idx, artists, nArtists: 2, name: '' };
+  });
+  // Name = station + signature artists. Several groups can share a dominant
+  // station (three radio-tlv groups in real data), so add artists until the
+  // names among those groups are distinct; a number is the last resort.
+  const nameOf = g => name(g.station) + ' · ' + (g.artists.slice(0, g.nArtists).join(', ') || '?');
+  for (let round = 0; round < 3; round++) {
+    const seen = {};
+    groups.forEach(g => { const n = nameOf(g); (seen[n] = seen[n] || []).push(g); });
+    const dup = Object.values(seen).filter(a => a.length > 1);
+    if (!dup.length) break;
+    dup.forEach(a => a.forEach(g => { g.nArtists++; }));
+  }
+  const count = {};
+  groups.forEach(g => { g.name = nameOf(g); count[g.name] = (count[g.name] || 0) + 1; });
+  const nth = {};
+  groups.forEach(g => { if (count[g.name] > 1) { nth[g.name] = (nth[g.name] || 0) + 1; g.name += ' #' + nth[g.name]; } });
+  clusterGroupsSrc = data; clusterGroupsCache = groups;
+  return groups;
+}
+function clusterGroupById(id) { return clusterGroups().find(g => String(g.id) === String(id)) || null; }
+function clusterShareTone(pct) { return pct < 50 ? 'ok' : pct >= 70 ? 'warn' : ''; }
+function clusterShareLabel(pct) { return pct < 50 ? 'ייחודית לתחנה' : pct >= 70 ? 'משותפת לתחנות' : 'מעורבת'; }
+
+function clusterSongRow(i) {
+  const s = D.clusters.songs[i];
+  return '<button type="button" class="cluster-song" data-si="' + i + '">' +
+    '<span class="cluster-song-text"><span class="cluster-song-title" dir="auto">' + esc(s.title) + '</span>' +
+    '<span class="cluster-song-artist" dir="auto">' + esc(s.artist) + '</span></span>' +
+    (s.is_bridge ? chip('גשר', 'minor') : '') +
+    '<span class="cluster-song-plays">' + (s.plays || 0) + '×</span></button>';
+}
+
+function renderClusterOverview() {
+  const el = document.getElementById('clusterContent');
+  if (!el) return;
+  el.dataset.active = '';
+  el.onclick = onClusterClick;
+  const data = D.clusters;
+  const groups = clusterGroups();
+  if (!data || data.ready === false || !groups.length || !data.songs || !data.songs.length) {
+    el.innerHTML = '<div class="cluster-empty">אין עדיין מספיק נתונים לקבוצות שירים</div>';
     return;
   }
-  // If no song selected yet, show a placeholder
-  const contentEl = document.getElementById('clusterContent');
-  if (!contentEl.querySelector('.cluster-hero') && !contentEl.querySelector('.cluster-graph-svg')) {
-    if (!contentEl.dataset.active) {
-      contentEl.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">\u05dc\u05d7\u05e5 "\u05d1\u05d7\u05e8 \u05e9\u05d9\u05e8 \u05d0\u05e7\u05e8\u05d0\u05d9" \u05d0\u05d5 \u05d7\u05e4\u05e9 \u05e9\u05d9\u05e8</div>';
-    }
+  const hours = data.window_hours || 48;
+  const total = data.songs.length;
+  const multi = data.songs.filter(s => s.stations && Object.keys(s.stations).length > 1).length;
+  const multiPct = Math.round(multi / total * 100);
+  const bridges = data.songs.filter(s => s.is_bridge).length;
+  const distinct = groups.slice().sort((a, b) => a.cross_pct - b.cross_pct)[0];
+
+  let h = '<div class="deep-hero"><span><b>' + groups.length + '</b> קבוצות שירים ב-' + hours + ' שעות</span>' +
+    '<span>הכי ייחודית: <b>' + esc(name(distinct.station)) + '</b> (' + (100 - distinct.cross_pct) + '% מהשירים רק בה)</span>' + helpTip(clusterTipTogether(hours)) + '</div>';
+  h += '<div class="stat-cards">' +
+    statCard(groups.length, 'קבוצות', clusterTipTogether(hours), 'accent') +
+    statCard(total, 'שירים בניתוח', 'שירים שהושמעו לפחות פעמיים ב-' + hours + ' השעות האחרונות.', '') +
+    statCard(multiPct + '%', 'שירים ביותר מתחנה', 'אחוז השירים שהושמעו ביותר מתחנה אחת בחלון הזמן.', multiPct >= 70 ? 'warn' : '') +
+    statCard(bridges, 'שירי גשר', CLUSTER_TIP_BRIDGE, 'minor') +
+    '</div>';
+  h += '<div class="cluster-legend"><span class="cluster-legend-swatch"></span>רק בתחנה' +
+    '<span class="cluster-legend-swatch shared"></span>גם בתחנות אחרות' + helpTip(CLUSTER_TIP_SHARED) +
+    '<span>· שם הקבוצה</span>' + helpTip(CLUSTER_TIP_NAME) + '</div>';
+  h += '<div class="cluster-groups">';
+  groups.forEach(g => {
+    const own = Math.max(0, 100 - g.cross_pct);
+    h += '<div class="cluster-group" data-cid="' + escAttr(g.id) + '" style="--grp:' + escAttr(color(g.station)) + '">' +
+      '<button type="button" class="cluster-group-open"><span class="cluster-group-name" dir="auto">' + esc(g.name) + '</span>' +
+      '<span class="cluster-group-meta"><span class="cluster-dot"></span>' + esc(name(g.station)) +
+      ' · ' + g.size + ' שירים</span></button>' +
+      '<div class="cluster-share"><span class="cluster-share-bar" title="' + own + '% רק בתחנה">' +
+      '<span class="cluster-share-own" style="width:' + own + '%"></span></span>' +
+      chip(g.cross_pct + '% ' + clusterShareLabel(g.cross_pct), clusterShareTone(g.cross_pct)) + '</div>' +
+      '<div class="cluster-songs">' + g.songIdx.slice(0, 4).map(clusterSongRow).join('') + '</div></div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+function showClusterOverview() {
+  const q = document.getElementById('clusterSearch');
+  if (q) q.value = '';
+  renderClusterOverview();
+}
+
+function openClusterCommunity(cid) {
+  const g = clusterGroupById(cid);
+  if (!g || !g.songIdx.length) return;
+  selectClusterSong(D.clusters.songs[g.songIdx[0]], g.id);
+}
+
+// One delegated handler for the whole region: overview cards, song rows,
+// the back button and search results.
+function onClusterClick(e) {
+  const t = e && e.target;
+  if (!t || !t.closest) return;
+  if (t.closest('.cluster-back')) { showClusterOverview(); return; }
+  const row = t.closest('.cluster-song');
+  if (row && row.dataset && row.dataset.si != null) {
+    const s = D.clusters && D.clusters.songs[Number(row.dataset.si)];
+    if (s) selectClusterSong(s);
+    return;
   }
+  const card = t.closest('.cluster-group');
+  if (card && card.dataset && card.dataset.cid != null) { openClusterCommunity(card.dataset.cid); return; }
+  const res = t.closest('.explorer-card');
+  if (res && D.clusters) {
+    const artist = (res.getAttribute('data-artist') || '').toLowerCase();
+    const title = (res.getAttribute('data-title') || '').toLowerCase();
+    const songData = D.clusters.songs.find(s =>
+      (s.artist || '').toLowerCase() === artist && (s.title || '').toLowerCase() === title);
+    if (songData) selectClusterSong(songData);
+  }
+}
+
+function renderClusters() {
+  const el = document.getElementById('clusterContent');
+  if (!el) return;
+  // A periodic refresh must not throw the visitor out of a drill-down.
+  if (el.dataset.active && D.clusters && D.clusters.songs && D.clusters.songs.length) return;
+  renderClusterOverview();
 }
 
 function pickRandomClusterSong() {
@@ -2798,48 +2967,67 @@ function pickRandomClusterSong() {
   selectClusterSong(pick);
 }
 
-function selectClusterSong(song) {
+function selectClusterSong(song, cid) {
   if (!song) return;
   const el = document.getElementById('clusterContent');
   if (!el) return;
   el.dataset.active = 'true';
+  el.onclick = onClusterClick;
 
   const neighbors = (song.top || []).slice(0, 12);
   const hasNeighbors = neighbors.length > 0;
+  const group = clusterGroupById(cid != null ? cid : song.community);
 
-  // Hero section
-  let h = '';
-  h += '<div class="cluster-hero">';
-  h += '<div class="cluster-hero-title">\ud83c\udfb5 ' + esc(song.title) + '</div>';
-  h += '<div class="cluster-hero-artist">' + esc(song.artist) + '</div>';
-  if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' \u05d4\u05e9\u05de\u05e2\u05d5\u05ea</div>';
+  let h = '<div class="cluster-back-row"><button type="button" class="hist-btn cluster-back">→ כל הקבוצות</button>';
+  if (group) {
+    h += '<span class="cluster-context" style="--grp:' + escAttr(color(group.station)) + '"><span class="cluster-dot"></span>' +
+      '<span dir="auto">' + esc(group.name) + '</span></span>';
+  }
   h += '</div>';
 
-  // Station info — uses the per-song station play counts shipped inside
-  // clusters.json (48h window). No full-history scan needed (history is
-  // sharded now; a full scan would pull every day shard).
+  // Hero section
+  h += '<div class="cluster-hero">';
+  h += '<div class="cluster-hero-title">🎵 ' + esc(song.title) + '</div>';
+  h += '<div class="cluster-hero-artist">' + esc(song.artist) + '</div>';
+  if (song.plays) h += '<div class="cluster-station-info">' + song.plays + ' השמעות' +
+    (song.is_bridge ? ' ' + chip('גשר', 'minor') + helpTip(CLUSTER_TIP_BRIDGE) : '') + '</div>';
+  h += '</div>';
+
+  // Station info: per-song station play counts shipped inside clusters.json
+  // (48h window). No full-history scan needed.
   let stationInfo = '';
   if (song.stations && Object.keys(song.stations).length) {
     stationInfo = Object.entries(song.stations)
-      .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '\u00d7)</span>')
-      .join(' \u00b7 ');
+      .map(([slug, cnt]) => '<span style="color:' + color(slug) + '">' + esc(name(slug)) + ' (' + cnt + '×)</span>')
+      .join(' · ');
+  }
+
+  // The rest of the group, so a card tap shows the whole group, not one song.
+  let more = '';
+  if (group) {
+    const rest = group.songIdx.filter(i => D.clusters.songs[i] !== song).slice(0, 8);
+    if (rest.length) more = '<div class="explorer-section-title">עוד בקבוצה</div><div class="cluster-songs">' +
+      rest.map(clusterSongRow).join('') + '</div>';
   }
 
   if (!hasNeighbors) {
-    h += '<div style="color:var(--muted);text-align:center;padding:20px">\u05d0\u05d9\u05df \u05e9\u05d9\u05e8\u05d9\u05dd \u05e7\u05e8\u05d5\u05d1\u05d9\u05dd \u05dc\u05e9\u05d9\u05e8 \u05d6\u05d4</div>';
-    if (stationInfo) h += '<div class="cluster-station-info" style="margin-top:8px">\ud83d\udcfb \u05d2\u05dd \u05d1: ' + stationInfo + '</div>';
-    el.innerHTML = h;
+    h += '<div class="cluster-empty">אין שירים קרובים לשיר זה</div>';
+    if (stationInfo) h += '<div class="cluster-station-info" style="margin-top:8px">📻 גם ב: ' + stationInfo + '</div>';
+    el.innerHTML = h + more;
     return;
   }
 
-  // D3 Force-directed graph
-  h += '<div class="explorer-section-title">\ud83d\udd17 \u05e8\u05e9\u05ea \u05e7\u05e9\u05e8\u05d9\u05dd</div>';
+  // D3 force-directed graph
+  h += '<div class="explorer-section-title">🔗 מתנגנים לידו' + helpTip(clusterTipTogether(D.clusters && D.clusters.window_hours)) + '</div>';
+  h += '<div class="cluster-legend"><span class="cluster-legend-swatch" style="background:var(--accent)"></span>באותה קבוצה' +
+    '<span class="cluster-legend-swatch" style="background:var(--minor)"></span>מקבוצה אחרת</div>';
   h += '<div id="clusterGraphContainer"><svg class="cluster-graph-svg" id="clusterGraphSvg"></svg></div>';
   if (stationInfo) {
-    h += '<div class="cluster-graph-info">\ud83d\udcfb \u05d2\u05dd \u05d1: ' + stationInfo + '</div>';
+    h += '<div class="cluster-graph-info">📻 גם ב: ' + stationInfo + '</div>';
   }
 
-  el.innerHTML = h;
+  el.innerHTML = h + more;
+  if (typeof d3 === 'undefined' || typeof d3.forceSimulation !== 'function') return;
 
   // Build D3 force graph
   const container = document.getElementById('clusterGraphContainer');
@@ -2848,12 +3036,10 @@ function selectClusterSong(song) {
   const height = 460;
 
   const songKey = (song.artist + ' | ' + song.title).toLowerCase();
-  const communityColors = D.clusters && D.clusters.communities
-    ? Object.fromEntries(D.clusters.communities.map(c => [c.id, c.color]))
-    : {};
   const songCommunityMap = D.clusters && D.clusters.songs
     ? Object.fromEntries(D.clusters.songs.map(s => [(s.artist + ' | ' + s.title).toLowerCase(), s.community]))
     : {};
+  const centerCommunity = songCommunityMap[songKey];
 
   const nodes = [{ id: songKey, artist: song.artist, title: song.title, plays: song.plays || 0, isCenter: true }];
   const links = [];
@@ -2872,6 +3058,7 @@ function selectClusterSong(song) {
   const zoom = d3.zoom().scaleExtent([0.3, 3]).on('zoom', (event) => { g.attr('transform', event.transform); });
   svg.call(zoom);
 
+  d3.selectAll('.cluster-graph-tooltip').remove();
   const tooltip = d3.select('body').append('div').attr('class', 'cluster-graph-tooltip').style('display', 'none');
 
   const sim = d3.forceSimulation(nodes)
@@ -2889,12 +3076,13 @@ function selectClusterSong(song) {
     .selectAll('circle').data(nodes).join('circle')
     .attr('r', d => d.isCenter ? 22 : 6 + Math.min(d.count || 0, 12))
     .attr('class', d => d.isCenter ? 'node-center' : 'node-neighbor')
-    .attr('fill', d => d.isCenter ? null : communityColors[songCommunityMap[d.id]] || 'var(--accent)')
+    .attr('fill', d => d.isCenter ? null
+      : songCommunityMap[d.id] != null && songCommunityMap[d.id] === centerCommunity ? 'var(--accent)' : 'var(--minor)')
     .on('mouseover', function(event, d) {
       if (d.isCenter) return;
       d3.select(this).attr('stroke-width', 2.5);
       tooltip.style('display', 'block')
-        .html('<b>' + esc(d.title) + '</b><br>' + esc(d.artist) + '<br>' + d.count + ' \u05de\u05e2\u05d1\u05e8\u05d9\u05dd')
+        .html('<b>' + esc(d.title) + '</b><br>' + esc(d.artist) + '<br>' + d.count + ' פעמים יחד')
         .style('left', (event.clientX + 14) + 'px')
         .style('top', (event.clientY - 10) + 'px');
     })
@@ -2936,27 +3124,26 @@ function selectClusterSong(song) {
 function onClusterSearch() {
   const q = (document.getElementById('clusterSearch').value || '').toLowerCase().trim();
   const el = document.getElementById('clusterContent');
-  if (!q) {
-    el.dataset.active = '';
-    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לחץ "בחר שיר אקראי" או חפש שיר</div>';
-    return;
-  }
+  if (!q) { renderClusterOverview(); return; }
 
   const data = D.clusters;
   if (!data || !data.songs) return;
+  el.dataset.active = 'true';
+  el.onclick = onClusterClick;
 
   const matches = data.songs.filter(s =>
     (s.title && s.title.toLowerCase().includes(q)) ||
     (s.artist && s.artist.toLowerCase().includes(q))
   );
 
+  let h = '<div class="cluster-back-row"><button type="button" class="hist-btn cluster-back">→ כל הקבוצות</button></div>';
   if (!matches.length) {
-    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">לא נמצאו שירים</div>';
+    el.innerHTML = h + '<div class="cluster-empty">לא נמצאו שירים</div>';
     return;
   }
 
   // Show search results as clickable items
-  let h = '<div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:6px">נמצאו ' + matches.length + ' תוצאות:</div>';
+  h += '<div style="font-size:var(--fs-sm);color:var(--muted);margin-bottom:6px">נמצאו ' + matches.length + ' תוצאות:</div>';
   matches.slice(0, 10).forEach(s => {
     h += '<div class="explorer-card" data-artist="' + escAttr(s.artist) + '" data-title="' + escAttr(s.title) + '">';
     h += '<div class="explorer-card-main">';
@@ -2965,23 +3152,9 @@ function onClusterSearch() {
     h += '</div></div>';
   });
   if (matches.length > 10) {
-    h += '<div style="text-align:center;padding:6px;font-size:var(--fs-sm);color:var(--muted)">עוד ' + (matches.length - 10) + ' תוצאות... השתמש בחיפוש מדויק יותר</div>';
+    h += '<div style="text-align:center;padding:6px;font-size:var(--fs-sm);color:var(--muted)">עוד ' + (matches.length - 10) + ' תוצאות, נסה חיפוש מדויק יותר</div>';
   }
   el.innerHTML = h;
-  // Click delegation for cluster search results
-  el.onclick = function(e) {
-    const card = e.target.closest('.explorer-card');
-    if (!card) return;
-    const artist = card.getAttribute('data-artist');
-    const title = card.getAttribute('data-title');
-    if (artist && title) {
-      const songData = D.clusters.songs.find(s =>
-        (s.artist || '').toLowerCase() === (artist || '').toLowerCase() &&
-        (s.title || '').toLowerCase() === (title || '').toLowerCase()
-      );
-      if (songData) selectClusterSong(songData);
-    }
-  };
 }
 
 

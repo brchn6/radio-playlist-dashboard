@@ -41,7 +41,7 @@ family is generated, so it is documented as a pattern.
 | `deep:transitions` | corner | Transition Explorer card: controls and results | `renderTransitionExplorer()` |
 | `deep:transitions-results` | flow | Explorer results region below the controls | `renderTransitionExplorer()` |
 | `deep:transitions-chain` | flow | The "where to next?" outgoing-transition chain | `renderTransitionExplorer()` |
-| `deep:clusters` | corner | Co-play graph card | `renderClusters()` |
+| `deep:clusters` | corner | Song groups card: overview of co-play groups, song drill-down with graph | `renderClusters()` |
 | `deep:redundancy` | corner | Repetition card (how often each station repeats itself) | `renderRedundancy()` |
 | `deep:uptime` | corner | System operations card (uptime, collector status) | `renderUptime()` |
 
