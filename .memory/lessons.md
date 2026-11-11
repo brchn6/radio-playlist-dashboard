@@ -508,3 +508,20 @@ zero-warning posture. Same reasoning applies to any generated class name.
 
 **What went wrong:** after restoring `generate_data.py` byte-identically, the test still failed: `scripts/__pycache__` held the mutated bytecode (same size, same mtime second).
 **Correct approach:** `rm -rf scripts/__pycache__` before re-running, or red-check on a copy.
+
+## 2026-11-11 - A pid-file liveness check must reject threads and other stations, not old boots
+
+**What went wrong:** after a reboot `radio-tlv.pid` held a number that was now a THREAD of the new 99fm proxy. `os.kill(tid, 0)` and `/proc/<tid>/cmdline` both pass for a thread, so the manager called radio-tlv frozen (a 31h false `proxy_crash`) and its SIGTERM killed the healthy 99fm proxy.
+**Why:** liveness was "pid exists and cmdline mentions shazamio_proxy.py".
+**Correct approach:** require Tgid == pid (a process, not a thread) and the process's `SHAZAMIO_PORT` == this station's port. Do NOT compare the pid-file mtime with boot time: btime moves when NTP steps the clock and would make healthy proxies look dead every heal cycle.
+**Files/commands involved:** `scripts/proxy_manager.py::is_running`, `tests/verify_ops.py::test_reboot`.
+
+## 2026-11-11 - Teams on head1 run in herdr, not as hidden subagents
+
+**What went wrong:** both deep-tab rounds used the built-in subagent tool although this session ran inside herdr and `progress.md` showed the jingle-filter job used herdr workers. Bar could not watch or steer the workers.
+**Correct approach:** check `HERDR_ENV=1`; if set, run each worker as a herdr pane (`herdr pane split`, `herdr agent start`, `herdr agent prompt/read/wait`), keep the contract + channel.log as the durable record.
+
+## 2026-11-11 - "Any station has data" is not uptime
+
+**What went wrong:** `_coverage_pct` counted a 5-minute bucket as up if any station logged a track, so the page said 100% for 7 days with 3 host reboots, 2 collector crashes and a 106-minute station outage.
+**Correct approach:** measure each pipeline stage and each station separately (`scripts/ops_monitor.py`), and treat "no signal at all" as dark, never as fine.

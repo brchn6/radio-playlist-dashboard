@@ -355,3 +355,8 @@ line so it cannot overlap a Hebrew section title.
 **Decision (Bar approved the plan):** BPM/key stats on the deep tab use each song's modal BPM/key across its plays (min 3 plays) instead of raw per-play values, and are shown as per-station comparisons (tempo bands, minor share) instead of time series. The `bpm_key.json` change is additive so the deployed page keeps working during rollout.
 **Why:** per-play values are noisy (31 BPM grid values, 62% key agreement); averaging them by hour produced flat lines that looked generated. Per-song modes recover real station differences.
 **Honesty rule:** a hero line names a "fastest" / "most minor" station only when it leads the runner-up by >= 5 points (`DEEP_STANDOUT_PTS`), else "no station stands out" with the spread.
+
+## 2026-11-11 - Ops glitches are public and plain; one detector writes them
+
+**Decision (Bar):** operational incidents are shown publicly on `deep:uptime` in plain Hebrew (no hostnames, paths or raw errors) and summarised in a daily digest (delivery channel to be chosen). BPM ties take the median of the tied values; key ties drop the song from key stats.
+**Single source of truth:** `scripts/ops_monitor.py` is the only writer of the ops event types in `system_events`; raw inputs (proxy logs, journal, boot times, publish.log) are read only by it; `generate_data.py` reads only the DB. `uptime.json.ops` is omitted until the detector has written day rows, so the page keeps its legacy card meanwhile.

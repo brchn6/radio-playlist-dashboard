@@ -720,3 +720,20 @@ file straight from disk, so it needs no restart.
 
 **Next:** merge into main once the other agent's work in the main checkout is committed (merge touches docs/index.html and generate_data.py there), then push. The live collector runs generate_data.py from the main checkout, so the panel's data appears on the first cycle after the merge; until then the panel shows "Method data not published yet".
 - 2026-11-11: feat/jingle-method merged (ff) and pushed to main at 481d1348; Pages run 43070256828 succeeded; published jingles.json carries method + evidence for all 15 flags. Worktree removed.
+
+## 2026-11-11 - Deep-tab round 2: transitions, ops truth, no em dashes
+
+**Branch:** still `feat/deep-redesign` (integration worktree), main merged in at `15ba46f6`, HEAD `57ea92e6`, merges cleanly into main, NOT pushed. Built by lead + 3 subagents (`ops-data`, `ui-ops`, `ui-transitions`) from `.scratch/deep-redesign/contract-r2.md`, then one review whose high/medium findings are fixed.
+
+| Piece | Where |
+|---|---|
+| Sticky station in the Transition Explorer (random/search scoped, never silently switched) | `docs/index.html` explorer functions, `tests/verify_deep_transitions.js` |
+| Em/en dashes: none in the page; `esc()` normalises data text, `escAttr()`/`escRaw()` keep lookups raw | `docs/index.html`, `tests/verify_no_dashes.js` |
+| Reboot false alarm fixed (stale pid files pointing at threads of other proxies) | `scripts/proxy_manager.py::is_running` |
+| Single ops detector, incidents in `system_events`, `uptime.json.ops`, digest | `scripts/ops_monitor.py`, `ops_model.py`, `ops_digest.py`, `generate_data.py`, `tests/verify_ops.py` |
+| deep:uptime ops view (stages, 7-day strips, stations, incidents) | `renderUptime`, `tests/verify_deep_uptime.js` |
+| Tie rule: BPM tie = median of tied values, key tie = song left out of key stats | `scripts/generate_data.py::_mode_bpm/_mode_key` |
+
+**Real 7 days:** 3 unclean host reboots (Nov 8, 9, 10), 2 collector crashes (SSL EOF -> rollback on closed connection in `supabase_db._execute`), kol-hashfela stream 403 for 106 min on Nov 5, 1-5% of plays never saved (collector polls only the latest proxy result ~1/min; radio-darom 95.1%). Listening otherwise clean. The 99fm "gap" was a talk show.
+
+**Waiting on Bar:** visual check (preview `http://100.93.8.110:8098/`); approve SQL re-typing 15 false `proxy_crash` rows (ids in the round-2 report); merge + 7-day backfill + hourly timer (units in README) + push. Open: review #7 (unreadable journal reads as ok), #8 (saving_gap never retracted), collector_down across a reboot; lost single-recognition plays; `_execute` rollback bug; daily reboots (hardware/power); digest delivery channel; two tooltip primitives now coexist (`.help-tip` from deep redesign, `.tip` from jingle-method).
