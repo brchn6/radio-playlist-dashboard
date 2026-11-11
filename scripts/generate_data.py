@@ -873,12 +873,29 @@ def daypart_of(il_hour: int) -> str:
     return "night"
 
 
-def _mode(values: list[Any]) -> Any:
-    """Most frequent value; ties go to the smallest so the result is deterministic."""
+def _modes(values: list[Any]) -> list[Any]:
+    """Every value that shares the top count, sorted."""
     counts: dict[Any, int] = defaultdict(int)
     for v in values:
         counts[v] += 1
-    return min(counts, key=lambda v: (-counts[v], v))
+    top = max(counts.values())
+    return sorted(v for v, c in counts.items() if c == top)
+
+
+def _mode_bpm(values: list[float]) -> float:
+    """Modal BPM; a tie takes the median of the tied values (Bar, 2026-11-11).
+
+    Picking the smallest tied value biased the median BPM card, which then
+    flipped between grid values (117 / 125) from one cycle to the next.
+    """
+    return float(np.median(_modes(values)))
+
+
+def _mode_key(values: list[str]) -> str | None:
+    """Modal key, or None when two keys tie: a tied song is left out of the
+    key stats rather than assigned an arbitrary key (Bar, 2026-11-11)."""
+    m = _modes(values)
+    return m[0] if len(m) == 1 else None
 
 
 def _pct(part: int, whole: int) -> int | None:
@@ -912,10 +929,13 @@ def _profile_of(plays: list[tuple[dict[str, Any], float, str]]) -> dict[str, Any
     bands = {b: 0 for b in PROFILE_BANDS}
     for _, bpm, _ in plays:
         bands[_band_of(bpm)] += 1
-    minor = sum(1 for _, _, k in plays if "minor" in k.lower())
-    minor_pct = _pct(minor, n)
+    # Key stats count only plays whose song has a single modal key (ties are None).
+    keyed = [k for _, _, k in plays if k is not None]
+    nk = len(keyed)
+    minor = sum(1 for k in keyed if "minor" in k.lower())
+    minor_pct = _pct(minor, nk)
     key_counts: dict[str, int] = defaultdict(int)
-    for _, _, k in plays:
+    for k in keyed:
         key_counts[k] += 1
     top_keys = sorted(key_counts.items(), key=lambda x: (-x[1], x[0]))[:PROFILE_TOP_KEYS]
 
@@ -931,7 +951,8 @@ def _profile_of(plays: list[tuple[dict[str, Any], float, str]]) -> dict[str, Any
             "median_bpm": round(float(np.median([b for _, b, _ in pp]))) if m else None,
             "fast_pct": _pct(sum(1 for _, b, _ in pp if _band_of(b) == "fast"), m),
             "slow_pct": _pct(sum(1 for _, b, _ in pp if _band_of(b) == "slow"), m),
-            "minor_pct": _pct(sum(1 for _, _, k in pp if "minor" in k.lower()), m),
+            "minor_pct": _pct(sum(1 for _, _, k in pp if k is not None and "minor" in k.lower()),
+                              sum(1 for _, _, k in pp if k is not None)),
         }
 
     return {
@@ -942,7 +963,7 @@ def _profile_of(plays: list[tuple[dict[str, Any], float, str]]) -> dict[str, Any
         "tempo": _largest_remainder(bands),
         "minor_pct": minor_pct,
         "major_pct": (100 - minor_pct) if minor_pct is not None else None,
-        "top_keys": [{"key": k, "pct": _pct(c, n)} for k, c in top_keys],
+        "top_keys": [{"key": k, "pct": _pct(c, nk)} for k, c in top_keys],
         "dayparts": dayparts,
     }
 
@@ -971,11 +992,12 @@ def build_tempo_key_profile(tracks: list[dict[str, Any]], slugs: list[str],
         keys = [t["musical_key"] for t in st if t.get("musical_key")]
         if len(bpms) < PROFILE_MIN_PLAYS or len(keys) < PROFILE_MIN_PLAYS:
             continue
-        song_bpm, song_k = _mode(bpms), _mode(keys)
+        song_bpm, song_k = _mode_bpm(bpms), _mode_key(keys)
         bpm_seen += len(bpms)
         bpm_agree += sum(1 for b in bpms if abs(b - song_bpm) <= PROFILE_BPM_TOLERANCE)
-        key_seen += len(keys)
-        key_agree += sum(1 for k in keys if k == song_k)
+        if song_k is not None:
+            key_seen += len(keys)
+            key_agree += sum(1 for k in keys if k == song_k)
         plays.extend((t, song_bpm, song_k) for t in st)
 
     by_station: dict[str, list[tuple[dict[str, Any], float, str]]] = defaultdict(list)

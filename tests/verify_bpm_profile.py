@@ -130,6 +130,22 @@ def main() -> int:
     check({"bpm_by_key", "bpm_by_hour"} <= set(out["cross_station"]), "cross_station keeps bpm_by_key/bpm_by_hour")
     check(out["profile"]["stations"]["st-a"]["plays"] == 4, "profile built from the same tracks")
 
+    print("9. ties (Bar, 2026-11-11): BPM takes the median of tied values, a key tie drops the song from key stats")
+    # Song T: BPM 117.2 x2 / 125.0 x2 (tie), key "C major" x2 / "A minor" x2 (tie).
+    t_vals = [(117.2, "C major"), (117.2, "A minor"), (125.0, "C major"), (125.0, "A minor")]
+    tracks = [track("st-a", "Art", "Tie", b, k, il(1, 9 + i)) for i, (b, k) in enumerate(t_vals)]
+    # Song U: clear mode, 3 x E minor at 100 BPM.
+    tracks += [track("st-a", "Art", "Clear", 100.0, "E minor", il(1, 15)) for _ in range(3)]
+    p = gd.build_tempo_key_profile(tracks, ["st-a"], NOW)
+    pa = p["stations"]["st-a"]
+    check(gd._mode_bpm([117.2, 117.2, 125.0, 125.0]) == 121.1, "tied BPMs resolve to their median (121.1), not the lowest")
+    check(gd._mode_key(["C major", "A minor", "C major", "A minor"]) is None, "tied keys resolve to None")
+    check(gd._mode_key(["C major", "C major", "A minor"]) == "C major", "a clear key mode still wins")
+    check(pa["plays"] == 7, f"the tied song still counts for tempo ({pa['plays']} plays)")
+    check(pa["minor_pct"] == 100 and pa["top_keys"] == [{"key": "E minor", "pct": 100}],
+          f"key stats skip the tied song ({pa['minor_pct']}, {pa['top_keys']})")
+    check(p["quality"]["key_agreement_pct"] == 100, "key agreement is measured over untied songs only")
+
     print()
     if FAILS:
         print(f"FAILED: {len(FAILS)} check(s)")
