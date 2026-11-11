@@ -262,7 +262,10 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
     await new Promise(r => setTimeout(r, 20));
     b.t.set({ uptime: JSON.parse(JSON.stringify(legacyFix)) }, STATIONS);
     b.t.renderUptime();
-    check('fallback output identical to the round-1 base renderUptime', b.els.uptimeContent._innerHTML === leg);
+    // The page-wide dash sweep (Bar, 2026-11-11) deliberately turned em/en
+    // dashes into hyphens; that is the only allowed difference.
+    const baseOut = b.els.uptimeContent._innerHTML.replace(/[\u2013\u2014]/g, '-');
+    check('fallback output identical to the round-1 base renderUptime (dashes normalised)', baseOut === leg);
   } else {
     console.log('note: base commit a06d9aff not reachable, identical-output check skipped');
   }

@@ -30,6 +30,10 @@ node tests/verify_section_tags.js               # section tags vs docs/SECTIONS.
 .venv/bin/python tests/verify_bpm_profile.py    # bpm_key.json profile (song-mode tempo/key)
 node tests/verify_deep_clusters.js              # deep:clusters overview + drill-down
 node tests/verify_deep_bpmkeys.js               # deep:bpm / deep:keys profile view + fallback
+node tests/verify_deep_transitions.js           # deep:transitions sticky station + scoped random/search
+node tests/verify_deep_uptime.js                # deep:uptime ops view + legacy fallback
+node tests/verify_no_dashes.js                  # no em/en dashes on the page, data dashes normalised
+.venv/bin/python tests/verify_ops.py            # ops detector + uptime.json ops block
 
 # proxy engine (lower-level interpreters, see notes in each file)
 .venv/bin/python tests/verify_proxy_healing.py          # frozen proxy is detected + healed
@@ -48,6 +52,10 @@ node tests/verify_section_tags.js && \
 .venv/bin/python tests/verify_bpm_profile.py && \
 node tests/verify_deep_clusters.js && \
 node tests/verify_deep_bpmkeys.js && \
+node tests/verify_deep_transitions.js && \
+node tests/verify_deep_uptime.js && \
+node tests/verify_no_dashes.js && \
+.venv/bin/python tests/verify_ops.py && \
 .venv/bin/python tests/verify_proxy_healing.py && \
 shazamio/.venv/bin/python tests/verify_capture_timeout.py --live && \
 echo "ALL SUITES PASSED"
@@ -72,6 +80,9 @@ node tests/verify_theme.js /tmp/live.html system-dark
 node tests/verify_section_tags.js /tmp/live.html
 node tests/verify_deep_clusters.js /tmp/live.html
 node tests/verify_deep_bpmkeys.js /tmp/live.html
+node tests/verify_deep_transitions.js /tmp/live.html
+node tests/verify_deep_uptime.js /tmp/live.html
+node tests/verify_no_dashes.js /tmp/live.html
 ```
 
 Also worth checking that the deploy actually shipped what you committed:
@@ -93,6 +104,10 @@ diff -q /tmp/live.html /tmp/committed.html && echo "live == main"
 | `verify_bpm_profile.py` | The `profile` block of `bpm_key.json` (deep tab): each song resolves to its modal BPM and modal key across its plays (min 3), station stats count plays with the song's values, tempo bands sum to 100 by largest remainder, day parts split at 06/12/18/00 Asia/Jerusalem, 30-day window, `low_data` below 50 plays, and every pre-existing `bpm_key.json` field is still present. Calls the real `build_tempo_key_profile()` and `build_bpm_key()`. |
 | `verify_deep_clusters.js` | `deep:clusters` lands on an overview with no click: hero, stat cards, one card per song group with its top songs and a cross-station share bar. Groups that share a dominant station (three were all `radio-tlv`) get distinct names (station + signature artists by plays, escalating to a third artist when the top two tie). Tapping a group opens the drill-down for that group, a refresh keeps it, back returns to the overview; song rows, search and the empty state still work. Synthetic clusters.json fixture. |
 | `verify_deep_bpmkeys.js` | `deep:bpm` and `deep:keys` render `bpm_key.json.profile` (per-song modal BPM/key): the hero names the station with the highest fast share / minor share computed from the data, rows are sorted, every 100% bar sums to 100, `low_data` stations get a gray chip, a muted bar and never headline, empty day parts render gray, and with no `profile` the legacy chart and key bars still render. A third argument runs it against a real file: `node tests/verify_deep_bpmkeys.js docs/index.html path/to/bpm_key.json`. |
+| `verify_deep_transitions.js` | The Transition Explorer keeps the station the user picked: random (x10 + x50) stays on it and every pick has outgoing transitions there; search is scoped to it and offers one tap to widen; selecting a result, hopping, breadcrumb, back, reset and a refresh all keep it; in 'all' mode a hop keeps 'all'; a song with no transitions on the station shows a plain message and a switch button without switching; no inline onclick; data escaped. Synthetic transition_map.json. |
+| `verify_deep_uptime.js` | `deep:uptime` renders `uptime.json.ops`: banner chip matches `ops.overall`, one row per stage with a 7-cell day strip, one card per station, incidents newest first collapsed to 5, an all-station incident reads "all stations", raw event `description` never rendered, unknown statuses gray, an open incident counts up to now; with no `ops` the legacy card renders unchanged. Optional real file: `node tests/verify_deep_uptime.js docs/index.html path/to/uptime.json`. |
+| `verify_no_dashes.js` | No em/en dash anywhere in `docs/index.html`; the real `esc()` turns dashes in data text into a hyphen while `escAttr()` keeps the raw value so artist/title lookups still match. |
+| `verify_ops.py` | The ops detector and `uptime.json.ops`: a reboot is not a station outage (stale pid file / thread id / another station's proxy), a heartbeat gap becomes a listening incident, incidents are bounded and idempotent, a single dark station is visible (the old any-station metric hid it), public text has no hostnames or paths. 39 checks. |
 | `verify_capture_timeout.py` | A stalled stream (accepts the connection, then goes silent) cannot freeze a station loop: ffmpeg gives up on its own via `-rw_timeout`; if it will not, the Python `CAPTURE_TIMEOUT` kills it; a cancelled capture leaves no orphan ffmpeg; and a healthy stream still captures exactly the expected WAV. This is the bug that cost radio-darom 5h19m of airtime on 2026-09-15. |
 | `verify_proxy_healing.py` | `_loop_verdict()` tells frozen from mid-backoff from never-started; a genuinely frozen proxy (bounds disabled, stalled stream) is reported stale even though its HTTP server answers; `start_one()` restarts it (not `already_running`), the restart is bounded by the cooldown, it is recorded as a **bounded outage** for the uptime panel, and a healthy proxy is left alone. |
 

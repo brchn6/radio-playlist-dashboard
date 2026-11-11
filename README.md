@@ -207,6 +207,29 @@ The `track_flags` table in Supabase is the single source of truth for which (art
 
 Flag in batches, not one at a time: a flag-set change forces clusters and the transition map to rebuild immediately. History day shards never carry the flag (the page derives the chip from `jingles.json`), so flagging does not re-upload them. `scripts/playlist_explorer.py` reads the same table.
 
+### 🩺 Operations: glitch detection and the daily digest
+
+The old uptime number counted a 5-minute window as "up" if any station logged a song, so it read ~100% while single stations, the host or the collector failed. `scripts/ops_monitor.py` is now the single detector: it reads the raw signals (proxy log heartbeats and capture failures, the collector's systemd journal, host boot times, `logs/publish.log`, tracks recognized vs saved) and records bounded, idempotent incidents in Supabase `system_events` (types `host_down`, `listening_gap`, `saving_gap`, `collector_down`, `publish_failed`, `ops_station_day`; documented in `scripts/ops_model.py`). `generate_data.py` reads only the DB and publishes them as `uptime.json.ops`, which `deep:uptime` renders: a status per pipeline stage, a 7-day strip, listening and saved % per station, and a plain-language incident list. Public text never contains hostnames, paths or raw errors.
+
+```bash
+# 1. Preview what the detector would record (read-only, writes nothing).
+.venv/bin/python scripts/ops_monitor.py --dry-run --days 7
+
+# 2. Record for real (one-time 7-day backfill; afterwards the hourly timer below).
+.venv/bin/python scripts/ops_monitor.py --days 7
+
+# 3. The daily digest (plain Hebrew text, printed; delivery channel not chosen yet).
+.venv/bin/python scripts/ops_digest.py
+
+# 4. Verify.
+.venv/bin/python tests/verify_ops.py
+node tests/verify_deep_uptime.js
+```
+
+Hourly schedule (systemd user timer, not installed by default): `~/.config/systemd/user/radio-ops-monitor.service` with `ExecStart=%h/dev/radio-playlist-dashboard/.venv/bin/python scripts/ops_monitor.py --days 2` and `WorkingDirectory=%h/dev/radio-playlist-dashboard`, plus a `.timer` with `OnBootSec=10min` and `OnUnitActiveSec=1h`. Each run reads about 2 days of tracks (~0.75 MB of egress).
+
+`scripts/radio-watchdog.sh` (cron, every 5 min) restarts the collector if systemd reports it inactive and records the event via `scripts/record_event.py`.
+
 ## 📻 Stations
 
 | Station | Slug |
