@@ -267,7 +267,7 @@ for sel in INTERACTIVE:
 # The section tags are labels for humans and agents, not primary controls, so
 # they are held to the AA minimum instead of the comfort target above. They are
 # still enforced: an unverifiable hit area is a failure here, not a warning.
-SMALL_TARGETS = ['.sec-tag']
+SMALL_TARGETS = ['.sec-tag', '.help-tip']
 for sel in SMALL_TARGETS:
     found = []
     for rule in re.finditer(r'([^{}]+)\{([^{}]*)\}', css):

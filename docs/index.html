@@ -521,6 +521,46 @@
     .sec-tag-flow{position:static;display:flex;width:max-content;margin:0 auto var(--sp-1) 0}
     /* inline: rides along a control row (the station pills) */
     .sec-tag-inline{position:static;margin:0;padding:0}
+    /* ── Deep-tab shared primitives (feat/deep-redesign) ──
+       One vocabulary for every deep:* section: a headline banner, big stat
+       cards, a "?" tooltip that holds the explanation (no prose paragraphs),
+       and status chips. Colours come from tokens only, so both themes work. */
+    .deep-hero{display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap;
+      padding:var(--sp-3) var(--sp-4);margin:var(--sp-2) 0 var(--sp-3);
+      border-radius:var(--radius-sm);background:var(--accent-soft);
+      border:1px solid var(--accent-tint);font-size:var(--fs-md);color:var(--fg)}
+    .deep-hero b{font-size:var(--fs-xl)}
+    .stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:var(--sp-2);margin-bottom:var(--sp-3)}
+    .stat-card{padding:var(--sp-3);border-radius:var(--radius-sm);background:var(--card-hover);
+      border:1px solid var(--border-soft);min-width:0}
+    .stat-card-value{font-family:var(--font-num);font-size:var(--fs-2xl);font-weight:700;line-height:1.1;color:var(--fg)}
+    .stat-card-label{font-size:var(--fs-xs);color:var(--muted);margin-top:var(--sp-1);
+      display:flex;align-items:center;gap:var(--sp-1)}
+    .stat-card.tone-ok .stat-card-value{color:var(--ok)}
+    .stat-card.tone-warn .stat-card-value{color:var(--warn)}
+    .stat-card.tone-bad .stat-card-value{color:var(--bad)}
+    .stat-card.tone-accent .stat-card-value{color:var(--accent)}
+    .stat-card.tone-minor .stat-card-value{color:var(--minor)}
+    .help-tip{position:relative;display:inline-flex;align-items:center;justify-content:center;
+      width:24px;height:24px;min-height:24px;padding:0;border:0;background:none;cursor:help;
+      color:var(--muted);font-family:var(--font-num);font-size:var(--fs-xs);font-weight:700;
+      vertical-align:middle;touch-action:manipulation}
+    .help-tip::before{content:"";position:absolute;inset:4px;border:1.5px solid currentColor;border-radius:50%}
+    .help-tip:hover,.help-tip:focus-visible{color:var(--fg)}
+    .help-bubble{display:none;position:absolute;bottom:calc(100% + 6px);right:-8px;z-index:30;
+      width:max-content;max-width:min(280px,80vw);padding:var(--sp-2) var(--sp-3);
+      border-radius:var(--radius-sm);background:var(--fg);color:var(--card);
+      font-family:var(--font);font-size:var(--fs-sm);font-weight:400;line-height:1.45;
+      text-align:start;white-space:normal;box-shadow:var(--shadow-lg);cursor:auto}
+    .help-tip:hover .help-bubble,.help-tip:focus .help-bubble{display:block}
+    .chip{display:inline-flex;align-items:center;padding:2px var(--sp-2);border-radius:var(--radius-pill);
+      font-size:var(--fs-xs);font-weight:600;line-height:1.5;white-space:nowrap;
+      background:var(--track);color:var(--fg-2)}
+    .chip-ok{background:var(--track);color:var(--ok)}
+    .chip-warn{background:var(--warn-soft);color:var(--warn)}
+    .chip-bad{background:var(--track);color:var(--bad)}
+    .chip-minor{background:var(--track);color:var(--minor)}
     /* Confirmation chip for click-to-copy. Inverted fg/card, so it needs no
        per-theme colours: it is legible in both by construction. */
     .sec-toast{position:fixed;left:50%;bottom:var(--sp-6);z-index:2000;
@@ -1196,6 +1236,27 @@ document.addEventListener('click', e => {
   const t = e.target && e.target.closest && e.target.closest('.sec-tag');
   if (t && t.dataset.sec) copySectionTag(t.dataset.sec);
 });
+/* ── Deep-tab shared primitives (feat/deep-redesign) ──
+   helpTip(text): a "?" button whose bubble holds the explanation. Opens on
+   hover and on focus, so a tap on a phone opens it too. text is escaped.
+   statCard(value, label, tip, tone): one big number. tone is one of
+   '', 'ok', 'warn', 'bad', 'accent', 'minor' (spelled out for ui_audit).
+   chip(text, tone): small status tag, tone '', 'ok', 'warn', 'bad', 'minor'. */
+function helpTip(text) {
+  return '<button type="button" class="help-tip" aria-label="' + esc(text).replace(/"/g, '&quot;') + '">?<span class="help-bubble" role="tooltip">' + esc(text) + '</span></button>';
+}
+function statCard(value, label, tip, tone) {
+  const cls = tone === 'ok' ? 'stat-card tone-ok' : tone === 'warn' ? 'stat-card tone-warn'
+    : tone === 'bad' ? 'stat-card tone-bad' : tone === 'accent' ? 'stat-card tone-accent'
+    : tone === 'minor' ? 'stat-card tone-minor' : 'stat-card';
+  return '<div class="' + cls + '"><div class="stat-card-value">' + esc(String(value)) + '</div>' +
+    '<div class="stat-card-label">' + esc(label) + (tip ? helpTip(tip) : '') + '</div></div>';
+}
+function chip(text, tone) {
+  const cls = tone === 'ok' ? 'chip chip-ok' : tone === 'warn' ? 'chip chip-warn'
+    : tone === 'bad' ? 'chip chip-bad' : tone === 'minor' ? 'chip chip-minor' : 'chip';
+  return '<span class="' + cls + '">' + esc(text) + '</span>';
+}
 function loadJSON(u) { return fetch(BASE + u, { signal: AbortSignal.timeout(25000) }).then(r => r.ok ? r.json() : null).catch(() => null); }
 /* Non-music flag chip (track_flags.kind). Gray = non-music; '' when unflagged. */
 const FLAG_LABELS = { ad: 'AD', jingle: 'JINGLE', show_theme: 'SHOW THEME' };
