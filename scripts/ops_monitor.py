@@ -114,6 +114,13 @@ def detect_listening_gaps(slug: str, beats: list[datetime], hosts: list[tuple[da
     pairs: list[tuple[datetime, datetime | None]] = list(zip(beats, beats[1:]))
     if beats and (now - beats[-1]).total_seconds() > threshold:
         pairs.append((beats[-1], None))                     # still silent right now
+    if not beats:
+        # No heartbeat in the whole scan (proxy dead since before it, or its
+        # log is missing): the station is dark from the scan start. Without
+        # this it showed as 100% listening (review, 2026-11-11). The start is
+        # stable across runs because main() widens the scan back to the
+        # earliest still-open incident, so the upsert key does not move.
+        pairs.append((since, None))
     for a, b in pairs:
         end = b or now
         if (end - a).total_seconds() <= threshold:
@@ -497,6 +504,35 @@ def record(db, rows: list[dict[str, Any]]) -> dict[str, int]:
     return counts
 
 
+MAX_REOPEN_DAYS = 14
+
+
+def scan_start(since: datetime, open_starts: list[datetime], now: datetime) -> datetime:
+    """Start the scan early enough to re-detect (and so update or close) every
+    incident that is still open in the DB. Without this, an incident still
+    open when its start left the --days window was never touched again and
+    stayed 'ongoing' forever (review, 2026-11-11). Capped so a very old open
+    row cannot make one run read weeks of tracks."""
+    floor = now - timedelta(days=MAX_REOPEN_DAYS)
+    starts = [t for t in open_starts if t is not None and t >= floor]
+    return min([since] + starts)
+
+
+def open_incident_starts(db) -> list[datetime]:
+    rows = db._query(
+        """SELECT started_at FROM system_events
+           WHERE ended_at IS NULL AND event_type = ANY(%s)""", [list(INCIDENT_TYPES)])
+    out = []
+    for r in rows or []:
+        t = r["started_at"]
+        if isinstance(t, str):
+            t = datetime.fromisoformat(t.replace("Z", "+00:00"))
+        if t is not None and t.tzinfo is None:
+            t = t.replace(tzinfo=timezone.utc)
+        out.append(t)
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Detect ops incidents and record them in system_events")
     ap.add_argument("--dry-run", action="store_true", help="print what would be written; write nothing")
@@ -511,6 +547,7 @@ def main() -> int:
     since = local_day_bounds((today - timedelta(days=args.days - 1)).isoformat())[0]
     slugs = [s["slug"] for s in STATIONS_CONFIG]
     db = SupabaseDB()
+    since = scan_start(since, open_incident_starts(db), now)
     rows = detect_all(gather(db, since, slugs), since, now)
 
     if args.dry_run:

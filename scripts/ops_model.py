@@ -198,6 +198,18 @@ def incident_text(event_type: str, station_name: str | None, seconds: float,
 
 # ── the builder ────────────────────────────────────────────────────────
 
+def ops_payload(rows: list[dict[str, Any]], stations: list[dict[str, Any]],
+                now: datetime) -> dict[str, Any] | None:
+    """`uptime.json.ops`, or None while the detector has never run (no
+    ops_station_day rows in the window). Publishing an all-gray "no data yet"
+    panel would replace the working legacy card on the live page until the
+    timer is installed; with None the page keeps its fallback (review,
+    2026-11-11)."""
+    if not any(r.get("event_type") == DAY_TYPE for r in rows or []):
+        return None
+    return build_ops(rows, stations, now)
+
+
 def build_ops(rows: list[dict[str, Any]], stations: list[dict[str, Any]],
               now: datetime, window_days: int = 7) -> dict[str, Any]:
     """Build `uptime.json.ops` from system_events rows. Pure: no I/O.

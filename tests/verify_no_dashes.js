@@ -25,6 +25,12 @@ check('no literal em/en dash anywhere in the page', literal.length === 0, litera
 const escapes = html.split('\n').map((l, i) => [i + 1, l]).filter(([, l]) => /\\u201[34]/.test(l) && !/^function esc\(s\)/.test(l.trim()));
 check('no \\u2014/\\u2013 escape outside esc()', escapes.length === 0, escapes.map(([n]) => 'line ' + n).join(', '));
 
+// Attributes that are read back as lookup keys (artist/title) must keep the raw
+// text: esc() would turn a dash into '-' and the lookup would miss the song
+// (top songs drill-down, review 2026-11-11).
+const keyAttrs = html.split('\n').map((l, i) => [i + 1, l]).filter(([, l]) => /data-(title|artist)="' \+ esc\(/.test(l));
+check('data-title / data-artist use escAttr(), not esc()', keyAttrs.length === 0, keyAttrs.map(([n]) => 'line ' + n).join(', '));
+
 const grab = name => {
   const m = html.match(new RegExp('^function ' + name + '\\(s\\) \\{.*\\}$', 'm'));
   return m ? m[0] : '';

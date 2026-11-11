@@ -131,13 +131,6 @@ def _proc_port(pid: int) -> int | None:
     return None
 
 
-def _pid_file_is_from_previous_boot(slug: str) -> bool:
-    """A pid file written before the current boot names a process that died
-    with the host. Its number now belongs to someone else."""
-    spawned, booted = _spawn_time(slug), _boot_time()
-    return spawned is not None and booted is not None and spawned < booted
-
-
 def is_running(slug: str) -> tuple[bool, int]:
     """Check if a proxy is running. Returns (running, pid).
 
@@ -147,17 +140,22 @@ def is_running(slug: str) -> tuple[bool, int]:
     thread id passes os.kill(tid, 0) and has the parent's cmdline, so the old
     radio-tlv.pid pointed at a thread of the NEW 99fm proxy. The manager then
     called radio-tlv "frozen since its pid file was written" (a 31h false
-    proxy_crash), and SIGTERM to that thread killed 99fm. So: reject pid files
-    from a previous boot, reject thread ids, reject another station's proxy.
+    proxy_crash), and SIGTERM to that thread killed 99fm. So: reject anything
+    that is not a shazamio_proxy.py PROCESS (not a thread) on THIS station's
+    port. Those three checks cover every reuse case.
+
+    Deliberately NOT checked: pid-file mtime vs boot time. btime moves when
+    the clock is stepped (NTP's first sync after boot), so a healthy proxy
+    whose pid file was written seconds before the step would be called dead,
+    its pid file deleted and a duplicate spawned every heal cycle (review,
+    2026-11-11). A pid file from a previous boot is harmless here: if its
+    number now names this station's own proxy process, it IS running.
     """
     pid_file = _pid_file(slug)
     if not pid_file.exists():
         return False, 0
     raw = pid_file.read_text().strip()
     if not raw:
-        pid_file.unlink(missing_ok=True)
-        return False, 0
-    if _pid_file_is_from_previous_boot(slug):
         pid_file.unlink(missing_ok=True)
         return False, 0
     pid = int(raw)

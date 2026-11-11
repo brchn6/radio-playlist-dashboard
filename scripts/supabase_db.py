@@ -733,14 +733,19 @@ class SupabaseDB:
         query fails).
         """
         self._ensure_system_events_table()
+        # ops_monitor writes 8 ops_station_day rows a day plus its incidents;
+        # they have their own reader (get_ops_events) and must not push real
+        # outages out of this LIMIT (review, 2026-11-11).
+        from ops_model import OPS_EVENT_TYPES
         return self._query(
             """SELECT id, event_type, source, started_at, ended_at,
                       duration_seconds, description, created_at
                FROM system_events
                WHERE started_at >= NOW() - INTERVAL '%s days'
+                 AND event_type <> ALL(%s)
                ORDER BY started_at DESC
                LIMIT %s""",
-            [days, limit],
+            [days, list(OPS_EVENT_TYPES), limit],
         )
 
     def get_ops_events(self, days: int = 8) -> list[dict[str, Any]]:

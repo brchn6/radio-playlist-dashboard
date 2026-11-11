@@ -90,13 +90,15 @@ def test_reboot() -> None:
         running, _ = pm.is_running(slug)
         check("baseline: this boot's own proxy is running", running)
 
-        # pid file written before the current boot (survived the reboot)
+        # pid file mtime before the boot time (a clock step after boot moves
+        # btime forward): this station's own live proxy must stay 'running'
+        # and its pid file must survive, or the heal timer spawns duplicates.
         pm._pid_file(slug).write_text(str(own.pid))
         old = time.time() - 31 * 3600
         os.utime(pm._pid_file(slug), (old, old))
         running, _ = pm.is_running(slug)
-        check("pid file from a previous boot is not 'running'", not running)
-        check("...and the stale pid file is removed", not pm._pid_file(slug).exists())
+        check("clock step: own live proxy with an 'old' pid file is still running", running)
+        check("...and its pid file is kept", pm._pid_file(slug).exists())
 
         # the old number now names a THREAD of another proxy (the real 2026-11-10 case)
         other = fake_proxy(other_port, threads=4)
@@ -379,10 +381,52 @@ def test_builder(detected: list[dict]) -> None:
           all(s["label"] in real["digest"] for s in real["stages"]))
 
 
+def test_review_fixes() -> None:
+    """Round-2 review: a fully dark station, and open incidents that must close."""
+    now = T("2026-11-11T12:00")
+    since = om.local_day_bounds("2026-11-10")[0]
+    # 1. galil wrote no heartbeat at all in the scan (dead before it / log missing)
+    dark_in = {**base_inputs(now), "beats": {**base_inputs(now)["beats"], "galil": []}}
+    rows = mon.detect_all(dark_in, since, now)
+    dark = [r for r in rows if r["event_type"] == "listening_gap" and r["source"] == "galil"]
+    # host downtime is cut out, so the dark stretch may split around a reboot
+    check("no heartbeat at all -> listening_gap from the scan start, still open at the end",
+          dark and dark[0]["started_at"] == mon.iso(since) and dark[-1]["ended_at"] is None, str(dark))
+    st = om.build_ops(rows, STATIONS, now)["stations"]["galil"]
+    check("...and the dark station is not 'ok' / 100%",
+          st["status"] != "ok" and (st["listening_pct"] or 0) < 100, str(st))
+    # 2. scan_start widens back to the earliest open incident (capped at 14 days)
+    open_start = T("2026-11-09T08:04")
+    check("scan widens back to an open incident", mon.scan_start(since, [open_start], now) == open_start)
+    check("no open incidents -> scan unchanged", mon.scan_start(since, [], now) == since)
+    check("an open incident older than 14 days does not widen the scan",
+          mon.scan_start(since, [now - timedelta(days=30)], now) == since)
+    # 3. an incident still open when its start left the window gets closed:
+    #    with the widened scan it is re-emitted under the same key with an end
+    full = mon.detect_all(base_inputs(now), om.local_day_bounds("2026-11-09")[0], now)
+    kol = [r for r in full if r["event_type"] == "listening_gap" and r["source"] == "kol-hashfela"][0]
+    start = datetime.fromisoformat(kol["started_at"].replace("Z", "+00:00"))
+    wide = mon.detect_all(base_inputs(now), mon.scan_start(since, [start], now), now)
+    again = [r for r in wide if (r["event_type"], r["source"], r["started_at"]) ==
+             ("listening_gap", "kol-hashfela", kol["started_at"])]
+    check("an open incident from before --days is re-detected and closed",
+          len(again) == 1 and again[0]["ended_at"] is not None, str(again))
+
+
 def test_wiring() -> None:
     src = (REPO / "scripts" / "generate_data.py").read_text()
     check("generate_data writes ops from the DB rows (get_ops_events -> build_ops)",
-          "build_ops(db.get_ops_events(" in src and "_uptime_payload" in src)
+          "ops_payload(db.get_ops_events(" in src and "_uptime_payload" in src)
+    dbsrc = (REPO / "scripts" / "supabase_db.py").read_text()
+    body = dbsrc.split("def get_recent_events", 1)[1].split("\n    def ", 1)[0]
+    check("legacy get_recent_events excludes ops rows (they must not crowd out real outages)",
+          "event_type <> ALL(%s)" in body and "OPS_EVENT_TYPES" in body)
+    now = T("2026-11-11T12:00")
+    check("no ops_station_day rows yet -> no ops block (page keeps its legacy card)",
+          om.ops_payload([], STATIONS, now) is None)
+    days = ["2026-11-10", "2026-11-11"]
+    check("with day rows -> ops block is built",
+          isinstance(om.ops_payload(day_rows_for(days, now), STATIONS, now), dict))
 
 
 def main() -> None:
@@ -390,6 +434,7 @@ def main() -> None:
     rows = test_detector()
     test_record(rows)
     test_builder(rows)
+    test_review_fixes()
     test_wiring()
     failed = [r for r in RESULTS if not r[0]]
     print(f"\n{len(RESULTS) - len(failed)}/{len(RESULTS)} checks passed")

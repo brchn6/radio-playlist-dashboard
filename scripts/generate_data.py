@@ -49,7 +49,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from supabase_db import SupabaseDB
-from ops_model import build_ops
+from ops_model import ops_payload
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
@@ -2043,7 +2043,9 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     def _uptime_payload() -> dict[str, Any]:
         payload = dict(uptime_data)
         try:
-            payload["ops"] = build_ops(db.get_ops_events(days=8), stations, now)
+            ops = ops_payload(db.get_ops_events(days=8), stations, now)
+            if ops is not None:
+                payload["ops"] = ops
         except Exception as exc:  # noqa: BLE001
             print(f"  [uptime] error building ops: {exc}", flush=True)
         return payload

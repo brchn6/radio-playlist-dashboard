@@ -1780,7 +1780,7 @@ function renderTopSongs() {
       }
     }
 
-    h += '<div class="top-row" data-title="' + esc(s.title) + '" data-artist="' + esc(s.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
+    h += '<div class="top-row" data-title="' + escAttr(s.title) + '" data-artist="' + escAttr(s.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(s.stations) + '\' data-window="' + topSongsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(s.title) + newBadge + '</div><div class="top-sub">' + esc(s.artist) + '<span class="top-stations">' + stationDots + '</span></div></div>';
     h += '<span class="top-count">' + displayCount + '×</span>';
@@ -1814,7 +1814,7 @@ function renderTopArtists() {
       '<span class="top-trend flat">-</span>');
     const stationDots = Object.keys(a.stations).map(sl => '<span class="top-station-dot" style="background:' + color(sl) + '" title="' + esc(name(sl)) + '"></span>').join('');
 
-    h += '<div class="top-row" data-artist="' + esc(a.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(a.stations) + '\' data-window="' + topArtistsWindow + '">';
+    h += '<div class="top-row" data-artist="' + escAttr(a.artist) + '" data-count="' + displayCount + '" data-stations=\'' + JSON.stringify(a.stations) + '\' data-window="' + topArtistsWindow + '">';
     h += '<span class="top-rank">' + (i + 1) + '</span>';
     h += '<div class="top-info"><div class="top-name">' + esc(a.artist) + '</div><div class="top-sub"><span class="top-stations">' + stationDots + '</span></div></div>';
     h += '<span class="top-count">' + displayCount + '×</span>';
@@ -3738,6 +3738,9 @@ function opsChip(status, text) {
 function opsPct(v) { return v == null || isNaN(v) ? null : Math.round(Number(v) * 10) / 10; }
 // Colour of a single percentage (station grid): same thresholds as the legacy dots.
 function opsPctStatus(v) { return v == null ? 'unknown' : v >= 99.5 ? 'ok' : v >= 95 ? 'partial' : 'failed'; }
+/* Saved % uses the backend's saving thresholds (ops_model SAVED_OK_PCT /
+   SAVED_PARTIAL_PCT = 98 / 90), not the listening ones. */
+function opsSavedStatus(v) { return v == null ? 'unknown' : v >= 98 ? 'ok' : v >= 90 ? 'partial' : 'failed'; }
 function opsMinutes(m) {
   if (m == null || isNaN(m)) return '';
   m = Math.round(Number(m));
@@ -3846,14 +3849,14 @@ function renderUptimeOps(el, ops) {
       const ia = order.indexOf(a.slug), ib = order.indexOf(b.slug);
       return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
     });
-    h += '<div class="ops-title">לפי תחנה' + helpTip('האזנה: אחוז הזמן שבו המערכת הקשיבה לשידור. שמירה: אחוז הזמן שבו שירים שזוהו גם נשמרו. ירוק מ-99.5%, צהוב מ-95%, אדום מתחת.') + '</div>';
+    h += '<div class="ops-title">לפי תחנה' + helpTip('האזנה: אחוז הזמן שבו המערכת הקשיבה לשידור (ירוק מ-99.5%, צהוב מ-95%). שמירה: אחוז השירים שזוהו ונשמרו (ירוק מ-98%, צהוב מ-90%). מתחת לזה אדום.') + '</div>';
     h += '<div class="ops-stations">';
     stRows.forEach(r => {
       const lp = opsPct(r.s.listening_pct), sp = opsPct(r.s.saved_pct);
       h += '<div class="' + OPS_ST_CLS[r.status] + '" data-s="' + escAttr(r.slug) + '">' +
         '<div class="ops-st-name">' + esc(name(r.slug)) + '</div><div class="ops-st-vals">' +
         '<span>האזנה <b class="' + OPS_VAL_CLS[opsPctStatus(lp)] + '">' + (lp == null ? '?' : lp + '%') + '</b></span>' +
-        '<span>שמירה <b class="' + OPS_VAL_CLS[opsPctStatus(sp)] + '">' + (sp == null ? '?' : sp + '%') + '</b></span>' +
+        '<span>שמירה <b class="' + OPS_VAL_CLS[opsSavedStatus(sp)] + '">' + (sp == null ? '?' : sp + '%') + '</b></span>' +
         '</div></div>';
     });
     h += '</div>';
