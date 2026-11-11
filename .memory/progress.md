@@ -699,3 +699,4 @@ file straight from disk, so it needs no restart.
 **Finding worth keeping:** sampling is ~1/min, so measured airtime has a ~1.5-2 min floor: a 30 s jingle and a 90 s ad bed look the same. The panel states this under Known limits.
 
 **Next:** merge into main once the other agent's work in the main checkout is committed (merge touches docs/index.html and generate_data.py there), then push. The live collector runs generate_data.py from the main checkout, so the panel's data appears on the first cycle after the merge; until then the panel shows "Method data not published yet".
+- 2026-11-11: feat/jingle-method merged (ff) and pushed to main at 481d1348; Pages run 43070256828 succeeded; published jingles.json carries method + evidence for all 15 flags. Worktree removed.
