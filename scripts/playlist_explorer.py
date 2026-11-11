@@ -23,7 +23,6 @@ from supabase_db import SupabaseDB
 from spotify_api import search_track, get_my_id, create_playlist, add_tracks_to_playlist
 
 # --- Config ---
-JINGLE_KEYWORDS = ["LukHash", "The Other Side"]  # artist/title substrings to drop
 OUTLIER_THRESHOLD = 50  # total plays in period - likely station IDs
 
 st.set_page_config(page_title="Radio Playlist Explorer", layout="wide", initial_sidebar_state="expanded")
@@ -31,8 +30,18 @@ st.set_page_config(page_title="Radio Playlist Explorer", layout="wide", initial_
 # --- Data Loading ---
 @st.cache_data(ttl=600, show_spinner="Loading tracks from database...")
 def load_tracks(station: str, days: int) -> pd.DataFrame:
-    """Load tracks from Postgres, convert to Israel time, drop jingles."""
+    """Load tracks from Postgres, convert to Israel time, drop flagged non-music.
+
+    Non-music (jingles / ads / show themes) comes from the track_flags table,
+    the same source generate_data.py filters on. A failed flags read stops
+    the app: showing jingles as songs silently is worse than showing nothing.
+    """
     db = SupabaseDB()
+    flags = db.get_track_flags()
+    if flags is None:
+        st.error("Could not read track_flags from the database - refusing to show unfiltered tracks.")
+        st.stop()
+    flagged_keys = {f["song_key"] for f in flags}
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     sql = """
         SELECT id, artist, title, recognized_at, bpm, musical_key
@@ -52,10 +61,10 @@ def load_tracks(station: str, days: int) -> pd.DataFrame:
     df["day_name"] = df["recognized_at"].dt.tz_convert("Asia/Jerusalem").dt.day_name()
     df["weekday"] = df["recognized_at"].dt.tz_convert("Asia/Jerusalem").dt.weekday
 
-    # Drop jingles: artist or title contains jingle keywords
-    jingle_mask = df["artist"].str.contains("|".join(JINGLE_KEYWORDS), case=False, na=False) | \
-                  df["title"].str.contains("|".join(JINGLE_KEYWORDS), case=False, na=False)
-    df = df[~jingle_mask].copy()
+    # Drop flagged non-music by song_key (lower(artist)|lower(title)), the
+    # same key as generate_data.song_key() and SupabaseDB.flag_key().
+    keys = df["artist"].fillna("").str.lower() + "|" + df["title"].fillna("").str.lower()
+    df = df[~keys.isin(flagged_keys)].copy()
 
     return df
 

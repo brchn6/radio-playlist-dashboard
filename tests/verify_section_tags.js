@@ -61,7 +61,7 @@ check('the page and the registry are not trivially empty', srcTags.size >= 15 &&
 // block. This pins each card comment to the tag that follows it.
 const CARD_TAG = {
   'Top Songs': 'insights:top-songs', 'Top Artists': 'insights:top-artists',
-  'Cross-Station': 'insights:cross-station', 'History': 'insights:history',
+  'Cross-Station': 'insights:cross-station', 'Jingles': 'insights:jingles', 'History': 'insights:history',
   'BPM Flow': 'deep:bpm', 'Key Distribution': 'deep:keys',
   'Song Transitions': 'deep:transitions', 'Clusters': 'deep:clusters',
   'Redundancy': 'deep:redundancy', 'Uptime': 'deep:uptime',

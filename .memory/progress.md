@@ -662,3 +662,23 @@ Bar's.
 **Next:** push approval (Pages deploys the frontend on push, ~30s), then Bar
 looks at it on his phone. The Tailscale preview on head1 (port 8099) serves the
 file straight from disk, so it needs no restart.
+
+## 2026-11-11 - Jingle / ad filter (track_flags)
+
+**Branch:** `feat/jingle-filter` (from `main` at `af8b3feb`), committed, NOT pushed. Built by lead + two herdr worker agents (`backend`, `frontend`) coordinated through `.scratch/jingle-filter/contract.md` and `channel.log` (gitignored scratch).
+
+**Problem:** Shazam matches jingles, ad beds and show themes as songs. The Doors - Riders On The Storm was #1 overall at a median 1.8 min on air (baseline 3.65 min across all plays).
+
+| Piece | Where |
+|---|---|
+| Table `track_flags` (song_key PK, kind jingle/ad/show_theme), created live 2026-11-11, public read only | `supabase_schema.sql` |
+| `get_track_flags()` (None on failure), `upsert_track_flag`, `remove_track_flag`, `flag_key` | `scripts/supabase_db.py` |
+| Detector + human-confirm CLI (`--review`, `--list`, `--flag`, `--unflag`) | `scripts/jingle_detector.py` |
+| Music-only aggregates, `jingles.json`, `stats.flags`, `flag` on current/recent (NOT on history shards), abort if flags unreadable | `scripts/generate_data.py` |
+| Explorer reads the table, hardcoded `JINGLE_KEYWORDS` retired | `scripts/playlist_explorer.py` |
+| Section `insights:jingles`, gray AD/JINGLE/SHOW THEME chips on now-playing + history (history chip derived from jingles.json) | `docs/index.html`, `docs/SECTIONS.md` |
+| Test (real builders, red-checked) | `tests/verify_track_flags.py` |
+
+**Verified:** all 8 suites green (verify_track_flags, verify_section_tags 20 tags, verify_nobulk, verify_drilldown, verify_theme, ui_audit 41/0/0, verify_proxy_healing, verify_capture_timeout 7/7 via shazamio venv). Real-data smoke with a simulated Doors flag (no DB write): Doors leaves top/trends/cross/clusters/bpm/transitions, Bar Tzabari becomes #1. `tracks` row count unchanged by the schema change (261475).
+
+**Not done yet:** zero flags in the DB, so the live site is unchanged. Next: first flagging batch with Bar in ONE go (`jingle_detector.py --review`), include LukHash - The Other Side (explorer used to drop it by keyword), then push approval. Visual check of the new section is Bar's (no browser on head1).

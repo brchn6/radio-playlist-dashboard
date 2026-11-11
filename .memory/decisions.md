@@ -339,3 +339,13 @@ stays: an id that moves is an id nobody can rely on.
 primary controls, which is why `ui_audit.py` got a separate `SMALL_TARGETS` list
 instead of being added to `INTERACTIVE`. Below 768px every tag becomes a flow
 line so it cannot overlap a Hebrew section title.
+
+## 2026-11-11 - Non-music tracks are flagged, never deleted, and hidden from music stats
+
+**Decision (Bar):** jingles/ads/show themes are hidden from every music aggregate and shown in their own section (`insights:jingles`); a detector ranks suspects but a human confirms each flag; now-playing shows a gray chip instead of pretending a song is on air.
+
+**Single source of truth:** Supabase `track_flags`, keyed by `song_key` = lower(artist)|lower(title). `tracks` is never modified. Flags are read with a function that returns None on failure, and `generate_data.py` aborts on None rather than silently publish unfiltered stats.
+
+**History shards carry no flag (egress):** a per-row flag would rewrite ~121 shards (~21 MB gzip) on every flag-set change. The page derives the history chip from `jingles.json`. Only `current.json` and `recent.json` (rewritten every cycle anyway) carry `flag`.
+
+**Transitions are built on the music-only sequence:** A -> jingle -> B counts as A -> B. `stats.json` headline counts (total, today) stay raw.

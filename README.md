@@ -181,6 +181,32 @@ appends, the script calls `sync_mirror()` afterwards, which re-fetches that delt
 from Postgres and re-appends anything the rewrite clobbered. The write itself is
 atomic (temp file + `os.replace`), so a crash cannot leave a truncated mirror.
 
+### 🔇 Flagging jingles, ads and show themes
+
+Shazam matches station jingles, ad beds (library music, or a real song licensed for a commercial) and show themes as if they were songs. Before this filter, The Doors - Riders On The Storm was the #1 "song" on the dashboard while airing for a median 1.8 minutes (real songs: 3.65).
+
+The `track_flags` table in Supabase is the single source of truth for which (artist, title) pairs are non-music. Rows in `tracks` are never touched. `generate_data.py` excludes flagged tracks from every music aggregate (top songs, trends, cross-station, clusters, BPM/key, transitions, so A -> jingle -> B reads A -> B), lists them in `jingles.json` (section `insights:jingles`), and marks them with a gray AD / JINGLE / SHOW THEME chip on now-playing cards and history rows. If the flags cannot be read, generation aborts rather than publish unfiltered stats.
+
+```bash
+# 1. Rank suspects (read-only). Main signal: median minutes until the next
+#    different track on the same station.
+.venv/bin/python scripts/jingle_detector.py            # --days 60 --max-median 2.0 --min-plays 20
+
+# 2. Review interactively: y/n/q per suspect, then kind (j/a/s) and a note.
+.venv/bin/python scripts/jingle_detector.py --review
+
+#    Or flag / unflag one track directly.
+.venv/bin/python scripts/jingle_detector.py --flag "The Doors" "Riders On The Storm" --kind ad --note "ad bed"
+.venv/bin/python scripts/jingle_detector.py --unflag "The Doors" "Riders On The Storm"
+
+# 3. Verify: the flag is listed, and the next collector cycle (or a manual
+#    publish) removes it from top.json and adds it to jingles.json.
+.venv/bin/python scripts/jingle_detector.py --list
+.venv/bin/python tests/verify_track_flags.py
+```
+
+Flag in batches, not one at a time: a flag-set change forces clusters and the transition map to rebuild immediately. History day shards never carry the flag (the page derives the chip from `jingles.json`), so flagging does not re-upload them. `scripts/playlist_explorer.py` reads the same table.
+
 ## 📻 Stations
 
 | Station | Slug |

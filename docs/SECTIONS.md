@@ -33,6 +33,7 @@ family is generated, so it is documented as a pattern.
 | `insights:top-songs` | corner | Top songs card, including its window pills | `renderTopSongs()` |
 | `insights:top-artists` | corner | Top artists card, including its window pills | `renderTopArtists()` |
 | `insights:cross-station` | corner | Cross-station card (songs that jump between stations) | `renderCrossStation()` |
+| `insights:jingles` | corner | Jingles & ads card: tracks flagged as non-music (`jingles.json`) | `renderJingles()` |
 | `insights:history` | corner | History card: search box, unique/newest toggles | `renderHistory()` |
 | `insights:history-list` | flow | The history rows and the "show more" button | `renderHistory()`, `loadMoreHistory()` |
 | `deep:bpm` | corner | BPM flow chart card | `renderBpmRealtime()` |

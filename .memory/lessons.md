@@ -489,3 +489,10 @@ zero-warning posture. Same reasoning applies to any generated class name.
 
 **Files/commands involved:** `docs/index.html::secTag`, `tests/ui_audit.py`
 (dead-CSS section), `python3 tests/ui_audit.py`.
+
+## 2026-11-11 - Per-row fields on immutable shards cost a full re-upload
+
+**What went wrong:** the first jingle-filter contract put a `flag` field on every history shard row. That would have rewritten all ~121 day shards (~21 MB gzip) on deploy and again on every later flag, against the egress budget the sharding exists to protect.
+**Why:** the field depends on mutable metadata (the flag set) but was stored in files designed to be immutable.
+**Correct approach:** keep shards a pure raw log; publish the mutable metadata in one small file (`jingles.json`) and join client-side by key.
+**Files/commands involved:** `scripts/generate_data.py` (`raw_row()` vs `public()`), `docs/index.html` (`rowFlag`), `tests/verify_track_flags.py` (shard byte-identity check).

@@ -97,6 +97,28 @@ create index if not exists idx_non_music_started on public.non_music_log (starte
 
 
 -- ============================================================================
+-- track_flags: Shazam matches that are NOT songs (jingles, ads, show themes)
+-- ============================================================================
+-- Shazam happily matches a station jingle or an ad bed (library music, or a
+-- real song licensed for a commercial) as if it were a song. Those rows stay in
+-- `tracks` untouched (raw log, never deleted); this table is the single source
+-- of truth for which (artist, title) pairs are non-music. generate_data.py
+-- excludes them from every music statistic and lists them in jingles.json.
+--
+-- song_key = lower(artist) || '|' || lower(title), identical to song_key() in
+-- scripts/generate_data.py. Written only by scripts/jingle_detector.py after a
+-- human confirms each flag.
+create table if not exists public.track_flags (
+    song_key    text primary key,
+    artist      text not null,
+    title       text not null,
+    kind        text not null check (kind in ('jingle', 'ad', 'show_theme')),
+    note        text,
+    flagged_at  timestamptz not null default now()
+);
+
+
+-- ============================================================================
 -- Row Level Security
 -- ============================================================================
 -- Model: the public may READ everything and WRITE nothing.
@@ -110,6 +132,7 @@ create index if not exists idx_non_music_started on public.non_music_log (starte
 alter table public.stations      enable row level security;
 alter table public.tracks        enable row level security;
 alter table public.non_music_log enable row level security;
+alter table public.track_flags   enable row level security;
 
 -- Public read.
 drop policy if exists "public read stations" on public.stations;
@@ -136,6 +159,13 @@ create policy "public read non_music_log"
 revoke insert, update, delete on public.stations      from anon, authenticated;
 revoke insert, update, delete on public.tracks        from anon, authenticated;
 revoke insert, update, delete on public.non_music_log from anon, authenticated;
+revoke insert, update, delete on public.track_flags   from anon, authenticated;
+
+drop policy if exists "public read track_flags" on public.track_flags;
+create policy "public read track_flags"
+    on public.track_flags for select
+    to anon, authenticated
+    using (true);
 
 
 -- ============================================================================

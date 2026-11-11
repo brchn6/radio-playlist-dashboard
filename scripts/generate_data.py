@@ -341,6 +341,123 @@ def song_key(t: dict[str, Any]) -> str:
     return (t["artist"] or "").lower() + "|" + (t["title"] or "").lower()
 
 
+# ── Non-music flags (jingles / ad beds / show themes) ───────────────────
+# Shazam matches jingles and ad beds as songs. The `track_flags` table is the
+# single source of truth for which song_keys are non-music. Every MUSIC
+# aggregate (top, trends, cross, clusters, bpm/key, transitions, first_seen)
+# is built from the music-only list; the raw log (recent, history shards,
+# current) keeps every row and only gains a `flag` field. Flagged tracks are
+# published on their own in jingles.json.
+FLAG_KINDS = ("jingle", "ad", "show_theme")
+CROSS_LIMIT = 30
+
+
+def load_flags(db: SupabaseDB) -> dict[str, dict[str, Any]]:
+    """song_key -> flag row. Aborts if the read FAILED.
+
+    get_track_flags() returns None on a read failure (vs [] = nothing
+    flagged). Publishing in that state would silently put jingles back into
+    every music chart, so we refuse to generate instead.
+    """
+    flags = db.get_track_flags()
+    if flags is None:
+        raise SystemExit("[generate_data] track_flags read failed - refusing to "
+                         "publish unfiltered music stats")
+    return {f["song_key"]: f for f in flags}
+
+
+def split_flagged(tracks: list[dict[str, Any]], flags: dict[str, dict[str, Any]]
+                  ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """(music, flagged), each keeping the input order."""
+    music: list[dict[str, Any]] = []
+    flagged: list[dict[str, Any]] = []
+    for t in tracks:
+        (flagged if song_key(t) in flags else music).append(t)
+    return music, flagged
+
+
+def flag_of(t: dict[str, Any], flags: dict[str, dict[str, Any]]) -> str | None:
+    f = flags.get(song_key(t))
+    return f["kind"] if f else None
+
+
+def filter_cross(cross_tracks: list[dict[str, Any]], flags: dict[str, dict[str, Any]],
+                 limit: int = CROSS_LIMIT) -> list[dict[str, Any]]:
+    """Drop flagged rows from the SQL cross-station result, keep the first `limit`."""
+    return [t for t in cross_tracks if song_key(t) not in flags][:limit]
+
+
+def build_jingles(flagged_tracks: list[dict[str, Any]], flags: dict[str, dict[str, Any]],
+                  now: datetime) -> dict[str, Any]:
+    """jingles.json: every flagged song_key with its play counts (see contract.md).
+
+    `stations` is the all-time per-station play count (sums to plays_total).
+    A flag whose song never played still appears, with zero plays.
+    """
+    week_ago = now - timedelta(days=7)
+    acc: dict[str, dict[str, Any]] = {}
+    for key, f in flags.items():
+        acc[key] = {
+            "song_key": key, "artist": f["artist"], "title": f["title"],
+            "kind": f["kind"], "note": f.get("note"),
+            "plays_total": 0, "plays_7d": 0, "stations": defaultdict(int),
+            "first_seen": None, "last_seen": None, "song_image": None,
+            "_last_img_dt": None,
+        }
+    for t in flagged_tracks:
+        e = acc.get(song_key(t))
+        if e is None:
+            continue
+        e["plays_total"] += 1
+        if t["_dt"] >= week_ago:
+            e["plays_7d"] += 1
+        e["stations"][t["station_slug"]] += 1
+        ts = t["recognized_at"]
+        if e["first_seen"] is None or ts < e["first_seen"]:
+            e["first_seen"] = ts
+        if e["last_seen"] is None or ts > e["last_seen"]:
+            e["last_seen"] = ts
+        if t.get("song_image") and (e["_last_img_dt"] is None or t["_dt"] > e["_last_img_dt"]):
+            e["song_image"] = t["song_image"]
+            e["_last_img_dt"] = t["_dt"]
+    out = []
+    for e in acc.values():
+        e.pop("_last_img_dt")
+        e["stations"] = dict(sorted(e["stations"].items(), key=lambda kv: -kv[1]))
+        out.append(e)
+    out.sort(key=lambda e: (-e["plays_7d"], -e["plays_total"], e["song_key"]))
+    return {"generated_at": now_iso(), "count": len(out), "tracks": out}
+
+
+def build_flag_stats(jingles: dict[str, Any]) -> dict[str, Any]:
+    """stats.flags block, derived from the jingles.json payload."""
+    by_kind = {k: 0 for k in FLAG_KINDS}
+    for e in jingles["tracks"]:
+        by_kind[e["kind"]] = by_kind.get(e["kind"], 0) + 1
+    return {
+        "count": jingles["count"],
+        "by_kind": by_kind,
+        "flagged_plays_7d": sum(e["plays_7d"] for e in jingles["tracks"]),
+    }
+
+
+def flags_changed(output_dir: Path, flags: dict[str, dict[str, Any]]) -> bool:
+    """True when the flag set (keys + kinds) differs from the last jingles.json.
+
+    The slow aggregates are rebuilt only every 5 min / 24 h. Without this, a
+    freshly flagged jingle would stay in clusters.json and transition_map.json
+    for up to a day. A change in the flag set bypasses those gates once.
+    """
+    path = output_dir / "jingles.json"
+    current = {k: f["kind"] for k, f in flags.items()}
+    try:
+        prev = json.loads(path.read_text("utf-8"))
+        previous = {e["song_key"]: e["kind"] for e in prev.get("tracks", [])}
+    except (OSError, ValueError, KeyError, TypeError):
+        return True
+    return previous != current
+
+
 def build_top(tracks: list[dict[str, Any]], now: datetime,
               first_seen_map: dict[str, str] | None = None) -> dict[str, Any]:
     """Top artists/songs per window with previous-window counts for trend arrows.
@@ -1181,11 +1298,19 @@ def build_transitions(tracks: list[dict[str, Any]], slugs: list[str]) -> dict[st
 def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     output_dir.mkdir(parents=True, exist_ok=True)
     db = SupabaseDB()
+    # Flags first: if they cannot be read, abort before writing anything.
+    flags = load_flags(db)
     stations = db.get_stations()
     slugs = [s["slug"] for s in stations]
     total_count = db.get_all_tracks_count()
     now = datetime.now(timezone.utc)
     sizes: dict[str, int] = {}
+    # A change in the flag set must reach every music aggregate now, not when
+    # its refresh gate next expires.
+    force_rebuild = flags_changed(output_dir, flags)
+    slow_s = 0 if force_rebuild else SLOW_REFRESH_SECONDS
+    if force_rebuild:
+        print(f"  [flags] flag set changed ({len(flags)} flagged) - rebuilding all music aggregates", flush=True)
 
     # Load the full track list from the LOCAL mirror, fetching only the delta
     # from Postgres (Option A egress fix). Prune old rows first so the mirror
@@ -1201,13 +1326,23 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         t["_il"] = dt.astimezone(IL_TZ)
         annotated.append(t)
     tracks = annotated
+    # music: every music aggregate reads ONLY this. tracks stays the raw log.
+    music, flagged_tracks = split_flagged(tracks, flags)
 
-    def public(t: dict[str, Any]) -> dict[str, Any]:
+    def raw_row(t: dict[str, Any]) -> dict[str, Any]:
         return {k: v for k, v in t.items() if not k.startswith("_")}
 
-    # ── Build first_seen map from all tracks ──────────────────────
+    def public(t: dict[str, Any]) -> dict[str, Any]:
+        # current.json / recent.json rows only. History shards use raw_row():
+        # a flag there would rewrite ~every shard on each flag-set change
+        # (egress); the frontend derives the shard chip from jingles.json.
+        row = raw_row(t)
+        row["flag"] = flag_of(t, flags)
+        return row
+
+    # ── Build first_seen map from music tracks ────────────────────
     first_seen_map: dict[str, str] = {}
-    for t in sorted(tracks, key=lambda x: x["_dt"]):
+    for t in sorted(music, key=lambda x: x["_dt"]):
         first_seen_map.setdefault(song_key(t), t["_il"].strftime("%Y-%m-%d"))
 
     write_json(output_dir / "stations.json", stations, sizes, "stations.json")
@@ -1236,7 +1371,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
             dt_first = parse_utc(first_seen)
             if dt_first:
                 duration_seconds = round((datetime.now(timezone.utc) - dt_first).total_seconds())
-        entry = public(ct)
+        entry = public(ct)  # carries "flag" (now-playing AD/JINGLE chip)
         entry["first_seen_at"] = first_seen
         entry["duration_seconds"] = duration_seconds
         current_annotated.append(entry)
@@ -1256,7 +1391,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     by_day: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for t in tracks:
         day = t["_il"].strftime("%Y-%m-%d")
-        by_day[day].append(public(t))
+        by_day[day].append(raw_row(t))  # no `flag`: shards stay byte-identical
     history_days = sorted(by_day.keys())  # ascending: 2026-07-13, ..., today
 
     # Write each day as an immutable shard: history/YYYY-MM-DD.json
@@ -1293,14 +1428,15 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     }, sizes, "history_index.json")
 
     maybe_write_json(output_dir / "top.json", "top.json",
-                     lambda: {"windows": build_top(tracks, now, first_seen_map)},
-                     sizes, SLOW_REFRESH_SECONDS, now)
+                     lambda: {"windows": build_top(music, now, first_seen_map)},
+                     sizes, slow_s, now)
 
     # v2: removed timeline.json, heatmap.json, non_music.json
-    trends = build_trends(tracks, now)
+    trends = build_trends(music, now)
 
-    # ── Per-station redundancy (repeat-safe tracks only) ──
-    trusted = repeat_safe(tracks)
+    # ── Per-station redundancy (repeat-safe MUSIC tracks only: a jingle
+    # aired 4x/day would otherwise read as "this station repeats itself") ──
+    trusted = repeat_safe(music)
     hours_since = (now - REPEAT_DATA_EPOCH).total_seconds() / 3600
     ready = hours_since >= MIN_EPOCH_HOURS and len(trusted) > 0
     by_slug: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1398,13 +1534,17 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         "daily_trend": dict(daily_rep_trend),
     }
     maybe_write_json(output_dir / "trends.json", "trends.json",
-                     lambda: trends, sizes, SLOW_REFRESH_SECONDS, now)
+                     lambda: trends, sizes, slow_s, now)
     # ── Cross-station: enrich with per-station play counts ──────────
     station_song_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
-    for tr in tracks:
+    for tr in music:
         station_song_counts[tr["station_slug"]][song_key(tr)] += 1
 
-    cross_tracks = db.get_cross_station_tracks()
+    # The ranking is SQL over raw tracks, so over-fetch and drop flagged rows
+    # in Python. One song_key can span several SQL groups (case / text
+    # variants), hence the generous headroom.
+    cross_tracks = filter_cross(
+        db.get_cross_station_tracks(limit=CROSS_LIMIT + 5 * len(flags) + 20), flags)
     for t in cross_tracks:
         station_slugs = (t.get("station_slugs") or "").split(",")
         per_station: dict[str, int] = {}
@@ -1424,29 +1564,30 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
 
     maybe_write_json(output_dir / "cross_station.json", "cross_station.json",
                      lambda: {"tracks": cross_tracks},
-                     sizes, SLOW_REFRESH_SECONDS, now)
+                     sizes, slow_s, now)
     # Cluster graph is a meta-analysis: only regenerate every CLUSTER_REFRESH_HOURS.
     # The 30-second poll shouldn't shuffle the force graph — it's confusing and wasteful.
     cluster_path = output_dir / "clusters.json"
-    if cluster_path.exists():
+    if cluster_path.exists() and not force_rebuild:
         mtime = datetime.fromtimestamp(cluster_path.stat().st_mtime, tz=timezone.utc)
         age_h = (now - mtime).total_seconds() / 3600
         if age_h < CLUSTER_REFRESH_HOURS:
             sizes["clusters.json"] = cluster_path.stat().st_size
             print(f"  [cluster] skipped — {age_h:.1f}h old (< {CLUSTER_REFRESH_HOURS}h refresh)", flush=True)
         else:
-            write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
+            write_json(cluster_path, build_song_clusters(music, now), sizes, "clusters.json")
     else:
-        write_json(cluster_path, build_song_clusters(tracks, now), sizes, "clusters.json")
+        write_json(cluster_path, build_song_clusters(music, now), sizes, "clusters.json")
     maybe_write_json(output_dir / "bpm_key.json", "bpm_key.json",
-                     lambda: build_bpm_key(tracks, slugs),
-                     sizes, SLOW_REFRESH_SECONDS, now)
+                     lambda: build_bpm_key(music, slugs),
+                     sizes, slow_s, now)
     # transitions_result stays unconditional: transition_map.json (24h gate)
     # below consumes its _from_song_map. Only the transitions.json WRITE is gated.
-    transitions_result = build_transitions(tracks, slugs)
+    # Built on the MUSIC-only per-station sequence, so A -> jingle -> B is A -> B.
+    transitions_result = build_transitions(music, slugs)
     maybe_write_json(output_dir / "transitions.json", "transitions.json",
                      lambda: {"stations": transitions_result["stations"]},
-                     sizes, SLOW_REFRESH_SECONDS, now)
+                     sizes, slow_s, now)
 
     # ── Transition explorer map ────────────────────────────────────
     from_song_map = transitions_result.get("_from_song_map", {})
@@ -1465,7 +1606,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     # tab re-downloaded it. Regenerate only every TRANSITION_MAP_REFRESH_HOURS
     # (same pattern as clusters.json). transitions.json (small) stays fresh.
     transition_map_path = output_dir / "transition_map.json"
-    if transition_map_path.exists():
+    if transition_map_path.exists() and not force_rebuild:
         mtime = datetime.fromtimestamp(transition_map_path.stat().st_mtime, tz=timezone.utc)
         age_h = (now - mtime).total_seconds() / 3600
         if age_h < TRANSITION_MAP_REFRESH_HOURS:
@@ -1493,6 +1634,14 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     stats["tracks_by_date"] = db.get_track_count_by_date()
     stats["non_music"] = db.get_non_music_stats()
 
+    # ── Flagged non-music tracks: their own file + headline counts ──
+    # Same refresh gate as the other slow files (plays_7d moves every cycle,
+    # and generated_at would move the content hash every poll otherwise).
+    jingles = build_jingles(flagged_tracks, flags, now)
+    stats["flags"] = build_flag_stats(jingles)
+    maybe_write_json(output_dir / "jingles.json", "jingles.json",
+                     lambda: jingles, sizes, slow_s, now)
+
     # Repeat/redundancy readiness — consumers must check `ready` before showing
     # any "this station repeats itself" claim. See REPEAT_DATA_EPOCH.
     trusted = repeat_safe(tracks)
@@ -1518,7 +1667,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
         max(station_today, key=station_today.get) if station_today else None)
     stats["updated_at"] = now_iso()
     maybe_write_json(output_dir / "stats.json", "stats.json",
-                     lambda: stats, sizes, SLOW_REFRESH_SECONDS, now)
+                     lambda: stats, sizes, slow_s, now)
 
     # ── Uptime / System Events ────────────────────────────────────
     # Uptime is MEASURED, not assumed: a 5-minute bucket with no track from

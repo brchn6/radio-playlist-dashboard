@@ -596,6 +596,65 @@ class SupabaseDB:
         except Exception:
             return []
 
+    # ── Track flags (jingles / ads / show themes) ──────────────────────
+
+    TRACK_FLAG_KINDS = ("jingle", "ad", "show_theme")
+
+    @staticmethod
+    def flag_key(artist: str | None, title: str | None) -> str:
+        """Same shape as generate_data.song_key(): lower(artist)|lower(title)."""
+        return (artist or "").lower() + "|" + (title or "").lower()
+
+    def get_track_flags(self) -> list[dict[str, Any]] | None:
+        """All flagged non-music tracks.
+
+        Returns None (not []) when the read fails, so a caller can tell
+        "nothing is flagged" from "the flags could not be read" and refuse to
+        publish silently unfiltered stats.
+        """
+        if not self.connected():
+            return None
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """SELECT song_key, artist, title, kind, note, flagged_at
+                       FROM track_flags ORDER BY flagged_at"""
+                )
+                cols = [d[0] for d in cur.description]
+                rows = []
+                for row in cur.fetchall():
+                    d = dict(zip(cols, row))
+                    if isinstance(d.get("flagged_at"), datetime):
+                        d["flagged_at"] = d["flagged_at"].strftime("%Y-%m-%dT%H:%M:%SZ")
+                    rows.append(d)
+                return rows
+        except Exception as exc:
+            print(f"[supabase_db] get_track_flags failed: {exc}", flush=True)
+            return None
+
+    def upsert_track_flag(
+        self, artist: str, title: str, kind: str, note: str | None = None,
+    ) -> bool:
+        """Flag (or re-classify) one (artist, title) as non-music."""
+        if kind not in self.TRACK_FLAG_KINDS:
+            raise ValueError(f"kind must be one of {self.TRACK_FLAG_KINDS}, got {kind!r}")
+        rc = self._execute(
+            """INSERT INTO track_flags (song_key, artist, title, kind, note)
+               VALUES (%s, %s, %s, %s, %s)
+               ON CONFLICT (song_key) DO UPDATE
+               SET kind = EXCLUDED.kind, note = EXCLUDED.note, flagged_at = NOW()""",
+            [self.flag_key(artist, title), artist, title, kind, note],
+        )
+        return rc is not None
+
+    def remove_track_flag(self, artist: str, title: str) -> bool:
+        """Unflag one (artist, title). Touches only track_flags, never tracks."""
+        rc = self._execute(
+            "DELETE FROM track_flags WHERE song_key = %s",
+            [self.flag_key(artist, title)],
+        )
+        return bool(rc)
+
     # ── Maintenance ────────────────────────────────────────────────────
 
     def cleanup_old_tracks(self, days: int = 45) -> int:

@@ -590,6 +590,20 @@
     .cross-station-pill{font-size:var(--fs-xs);padding:3px 9px}
     .cross-donut svg{width:34px;height:34px}
 
+    /* ── Non-music flags (jingles, ads, show themes): gray = non-music ── */
+    .flag-chip{display:inline-block;font-family:var(--font-num);font-size:var(--fs-xs);font-weight:600;line-height:1.4;letter-spacing:.4px;
+      padding:1px 7px;border-radius:var(--radius-pill);border:1px solid var(--border);background:var(--card);color:var(--unknown);
+      direction:ltr;unicode-bidi:isolate;white-space:nowrap;vertical-align:middle;margin-inline-start:6px}
+    .jingle-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3);border-bottom:1px solid var(--divider)}
+    .jingle-row:last-child{border-bottom:none}
+    .jingle-info{flex:1;min-width:0}
+    .jingle-song{font-weight:600;font-size:var(--fs-base)}
+    .jingle-meta{font-size:var(--fs-xs);color:var(--muted);margin-top:2px}
+    .jingle-stations{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+    .jingle-plays{flex-shrink:0;text-align:center;min-width:52px}
+    .jingle-plays-num{font-family:var(--font-num);font-size:var(--fs-xl);font-weight:700;color:var(--unknown);line-height:1.1}
+    .jingle-plays-label{font-size:var(--fs-xs);color:var(--muted)}
+
     /* ── Window pills / legends / charts ── */
     .window-pills{gap:var(--sp-2);margin-bottom:var(--sp-3)}
     .window-pill{font-size:var(--fs-sm);padding:8px 14px;min-height:36px;border-radius:var(--radius-pill)}
@@ -824,6 +838,16 @@
       <div class="section-sub">שירים שבורחים מתחנה אחת ומתנגנים בכמה תחנות</div>
     </div>
     <div id="crossStationList"></div>
+  </div>
+
+  <!-- Jingles -->
+  <div class="card">
+    <button type="button" class="sec-tag" data-sec="insights:jingles" title="insights:jingles - click to copy">insights:jingles</button>
+    <div class="section-header">
+      <div class="section-title">📢 ג'ינגלים ופרסומות - Jingles &amp; Ads</div>
+      <div class="section-sub">רצועות שסומנו כלא-מוזיקה ולא נספרות בסטטיסטיקות</div>
+    </div>
+    <div id="jinglesList"></div>
   </div>
 
   <!-- History -->
@@ -1173,6 +1197,26 @@ document.addEventListener('click', e => {
   if (t && t.dataset.sec) copySectionTag(t.dataset.sec);
 });
 function loadJSON(u) { return fetch(BASE + u, { signal: AbortSignal.timeout(25000) }).then(r => r.ok ? r.json() : null).catch(() => null); }
+/* Non-music flag chip (track_flags.kind). Gray = non-music; '' when unflagged. */
+const FLAG_LABELS = { ad: 'AD', jingle: 'JINGLE', show_theme: 'SHOW THEME' };
+function flagLabel(kind) { return FLAG_LABELS[kind] || String(kind).replace(/_/g, ' ').toUpperCase(); }
+function flagChip(kind) { return kind ? '<span class="flag-chip">' + esc(flagLabel(kind)) + '</span>' : ''; }
+/* History day shards carry no `flag` (adding it would rewrite every shard on
+   each flag change), so a row's kind is looked up in jingles.json by the same
+   song_key as Python's song_key(). A row that carries its own `flag` field
+   (recent.json) wins, even when it is null. */
+let flagMapSrc = null, flagMap = new Map();
+function songKey(t) { return (t.artist || '').toLowerCase() + '|' + (t.title || '').toLowerCase(); }
+function rowFlag(t) {
+  if (!t) return null;
+  if ('flag' in t) return t.flag;
+  const j = D.jingles;
+  if (j !== flagMapSrc) {
+    flagMapSrc = j;
+    flagMap = new Map(((j && j.tracks) || []).map(x => [x.song_key || songKey(x), x.kind]));
+  }
+  return flagMap.get(songKey(t)) || null;
+}
 function stationBySlug(slug) { return stations.find(s => s.slug === slug); }
 function color(slug) { const s = stationBySlug(slug); return s ? s.color : ACCENT; }
 function name(slug) { const s = stationBySlug(slug); return s ? s.name : slug; }
@@ -1226,6 +1270,14 @@ async function loadTracked(name) {
   return data;
 }
 
+/* jingles.json is newer than some deploys. When the manifest is known and does
+   not list it, skip the request instead of logging a 404 on every poll; the
+   section then shows its "unavailable" state. null = unavailable. */
+function loadJingles() {
+  if (Object.keys(manifest).length && manifest['jingles.json'] === undefined) return Promise.resolve(null);
+  return loadTracked('jingles.json');
+}
+
 async function fetchManifest() {
   const m = await loadJSON('manifest.json');
   if (m) manifest = m.files || {};
@@ -1239,7 +1291,7 @@ let deepDataPromise = null;
 
 async function fetchAll() {
   await fetchManifest();
-  const [st, cur, hist, hIdx, top, cross, bpm, trends, stats, trans, uptime] = await Promise.all([
+  const [st, cur, hist, hIdx, top, cross, bpm, trends, stats, trans, uptime, jingles] = await Promise.all([
     loadTracked('stations.json'),
     loadTracked('current.json'),
     loadTracked('recent.json'),
@@ -1251,10 +1303,11 @@ async function fetchAll() {
     loadTracked('stats.json'),
     loadTracked('transitions.json'),
     loadTracked('uptime.json'),
+    loadJingles(),
   ]);
   if (st) stations = st;
   if (hist && hist.history) mergeTracks(hist.history);
-  D = { current: cur, history: { history: historyState.merged, total: hist ? hist.total : 0 }, historyIndex: hIdx, top, cross, bpm, clusters: D.clusters, trends, stats, transitions: trans, transition_map: D.transition_map, uptime };
+  D = { current: cur, history: { history: historyState.merged, total: hist ? hist.total : 0 }, historyIndex: hIdx, top, cross, bpm, clusters: D.clusters, trends, stats, transitions: trans, transition_map: D.transition_map, uptime, jingles };
   if (deepDataLoaded) {
     const [clust, transMap] = await Promise.all([
       loadTracked('clusters.json'),
@@ -1378,7 +1431,7 @@ function renderNowPlaying() {
     if (c) {
       h += '<div class="np-now">';
       h += '<div class="np-now-label">◄ מנגן עכשיו</div>';
-      h += '<div class="np-title">' + esc(c.title) + '</div>';
+      h += '<div class="np-title">' + esc(c.title) + flagChip(c.flag) + '</div>';
       h += '<div class="np-artist">' + esc(c.artist) + '</div>';
       // Timing info
       const recogTs = c.recognized_at || '';
@@ -1404,7 +1457,7 @@ function renderNowPlaying() {
     if (prev) {
       h += '<div class="np-prev">';
       h += '<div class="np-prev-label">▸ קודם</div>';
-      h += '<div class="np-prev-title">' + esc(prev.title) + '</div>';
+      h += '<div class="np-prev-title">' + esc(prev.title) + flagChip(rowFlag(prev)) + '</div>';
       h += '<div class="np-prev-artist">' + esc(prev.artist) + '</div>';
       h += '</div>';
     }
@@ -1616,6 +1669,38 @@ function renderCrossStation() {
   el.innerHTML = h || '<div style="color:var(--muted);text-align:center;padding:20px">אין נתונים</div>';
 }
 
+/* insights:jingles - tracks flagged as non-music (jingles.json). They are
+   excluded from every music stat, so this is the one place they are listed. */
+function renderJingles() {
+  const el = document.getElementById('jinglesList');
+  const empty = msg => '<div style="color:var(--muted);text-align:center;padding:20px">' + msg + '</div>';
+  if (D.jingles === undefined) { el.innerHTML = empty('טוען...'); return; }
+  if (!D.jingles || !Array.isArray(D.jingles.tracks)) { el.innerHTML = empty('לא זמין עדיין'); return; }
+  let tracks = D.jingles.tracks;
+  if (activeStation) tracks = tracks.filter(t => t.stations && t.stations[activeStation] > 0);
+  if (!tracks.length) {
+    el.innerHTML = empty(D.jingles.count ? 'אין רצועות מסומנות בתחנה זו' : 'אין רצועות מסומנות');
+    return;
+  }
+  let h = '';
+  tracks.forEach(t => {
+    const st = Object.entries(t.stations || {}).sort((a, b) => b[1] - a[1]);
+    const pills = st.map(([sl, n]) => {
+      const c = color(sl);
+      return '<span class="cross-station-pill" style="color:' + c + ';border-color:' + c + '40">' + esc(name(sl)) + ' ' + n + '</span>';
+    }).join('');
+    h += '<div class="jingle-row">';
+    h += '<div class="jingle-info">';
+    h += '<div class="jingle-song">' + esc(t.artist) + ' - ' + esc(t.title) + flagChip(t.kind) + '</div>';
+    h += '<div class="jingle-meta">' + (t.plays_total || 0).toLocaleString() + ' השמעות סה"כ · נראה לאחרונה ' + (t.last_seen ? timeAgo(t.last_seen) : '-') + '</div>';
+    if (pills) h += '<div class="jingle-stations">' + pills + '</div>';
+    h += '</div>';
+    h += '<div class="jingle-plays"><div class="jingle-plays-num">' + (t.plays_7d || 0).toLocaleString() + '</div><div class="jingle-plays-label">7 ימים</div></div>';
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
 function renderHistory() {
   const el = document.getElementById('historyList');
   if (!D.history || !D.history.history) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">טוען...</div>'; return; }
@@ -1692,7 +1777,7 @@ function renderHistory() {
   shown.forEach(t => {
     h += '<div class="hist-item">';
     h += '<span class="hist-station" style="color:' + color(t.station_slug) + '">' + esc(name(t.station_slug)) + '</span>';
-    h += '<div class="hist-info"><span class="hist-artist">' + esc(t.artist) + '</span> — <span class="hist-title">' + esc(t.title) + '</span></div>';
+    h += '<div class="hist-info"><span class="hist-artist">' + esc(t.artist) + '</span> — <span class="hist-title">' + esc(t.title) + '</span>' + flagChip(rowFlag(t)) + '</div>';
     h += '<span class="hist-time">' + timeAgo(t.recognized_at) + '</span>';
     h += '</div>';
   });
@@ -3062,6 +3147,7 @@ function renderAll() {
     renderTopSongs();
     renderTopArtists();
     renderCrossStation();
+    renderJingles();
     renderHistory();
   } else if (tab === 'deep') {
     renderBpmFlow();
