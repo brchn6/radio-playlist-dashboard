@@ -496,3 +496,15 @@ zero-warning posture. Same reasoning applies to any generated class name.
 **Why:** the field depends on mutable metadata (the flag set) but was stored in files designed to be immutable.
 **Correct approach:** keep shards a pure raw log; publish the mutable metadata in one small file (`jingles.json`) and join client-side by key.
 **Files/commands involved:** `scripts/generate_data.py` (`raw_row()` vs `public()`), `docs/index.html` (`rowFlag`), `tests/verify_track_flags.py` (shard byte-identity check).
+
+## 2026-11-11 - Parallel workers all append to the same README lines
+
+**What went wrong:** each of 3 workers added its test to the same three spots in `tests/README.md` (run list, chained command, table), so every merge after the first conflicted.
+**Why:** the contract assigned ownership inside `docs/index.html` but not in shared docs.
+**Correct approach:** in the team contract, the lead pre-reserves placeholder lines in shared files (README rows, SECTIONS.md) or the lead adds those rows at merge time.
+**Files/commands involved:** `tests/README.md`, `.scratch/deep-redesign/contract.md`.
+
+## 2026-11-11 - Red-checking Python by in-place edit can be fooled by a stale .pyc
+
+**What went wrong:** after restoring `generate_data.py` byte-identically, the test still failed: `scripts/__pycache__` held the mutated bytecode (same size, same mtime second).
+**Correct approach:** `rm -rf scripts/__pycache__` before re-running, or red-check on a copy.

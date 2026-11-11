@@ -349,3 +349,9 @@ line so it cannot overlap a Hebrew section title.
 **History shards carry no flag (egress):** a per-row flag would rewrite ~121 shards (~21 MB gzip) on every flag-set change. The page derives the history chip from `jingles.json`. Only `current.json` and `recent.json` (rewritten every cycle anyway) carry `flag`.
 
 **Transitions are built on the music-only sequence:** A -> jingle -> B counts as A -> B. `stats.json` headline counts (total, today) stay raw.
+
+## 2026-11-11 - Deep tab shows per-song modal values, and names a winner only with a real lead
+
+**Decision (Bar approved the plan):** BPM/key stats on the deep tab use each song's modal BPM/key across its plays (min 3 plays) instead of raw per-play values, and are shown as per-station comparisons (tempo bands, minor share) instead of time series. The `bpm_key.json` change is additive so the deployed page keeps working during rollout.
+**Why:** per-play values are noisy (31 BPM grid values, 62% key agreement); averaging them by hour produced flat lines that looked generated. Per-song modes recover real station differences.
+**Honesty rule:** a hero line names a "fastest" / "most minor" station only when it leads the runner-up by >= 5 points (`DEEP_STANDOUT_PTS`), else "no station stands out" with the spread.

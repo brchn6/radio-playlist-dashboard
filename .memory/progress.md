@@ -685,3 +685,24 @@ file straight from disk, so it needs no restart.
 
 **Update 2026-11-11 (same day):** Bar approved the first batch: 15 flags written in one go (8 jingle/show_theme incl. LukHash and two small variants, 5 ads: Doors, Black Keys, Balkan Beat Box, Ofenbach PARTY x2, Dominic Fike). The live collector (it runs generate_data.py from this working tree, so the branch's data side went live at commit time) picked them up on the next cycle: jingles.json count 15, top.json #1 is now Bar Tzabari, Riders On The Storm absent from top/cross/transitions/clusters/bpm/trends, publish uploaded ~1.2 MB (no shard re-upload). Worker panes closed. Remaining: push approval (frontend section appears only after Pages deploys), Bar's visual check. Open candidate: Temper City - Self Aware (now #3, looks like library music but normal airtime). Unrelated open issue: updater.py crashes on `SSL SYSCALL error: EOF` in `end_non_music_event` (systemd restarts it).
 - 2026-11-11: feat/jingle-filter merged (ff) and pushed to main at 1386434d; Pages deploy run 43063554598 succeeded, live page serves insights:jingles.
+
+## 2026-11-11 - Deep-tab redesign (deep:bpm, deep:keys, deep:clusters)
+
+**Branch:** `feat/deep-redesign` in worktree `~/dev/radio-playlist-dashboard.worktrees/integration`, committed, NOT pushed, NOT merged to main. Built by lead + 3 agents (`data`, `ui-bpmkeys`, `ui-clusters`), each in its own worktree, coordinated through `.scratch/deep-redesign/contract.md` + `channel.log`, then one independent review. Worktrees for the three worker branches still exist.
+
+**Why (Bar):** the deep tab "looks AI generated, trends not clear". Root cause was data, not design: librosa BPM has 31 grid values, per-play key agrees with the song's usual key 62%, BPM within 4 of usual 77%, so hourly averages were flat noise.
+
+| Piece | Where |
+|---|---|
+| `profile` block (per-song modal BPM/key, tempo bands, minor %, day parts, quality), additive | `scripts/generate_data.py::build_tempo_key_profile`, called by `build_bpm_key` |
+| Shared primitives `helpTip` / `statCard` / `chip`, `.deep-hero`, `.stat-cards` | `docs/index.html` |
+| deep:bpm: hero, stat cards, per-station fast/mid/slow 100% bars, day-part tiles; legacy chart only as fallback | `renderBpmProfile` |
+| deep:keys: minor/major per station, top-3 key chips; 24x48 heatmap removed | `renderKeyDistProfile` |
+| deep:clusters: lands on 11 named song-group cards, drill-down + back | `renderClusterOverview` |
+| Tests | `tests/verify_bpm_profile.py`, `tests/verify_deep_bpmkeys.js` (34), `tests/verify_deep_clusters.js` (29) |
+
+**Real numbers (30 days):** radio-darom 65% minor / 40% fast vs 42-50% / 29-32% for the rest; nights 36% fast vs mornings 30%.
+
+**Verified:** all suites green on the merged branch (ui_audit 46/0/0). `verify_proxy_healing.py` cannot run in a worktree (no `shazamio/.venv`), branch does not touch proxy code. Not verified: visuals (no browser on head1). Preview for Bar: `http://100.93.8.110:8098/` (scratchpad copy, bpm_key.json from fixture, rest live).
+
+**Next:** Bar's visual check on phone + both themes; decide review item 5 (mode tie-breaking: 7% of songs tie on BPM, 13% on key; median BPM flips 117/125 on tie rule); then merge to main (data side goes live at merge because the collector runs from the main tree) and push approval. Open follow-ups: "Shtriker Big Band - Chunky Monkey" looks like an unflagged jingle; clusters "played together" also counts cross-station same-5-min plays (likely inflates cross %).
