@@ -68,7 +68,7 @@ const BUILTIN = {
       inc('2026-11-09T00:22:00Z', 3, 'host', [], 'partial', 'T_REBOOT_2', 'I_REBOOT_2'),
       inc('2026-11-10T07:50:00Z', 1, 'collector', [], 'partial', 'T_COLL_2', 'I_COLL_2'),
       inc('2026-11-06T23:00:00Z', 1, 'collector', [], 'partial', 'T_COLL_1', 'I_COLL_1'),
-      inc('2026-11-10T07:27:00Z', 3, 'host', [], 'partial', 'T_REBOOT_3', 'I_REBOOT_3'),
+      inc('2026-11-10T07:27:00Z', 3, 'host', ['99fm', 'galgalatz', 'galil', 'radio-tlv'], 'partial', 'T_REBOOT_3', 'I_REBOOT_3'),
       inc('2026-11-08T14:00:00Z', 135, 'saving', ['99fm'], 'partial', 'T_SAVE_99', 'I_SAVE_99'),
       inc('2026-11-07T23:21:00Z', 3, 'host', [], 'partial', 'T_REBOOT_1', 'I_REBOOT_1'),
     ],
@@ -198,8 +198,13 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
   check('every incident has an Israel-time line', incChunks.every(c => /<span class="ops-inc-time">[^<]*\d{1,2}:\d{2}/.test(c)));
   check('every incident has a recovered/ongoing chip', incChunks.every(c => c.includes('חזר לפעול') || c.includes('עדיין פתוח') || c.includes('ops-gray')));
   check('every incident has a severity chip', incChunks.every(c => c.includes('<span class="chip chip-warn">חלקי</span>') || c.includes('<span class="chip chip-bad">תקלה</span>')));
-  const withSt = sorted.slice(0, want).filter(i => (i.stations || []).length);
-  check('affected stations shown as dots', withSt.every(i => i.stations.every(s => out.includes('<span class="ops-dot" style="background:#5ddbb5"></span>ST_' + s))));
+  const allSlugs = Object.keys(OPS.stations || {});
+  const coversAll = i => allSlugs.length > 1 && allSlugs.every(s => (i.stations || []).includes(s));
+  const incOf = i => incChunks[sorted.indexOf(i)] || '';
+  const withSt = sorted.slice(0, want).filter(i => (i.stations || []).length && !coversAll(i));
+  check('affected stations shown as dots', withSt.every(i => i.stations.every(s => incOf(i).includes('<span class="ops-dot" style="background:#5ddbb5"></span>ST_' + s))));
+  const allInc = sorted.slice(0, want).filter(coversAll);
+  check('an incident hitting every station reads "all stations", not 8 dots', allInc.every(i => incOf(i).includes('כל התחנות') && !incOf(i).includes('ST_')), allInc.length + ' such');
 
   // public and plain
   const descs = [].concat(OPS.incidents.map(i => i.description), (FIX.recent_outages || []).map(o => o.description)).filter(Boolean);

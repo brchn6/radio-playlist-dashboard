@@ -840,6 +840,7 @@
     .ops-inc-sts{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-3);margin-top:var(--sp-1);font-size:var(--fs-xs);color:var(--fg-2)}
     .ops-inc-st{display:inline-flex;align-items:center;gap:var(--sp-1)}
     .ops-dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+    .ops-dot-all{background:var(--fg-2)}
     .ops-empty{font-size:var(--fs-sm);color:var(--ok);padding:var(--sp-2) 0}
     .ops-more{display:block;width:100%;min-height:44px;margin-top:var(--sp-2);border:1px solid var(--border);
       border-radius:var(--radius-sm);background:var(--card-hover);color:var(--fg);font:inherit;font-size:var(--fs-sm);
@@ -3654,7 +3655,10 @@ function renderUptimeOps(el, ops) {
         chip(stageLabel[i.stage] || i.stage || '', '') + sev + state + '</div>';
       h += '<div class="ops-inc-title">' + esc(i.title || '') + '</div>';
       if (i.impact) h += '<div class="ops-inc-impact">' + esc(i.impact) + '</div>';
-      if (Array.isArray(i.stations) && i.stations.length) {
+      const allSt = Object.keys(stationsMap);
+      if (Array.isArray(i.stations) && allSt.length > 1 && allSt.every(slug => i.stations.includes(slug))) {
+        h += '<div class="ops-inc-sts"><span class="ops-inc-st"><span class="ops-dot ops-dot-all"></span>כל התחנות</span></div>';
+      } else if (Array.isArray(i.stations) && i.stations.length) {
         h += '<div class="ops-inc-sts">' + i.stations.map(slug =>
           '<span class="ops-inc-st"><span class="ops-dot" style="background:' + escAttr(color(slug)) + '"></span>' + esc(name(slug)) + '</span>').join('') + '</div>';
       }
