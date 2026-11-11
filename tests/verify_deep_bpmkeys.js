@@ -182,6 +182,30 @@ const nonIncreasing = a => a.every((v, i) => i === 0 || a[i - 1] >= v);
   check('heatmap gone', !keys.includes('key-heatmap') && !/function renderKeyHeatmap/.test(script));
   check('legacy key legend hidden in profile mode', els.keyLegacyLegend.style.display === 'none');
 
+  // ── 4b. no clear leader: nobody is crowned ─────────────────────────
+  // A 1-point lead must not name a "fastest" / "most minor" station.
+  const tie = JSON.parse(JSON.stringify(FIX));
+  const tp = tie.profile;
+  Object.values(tp.stations).forEach(p => { if (p && !p.low_data) { p.tempo = { slow: 18, mid: 51, fast: 31 }; p.minor_pct = 45; p.major_pct = 55; } });
+  const tieTop = Object.keys(tp.stations).find(k => !tp.stations[k].low_data);
+  tp.stations[tieTop].tempo = { slow: 18, mid: 50, fast: 32 };
+  tp.stations[tieTop].minor_pct = 46; tp.stations[tieTop].major_pct = 54;
+  ctx.set({ bpm: tie }, STATIONS);
+  ctx.bpmStation = 'all';
+  ctx.renderBpmFlow(); ctx.renderKeyDist();
+  const tHero = (els.bpmProfile._innerHTML.match(/<div class="deep-hero">([\s\S]*?)<button/) || [])[1] || '';
+  const tkHero = (els.keyDistContent._innerHTML.match(/<div class="deep-hero">([\s\S]*?)<button/) || [])[1] || '';
+  check('bpm hero: a 1-point lead names no station', tHero.includes('אין תחנה בולטת') && !tHero.includes('ST_' + tieTop), tHero);
+  check('keys hero: a 1-point lead names no station', tkHero.includes('אין תחנה בולטת') && !tkHero.includes('ST_' + tieTop), tkHero);
+
+  // ── 4c. a profile with zero plays falls back instead of printing "null%" ──
+  const empty = JSON.parse(JSON.stringify(FIX));
+  empty.profile.all.plays = 0; empty.profile.all.minor_pct = null; empty.profile.all.major_pct = null;
+  ctx.set({ bpm: empty }, STATIONS);
+  let emptyThrew = null;
+  try { ctx.renderBpmFlow(); ctx.renderKeyDist(); } catch (e) { emptyThrew = e; }
+  check('zero-play profile: no "null%" and no throw', !emptyThrew && !/null%/.test(els.keyDistContent._innerHTML + els.bpmProfile._innerHTML), emptyThrew && emptyThrew.message);
+
   // ── 5. fallback: no profile deployed yet ───────────────────────────
   // the pill click above left a station selected, so every station gets legacy data
   const legacy = { stations: Object.fromEntries(STATIONS.map(s => [s.slug,

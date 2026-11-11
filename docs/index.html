@@ -1306,6 +1306,19 @@ document.addEventListener('click', e => {
 function helpTip(text) {
   return '<button type="button" class="help-tip" aria-label="' + esc(text).replace(/"/g, '&quot;') + '">?<span class="help-bubble" role="tooltip">' + esc(text) + '</span></button>';
 }
+function fitHelpBubble(btn) {
+  const b = btn && btn.querySelector && btn.querySelector('.help-bubble');
+  if (!b || typeof window === 'undefined') return;
+  b.style.right = '';
+  const r = b.getBoundingClientRect(), vw = document.documentElement.clientWidth || window.innerWidth, pad = 8;
+  if (!r.width) return;
+  if (r.left < pad) b.style.right = (-8 - (pad - r.left)) + 'px';
+  else if (r.right > vw - pad) b.style.right = (-8 + (r.right - (vw - pad))) + 'px';
+}
+['mouseover', 'focusin'].forEach(ev => document.addEventListener(ev, e => {
+  const t = e.target && e.target.closest && e.target.closest('.help-tip');
+  if (t) fitHelpBubble(t);
+}));
 function statCard(value, label, tip, tone) {
   const cls = tone === 'ok' ? 'stat-card tone-ok' : tone === 'warn' ? 'stat-card tone-warn'
     : tone === 'bad' ? 'stat-card tone-bad' : tone === 'accent' ? 'stat-card tone-accent'
@@ -1950,8 +1963,11 @@ const BPM_DAYPARTS = [
   ['morning', 'בוקר', '06-11'], ['afternoon', 'צהריים', '12-17'],
   ['evening', 'ערב', '18-23'], ['night', 'לילה', '00-05'],
 ];
+/* A station is named in a hero line only when it leads the runner-up by at
+   least this many percentage points. */
+const DEEP_STANDOUT_PTS = 5;
 function bpmProfileReady() {
-  return !!(D.bpm && D.bpm.profile && D.bpm.profile.stations && D.bpm.profile.all);
+  return !!(D.bpm && D.bpm.profile && D.bpm.profile.stations && D.bpm.profile.all && D.bpm.profile.all.plays > 0);
 }
 /* Station profiles that carry enough plays to be compared (low_data excluded). */
 function bpmProfileStations(prof) {
@@ -2016,11 +2032,17 @@ function renderBpmProfile() {
   const top = sorted[0];
   const all = prof.all;
   let h = '';
-  if (top) {
+  // Name a winner only when it clearly leads the runner-up; otherwise a
+  // 1-point lead or a tie would crown an arbitrary station.
+  if (top && !(sorted[1] && top[1].tempo.fast - sorted[1][1].tempo.fast < DEEP_STANDOUT_PTS)) {
     const rest = bpmWeighted(sorted.slice(1), p => p.tempo.fast);
     h += '<div class="deep-hero"><span><b>' + esc(name(top[0])) + '</b> הכי מהירה: <b>' + top[1].tempo.fast + '%</b> שירים מהירים' +
       (rest != null ? ', מול ' + rest + '% בשאר התחנות' : '') + '</span>' +
       helpTip('שיר מהיר = ' + fastLo + ' BPM ומעלה. "שאר התחנות" = ממוצע משוקלל לפי מספר ההשמעות.') + '</div>';
+  } else if (top) {
+    const lo = sorted[sorted.length - 1][1].tempo.fast;
+    h += '<div class="deep-hero"><span>אין תחנה בולטת בקצב: <b>' + lo + '-' + top[1].tempo.fast + '%</b> שירים מהירים בכל התחנות</span>' +
+      helpTip('שיר מהיר = ' + fastLo + ' BPM ומעלה. תחנה נחשבת בולטת רק כשהיא מקדימה את הבאה אחריה ב-' + DEEP_STANDOUT_PTS + ' נקודות לפחות.') + '</div>';
   }
   const dps = all.dayparts || {};
   const night = dps.night && dps.night.fast_pct, morning = dps.morning && dps.morning.fast_pct;
@@ -2029,7 +2051,7 @@ function renderBpmProfile() {
       'חצי מההשמעות מתחת לערך הזה וחצי מעליו. ' + (q.songs_used || '?') + ' שירים, ' + (q.plays_used || '?') + ' השמעות.', 'accent') +
     (top ? statCard(top[1].tempo.fast + '%', 'מהירים ב' + name(top[0]), 'חציון BPM בתחנה: ' + top[1].median_bpm, 'accent') : '') +
     (night != null && morning != null ? statCard(night + '%', 'מהירים בלילה, מול ' + morning + '% בבוקר',
-      'לילה 00-05, בוקר 06-11 (שעון ישראל), כל התחנות.', night > morning ? 'warn' : '') : '') +
+      'לילה 00-05, בוקר 06-11 (שעון ישראל), כל התחנות.', night > morning ? 'accent' : '') : '') +
     '</div>';
 
   // Per-station 100% stacked bars, fastest first; 'all' as a dashed reference row.
@@ -2336,7 +2358,11 @@ function renderKeyDistProfile() {
   const sorted = ok.slice().sort((a, b) => b[1].minor_pct - a[1].minor_pct);
   const top = sorted[0];
   let h = '';
-  if (top) {
+  if (top && sorted[1] && top[1].minor_pct - sorted[1][1].minor_pct < DEEP_STANDOUT_PTS) {
+    const lo = sorted[sorted.length - 1][1].minor_pct;
+    h += '<div class="deep-hero"><span>אין תחנה בולטת: <b>' + lo + '-' + top[1].minor_pct + '%</b> מינור בכל התחנות</span>' +
+      helpTip('תחנה נחשבת בולטת רק כשהיא מקדימה את הבאה אחריה ב-' + DEEP_STANDOUT_PTS + ' נקודות לפחות.') + '</div>';
+  } else if (top) {
     h += '<div class="deep-hero"><span><b>' + esc(name(top[0])) + '</b> הכי מינורית: <b>' + top[1].minor_pct + '%</b> מינור, מול ממוצע ' +
       all.minor_pct + '%</span>' + helpTip('מינור נשמע לרוב עצוב או קודר, מז׳ור שמח ובהיר. הממוצע הוא של כל ההשמעות בכל התחנות.') + '</div>';
   }
@@ -2956,7 +2982,7 @@ function clusterShareLabel(pct) { return pct < 50 ? 'ייחודית לתחנה' 
 
 function clusterSongRow(i) {
   const s = D.clusters.songs[i];
-  return '<button type="button" class="cluster-song" data-si="' + i + '">' +
+  return '<button type="button" class="cluster-song" data-artist="' + escAttr(s.artist || '') + '" data-title="' + escAttr(s.title || '') + '">' +
     '<span class="cluster-song-text"><span class="cluster-song-title" dir="auto">' + esc(s.title) + '</span>' +
     '<span class="cluster-song-artist" dir="auto">' + esc(s.artist) + '</span></span>' +
     (s.is_bridge ? chip('גשר', 'minor') : '') +
@@ -2982,14 +3008,14 @@ function renderClusterOverview() {
   const distinct = groups.slice().sort((a, b) => a.cross_pct - b.cross_pct)[0];
 
   let h = '<div class="deep-hero"><span><b>' + groups.length + '</b> קבוצות שירים ב-' + hours + ' שעות</span>' +
-    '<span>הכי ייחודית: <b>' + esc(name(distinct.station)) + '</b> (' + (100 - distinct.cross_pct) + '% מהשירים רק בה)</span>' + helpTip(clusterTipTogether(hours)) + '</div>';
+    '<span>הקבוצה הכי ייחודית: <b dir="auto">' + esc(distinct.name) + '</b> (' + (100 - distinct.cross_pct) + '% מהשירים בה הושמעו בתחנה אחת בלבד)</span>' + helpTip(clusterTipTogether(hours)) + '</div>';
   h += '<div class="stat-cards">' +
     statCard(groups.length, 'קבוצות', clusterTipTogether(hours), 'accent') +
     statCard(total, 'שירים בניתוח', 'שירים שהושמעו לפחות פעמיים ב-' + hours + ' השעות האחרונות.', '') +
     statCard(multiPct + '%', 'שירים ביותר מתחנה', 'אחוז השירים שהושמעו ביותר מתחנה אחת בחלון הזמן.', multiPct >= 70 ? 'warn' : '') +
     statCard(bridges, 'שירי גשר', CLUSTER_TIP_BRIDGE, 'minor') +
     '</div>';
-  h += '<div class="cluster-legend"><span class="cluster-legend-swatch"></span>רק בתחנה' +
+  h += '<div class="cluster-legend"><span class="cluster-legend-swatch"></span>בתחנה אחת בלבד' +
     '<span class="cluster-legend-swatch shared"></span>גם בתחנות אחרות' + helpTip(CLUSTER_TIP_SHARED) +
     '<span>· שם הקבוצה</span>' + helpTip(CLUSTER_TIP_NAME) + '</div>';
   h += '<div class="cluster-groups">';
@@ -2999,9 +3025,9 @@ function renderClusterOverview() {
       '<button type="button" class="cluster-group-open"><span class="cluster-group-name" dir="auto">' + esc(g.name) + '</span>' +
       '<span class="cluster-group-meta"><span class="cluster-dot"></span>' + esc(name(g.station)) +
       ' · ' + g.size + ' שירים</span></button>' +
-      '<div class="cluster-share"><span class="cluster-share-bar" title="' + own + '% רק בתחנה">' +
+      '<div class="cluster-share"><span class="cluster-share-bar" title="' + own + '% בתחנה אחת · ' + clusterShareLabel(g.cross_pct) + '">' +
       '<span class="cluster-share-own" style="width:' + own + '%"></span></span>' +
-      chip(g.cross_pct + '% ' + clusterShareLabel(g.cross_pct), clusterShareTone(g.cross_pct)) + '</div>' +
+      chip(own + '% בתחנה אחת', clusterShareTone(g.cross_pct)) + '</div>' +
       '<div class="cluster-songs">' + g.songIdx.slice(0, 4).map(clusterSongRow).join('') + '</div></div>';
   });
   h += '</div>';
@@ -3026,9 +3052,11 @@ function onClusterClick(e) {
   const t = e && e.target;
   if (!t || !t.closest) return;
   if (t.closest('.cluster-back')) { showClusterOverview(); return; }
+  // Rows are looked up by artist/title, not by index: a refresh can swap
+  // D.clusters while a drill-down stays open, and indexes would go stale.
   const row = t.closest('.cluster-song');
-  if (row && row.dataset && row.dataset.si != null) {
-    const s = D.clusters && D.clusters.songs[Number(row.dataset.si)];
+  if (row && D.clusters && D.clusters.songs) {
+    const s = clusterSongByName(row.getAttribute('data-artist'), row.getAttribute('data-title'));
     if (s) selectClusterSong(s);
     return;
   }
@@ -3036,12 +3064,14 @@ function onClusterClick(e) {
   if (card && card.dataset && card.dataset.cid != null) { openClusterCommunity(card.dataset.cid); return; }
   const res = t.closest('.explorer-card');
   if (res && D.clusters) {
-    const artist = (res.getAttribute('data-artist') || '').toLowerCase();
-    const title = (res.getAttribute('data-title') || '').toLowerCase();
-    const songData = D.clusters.songs.find(s =>
-      (s.artist || '').toLowerCase() === artist && (s.title || '').toLowerCase() === title);
+    const songData = clusterSongByName(res.getAttribute('data-artist'), res.getAttribute('data-title'));
     if (songData) selectClusterSong(songData);
   }
+}
+function clusterSongByName(artist, title) {
+  const a = (artist || '').toLowerCase(), ti = (title || '').toLowerCase();
+  return (D.clusters.songs || []).find(s =>
+    (s.artist || '').toLowerCase() === a && (s.title || '').toLowerCase() === ti) || null;
 }
 
 function renderClusters() {

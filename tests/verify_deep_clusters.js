@@ -138,8 +138,11 @@ const count = (s, needle) => s.split(needle).length - 1;
   check('overview renders without a click: hero banner', ov.includes('class="deep-hero"'));
   check('overview has stat cards', count(ov, 'class="stat-card') >= 3, 'cards=' + count(ov, 'class="stat-card'));
   check('one card per community', count(ov, 'class="cluster-group"') === 4, 'groups=' + count(ov, 'class="cluster-group"'));
-  check('hero names the most distinct group station (lowest cross %)',
-        /הכי ייחודית: <b>רדיו תל אביב<\/b> \(67%/.test(ov));
+  check('hero names the most distinct GROUP (lowest cross %), not a station',
+        /הקבוצה הכי ייחודית: <b dir="auto">[^<]*רדיו תל אביב[^<]*<\/b> \(67% מהשירים בה הושמעו בתחנה אחת בלבד\)/.test(ov));
+  check('share chip states the one-station share (100 - cross_pct)', ov.includes('67% בתחנה אחת') && !ov.includes('33% ייחודית'));
+  check('song rows carry artist/title, not a stale-prone index',
+        ov.includes('class="cluster-song" data-artist="Noam K" data-title="Ten Li Zman"') && !ov.includes('data-si='));
   check('cards list their top songs', ov.includes('Tame Impala') && ov.includes('Ten Li Zman'));
   check('cross-station share shown as a bar + chip', ov.includes('cluster-share-own') && ov.includes('chip chip-ok'));
   check('explanations sit in helpTips', count(ov, 'class="help-tip"') >= 3);
@@ -174,8 +177,8 @@ const count = (s, needle) => s.split(needle).length - 1;
   check('back returns to the overview', count(content(), 'class="cluster-group"') === 4 && !els.clusterContent.dataset.active);
 
   // 5. A song row opens that song (with its neighbour graph section).
-  const flowersIdx = CLUSTERS.songs.findIndex(s => s.title === 'Flowers');
-  click(tap('.cluster-song', { dataset: { si: String(flowersIdx) } }));
+  const attrs = { 'data-artist': 'Miley Cyrus', 'data-title': 'Flowers' };
+  click(tap('.cluster-song', { dataset: {}, getAttribute: k => attrs[k] }));
   check('song row opens that song', /cluster-hero-title">[^<]*Flowers/.test(content()) && content().includes('clusterGraphSvg'));
   check('bridge song is tagged', content().includes('chip chip-minor'));
 
