@@ -743,6 +743,20 @@ class SupabaseDB:
             [days, limit],
         )
 
+    def get_ops_events(self, days: int = 8) -> list[dict[str, Any]]:
+        """Rows written by scripts/ops_monitor.py (types in ops_model.OPS_EVENT_TYPES)
+        that overlap the last `days` days. Read-only; [] on failure."""
+        from ops_model import OPS_EVENT_TYPES
+        self._ensure_system_events_table()
+        return self._query(
+            """SELECT event_type, source, started_at, ended_at, description
+               FROM system_events
+               WHERE event_type = ANY(%s)
+                 AND COALESCE(ended_at, NOW()) >= NOW() - INTERVAL '%s days'
+               ORDER BY started_at""",
+            [list(OPS_EVENT_TYPES), days],
+        )
+
     def get_system_uptime(self, days: int = 7) -> dict[str, Any]:
         """Calculate uptime percentage over N days.
 

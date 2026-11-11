@@ -94,17 +94,70 @@ def ensure_dirs() -> None:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _boot_time() -> datetime | None:
+    """When this host last booted (kernel btime), or None if unknown."""
+    try:
+        for line in Path("/proc/stat").read_text().splitlines():
+            if line.startswith("btime "):
+                return datetime.fromtimestamp(int(line.split()[1]), tz=timezone.utc)
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def _proc_tgid(pid: int) -> int | None:
+    """Thread-group id of pid (== pid for a process, != pid for a thread)."""
+    try:
+        for line in Path(f"/proc/{pid}/status").read_text().splitlines():
+            if line.startswith("Tgid:"):
+                return int(line.split()[1])
+    except (OSError, ValueError):
+        pass
+    return None
+
+
+def _proc_port(pid: int) -> int | None:
+    """SHAZAMIO_PORT the process was started with (None if unreadable)."""
+    try:
+        env = Path(f"/proc/{pid}/environ").read_bytes().split(b"\0")
+    except OSError:
+        return None
+    for item in env:
+        if item.startswith(b"SHAZAMIO_PORT="):
+            try:
+                return int(item.split(b"=", 1)[1])
+            except ValueError:
+                return None
+    return None
+
+
+def _pid_file_is_from_previous_boot(slug: str) -> bool:
+    """A pid file written before the current boot names a process that died
+    with the host. Its number now belongs to someone else."""
+    spawned, booted = _spawn_time(slug), _boot_time()
+    return spawned is not None and booted is not None and spawned < booted
+
+
 def is_running(slug: str) -> tuple[bool, int]:
     """Check if a proxy is running. Returns (running, pid).
-    
-    Verifies both that the PID exists AND that it's actually a shazamio
-    proxy (not a recycled PID that got grabbed by another process).
+
+    Verifies that the PID exists AND that it is really THIS station's proxy.
+    Why every check exists (2026-11-10 reboot): pid files survive a reboot,
+    and after it the old numbers are reused. Each proxy has ~60 threads, and a
+    thread id passes os.kill(tid, 0) and has the parent's cmdline, so the old
+    radio-tlv.pid pointed at a thread of the NEW 99fm proxy. The manager then
+    called radio-tlv "frozen since its pid file was written" (a 31h false
+    proxy_crash), and SIGTERM to that thread killed 99fm. So: reject pid files
+    from a previous boot, reject thread ids, reject another station's proxy.
     """
     pid_file = _pid_file(slug)
     if not pid_file.exists():
         return False, 0
     raw = pid_file.read_text().strip()
     if not raw:
+        pid_file.unlink(missing_ok=True)
+        return False, 0
+    if _pid_file_is_from_previous_boot(slug):
         pid_file.unlink(missing_ok=True)
         return False, 0
     pid = int(raw)
@@ -124,6 +177,15 @@ def is_running(slug: str) -> tuple[bool, int]:
             pid_file.unlink(missing_ok=True)
             return False, 0
     except (OSError, FileNotFoundError):
+        pid_file.unlink(missing_ok=True)
+        return False, 0
+
+    tgid = _proc_tgid(pid)
+    if tgid is not None and tgid != pid:
+        pid_file.unlink(missing_ok=True)
+        return False, 0
+    port, expected = _proc_port(pid), _port_for(slug)
+    if port is not None and expected is not None and port != expected:
         pid_file.unlink(missing_ok=True)
         return False, 0
 
@@ -229,6 +291,19 @@ def _loop_verdict(slug: str, state: dict[str, Any] | None, error: str | None) ->
             "spawned_at": _iso(_spawn_time(slug))}
 
 
+def _crash_start(verdict: dict[str, Any]) -> str | None:
+    """Start of a frozen-loop outage: the last heartbeat (or the spawn time),
+    but never before this boot. Anything earlier is the HOST being down, which
+    the ops monitor records as a host event, not as a per-station outage."""
+    start = _parse_ts(verdict.get("last_beat") or verdict.get("spawned_at"))
+    booted = _boot_time()
+    if start is None:
+        return _iso(booted)
+    if booted is not None and start < booted:
+        start = booted
+    return _iso(start)
+
+
 def loop_status(slug: str) -> dict[str, Any]:
     """Is this proxy's station loop actually running, or only its HTTP server?"""
     running, pid = is_running(slug)
@@ -275,7 +350,7 @@ def start_one(slug: str) -> dict[str, Any]:
         _record_event("proxy_crash", slug,
                       f"station loop frozen ({verdict['reason']}, last heartbeat "
                       f"{verdict['last_beat'] or 'never'}); auto-restarted",
-                      started_at=verdict.get("last_beat") or verdict.get("spawned_at"),
+                      started_at=_crash_start(verdict),
                       ended_at=_iso(datetime.now(timezone.utc)))
         stop_one(slug)
         time.sleep(1)  # let the listening socket go before rebinding the port

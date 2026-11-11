@@ -62,19 +62,33 @@ def build_manifest(files: dict[str, bytes]) -> bytes:
     ).encode("utf-8")
 
 
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def generate_and_publish(
     force: bool = False, dry_run: bool = False, local: bool = False
 ) -> dict[str, int]:
     """Regenerate aggregates and upload changed files."""
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     gen_script = str(PROJECT_ROOT / "scripts" / "generate_data.py")
-    result = subprocess.run(
-        [sys.executable, gen_script],
-        cwd=str(PROJECT_ROOT),
-        capture_output=True, text=True, timeout=300,
-    )
+    try:
+        result = subprocess.run(
+            [sys.executable, gen_script],
+            cwd=str(PROJECT_ROOT),
+            capture_output=True, text=True, timeout=300,
+        )
+    except subprocess.TimeoutExpired:
+        # Used to escape as a bare traceback with no time on it (16 of them on
+        # 2026-11-04); log it as one dated failed run instead.
+        print("[publish] generate failed: timed out after 300 s", flush=True)
+        print(json.dumps({"ts": _now_iso(), "event": "publish_generate_failed"}), flush=True)
+        return {"changed": 0, "uploaded": 0, "bytes": 0}
     if result.returncode != 0:
         print(f"[publish] generate failed: {result.stderr[:200]}", flush=True)
+        # Machine-readable, timestamped run outcome for scripts/ops_monitor.py
+        # (the text line above carries no time, so a failure could not be dated).
+        print(json.dumps({"ts": _now_iso(), "event": "publish_generate_failed"}), flush=True)
         return {"changed": 0, "uploaded": 0, "bytes": 0}
 
     files = collect_files()
@@ -107,6 +121,7 @@ def generate_and_publish(
 
     save_state(new_state)
     print(json.dumps({
+        "ts": _now_iso(),
         "event": "published",
         "changed": len(changed),
         "uploaded": uploaded,

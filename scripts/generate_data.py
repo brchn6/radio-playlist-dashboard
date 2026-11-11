@@ -48,6 +48,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from supabase_db import SupabaseDB
+from ops_model import build_ops
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "docs" / "data"
@@ -1923,8 +1924,21 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     except Exception as exc:
         print(f"  [uptime] error building uptime data: {exc}", flush=True)
 
+    # `ops` is the honest operations picture (per stage, per station, per day,
+    # incidents, digest). It replaces the any-station `_coverage_pct` above,
+    # which counted a 5-min bucket as up if ANY station had a track and so
+    # stayed ~100% while a single station was dark. The old fields stay for the
+    # deployed page. Source: rows written by scripts/ops_monitor.py only.
+    def _uptime_payload() -> dict[str, Any]:
+        payload = dict(uptime_data)
+        try:
+            payload["ops"] = build_ops(db.get_ops_events(days=8), stations, now)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [uptime] error building ops: {exc}", flush=True)
+        return payload
+
     maybe_write_json(output_dir / "uptime.json", "uptime.json",
-                     lambda: uptime_data, sizes, SLOW_REFRESH_SECONDS, now)
+                     _uptime_payload, sizes, SLOW_REFRESH_SECONDS, now)
 
     # ── Retire v2 artifacts (durable guard against stale shipments) ──
     # publish.py collects every *.json under output_dir, so anything left here
