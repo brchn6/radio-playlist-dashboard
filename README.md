@@ -209,6 +209,18 @@ The `track_flags` table in Supabase is the single source of truth for which (art
 
 Flag in batches, not one at a time: a flag-set change forces clusters and the transition map to rebuild immediately. History day shards never carry the flag (the page derives the chip from `jingles.json`), so flagging does not re-upload them. `scripts/playlist_explorer.py` reads the same table.
 
+### 🐕 Updater watchdog
+
+`scripts/radio-watchdog.sh` runs from cron every 5 minutes on head1. If `radio-updater.service` is inactive it restarts it and records `collector_crash` / `watchdog_recovery` events in Supabase via `scripts/record_event.py` (the dashboard uptime panel reads them). It also checks that `data/tracks_mirror.jsonl` got a track in the last 15 minutes. Silent when healthy; it only writes to `logs/watchdog.log` on a problem. (It previously lived in `~/.hermes/scripts/`, moved here when Hermes was retired on 2026-11-10.)
+
+```bash
+# crontab entry (head1)
+*/5 * * * * DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus XDG_RUNTIME_DIR=/run/user/1000 /home/barc/dev/radio-playlist-dashboard/scripts/radio-watchdog.sh >> /home/barc/dev/radio-playlist-dashboard/logs/watchdog.log 2>&1
+
+# Verify: a manual run exits 0 and prints nothing while the updater is up
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus XDG_RUNTIME_DIR=/run/user/1000 scripts/radio-watchdog.sh; echo "exit=$?"
+```
+
 ## 📻 Stations
 
 | Station | Slug |
