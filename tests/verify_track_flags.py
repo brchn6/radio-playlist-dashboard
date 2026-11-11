@@ -217,10 +217,10 @@ def test_generate_all() -> None:
         check([t["title"] for t in cross] == ["Song A", "Song B"], "cross_station.json: music rows kept")
 
         j = load("jingles.json")
-        check(set(j) == {"generated_at", "count", "tracks"} and j["count"] == 2,
+        check(set(j) == {"generated_at", "count", "tracks", "method"} and j["count"] == 2,
               "jingles.json: top-level keys + count")
         want = {"song_key", "artist", "title", "kind", "note", "plays_total", "plays_7d",
-                "stations", "first_seen", "last_seen", "song_image"}
+                "stations", "first_seen", "last_seen", "song_image", "evidence"}
         check(all(set(t) == want for t in j["tracks"]), "jingles.json: track keys match contract")
         first, second = j["tracks"]
         check(first["song_key"] == JINGLE_KEY and first["plays_total"] == 24
@@ -257,9 +257,51 @@ def test_abort_on_failed_read() -> None:
         check(not any(out.rglob("*.json")), "nothing written on abort")
 
 
+def test_evidence() -> None:
+    """Airtime evidence for the method panel, via the REAL generate_data functions.
+
+    Fixture per station per 20-min cycle: Song A at +0, jingle at +3, Song B at
+    +4. So every jingle airing is replaced after 1 min, Song A after 3, Song B
+    after 16 (next cycle), and each station's newest B has no next airing.
+    """
+    print("5. airtime evidence (method panel)")
+    raw = make_tracks()
+    # A second recognition of the same jingle 30 s into its airing: it must
+    # collapse into the same airing, not count as a 0.5-min airing of its own.
+    j0 = next(t for t in raw if t["artist"] == JINGLE_ARTIST and t["station_slug"] == "st-a")
+    rep = dict(j0, id=99999, shazam_key="99999",
+               recognized_at=iso(gd.parse_utc(j0["recognized_at"]) + timedelta(seconds=30)))
+    tracks = annotate(raw + [rep])
+    flags = {f["song_key"]: f for f in FLAGS_ROWS}
+    airings = gd.airtime_gaps(tracks, NOW - timedelta(days=60))
+    check(len(airings) == 72, f"72 airings (2 stations x 12 cycles x 3), got {len(airings)}")
+    check(sum(g is None for _, _, g in airings) == 2, "one gap-less airing per station (its last)")
+    ev = gd.build_airtime_evidence(tracks, flags, NOW)
+    m, j = ev["method"], ev["evidence"][JINGLE_KEY]
+    check(m["baseline_median_min"] == 3.0, f"baseline median = 3.0 min, got {m['baseline_median_min']}")
+    check(j["airings"] == 24 and j["median_gap_min"] == 1.0, f"jingle: 24 airings, median 1.0, got {j['airings']}, {j['median_gap_min']}")
+    check(j["short_share"] == 1.0 and j["long_share"] == 0.0, "jingle: 100% cut short, 0% ran 3+ min")
+    check(j["score"] == round(24 / 60 * (1 - 1 / 3), 2), f"score = per_day x (1 - median/baseline), got {j['score']}")
+    check(sum(j["hours"]) == 24 and len(j["hours"]) == 24, "hour histogram: 24 bins summing to airings")
+    ad = ev["evidence"][(AD_ARTIST + "|" + AD_TITLE).lower()]
+    check(ad["airings"] == 0 and ad["median_gap_min"] is None and ad["score"] is None, "never-played flag: zeros/None, no crash")
+    check(m["gap_hist_flagged"][1] == 24 and sum(m["gap_hist_flagged"]) == 24, "flagged histogram: all 24 gaps in the 1-1.5 bin")
+    check(m["gap_hist_all"][1] == 24 and m["gap_hist_all"][5] == 24 and m["gap_hist_all"][-1] == 22, "all histogram: 1 / 3 / >=8 bins")
+    from jingle_detector import DEFAULT_DAYS, DEFAULT_MAX_MEDIAN, SHORT_GAP_MIN
+    check((m["window_days"], m["max_median_min"], m["short_gap_min"]) == (DEFAULT_DAYS, DEFAULT_MAX_MEDIAN, SHORT_GAP_MIN),
+          "method constants come from jingle_detector (one source)")
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        run_generate_all(out, FLAGS_ROWS)
+        pub = json.loads((out / "jingles.json").read_text("utf-8"))
+        check("method" in pub and all("evidence" in t for t in pub["tracks"]), "published jingles.json carries method + per-track evidence")
+        check(pub["count"] == 2 and {t["song_key"] for t in pub["tracks"]} == set(flags), "jingles.json shape unchanged (additive only)")
+
+
 if __name__ == "__main__":
     test_builders()
     test_generate_all()
     test_abort_on_failed_read()
+    test_evidence()
     print(f"\n{'ALL PASSED' if not FAILS else f'{len(FAILS)} FAILED'}")
     sys.exit(1 if FAILS else 0)

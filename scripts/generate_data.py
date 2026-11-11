@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import json
 import math
+import statistics
 import sys
 from pathlib import Path
 
@@ -428,6 +429,116 @@ def build_jingles(flagged_tracks: list[dict[str, Any]], flags: dict[str, dict[st
         out.append(e)
     out.sort(key=lambda e: (-e["plays_7d"], -e["plays_total"], e["song_key"]))
     return {"generated_at": now_iso(), "count": len(out), "tracks": out}
+
+
+# Airtime evidence for the "How we calculated this" panel. Same definition and
+# constants as scripts/jingle_detector.py (imported, not copied), so the page
+# shows exactly the numbers the detector ranked on.
+GAP_HIST_EDGES = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 8]  # minutes; last bin is >= 8
+
+
+def _detector_constants() -> dict[str, float]:
+    from jingle_detector import (DEFAULT_DAYS, DEFAULT_MAX_MEDIAN,
+                                 DEFAULT_MIN_PLAYS, SHORT_GAP_MIN)
+    return {"days": DEFAULT_DAYS, "max_median": DEFAULT_MAX_MEDIAN,
+            "min_plays": DEFAULT_MIN_PLAYS, "short_gap": SHORT_GAP_MIN}
+
+
+def airtime_gaps(tracks: list[dict[str, Any]], since: datetime
+                 ) -> list[tuple[str, datetime, float | None]]:
+    """(song_key, start, gap_minutes) per airing, mirroring jingle_detector._GAPS_CTE.
+
+    Per station, ordered by (recognized_at, key): consecutive recognitions of
+    the same song collapse into one airing; gap = minutes until the next
+    airing on that station (None for the station's last airing).
+    """
+    by_station: dict[str, list[tuple[datetime, str]]] = defaultdict(list)
+    for t in tracks:
+        if t["_dt"] >= since:
+            by_station[t["station_slug"]].append((t["_dt"], song_key(t)))
+    out: list[tuple[str, datetime, float | None]] = []
+    for rows in by_station.values():
+        rows.sort()
+        runs: list[tuple[datetime, str]] = []
+        prev_k = None
+        for dt, k in rows:
+            if k != prev_k:
+                runs.append((dt, k))
+            prev_k = k
+        for i, (dt, k) in enumerate(runs):
+            gap = (runs[i + 1][0] - dt).total_seconds() / 60.0 if i + 1 < len(runs) else None
+            out.append((k, dt, gap))
+    return out
+
+
+def _gap_hist(gaps: list[float]) -> list[int]:
+    """Counts per GAP_HIST_EDGES bin: bin i is [edge_i, edge_i+1), last is >= 8."""
+    counts = [0] * len(GAP_HIST_EDGES)
+    for g in gaps:
+        i = len(GAP_HIST_EDGES) - 1
+        while i > 0 and g < GAP_HIST_EDGES[i]:
+            i -= 1
+        counts[i] += 1
+    return counts
+
+
+def build_airtime_evidence(tracks: list[dict[str, Any]], flags: dict[str, dict[str, Any]],
+                           now: datetime) -> dict[str, Any]:
+    """{"method": {...}, "evidence": {song_key: {...}}} for jingles.json."""
+    c = _detector_constants()
+    days = c["days"]
+    airings = airtime_gaps(tracks, now - timedelta(days=days))
+    all_gaps = [g for _, _, g in airings if g is not None]
+    baseline = statistics.median(all_gaps) if all_gaps else None
+    per_key: dict[str, dict[str, Any]] = {
+        k: {"airings": 0, "gaps": [], "hours": [0] * 24} for k in flags}
+    for k, dt, g in airings:
+        e = per_key.get(k)
+        if e is None:
+            continue
+        e["airings"] += 1
+        e["hours"][dt.astimezone(IL_TZ).hour] += 1
+        if g is not None:
+            e["gaps"].append(g)
+    evidence: dict[str, Any] = {}
+    flagged_gaps: list[float] = []
+    for k, e in per_key.items():
+        gaps = e["gaps"]
+        flagged_gaps.extend(gaps)
+        med = statistics.median(gaps) if gaps else None
+        per_day = e["airings"] / days
+        evidence[k] = {
+            "airings": e["airings"],
+            "median_gap_min": round(med, 2) if med is not None else None,
+            "short_share": round(sum(g <= c["short_gap"] for g in gaps) / len(gaps), 3) if gaps else None,
+            "long_share": round(sum(g >= 3 for g in gaps) / len(gaps), 3) if gaps else None,
+            "per_day": round(per_day, 2),
+            "score": round(per_day * max(0.0, 1 - med / baseline), 2)
+                     if (med is not None and baseline) else None,
+            "hours": e["hours"],
+        }
+    method = {
+        "window_days": days,
+        "baseline_median_min": round(baseline, 2) if baseline is not None else None,
+        "short_gap_min": c["short_gap"],
+        "max_median_min": c["max_median"],
+        "min_plays": c["min_plays"],
+        "total_airings": len(airings),
+        "gap_hist_edges": GAP_HIST_EDGES,
+        "gap_hist_all": _gap_hist(all_gaps),
+        "gap_hist_flagged": _gap_hist(flagged_gaps),
+    }
+    return {"method": method, "evidence": evidence}
+
+
+def with_evidence(jingles: dict[str, Any], tracks: list[dict[str, Any]],
+                  flags: dict[str, dict[str, Any]], now: datetime) -> dict[str, Any]:
+    """jingles payload + top-level `method` + per-track `evidence` (additive)."""
+    ev = build_airtime_evidence(tracks, flags, now)
+    out = dict(jingles)
+    out["method"] = ev["method"]
+    out["tracks"] = [dict(t, evidence=ev["evidence"].get(t["song_key"])) for t in jingles["tracks"]]
+    return out
 
 
 def build_flag_stats(jingles: dict[str, Any]) -> dict[str, Any]:
@@ -1816,7 +1927,7 @@ def generate_all(output_dir: Path = DATA_DIR) -> dict[str, int]:
     jingles = build_jingles(flagged_tracks, flags, now)
     stats["flags"] = build_flag_stats(jingles)
     maybe_write_json(output_dir / "jingles.json", "jingles.json",
-                     lambda: jingles, sizes, slow_s, now)
+                     lambda: with_evidence(jingles, tracks, flags, now), sizes, slow_s, now)
 
     # Repeat/redundancy readiness — consumers must check `ready` before showing
     # any "this station repeats itself" claim. See REPEAT_DATA_EPOCH.

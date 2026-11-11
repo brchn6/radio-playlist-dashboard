@@ -205,6 +205,8 @@ The `track_flags` table in Supabase is the single source of truth for which (art
 .venv/bin/python tests/verify_track_flags.py
 ```
 
+**How we calculated this:** the Jingles & Ads section has a "🔬 איך חישבנו? · How we calculated this" button that opens the full method: the pipeline, the key numbers (baseline airtime, thresholds), the airtime distribution of all airings vs flagged ones, and per-track proof (median airtime vs baseline, cut-short share, score, hour-of-day pattern). Every number comes from `jingles.json` (`method` + per-track `evidence`), which `generate_data.py` computes with the same definition and constants as `jingle_detector.py` (verified to match the detector's SQL on real data). Check: `node tests/verify_jingle_method.js` and `.venv/bin/python tests/verify_track_flags.py`.
+
 Flag in batches, not one at a time: a flag-set change forces clusters and the transition map to rebuild immediately. History day shards never carry the flag (the page derives the chip from `jingles.json`), so flagging does not re-upload them. `scripts/playlist_explorer.py` reads the same table.
 
 ### 🩺 Operations: glitch detection and the daily digest
@@ -228,7 +230,17 @@ node tests/verify_deep_uptime.js
 
 Hourly schedule (systemd user timer, not installed by default): `~/.config/systemd/user/radio-ops-monitor.service` with `ExecStart=%h/dev/radio-playlist-dashboard/.venv/bin/python scripts/ops_monitor.py --days 2` and `WorkingDirectory=%h/dev/radio-playlist-dashboard`, plus a `.timer` with `OnBootSec=10min` and `OnUnitActiveSec=1h`. Each run reads about 2 days of tracks (~0.75 MB of egress).
 
-`scripts/radio-watchdog.sh` (cron, every 5 min) restarts the collector if systemd reports it inactive and records the event via `scripts/record_event.py`.
+### 🐕 Updater watchdog
+
+`scripts/radio-watchdog.sh` runs from cron every 5 minutes on head1. If `radio-updater.service` is inactive it restarts it and records `collector_crash` / `watchdog_recovery` events in Supabase via `scripts/record_event.py` (the dashboard uptime panel reads them). It also checks that `data/tracks_mirror.jsonl` got a track in the last 15 minutes. Silent when healthy; it only writes to `logs/watchdog.log` on a problem. (It previously lived in `~/.hermes/scripts/`, moved here when Hermes was retired on 2026-11-10.)
+
+```bash
+# crontab entry (head1)
+*/5 * * * * DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus XDG_RUNTIME_DIR=/run/user/1000 /home/barc/dev/radio-playlist-dashboard/scripts/radio-watchdog.sh >> /home/barc/dev/radio-playlist-dashboard/logs/watchdog.log 2>&1
+
+# Verify: a manual run exits 0 and prints nothing while the updater is up
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus XDG_RUNTIME_DIR=/run/user/1000 scripts/radio-watchdog.sh; echo "exit=$?"
+```
 
 ## 📻 Stations
 

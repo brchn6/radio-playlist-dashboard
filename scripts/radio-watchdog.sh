@@ -8,12 +8,12 @@ LOG="$PROJECT/logs/watchdog.log"
 
 # 1. Check systemd updater
 if ! systemctl --user -q is-active radio-updater.service 2>/dev/null; then
-  echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) - updater inactive, attempting restart" >> "$LOG"
+  echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) — updater inactive, attempting restart" >> "$LOG"
   systemctl --user start radio-updater.service 2>&1 || true
   sleep 5
   if systemctl --user -q is-active radio-updater.service 2>/dev/null; then
     # restart succeeded — stay silent, data will resume
-    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) - restart OK" >> "$LOG"
+    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) — restart OK" >> "$LOG"
     # Real outage event for the dashboard uptime panel: bounded crash
     # (detection -> restart). record_event.py args: type source [desc] [ended_at]
     /home/barc/dev/radio-playlist-dashboard/.venv/bin/python "$PROJECT/scripts/record_event.py" \
@@ -23,12 +23,12 @@ if ! systemctl --user -q is-active radio-updater.service 2>/dev/null; then
       watchdog_recovery watchdog "Collector auto-restarted" || true
     exit 0
   else
-    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) - RESTART FAILED" >> "$LOG"
+    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) — RESTART FAILED" >> "$LOG"
     # Open collector_crash (no ended_at) — dashboard flips to DOWN until resolved.
     /home/barc/dev/radio-playlist-dashboard/.venv/bin/python "$PROJECT/scripts/record_event.py" \
       collector_crash collector "watchdog detected updater inactive; RESTART FAILED" || true
     journalctl --user -u radio-updater.service --since "5 min ago" --no-pager 2>/dev/null | tail -10 >> "$LOG"
-    echo "❌ radio-updater.service DOWN - restart failed. החזר אותו ידנית: systemctl --user start radio-updater"
+    echo "❌ radio-updater.service DOWN — restart failed. החזר אותו ידנית: systemctl --user start radio-updater"
     exit 1
   fi
 fi
@@ -48,8 +48,8 @@ except Exception:
 ")
 
   if [ "$LATEST" = "never" ]; then
-    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) - mirror empty, no tracks ever" >> "$LOG"
-    echo "⚠️ radio-playlist mirror empty - no tracks ever collected"
+    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) — mirror empty, no tracks ever" >> "$LOG"
+    echo "⚠️ radio-playlist mirror empty — no tracks ever collected"
     exit 1
   fi
 
@@ -65,7 +65,7 @@ except:
 ")
   AGE=$(( (NOW_EPOCH - LATEST_EPOCH) / 60 ))
   if [ "$AGE" -gt 15 ]; then
-    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) - stale data, last track ${AGE}m ago" >> "$LOG"
+    echo "[watchdog] $(date -u +%Y-%m-%dT%H:%M:%SZ) — stale data, last track ${AGE}m ago" >> "$LOG"
     # Don't alert yet — maybe just a slow period. Let it slide once.
     exit 0
   fi
