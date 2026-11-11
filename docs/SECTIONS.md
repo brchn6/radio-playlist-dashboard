@@ -36,8 +36,8 @@ family is generated, so it is documented as a pattern.
 | `insights:jingles` | corner | Jingles & ads card: tracks flagged as non-music (`jingles.json`) | `renderJingles()` |
 | `insights:history` | corner | History card: search box, unique/newest toggles | `renderHistory()` |
 | `insights:history-list` | flow | The history rows and the "show more" button | `renderHistory()`, `loadMoreHistory()` |
-| `deep:bpm` | corner | BPM flow chart card | `renderBpmRealtime()` |
-| `deep:keys` | corner | Key (major/minor) distribution card | `renderKeyDistRealtime()` |
+| `deep:bpm` | corner | Tempo card: how fast each station plays (stacked slow/mid/fast bars, day parts) | `renderBpmFlow()` |
+| `deep:keys` | corner | Key card: minor vs major share per station, top keys | `renderKeyDist()` |
 | `deep:transitions` | corner | Transition Explorer card: controls and results | `renderTransitionExplorer()` |
 | `deep:transitions-results` | flow | Explorer results region below the controls | `renderTransitionExplorer()` |
 | `deep:transitions-chain` | flow | The "where to next?" outgoing-transition chain | `renderTransitionExplorer()` |

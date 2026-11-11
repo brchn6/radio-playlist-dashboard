@@ -395,14 +395,40 @@
 
     .bpm-time-range-pills { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
 
-    /* Key heatmap */
-    .key-heatmap-wrapper { overflow-x: auto; margin: 4px 0; }
-    .key-heatmap { display: flex; flex-direction: column; gap: 1px; }
-    .key-heatmap-row { display: flex; align-items: center; gap: 2px; }
-    .key-heatmap-label { font-size: .55rem; color: var(--muted); flex-shrink: 0; width: 8px; text-align: center; white-space: nowrap; transform: rotate(-45deg); transform-origin: left center; }
-    .key-hm-label { width: 30px; font-size: .6rem; color: var(--muted); text-align: left; flex-shrink: 0; direction: ltr; }
-    .key-cell { width: 8px; height: 8px; border-radius: 1px; flex-shrink: 0; cursor: pointer; }
-    .key-cell:hover { outline: 1px solid var(--fg); outline-offset: -1px; }
+    /* deep:bpm / deep:keys profile view: one 100% stacked bar per station.
+       Tempo: fast = solid accent, mid = accent tint, slow = neutral track.
+       Keys: minor = --minor, major = accent tint. Low-data rows are muted. */
+    .bpm-legend{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1) var(--sp-3);margin:0 0 var(--sp-2);font-size:var(--fs-xs);color:var(--muted)}
+    .bpm-legend span{display:inline-flex;align-items:center;gap:var(--sp-1)}
+    .bpm-sw{display:inline-block;width:12px;height:12px;border-radius:3px}
+    .bpm-rows{display:flex;flex-direction:column;gap:var(--sp-3);margin-bottom:var(--sp-3)}
+    .bpm-row{min-width:0}
+    .bpm-row-ref{padding:var(--sp-2);border:1px dashed var(--border);border-radius:var(--radius-sm)}
+    .bpm-row-head{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-1);font-size:var(--fs-sm);min-width:0}
+    .bpm-row-name{font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    .bpm-row-name-ref{color:var(--fg-2)}
+    .bpm-row-num{margin-inline-start:auto;font-family:var(--font-num);font-size:var(--fs-sm);color:var(--fg-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+    .bpm-stack{display:flex;height:24px;border-radius:var(--radius-sm);overflow:hidden;background:var(--track)}
+    .bpm-stack span{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden;
+      font-family:var(--font-num);font-size:var(--fs-xs);font-weight:700;white-space:nowrap}
+    .bpm-stack-muted{opacity:.45;filter:grayscale(1)}
+    .bpm-seg-fast{background:var(--accent);color:var(--accent-contrast)}
+    .bpm-seg-mid{background:var(--accent-tint);color:var(--fg)}
+    .bpm-seg-slow{background:var(--track);color:var(--fg-2)}
+    .key-seg-minor{background:var(--minor);color:var(--card)}
+    .key-seg-major{background:var(--accent-tint);color:var(--fg)}
+    .key-chips{display:flex;flex-wrap:wrap;gap:var(--sp-1);margin-top:var(--sp-1);direction:ltr;justify-content:flex-end}
+    .bpm-dp-title{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-1);margin:var(--sp-2) 0;font-size:var(--fs-sm);font-weight:600;color:var(--fg)}
+    .bpm-dp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-2)}
+    .bpm-dp{padding:var(--sp-2);border-radius:var(--radius-sm);background:var(--card-hover);border:1px solid var(--border-soft);min-width:0;text-align:center}
+    .bpm-dp-top{border-color:var(--accent)}
+    .bpm-dp-val{font-family:var(--font-num);font-size:var(--fs-xl);font-weight:700;color:var(--fg)}
+    .bpm-dp-top .bpm-dp-val{color:var(--accent)}
+    .bpm-dp-empty .bpm-dp-val{color:var(--muted)}
+    .bpm-dp-bar{height:6px;margin:var(--sp-1) 0;border-radius:var(--radius-pill);background:var(--track);overflow:hidden}
+    .bpm-dp-bar span{display:block;height:100%;background:var(--accent)}
+    .bpm-dp-label{font-size:var(--fs-xs);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    @media (max-width:480px){.bpm-dp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
     /* Cluster card */
     .cluster-controls { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
@@ -652,16 +678,13 @@
     .chart-legend{font-size:var(--fs-sm);gap:var(--sp-2) var(--sp-4);margin-top:var(--sp-3)}
     .chart-legend .sw{width:10px;height:10px}
 
-    /* ── Key distribution / heatmap ── */
+    /* ── Key distribution ── */
     .key-bars{height:180px;gap:var(--sp-1);padding:0 var(--sp-1)}
     .key-bar-stack{height:150px}
     .key-bar-major{background:var(--accent)}
     .key-bar-minor{background:var(--minor)}
     .key-label{font-size:var(--fs-xs)}
     .key-count{font-size:var(--fs-xs);color:var(--muted)}
-    .key-heatmap-label{font-size:var(--fs-xs)}
-    .key-hm-label{font-size:var(--fs-xs);width:34px}
-    .key-cell{width:10px;height:10px;border-radius:2px}
 
     /* ── Transitions explorer ── */
     .trans-entry{padding:12px var(--sp-3);font-size:var(--fs-base);border-bottom:1px solid var(--divider)}
@@ -915,24 +938,28 @@
   <div class="card">
     <button type="button" class="sec-tag" data-sec="deep:bpm" title="deep:bpm - click to copy">deep:bpm</button>
     <div class="section-header">
-      <div class="section-title">🎵 זרימת BPM</div>
-      <div class="section-sub">איך הקצב של כל תחנה משתנה לאורך היום</div>
+      <div class="section-title">🎵 קצב התחנות</div>
+      <div class="section-sub">איזו תחנה מנגנת הכי מהר?</div>
     </div>
+    <div id="bpmProfile"></div>
     <div class="window-pills" id="bpmStationPills"></div>
-    <div class="chart-wrap"><canvas id="bpmChart"></canvas></div>
-    <div class="chart-legend" id="bpmLegend"></div>
+    <div id="bpmDayparts"></div>
+    <div id="bpmLegacyWrap">
+      <div class="chart-wrap"><canvas id="bpmChart"></canvas></div>
+      <div class="chart-legend" id="bpmLegend"></div>
+    </div>
   </div>
 
   <!-- Key Distribution -->
   <div class="card">
     <button type="button" class="sec-tag" data-sec="deep:keys" title="deep:keys - click to copy">deep:keys</button>
     <div class="section-header">
-      <div class="section-title">🎼 התפלגות סולמות</div>
-      <div class="section-sub">הטביעה המוזיקלית של כל תחנה — שמח (מז׳ור) או עגום (מינור)?</div>
+      <div class="section-title">🎼 שמח או עגום</div>
+      <div class="section-sub">הטביעה המוזיקלית של כל תחנה: מז׳ור (שמח) או מינור (עגום)?</div>
     </div>
     <div class="window-pills" id="keyStationPills"></div>
     <div id="keyDistContent"></div>
-    <div style="display:flex;gap:12px;margin-top:8px;font-size:var(--fs-xs);color:var(--muted)">
+    <div id="keyLegacyLegend" style="display:flex;gap:12px;margin-top:8px;font-size:var(--fs-xs);color:var(--muted)">
       <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);border-radius:2px;opacity:.8;vertical-align:middle"></span> מז׳ור</span>
       <span><span style="display:inline-block;width:10px;height:10px;background:var(--minor);border-radius:2px;opacity:.8;vertical-align:middle"></span> מינור</span>
     </div>
@@ -1881,7 +1908,54 @@ async function loadMoreHistory() {
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── BPM Flow ── */
+/* Profile path (bpm_key.json.profile, song_mode): per-station tempo mix.
+   Per-play BPM from a short clip is noisy, so the data side takes each song's
+   modal value first; the station differences are the real signal. Falls back
+   to the legacy line charts when the profile is not deployed yet. */
+const BPM_DAYPARTS = [
+  ['morning', 'בוקר', '06-11'], ['afternoon', 'צהריים', '12-17'],
+  ['evening', 'ערב', '18-23'], ['night', 'לילה', '00-05'],
+];
+function bpmProfileReady() {
+  return !!(D.bpm && D.bpm.profile && D.bpm.profile.stations && D.bpm.profile.all);
+}
+/* Station profiles that carry enough plays to be compared (low_data excluded). */
+function bpmProfileStations(prof) {
+  return Object.entries(prof.stations).filter(([, p]) => p && !p.low_data && p.tempo);
+}
+/* Plays-weighted mean of one field over a set of [slug, profile] pairs. */
+function bpmWeighted(pairs, get) {
+  let n = 0, w = 0;
+  pairs.forEach(([, p]) => { const v = get(p); if (v == null) return; n += v * (p.plays || 0); w += p.plays || 0; });
+  return w ? Math.round(n / w) : null;
+}
+/* One stacked 100% bar. segs: [{pct, cls}]; a number is printed inside a
+   segment only when it is wide enough to hold it. */
+function bpmStackBar(segs, muted) {
+  return '<div class="bpm-stack' + (muted ? ' bpm-stack-muted' : '') + '">' + segs.map(sg => {
+    const pct = Math.max(0, Number(sg.pct) || 0);
+    return '<span class="' + sg.cls + '" style="width:' + pct + '%" title="' + esc(sg.label) + ' ' + pct + '%">' +
+      (pct >= 14 ? pct + '%' : '') + '</span>';
+  }).join('') + '</div>';
+}
+/* The 'all stations' row sits in its sorted position as a dashed reference. */
+function bpmRowHead(label, isRef, lowData, right) {
+  return '<div class="bpm-row-head"><span class="bpm-row-name' + (isRef ? ' bpm-row-name-ref' : '') + '">' + esc(label) + '</span>' +
+    (lowData ? chip('מעט נתונים', '') : '') + '<span class="bpm-row-num">' + right + '</span></div>';
+}
+
 function renderBpmFlow() {
+  const legacyWrap = document.getElementById('bpmLegacyWrap');
+  if (bpmProfileReady()) {
+    if (legacyWrap) legacyWrap.style.display = 'none';
+    renderBpmProfile();
+    return;
+  }
+  if (legacyWrap) legacyWrap.style.display = '';
+  const prof = document.getElementById('bpmProfile');
+  if (prof) prof.innerHTML = '';
+  const dp = document.getElementById('bpmDayparts');
+  if (dp) dp.innerHTML = '';
   // Check for real-time BPM data
   const hasRealtime = D.bpm && D.bpm.stations && Object.values(D.bpm.stations).some(s => s && s.bpm_realtime);
   if (hasRealtime) {
@@ -1891,12 +1965,98 @@ function renderBpmFlow() {
   }
 }
 
+function renderBpmProfile() {
+  const prof = D.bpm.profile;
+  const q = prof.quality || {};
+  const bands = prof.bands || {};
+  const midLo = bands.mid ? bands.mid[0] : 100, fastLo = bands.fast ? bands.fast[0] : 130;
+  destroyChart('bpm');
+  const oldRange = document.querySelector('.bpm-time-range-pills');
+  if (oldRange && oldRange.remove) oldRange.remove();
+
+  const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
+  if (subEl) subEl.textContent = 'איזו תחנה מנגנת הכי מהר? ' + (prof.window_days || 30) + ' הימים האחרונים';
+
+  const ok = bpmProfileStations(prof);
+  const sorted = ok.slice().sort((a, b) => b[1].tempo.fast - a[1].tempo.fast);
+  const top = sorted[0];
+  const all = prof.all;
+  let h = '';
+  if (top) {
+    const rest = bpmWeighted(sorted.slice(1), p => p.tempo.fast);
+    h += '<div class="deep-hero"><span><b>' + esc(name(top[0])) + '</b> הכי מהירה: <b>' + top[1].tempo.fast + '%</b> שירים מהירים' +
+      (rest != null ? ', מול ' + rest + '% בשאר התחנות' : '') + '</span>' +
+      helpTip('שיר מהיר = ' + fastLo + ' BPM ומעלה. "שאר התחנות" = ממוצע משוקלל לפי מספר ההשמעות.') + '</div>';
+  }
+  const dps = all.dayparts || {};
+  const night = dps.night && dps.night.fast_pct, morning = dps.morning && dps.morning.fast_pct;
+  h += '<div class="stat-cards">' +
+    statCard(all.median_bpm != null ? all.median_bpm : '?', 'חציון BPM, כל התחנות',
+      'חצי מההשמעות מתחת לערך הזה וחצי מעליו. ' + (q.songs_used || '?') + ' שירים, ' + (q.plays_used || '?') + ' השמעות.', 'accent') +
+    (top ? statCard(top[1].tempo.fast + '%', 'מהירים ב' + name(top[0]), 'חציון BPM בתחנה: ' + top[1].median_bpm, 'accent') : '') +
+    (night != null && morning != null ? statCard(night + '%', 'מהירים בלילה, מול ' + morning + '% בבוקר',
+      'לילה 00-05, בוקר 06-11 (שעון ישראל), כל התחנות.', night > morning ? 'warn' : '') : '') +
+    '</div>';
+
+  // Per-station 100% stacked bars, fastest first; 'all' as a dashed reference row.
+  const rows = sorted.map(([slug, p]) => ({ slug, p, ref: false }));
+  const refIdx = rows.findIndex(r => r.p.tempo.fast < all.tempo.fast);
+  rows.splice(refIdx < 0 ? rows.length : refIdx, 0, { slug: 'all', p: all, ref: true });
+  Object.entries(prof.stations).filter(([, p]) => p && p.low_data).forEach(([slug, p]) => rows.push({ slug, p, ref: false, low: true }));
+  h += '<div class="bpm-legend"><span><i class="bpm-sw bpm-seg-fast"></i>מהיר ' + fastLo + '+</span>' +
+    '<span><i class="bpm-sw bpm-seg-mid"></i>בינוני ' + midLo + '-' + (fastLo - 1) + '</span>' +
+    '<span><i class="bpm-sw bpm-seg-slow"></i>איטי מתחת ל-' + midLo + '</span>' +
+    helpTip('BPM נמדד אוטומטית מקטע קצר של כל השמעה, ולכן השמעה בודדת רועשת. לכל שיר נלקח ה-BPM השכיח שלו מכל ההשמעות (לפחות ' +
+      (prof.min_plays_per_song || 3) + '), ורק אז נספרות ההשמעות. ' + (q.bpm_agreement_pct != null ? q.bpm_agreement_pct + '% מההשמעות קרובות (עד 4 BPM) לערך השכיח של השיר.' : '')) +
+    '</div>';
+  h += '<div class="bpm-rows">' + rows.map(r => {
+    const t = r.p.tempo || {};
+    return '<div class="bpm-row' + (r.ref ? ' bpm-row-ref' : '') + '" data-s="' + esc(r.slug) + '">' +
+      bpmRowHead(r.ref ? 'כל התחנות' : name(r.slug), r.ref, r.low,
+        (t.fast != null ? t.fast + '% מהירים' : '') + (r.p.median_bpm != null ? ' · ' + r.p.median_bpm + ' BPM' : '')) +
+      bpmStackBar([{ pct: t.fast, cls: 'bpm-seg-fast', label: 'מהיר' }, { pct: t.mid, cls: 'bpm-seg-mid', label: 'בינוני' },
+        { pct: t.slow, cls: 'bpm-seg-slow', label: 'איטי' }], r.low) + '</div>';
+  }).join('') + '</div>';
+  document.getElementById('bpmProfile').innerHTML = h;
+
+  // Station pills pick the day-part view (all stations by default).
+  if (bpmStation !== 'all' && !prof.stations[bpmStation]) bpmStation = 'all';
+  const pillsEl = document.getElementById('bpmStationPills');
+  pillsEl.innerHTML = '<button class="window-pill' + (bpmStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
+    stations.filter(s => prof.stations[s.slug]).map(s => '<button class="window-pill' + (bpmStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
+  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; bpmStation = b.dataset.s; renderBpmFlow(); };
+  renderBpmDayparts();
+}
+
+/* Four day parts for the selected station: fast share is the headline number,
+   the busiest-fast part is highlighted. Empty parts (null stats) render gray. */
+function renderBpmDayparts() {
+  const prof = D.bpm.profile;
+  const p = bpmStation === 'all' ? prof.all : prof.stations[bpmStation];
+  const el = document.getElementById('bpmDayparts');
+  if (!p || !p.dayparts) { el.innerHTML = ''; return; }
+  const vals = BPM_DAYPARTS.map(([k]) => p.dayparts[k] && p.dayparts[k].fast_pct).filter(v => v != null);
+  const max = vals.length ? Math.max(...vals) : null;
+  el.innerHTML = '<div class="bpm-dp-title">שירים מהירים לפי שעה ביום: ' + esc(bpmStation === 'all' ? 'כל התחנות' : name(bpmStation)) +
+    (p.low_data ? ' ' + chip('מעט נתונים', '') : '') +
+    helpTip('אחוז ההשמעות המהירות בכל חלק של היום, שעון ישראל. המודגש הוא החלק המהיר ביותר.') + '</div>' +
+    '<div class="bpm-dp-grid">' + BPM_DAYPARTS.map(([k, label, hours]) => {
+      const d = p.dayparts[k];
+      const v = d && d.fast_pct;
+      if (v == null) return '<div class="bpm-dp bpm-dp-empty"><div class="bpm-dp-val">?</div><div class="bpm-dp-label">' + label + ' ' + hours + '</div>' + chip('אין נתונים', '') + '</div>';
+      return '<div class="bpm-dp' + (v === max ? ' bpm-dp-top' : '') + '"><div class="bpm-dp-val">' + v + '%</div>' +
+        '<div class="bpm-dp-bar"><span style="width:' + v + '%"></span></div>' +
+        '<div class="bpm-dp-label">' + label + ' ' + hours + '</div>' +
+        '<div class="bpm-dp-label">' + (d.median_bpm != null ? d.median_bpm + ' BPM' : '') + '</div></div>';
+    }).join('') + '</div>';
+}
+
 function renderBpmRealtime() {
   // Update section-sub
   const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
   if (subEl) {
     const bucketMin = D.bpm.global ? (D.bpm.global.bucket_minutes || 60) : 60;
-    subEl.innerHTML = 'BPM בזמן אמת — קצב השירים ב-48 השעות האחרונות, ברזולוציית ' + bucketMin + ' דקות';
+    subEl.innerHTML = 'BPM בזמן אמת: קצב השירים ב-48 השעות האחרונות, ברזולוציית ' + bucketMin + ' דקות';
   }
 
   // Station pills
@@ -1975,7 +2135,7 @@ function renderBpmRealtime() {
               const cnt = ds.counts ? ds.counts[idx] : 0;
               const stName = ds.label || '';
               let lines = ['📻 ' + stName];
-              lines.push('BPM: ' + (val !== null ? val.toFixed(1) : '—'));
+              lines.push('BPM: ' + (val !== null ? val.toFixed(1) : '?'));
               lines.push('זוהו: ' + cnt + ' שירים');
               return lines;
             }
@@ -2003,7 +2163,7 @@ function renderBpmRealtime() {
   document.getElementById('bpmLegend').innerHTML = slugs.map(slug => {
     const stData = D.bpm.stations[slug];
     const rt = stData && stData.bpm_realtime;
-    const avg = rt && rt.data ? ' — ממוצע ' + (rt.data.filter(v => v !== null).reduce((a, b) => a + b, 0) / (rt.data.filter(v => v !== null).length || 1)).toFixed(0) + ' BPM' : '';
+    const avg = rt && rt.data ? ', ממוצע ' + (rt.data.filter(v => v !== null).reduce((a, b) => a + b, 0) / (rt.data.filter(v => v !== null).length || 1)).toFixed(0) + ' BPM' : '';
     return '<span><span class="sw" style="background:' + color(slug) + '"></span>' + esc(name(slug)) + avg + '</span>';
   }).join('');
 
@@ -2016,7 +2176,7 @@ function renderBpmLegacy() {
   const subEl = document.querySelector('.card:has(#bpmChart) .section-sub');
   if (subEl && D.bpm && D.bpm.lookback) {
     const lb = D.bpm.lookback;
-    subEl.innerHTML = 'ממוצע BPM ב-' + (lb.days ? lb.days.toFixed(1) : '?') + ' הימים האחרונים — איך הקצב של כל תחנה משתנה במהלך היום';
+    subEl.innerHTML = 'ממוצע BPM ב-' + (lb.days ? lb.days.toFixed(1) : '?') + ' הימים האחרונים: איך הקצב של כל תחנה משתנה במהלך היום';
   }
 
   // Station pills
@@ -2071,7 +2231,7 @@ function renderBpmLegacy() {
               const idx = ctx.dataIndex;
               const val = ctx.parsed.y;
               const cnt = ds.counts ? ds.counts[idx] : 0;
-              return 'ממוצע: ' + (val !== null ? val.toFixed(1) : '—') + ' BPM · דגימות: ' + cnt;
+              return 'ממוצע: ' + (val !== null ? val.toFixed(1) : '?') + ' BPM · דגימות: ' + cnt;
             }
           }
         }
@@ -2089,7 +2249,7 @@ function renderBpmLegacy() {
   // Legend
   document.getElementById('bpmLegend').innerHTML = slugs.map(slug => {
     const stData = D.bpm.stations[slug];
-    const avg = stData && stData.bpm ? ' — ממוצע ' + stData.bpm.mean + ' BPM' : '';
+    const avg = stData && stData.bpm ? ', ממוצע ' + stData.bpm.mean + ' BPM' : '';
     return '<span><span class="sw" style="background:' + color(slug) + '"></span>' + esc(name(slug)) + avg + '</span>';
   }).join('');
 }
@@ -2116,124 +2276,59 @@ function renderBpmTimeRangePills() {
 }
 
 /* ── Key Distribution ── */
+/* Profile path: minor vs major share per station, most minor first, plus each
+   station's top 3 keys. Fallback (no profile yet): the per-key bar chart from
+   the legacy `keys` totals. The 24x48 heatmap of 0-3 counts is gone. */
 function renderKeyDist() {
-  // Check for real-time key data
-  const hasRealtime = D.bpm && D.bpm.stations && Object.values(D.bpm.stations).some(s => s && s.keys_realtime);
-  if (hasRealtime) {
-    renderKeyDistRealtime();
-  } else {
-    renderKeyDistLegacy();
+  const legend = document.getElementById('keyLegacyLegend');
+  if (bpmProfileReady()) {
+    if (legend) legend.style.display = 'none';
+    renderKeyDistProfile();
+    return;
   }
+  if (legend) legend.style.display = 'flex';
+  renderKeyDistLegacy();
 }
 
-function renderKeyDistRealtime() {
+function renderKeyDistProfile() {
+  const prof = D.bpm.profile;
+  const q = prof.quality || {};
+  const all = prof.all;
   const subEl = document.querySelector('.card:has(#keyDistContent) .section-sub');
-  if (subEl) {
-    subEl.innerHTML = 'הטביעה המוזיקלית של כל תחנה — סולמות לאורך זמן';
+  if (subEl) subEl.textContent = 'שמח או עגום? כמה מהשירים בכל תחנה בסולם מינור';
+  document.getElementById('keyStationPills').innerHTML = '';
+
+  const ok = Object.entries(prof.stations).filter(([, p]) => p && !p.low_data && p.minor_pct != null);
+  const sorted = ok.slice().sort((a, b) => b[1].minor_pct - a[1].minor_pct);
+  const top = sorted[0];
+  let h = '';
+  if (top) {
+    h += '<div class="deep-hero"><span><b>' + esc(name(top[0])) + '</b> הכי מינורית: <b>' + top[1].minor_pct + '%</b> מינור, מול ממוצע ' +
+      all.minor_pct + '%</span>' + helpTip('מינור נשמע לרוב עצוב או קודר, מז׳ור שמח ובהיר. הממוצע הוא של כל ההשמעות בכל התחנות.') + '</div>';
   }
+  const topKey = all.top_keys && all.top_keys[0];
+  h += '<div class="stat-cards">' +
+    statCard(all.minor_pct + '%', 'מינור, כל התחנות', 'מז׳ור: ' + all.major_pct + '%', 'minor') +
+    (top ? statCard(top[1].minor_pct + '%', 'מינור ב' + name(top[0]), '', 'minor') : '') +
+    (topKey ? statCard(topKey.key, 'הסולם הנפוץ ביותר', topKey.pct + '% מההשמעות', '') : '') +
+    '</div>';
 
-  const pillsEl = document.getElementById('keyStationPills');
-  pillsEl.innerHTML = '<button class="window-pill' + (keyStation === 'all' ? ' active' : '') + '" data-s="all">הכל</button>' +
-    stations.map(s => '<button class="window-pill' + (keyStation === s.slug ? ' active' : '') + '" data-s="' + s.slug + '">' + esc(s.name) + '</button>').join('');
-  pillsEl.onclick = e => { const b = e.target.closest('.window-pill'); if (!b) return; keyStation = b.dataset.s; renderKeyDist(); };
-
-  const el = document.getElementById('keyDistContent');
-  if (!D.bpm || !D.bpm.stations) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
-
-  // Aggregate keys_realtime across selected stations
-  const slugs = keyStation === 'all' ? stations.map(s => s.slug) : [keyStation];
-  let mergedKeys = null;
-  let mergedSlots = null;
-
-  slugs.forEach(slug => {
-    const stData = D.bpm.stations[slug];
-    if (!stData || !stData.keys_realtime) return;
-    const kr = stData.keys_realtime;
-    if (!mergedKeys) {
-      mergedKeys = { ...kr };
-      mergedSlots = kr.slot_labels || [];
-    } else {
-      // Merge matrix
-      if (kr.matrix && mergedKeys.matrix) {
-        mergedKeys.matrix = mergedKeys.matrix.map((row, yi) => {
-          if (kr.matrix[yi]) {
-            return row.map((v, xi) => v + (kr.matrix[yi][xi] || 0));
-          }
-          return row;
-        });
-      }
-      // Merge totals
-      if (kr.totals && mergedKeys.totals) {
-        Object.entries(kr.totals).forEach(([k, v]) => {
-          mergedKeys.totals[k] = (mergedKeys.totals[k] || 0) + v;
-        });
-      }
-    }
-  });
-
-  if (!mergedKeys) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">אין נתוני סולמות</div>'; return; }
-
-  // Apply BPM time range filter
-  const rangeHours = parseInt(bpmTimeRange) || 48;
-  const bucketMin = D.bpm.global ? (D.bpm.global.bucket_minutes || 15) : 15;
-  const slotsToShow = Math.ceil((rangeHours * 60) / bucketMin);
-
-  let slotLabels = mergedSlots || mergedKeys.slot_labels || [];
-  let matrix = mergedKeys.matrix || [];
-  const keyLabels = mergedKeys.key_labels || [];
-
-  if (slotLabels.length > slotsToShow) {
-    const start = slotLabels.length - slotsToShow;
-    slotLabels = slotLabels.slice(start);
-    if (matrix.length) {
-      matrix = matrix.map(row => row.slice(start));
-    }
-  }
-
-  el.innerHTML = '<div class="key-heatmap-wrapper">' + renderKeyHeatmap({
-    key_labels: keyLabels,
-    slot_labels: slotLabels,
-    matrix: matrix
-  }) + '</div>';
-
-  // Hide the major/minor legend below
-  const legend = document.querySelector('.card:has(#keyDistContent) > div:last-child');
-  if (legend) legend.style.display = 'none';
-}
-
-function renderKeyHeatmap(data) {
-  if (!data || !data.matrix || !data.matrix.length) return '<div style="color:var(--muted);text-align:center;padding:10px">אין נתונים</div>';
-  const maxVal = Math.max(1, ...data.matrix.flat().filter(v => v > 0));
-  let html = '<div class="key-heatmap">';
-
-  // X-axis labels (top)
-  html += '<div class="key-heatmap-row" style="margin-bottom:2px">';
-  html += '<span class="key-hm-label"></span>';
-  const labelEvery = Math.max(1, Math.floor(data.slot_labels.length / 20));
-  data.slot_labels.forEach((label, xi) => {
-    if (xi % labelEvery === 0) {
-      html += '<span class="key-heatmap-label" style="width:8px">' + esc(label) + '</span>';
-    } else {
-      html += '<span style="width:8px;flex-shrink:0"></span>';
-    }
-  });
-  html += '</div>';
-
-  data.key_labels.forEach((key, yi) => {
-    html += '<div class="key-heatmap-row">';
-    html += '<span class="key-hm-label">' + esc(key) + '</span>';
-    (data.matrix[yi] || []).forEach((val, xi) => {
-      const intensity = val > 0 ? val / maxVal : 0;
-      const colorStr = val > 0
-        ? 'rgba(93, 219, 181, ' + (0.1 + intensity * 0.7) + ')'
-        : 'transparent';
-      const timeLabel = data.slot_labels[xi] || '';
-      html += '<span class="key-cell" style="background:' + colorStr + '" title="' + timeLabel + ' · ' + esc(key) + ': ' + val + ' tracks"></span>';
-    });
-    html += '</div>';
-  });
-  html += '</div>';
-  return html;
+  const rows = sorted.map(([slug, p]) => ({ slug, p }));
+  const refIdx = rows.findIndex(r => r.p.minor_pct < all.minor_pct);
+  rows.splice(refIdx < 0 ? rows.length : refIdx, 0, { slug: 'all', p: all, ref: true });
+  Object.entries(prof.stations).filter(([, p]) => p && p.low_data).forEach(([slug, p]) => rows.push({ slug, p, low: true }));
+  h += '<div class="bpm-legend"><span><i class="bpm-sw key-seg-minor"></i>מינור</span><span><i class="bpm-sw key-seg-major"></i>מז׳ור</span>' +
+    helpTip('הסולם מזוהה אוטומטית מקטע קצר ולכן אינו ודאי: ' + (q.key_agreement_pct != null ? 'רק ' + q.key_agreement_pct + '% מההשמעות מסכימות' : 'השמעות רבות אינן מסכימות') +
+      ' עם הסולם השכיח של השיר. לכן לכל שיר נלקח הסולם השכיח מכל ההשמעות שלו, ורק אז נספרות ההשמעות.') + '</div>';
+  h += '<div class="bpm-rows">' + rows.map(r => {
+    const keys = (r.p.top_keys || []).slice(0, 3);
+    return '<div class="bpm-row' + (r.ref ? ' bpm-row-ref' : '') + '" data-s="' + esc(r.slug) + '">' +
+      bpmRowHead(r.ref ? 'כל התחנות' : name(r.slug), r.ref, r.low, r.p.minor_pct != null ? r.p.minor_pct + '% מינור' : '') +
+      bpmStackBar([{ pct: r.p.minor_pct, cls: 'key-seg-minor', label: 'מינור' }, { pct: r.p.major_pct, cls: 'key-seg-major', label: 'מז׳ור' }], r.low) +
+      (keys.length ? '<div class="key-chips">' + keys.map(k => chip(k.key + ' ' + k.pct + '%', /minor/i.test(k.key) ? 'minor' : '')).join('') + '</div>' : '') +
+      '</div>';
+  }).join('') + '</div>';
+  document.getElementById('keyDistContent').innerHTML = h;
 }
 
 function renderKeyDistLegacy() {
