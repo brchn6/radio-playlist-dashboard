@@ -848,6 +848,157 @@ def build_trends(tracks: list[dict[str, Any]], now: datetime) -> dict[str, Any]:
     return {"days": TRENDS_DAYS, "daily": daily_out, "rising_artists": rising[:15]}
 
 
+# ── Tempo / key profile (deep tab, song_mode) ───────────────────────────
+# librosa BPM sits on a coarse tempo grid and the key estimate flips between
+# plays of the same recording (~60% agreement), so a per-play average is noise.
+# Each song gets ONE tempo and ONE key (the mode across its plays in the
+# window); station stats are then counted over plays using the song's value.
+PROFILE_WINDOW_DAYS = 30
+PROFILE_MIN_PLAYS = 3
+PROFILE_LOW_DATA_PLAYS = 50
+PROFILE_BPM_TOLERANCE = 4
+PROFILE_BANDS = {"slow": [0, 100], "mid": [100, 130], "fast": [130, 1000]}
+PROFILE_TOP_KEYS = 3
+DAYPARTS = ("morning", "afternoon", "evening", "night")
+
+
+def daypart_of(il_hour: int) -> str:
+    """Asia/Jerusalem hour -> morning 06-11, afternoon 12-17, evening 18-23, night 00-05."""
+    if 6 <= il_hour <= 11:
+        return "morning"
+    if 12 <= il_hour <= 17:
+        return "afternoon"
+    if 18 <= il_hour <= 23:
+        return "evening"
+    return "night"
+
+
+def _mode(values: list[Any]) -> Any:
+    """Most frequent value; ties go to the smallest so the result is deterministic."""
+    counts: dict[Any, int] = defaultdict(int)
+    for v in values:
+        counts[v] += 1
+    return min(counts, key=lambda v: (-counts[v], v))
+
+
+def _pct(part: int, whole: int) -> int | None:
+    return round(100 * part / whole) if whole else None
+
+
+def _largest_remainder(counts: dict[str, int]) -> dict[str, int]:
+    """Integer percents of counts that sum to exactly 100 (all zero if empty)."""
+    total = sum(counts.values())
+    if not total:
+        return {k: 0 for k in counts}
+    raw = {k: 100 * v / total for k, v in counts.items()}
+    out = {k: int(math.floor(r)) for k, r in raw.items()}
+    short = 100 - sum(out.values())
+    for k in sorted(raw, key=lambda k: -(raw[k] - out[k]))[:short]:
+        out[k] += 1
+    return out
+
+
+def _band_of(bpm: float) -> str:
+    for name, (lo, hi) in PROFILE_BANDS.items():
+        if lo <= bpm < hi:
+            return name
+    return "fast"
+
+
+def _profile_of(plays: list[tuple[dict[str, Any], float, str]]) -> dict[str, Any]:
+    """<PROFILE> (see .scratch/deep-redesign/contract.md) over (track, song_bpm, song_key) plays."""
+    n = len(plays)
+    songs = len({song_key(t) for t, _, _ in plays})
+    bands = {b: 0 for b in PROFILE_BANDS}
+    for _, bpm, _ in plays:
+        bands[_band_of(bpm)] += 1
+    minor = sum(1 for _, _, k in plays if "minor" in k.lower())
+    minor_pct = _pct(minor, n)
+    key_counts: dict[str, int] = defaultdict(int)
+    for _, _, k in plays:
+        key_counts[k] += 1
+    top_keys = sorted(key_counts.items(), key=lambda x: (-x[1], x[0]))[:PROFILE_TOP_KEYS]
+
+    by_part: dict[str, list[tuple[dict[str, Any], float, str]]] = defaultdict(list)
+    for p in plays:
+        by_part[daypart_of(p[0]["_il"].hour)].append(p)
+    dayparts: dict[str, Any] = {}
+    for part in DAYPARTS:
+        pp = by_part.get(part, [])
+        m = len(pp)
+        dayparts[part] = {
+            "plays": m,
+            "median_bpm": round(float(np.median([b for _, b, _ in pp]))) if m else None,
+            "fast_pct": _pct(sum(1 for _, b, _ in pp if _band_of(b) == "fast"), m),
+            "slow_pct": _pct(sum(1 for _, b, _ in pp if _band_of(b) == "slow"), m),
+            "minor_pct": _pct(sum(1 for _, _, k in pp if "minor" in k.lower()), m),
+        }
+
+    return {
+        "plays": n,
+        "songs": songs,
+        "low_data": n < PROFILE_LOW_DATA_PLAYS,
+        "median_bpm": round(float(np.median([b for _, b, _ in plays]))) if n else None,
+        "tempo": _largest_remainder(bands),
+        "minor_pct": minor_pct,
+        "major_pct": (100 - minor_pct) if minor_pct is not None else None,
+        "top_keys": [{"key": k, "pct": _pct(c, n)} for k, c in top_keys],
+        "dayparts": dayparts,
+    }
+
+
+def build_tempo_key_profile(tracks: list[dict[str, Any]], slugs: list[str],
+                            now: datetime) -> dict[str, Any]:
+    """bpm_key.json `profile`: per-song modal tempo/key, then per-station stats over plays.
+
+    `tracks` are music tracks (flagged rows already removed by the caller),
+    annotated with `_dt` (UTC) and `_il` (Asia/Jerusalem). A song counts only
+    if at least PROFILE_MIN_PLAYS of its in-window plays carry a BPM AND at
+    least that many carry a key; every in-window play of such a song is then
+    counted with the song's modal values.
+    """
+    cutoff = now - timedelta(days=PROFILE_WINDOW_DAYS)
+    window = [t for t in tracks if t["_dt"] >= cutoff]
+
+    by_song: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for t in window:
+        by_song[song_key(t)].append(t)
+
+    plays: list[tuple[dict[str, Any], float, str]] = []
+    bpm_seen = bpm_agree = key_seen = key_agree = 0
+    for st in by_song.values():
+        bpms = [float(t["bpm"]) for t in st if t.get("bpm") is not None]
+        keys = [t["musical_key"] for t in st if t.get("musical_key")]
+        if len(bpms) < PROFILE_MIN_PLAYS or len(keys) < PROFILE_MIN_PLAYS:
+            continue
+        song_bpm, song_k = _mode(bpms), _mode(keys)
+        bpm_seen += len(bpms)
+        bpm_agree += sum(1 for b in bpms if abs(b - song_bpm) <= PROFILE_BPM_TOLERANCE)
+        key_seen += len(keys)
+        key_agree += sum(1 for k in keys if k == song_k)
+        plays.extend((t, song_bpm, song_k) for t in st)
+
+    by_station: dict[str, list[tuple[dict[str, Any], float, str]]] = defaultdict(list)
+    for p in plays:
+        by_station[p[0]["station_slug"]].append(p)
+
+    return {
+        "method": "song_mode",
+        "window_days": PROFILE_WINDOW_DAYS,
+        "min_plays_per_song": PROFILE_MIN_PLAYS,
+        "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "bands": PROFILE_BANDS,
+        "quality": {
+            "songs_used": len({song_key(t) for t, _, _ in plays}),
+            "plays_used": len(plays),
+            "key_agreement_pct": _pct(key_agree, key_seen),
+            "bpm_agreement_pct": _pct(bpm_agree, bpm_seen),
+        },
+        "all": _profile_of(plays),
+        "stations": {slug: _profile_of(by_station.get(slug, [])) for slug in slugs},
+    }
+
+
 def build_bpm_key(tracks: list[dict[str, Any]],
                    slugs: list[str]) -> dict[str, Any]:
     """Build BPM and musical-key aggregates with real-time 15-min granularity.
@@ -861,7 +1012,8 @@ def build_bpm_key(tracks: list[dict[str, Any]],
     # Filter to tracks with BPM data
     with_bpm = [t for t in tracks if t.get("bpm") is not None]
     if not with_bpm:
-        return {"stations": {}, "cross_station": {}, "lookback": {}, "global": {}}
+        return {"stations": {}, "cross_station": {}, "lookback": {}, "global": {},
+                "profile": build_tempo_key_profile(tracks, slugs, datetime.now(timezone.utc))}
 
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(hours=BPM_LOOKBACK_HOURS)
@@ -1055,6 +1207,7 @@ def build_bpm_key(tracks: list[dict[str, Any]],
             "bucket_minutes": BPM_BUCKET_MINUTES,
             "all_slots": all_slots,
         },
+        "profile": build_tempo_key_profile(tracks, slugs, now),
     }
 
 

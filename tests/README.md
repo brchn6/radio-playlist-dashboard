@@ -27,6 +27,7 @@ node tests/verify_drilldown.js                  # drill-down keeps its filter
 node tests/verify_theme.js "" system-light       # theme system, light OS
 node tests/verify_theme.js "" system-dark        # theme system, dark OS
 node tests/verify_section_tags.js               # section tags vs docs/SECTIONS.md
+.venv/bin/python tests/verify_bpm_profile.py    # bpm_key.json profile (song-mode tempo/key)
 
 # proxy engine (lower-level interpreters, see notes in each file)
 .venv/bin/python tests/verify_proxy_healing.py          # frozen proxy is detected + healed
@@ -42,6 +43,7 @@ node tests/verify_drilldown.js && \
 node tests/verify_theme.js "" system-light && \
 node tests/verify_theme.js "" system-dark && \
 node tests/verify_section_tags.js && \
+.venv/bin/python tests/verify_bpm_profile.py && \
 .venv/bin/python tests/verify_proxy_healing.py && \
 shazamio/.venv/bin/python tests/verify_capture_timeout.py --live && \
 echo "ALL SUITES PASSED"
@@ -82,6 +84,7 @@ diff -q /tmp/live.html /tmp/committed.html && echo "live == main"
 | `verify_drilldown.js` | Tapping a top song keeps its filter: the banner renders with the station breakdown and window label, and the time window is actually applied (only the in-window play is listed). ✕ clears it. |
 | `verify_theme.js` | Toggle sets and persists the theme; an explicit choice beats the OS; the canvas palette refreshes; the icon offers the opposite theme; and all 8 station colours reach 4.5:1 as text in **both** themes. Run once per OS scenario. |
 | `verify_section_tags.js` | The section tags (the English `subject:thing` ids in the corner of every region) match `docs/SECTIONS.md` in both directions, follow the shape, are unique, and sit on the card they name. Drives the real `secTag()`, `renderPills()` and `renderNowPlaying()`, then fires the real click handler to prove id -> clipboard -> toast, including the insecure-context (plain http) fallback. |
+| `verify_bpm_profile.py` | The `profile` block of `bpm_key.json` (deep tab): each song resolves to its modal BPM and modal key across its plays (min 3), station stats count plays with the song's values, tempo bands sum to 100 by largest remainder, day parts split at 06/12/18/00 Asia/Jerusalem, 30-day window, `low_data` below 50 plays, and every pre-existing `bpm_key.json` field is still present. Calls the real `build_tempo_key_profile()` and `build_bpm_key()`. |
 | `verify_capture_timeout.py` | A stalled stream (accepts the connection, then goes silent) cannot freeze a station loop: ffmpeg gives up on its own via `-rw_timeout`; if it will not, the Python `CAPTURE_TIMEOUT` kills it; a cancelled capture leaves no orphan ffmpeg; and a healthy stream still captures exactly the expected WAV. This is the bug that cost radio-darom 5h19m of airtime on 2026-09-15. |
 | `verify_proxy_healing.py` | `_loop_verdict()` tells frozen from mid-backoff from never-started; a genuinely frozen proxy (bounds disabled, stalled stream) is reported stale even though its HTTP server answers; `start_one()` restarts it (not `already_running`), the restart is bounded by the cooldown, it is recorded as a **bounded outage** for the uptime panel, and a healthy proxy is left alone. |
 
