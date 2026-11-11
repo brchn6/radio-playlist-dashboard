@@ -242,7 +242,7 @@ note(f"breakpoints present: {sorted(bps, key=int)}")
 # ── 5. interactive hit areas ─────────────────────────────────────────
 INTERACTIVE = ['.tab-btn', '.pill', '.window-pill', '.hist-btn', '.np-btn',
                '.explorer-btn', '.theme-toggle', '.hist-search', '.cluster-search',
-               '.explorer-search', '.top-spotify']
+               '.explorer-search', '.top-spotify', '.method-btn']
 for sel in INTERACTIVE:
     # selectors are frequently grouped (".a,.b{"), so match the class anywhere
     # in a selector list and then read that rule's body
@@ -267,7 +267,7 @@ for sel in INTERACTIVE:
 # The section tags are labels for humans and agents, not primary controls, so
 # they are held to the AA minimum instead of the comfort target above. They are
 # still enforced: an unverifiable hit area is a failure here, not a warning.
-SMALL_TARGETS = ['.sec-tag']
+SMALL_TARGETS = ['.sec-tag', '.tip']
 for sel in SMALL_TARGETS:
     found = []
     for rule in re.finditer(r'([^{}]+)\{([^{}]*)\}', css):

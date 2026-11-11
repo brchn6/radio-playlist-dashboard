@@ -685,3 +685,17 @@ file straight from disk, so it needs no restart.
 
 **Update 2026-11-11 (same day):** Bar approved the first batch: 15 flags written in one go (8 jingle/show_theme incl. LukHash and two small variants, 5 ads: Doors, Black Keys, Balkan Beat Box, Ofenbach PARTY x2, Dominic Fike). The live collector (it runs generate_data.py from this working tree, so the branch's data side went live at commit time) picked them up on the next cycle: jingles.json count 15, top.json #1 is now Bar Tzabari, Riders On The Storm absent from top/cross/transitions/clusters/bpm/trends, publish uploaded ~1.2 MB (no shard re-upload). Worker panes closed. Remaining: push approval (frontend section appears only after Pages deploys), Bar's visual check. Open candidate: Temper City - Self Aware (now #3, looks like library music but normal airtime). Unrelated open issue: updater.py crashes on `SSL SYSCALL error: EOF` in `end_non_music_event` (systemd restarts it).
 - 2026-11-11: feat/jingle-filter merged (ff) and pushed to main at 1386434d; Pages deploy run 43063554598 succeeded, live page serves insights:jingles.
+
+## 2026-11-11 - "How we calculated this" panel for insights:jingles
+
+**Branch:** `feat/jingle-method`, built in a separate git worktree (`../radio-playlist-dashboard-jingle-method`) because another agent was editing the dashboard in the main checkout at the same time. NOT merged, NOT pushed.
+
+**Asked for by Bar:** a button in the Jingles & Ads section that opens a deep explanation of how jingles are detected; chose "method + per-track proof" and bilingual (Hebrew/English titles, English body).
+
+**Built:** `generate_data.py` `airtime_gaps()` / `build_airtime_evidence()` / `with_evidence()` add `method` (baseline, thresholds, airtime histogram all vs flagged) and per-track `evidence` (airings, median airtime, cut-short share, 3+ min share, score, 24-hour pattern) to `jingles.json`, using jingle_detector's constants (imported). `docs/index.html`: `.method-btn` toggle (aria-expanded, 44px), panel with pipeline, stat cards, histogram, per-track proof, known limits, and `(?)` tooltips (`.tip`, 24px, bound to the panel so the section-tag copy handler stays the only document click listener).
+
+**Verified:** Python evidence matches the detector SQL on real data for all 15 flags (baseline 3.65, same medians/short shares; two tracks differ by one airing at the window edge); 0.3 s over 262k rows. Suites: verify_jingle_method 23/23 (new, red-checked), verify_track_flags incl. 13 evidence checks (red-checked: removing repeat-collapsing fails 4), verify_section_tags, nobulk, drilldown, theme, ui_audit 42/0/0, proxy_healing, capture_timeout.
+
+**Finding worth keeping:** sampling is ~1/min, so measured airtime has a ~1.5-2 min floor: a 30 s jingle and a 90 s ad bed look the same. The panel states this under Known limits.
+
+**Next:** merge into main once the other agent's work in the main checkout is committed (merge touches docs/index.html and generate_data.py there), then push. The live collector runs generate_data.py from the main checkout, so the panel's data appears on the first cycle after the merge; until then the panel shows "Method data not published yet".

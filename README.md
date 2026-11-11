@@ -205,6 +205,8 @@ The `track_flags` table in Supabase is the single source of truth for which (art
 .venv/bin/python tests/verify_track_flags.py
 ```
 
+**How we calculated this:** the Jingles & Ads section has a "🔬 איך חישבנו? · How we calculated this" button that opens the full method: the pipeline, the key numbers (baseline airtime, thresholds), the airtime distribution of all airings vs flagged ones, and per-track proof (median airtime vs baseline, cut-short share, score, hour-of-day pattern). Every number comes from `jingles.json` (`method` + per-track `evidence`), which `generate_data.py` computes with the same definition and constants as `jingle_detector.py` (verified to match the detector's SQL on real data). Check: `node tests/verify_jingle_method.js` and `.venv/bin/python tests/verify_track_flags.py`.
+
 Flag in batches, not one at a time: a flag-set change forces clusters and the transition map to rebuild immediately. History day shards never carry the flag (the page derives the chip from `jingles.json`), so flagging does not re-upload them. `scripts/playlist_explorer.py` reads the same table.
 
 ## 📻 Stations

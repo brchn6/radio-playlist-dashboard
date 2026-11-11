@@ -603,6 +603,57 @@
     .jingle-plays{flex-shrink:0;text-align:center;min-width:52px}
     .jingle-plays-num{font-family:var(--font-num);font-size:var(--fs-xl);font-weight:700;color:var(--unknown);line-height:1.1}
     .jingle-plays-label{font-size:var(--fs-xs);color:var(--muted)}
+    /* ── insights:jingles "How we calculated this" panel ── */
+    .method-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 var(--sp-4);margin-top:var(--sp-2);border-radius:var(--radius-pill);
+      border:1px solid var(--border);background:var(--card);color:var(--fg-2);font:inherit;font-size:var(--fs-sm);cursor:pointer;touch-action:manipulation}
+    .method-btn:hover{background:var(--card-hover);color:var(--fg)}
+    .method-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+    .method-btn .chev{transition:transform var(--transition)}
+    .method-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+    .method-panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--elevated);padding:var(--sp-4);margin-bottom:var(--sp-4)}
+    .method-panel[hidden]{display:none}
+    .method-h{font-size:var(--fs-xs);font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:var(--sp-5) 0 var(--sp-2)}
+    .method-h:first-child{margin-top:0}
+    .method-en{direction:ltr;text-align:left;unicode-bidi:isolate}
+    .method-steps{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
+    .method-step{flex:1 1 120px;min-width:0;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);padding:var(--sp-2) var(--sp-3)}
+    .method-step-n{font-family:var(--font-num);font-size:var(--fs-xs);color:var(--accent);font-weight:700}
+    .method-step-t{font-size:var(--fs-sm);font-weight:600;margin-top:2px}
+    .method-step-d{font-size:var(--fs-xs);color:var(--muted);margin-top:2px}
+    .method-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:var(--sp-2)}
+    .method-stat{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);padding:var(--sp-2) var(--sp-3)}
+    .method-stat-num{font-family:var(--font-num);font-size:var(--fs-xl);font-weight:700;line-height:1.2}
+    .method-stat-label{font-size:var(--fs-xs);color:var(--muted);display:flex;align-items:center;gap:4px}
+    .tip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;min-width:24px;min-height:24px;padding:0;border-radius:50%;border:1px solid var(--border);
+      background:var(--card);color:var(--muted);font:600 var(--fs-xs)/1 var(--font-num);cursor:help;position:relative;vertical-align:middle;touch-action:manipulation}
+    .tip:hover,.tip:focus-visible,.tip.open{color:var(--fg);border-color:var(--muted-2)}
+    .tip-pop{position:fixed;z-index:50;width:min(280px,calc(100vw - 32px));padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-sm);
+      background:var(--elevated);border:1px solid var(--border);box-shadow:var(--shadow-lg);color:var(--fg);font:400 var(--fs-xs)/1.5 var(--font);text-align:left;direction:ltr;
+      white-space:normal;cursor:auto;display:none}
+    .tip.open .tip-pop{display:block}
+    .gap-hist{display:flex;flex-direction:column;gap:3px}
+    .gap-row{display:grid;grid-template-columns:64px 1fr 1fr;gap:var(--sp-2);align-items:center;font-size:var(--fs-xs)}
+    .gap-lbl{font-family:var(--font-num);color:var(--muted);text-align:right}
+    .gap-bar{height:12px;border-radius:3px;background:var(--divider);overflow:hidden}
+    .gap-bar>i{display:block;height:100%}
+    .gap-bar.all>i{background:var(--accent)}
+    .gap-bar.flag>i{background:var(--unknown)}
+    .gap-legend{display:grid;grid-template-columns:64px 1fr 1fr;gap:var(--sp-2);font-size:var(--fs-xs);color:var(--muted);margin-bottom:2px}
+    .proof{border-top:1px solid var(--divider);padding:var(--sp-3) 0}
+    .proof:first-of-type{border-top:none}
+    .proof-title{font-weight:600;font-size:var(--fs-sm)}
+    .proof-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:var(--sp-3);margin-top:var(--sp-2);align-items:end}
+    .air-track{position:relative;height:14px;border-radius:7px;background:var(--divider)}
+    .air-fill{position:absolute;inset-block:0;left:0;border-radius:7px;background:var(--unknown)}
+    .air-base{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ok)}
+    .air-thr{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dashed var(--warn)}
+    .proof-nums{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:var(--fs-xs);color:var(--muted);margin-top:6px;font-family:var(--font-num)}
+    .proof-nums b{color:var(--fg);font-weight:700}
+    .hours{display:flex;align-items:flex-end;gap:1px;height:28px}
+    .hours>i{flex:1;background:var(--unknown);border-radius:1px 1px 0 0;min-height:1px}
+    .hours-lbl{display:flex;justify-content:space-between;font-size:var(--fs-xs);color:var(--muted);font-family:var(--font-num)}
+    .method-limits{margin:0;padding-inline-start:18px;font-size:var(--fs-sm);color:var(--fg-2);line-height:1.6}
+    @media (max-width:768px){.proof-grid{grid-template-columns:1fr}.gap-row,.gap-legend{grid-template-columns:52px 1fr 1fr}}
 
     /* ── Window pills / legends / charts ── */
     .window-pills{gap:var(--sp-2);margin-bottom:var(--sp-3)}
@@ -846,7 +897,9 @@
     <div class="section-header">
       <div class="section-title">📢 ג'ינגלים ופרסומות - Jingles &amp; Ads</div>
       <div class="section-sub">רצועות שסומנו כלא-מוזיקה ולא נספרות בסטטיסטיקות</div>
+      <button type="button" class="method-btn" id="jingleMethodBtn" aria-expanded="false" aria-controls="jingleMethod" onclick="toggleJingleMethod()">🔬 איך חישבנו? · How we calculated this <span class="chev" aria-hidden="true">▾</span></button>
     </div>
+    <div class="method-panel" id="jingleMethod" hidden></div>
     <div id="jinglesList"></div>
   </div>
 
@@ -1699,7 +1752,133 @@ function renderJingles() {
     h += '</div>';
   });
   el.innerHTML = h;
+  if (jingleMethodOpen) renderJingleMethod();
 }
+
+/* insights:jingles "How we calculated this" panel. Every number comes from
+   jingles.json (method + per-track evidence), which generate_data.py computes
+   with the same definition and constants as scripts/jingle_detector.py. */
+let jingleMethodOpen = false;
+function toggleJingleMethod() {
+  jingleMethodOpen = !jingleMethodOpen;
+  const btn = document.getElementById('jingleMethodBtn');
+  const panel = document.getElementById('jingleMethod');
+  btn.setAttribute('aria-expanded', String(jingleMethodOpen));
+  panel.hidden = !jingleMethodOpen;
+  panel.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open'));
+  if (jingleMethodOpen) renderJingleMethod();
+}
+function tip(text) {
+  return '<button type="button" class="tip" aria-label="' + esc(text) + '">?<span class="tip-pop" role="tooltip">' + esc(text) + '</span></button>';
+}
+function fmtMin(v) { return v == null ? '-' : Number(v).toFixed(2); }
+function pct(v) { return v == null ? '-' : Math.round(v * 100) + '%'; }
+function renderJingleMethod() {
+  const el = document.getElementById('jingleMethod');
+  if (!el) return;
+  const J = D.jingles;
+  const m = J && J.method;
+  if (!m) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:12px">פירוט החישוב עדיין לא זמין · Method data not published yet</div>'; return; }
+  const base = m.baseline_median_min, thr = m.max_median_min, shortG = m.short_gap_min;
+  let h = '';
+
+  h += '<div class="method-h">תהליך · Pipeline</div><div class="method-steps method-en">';
+  [
+    ['Listen', 'Shazam samples every station about once a minute', 'Each proxy captures a short clip roughly every 60 s and asks Shazam what it is. A jingle or ad bed is often real (library) music, so Shazam matches it like any song.'],
+    ['Airings', 'Back-to-back hits of one track = one airing', 'A 4-minute song is recognized several times in a row. Consecutive recognitions of the same artist + title on a station are collapsed into a single airing.'],
+    ['Airtime', 'Minutes until the next different airing', 'For each airing we measure the minutes until the next different airing on the same station. A song holds the air for ~3-4 min; a jingle or ad bed is replaced within a minute or two.'],
+    ['Rank', 'Detector lists suspects', 'Tracks with at least ' + m.min_plays + ' airings in ' + m.window_days + ' days and a median airtime of ' + thr + ' min or less are listed, ranked by score.'],
+    ['Confirm', 'A human approves every flag', 'Nothing is flagged automatically. Each suspect is checked by a person and flagged as jingle, ad or show theme.'],
+    ['Exclude', 'Hidden from music stats, kept in the log', 'Flagged tracks leave top songs, trends, cross-station, clusters, BPM/key and transitions (A -> jingle -> B counts as A -> B). The raw recognitions are never deleted.'],
+  ].forEach((s, i) => {
+    h += '<div class="method-step"><div class="method-step-n">' + (i + 1) + ' ' + tip(s[2]) + '</div><div class="method-step-t">' + esc(s[0]) + '</div><div class="method-step-d">' + esc(s[1]) + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="method-h">מספרים · Key numbers</div><div class="method-stats">';
+  [
+    [fmtMin(base) + ' min', 'זמן שידור חציוני · Baseline', 'Median airtime over all ' + (m.total_airings || 0).toLocaleString() + ' airings in the last ' + m.window_days + ' days. This is what a normal song looks like.', 'var(--ok)'],
+    ['≤ ' + thr + ' min', 'סף חשד · Suspect', 'A track becomes a suspect when its median airtime is at or below this.', 'var(--warn)'],
+    ['≤ ' + shortG + ' min', 'נחתך · Cut short', 'An airing this short counts as cut short. Real songs are almost never cut this early.', 'var(--fg)'],
+    [String(J.count || 0), 'מסומנים · Flagged', 'Tracks a human confirmed as non-music.', 'var(--unknown)'],
+  ].forEach(s => {
+    h += '<div class="method-stat"><div class="method-stat-num" style="color:' + s[3] + '">' + esc(s[0]) + '</div><div class="method-stat-label">' + esc(s[1]) + ' ' + tip(s[2]) + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="method-h method-en">Score ' + tip('Score = airings per day x (1 - median airtime / baseline). Frequent AND short ranks first; a track as long as a normal song scores 0.') + '</div>';
+  h += '<div class="method-en" style="font-family:var(--font-num);font-size:var(--fs-sm)">score = airings/day × (1 − median airtime / ' + fmtMin(base) + ')</div>';
+
+  const edges = m.gap_hist_edges || [], ha = m.gap_hist_all || [], hf = m.gap_hist_flagged || [];
+  const sa = ha.reduce((a, b) => a + b, 0) || 1, sf = hf.reduce((a, b) => a + b, 0) || 1;
+  const maxShare = Math.max(...ha.map(v => v / sa), ...hf.map(v => v / sf), 0.01);
+  h += '<div class="method-h">התפלגות זמן שידור · Airtime distribution ' + tip('Share of airings by minutes until the next different airing. Teal: every airing on every station. Gray: airings of flagged tracks. Flagged tracks pile up at 1.5-2 min, songs at 3-5 min. Because sampling is ~1 min, even a 30 s jingle shows up as ~1.5-2 min.') + '</div>';
+  h += '<div class="method-en"><div class="gap-legend"><span></span><span>All airings</span><span>Flagged</span></div><div class="gap-hist">';
+  edges.forEach((e, i) => {
+    const lbl = i === edges.length - 1 ? '≥ ' + e : e + '-' + edges[i + 1];
+    const wa = (ha[i] || 0) / sa / maxShare * 100, wf = (hf[i] || 0) / sf / maxShare * 100;
+    h += '<div class="gap-row"><span class="gap-lbl">' + lbl + '</span>'
+      + '<span class="gap-bar all" title="' + pct((ha[i] || 0) / sa) + '"><i style="width:' + wa.toFixed(1) + '%"></i></span>'
+      + '<span class="gap-bar flag" title="' + pct((hf[i] || 0) / sf) + '"><i style="width:' + wf.toFixed(1) + '%"></i></span></div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="method-h">הוכחה לכל רצועה · Per-track proof ' + tip('Gray bar: this track\'s median airtime. Green line: the baseline for a normal song. Dashed yellow line: the suspect threshold. Below: airings, cut-short share, share that ran 3+ min, score, and when in the day (Israel time) it aired.') + '</div><div class="method-en">';
+  const scaleMax = Math.max(base || 4, 6);
+  const tracks = (J.tracks || []).slice().sort((a, b) => ((b.evidence && b.evidence.airings) || 0) - ((a.evidence && a.evidence.airings) || 0));
+  tracks.forEach(t => {
+    const ev = t.evidence;
+    h += '<div class="proof"><div class="proof-title">' + esc(t.artist) + ' - ' + esc(t.title) + flagChip(t.kind) + '</div>';
+    if (!ev || !ev.airings || ev.median_gap_min == null) {
+      h += '<div class="proof-nums">No airings in the last ' + m.window_days + ' days - flagged from earlier evidence.</div></div>';
+      return;
+    }
+    const w = Math.min(ev.median_gap_min / scaleMax, 1) * 100;
+    const hmax = Math.max(...ev.hours, 1);
+    h += '<div class="proof-grid"><div>'
+      + '<div class="air-track" role="img" aria-label="median airtime ' + fmtMin(ev.median_gap_min) + ' min vs baseline ' + fmtMin(base) + ' min">'
+      + '<span class="air-fill" style="width:' + w.toFixed(1) + '%"></span>'
+      + '<span class="air-thr" style="left:' + (thr / scaleMax * 100).toFixed(1) + '%"></span>'
+      + '<span class="air-base" style="left:' + (Math.min(base / scaleMax, 1) * 100).toFixed(1) + '%"></span></div>'
+      + '<div class="proof-nums"><span>airtime <b>' + fmtMin(ev.median_gap_min) + '</b> vs ' + fmtMin(base) + ' min</span>'
+      + '<span>airings <b>' + ev.airings + '</b></span><span>cut ≤' + shortG + ' <b>' + pct(ev.short_share) + '</b></span>'
+      + '<span>3+ min <b>' + pct(ev.long_share) + '</b></span><span>score <b>' + (ev.score == null ? '-' : ev.score.toFixed(2)) + '</b></span></div></div>'
+      + '<div><div class="hours" role="img" aria-label="airings by hour of day">' + ev.hours.map((n, hr) => '<i title="' + hr + ':00 - ' + n + '" style="height:' + (n / hmax * 100).toFixed(0) + '%"></i>').join('') + '</div>'
+      + '<div class="hours-lbl"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div></div></div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="method-h">מגבלות · Known limits</div><ul class="method-limits method-en">'
+    + '<li>Sampling is about once a minute, so airtime is measured in ~1 min steps: a 30 s jingle and a 90 s ad bed can both read ~1.8 min.</li>'
+    + '<li>A real song a DJ talks over or cuts early can look short. That is why a human confirms every flag instead of a threshold deciding.</li>'
+    + '<li>A song licensed for a commercial is the same recording as the song. Only its airing pattern (short, frequent, every day) tells them apart.</li>'
+    + '<li>Flags match artist + title exactly (case-insensitive). A new edit of the same jingle needs its own flag.</li>'
+    + '</ul>';
+  el.innerHTML = h;
+}
+
+/* (?) tooltips: tap/click toggles; a click elsewhere in the panel, scrolling or
+   Escape closes. Bound to the panel, not document: tooltips only live there,
+   and the section-tag copy handler must stay the page's only document click
+   listener (tests/verify_section_tags.js). */
+document.getElementById('jingleMethod').addEventListener('click', ev => {
+  const b = ev.target.closest && ev.target.closest('.tip');
+  document.querySelectorAll('.tip.open').forEach(x => { if (x !== b) x.classList.remove('open'); });
+  if (b) {
+    ev.preventDefault();
+    if (b.classList.toggle('open')) {
+      // fixed + clamped to the viewport so a tip near the edge never causes horizontal scroll
+      const pop = b.querySelector('.tip-pop'), r = b.getBoundingClientRect();
+      const w = Math.min(280, window.innerWidth - 32);
+      pop.style.left = Math.max(16, Math.min(r.left, window.innerWidth - 16 - w)) + 'px';
+      pop.style.top = (r.bottom + 6) + 'px';
+    }
+  }
+});
+window.addEventListener('scroll', () => document.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open')), { passive: true });
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') document.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open'));
+});
 
 function renderHistory() {
   const el = document.getElementById('historyList');
