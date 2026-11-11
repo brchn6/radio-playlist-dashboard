@@ -789,6 +789,62 @@
     .uptime-mini-dot{width:14px;height:14px;border-radius:4px}
     .uptime-outage{font-size:var(--fs-sm);padding:7px 0;border-bottom:1px solid var(--divider)}
     .uptime-outage-desc{font-size:var(--fs-xs)}
+    /* ── Operations view (uptime.json.ops, round 2) ──
+       Status colours: ok green, partial yellow, failed red, unknown gray.
+       Class names are spelled out per status so ui_audit can see them. */
+    .ops-hero{border-inline-start-width:4px}
+    .ops-hero-ok{border-color:var(--ok)}
+    .ops-hero-partial{border-color:var(--warn)}
+    .ops-hero-failed{border-color:var(--bad)}
+    .ops-hero-unknown{border-color:var(--unknown)}
+    .ops-hero-text{flex:1;min-width:0;font-weight:600}
+    .ops-gray .chip{color:var(--unknown)}
+    .ops-title{display:flex;align-items:center;flex-wrap:wrap;gap:var(--sp-1);margin:var(--sp-3) 0 var(--sp-2);
+      font-size:var(--fs-sm);font-weight:600;color:var(--fg)}
+    .ops-stages{display:flex;flex-direction:column;margin-bottom:var(--sp-3)}
+    .ops-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(126px,196px);align-items:center;
+      gap:var(--sp-2);padding:var(--sp-2) 0;border-bottom:1px solid var(--divider);min-width:0}
+    .ops-stage:last-child{border-bottom:none}
+    .ops-stage-axis{padding:0;border-bottom:none}
+    .ops-stage-head{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1) var(--sp-2);min-width:0}
+    .ops-stage-name{display:inline-flex;align-items:center;font-size:var(--fs-sm);font-weight:600;color:var(--fg);min-width:0}
+    .ops-stage-pct{font-family:var(--font-num);font-size:var(--fs-sm);color:var(--fg-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .ops-strip,.ops-axis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;direction:ltr;min-width:0}
+    .ops-axis span{font-family:var(--font-num);font-size:var(--fs-xs);color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+    .ops-day{display:block;height:20px;border-radius:4px}
+    .ops-day-ok{background:var(--ok)}
+    .ops-day-partial{background:var(--warn)}
+    .ops-day-failed{background:var(--bad)}
+    .ops-day-unknown{background:var(--muted-2)}
+    .ops-stations{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--sp-2);margin-bottom:var(--sp-3)}
+    .ops-st{padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-sm);background:var(--card-hover);
+      border:1px solid var(--border-soft);border-inline-start:4px solid var(--muted-2);min-width:0}
+    .ops-st-ok{border-inline-start-color:var(--ok)}
+    .ops-st-partial{border-inline-start-color:var(--warn)}
+    .ops-st-failed{border-inline-start-color:var(--bad)}
+    .ops-st-unknown{border-inline-start-color:var(--muted-2)}
+    .ops-st-name{font-size:var(--fs-sm);font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ops-st-vals{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-3);font-size:var(--fs-xs);color:var(--muted);margin-top:2px}
+    .ops-st-vals b{font-family:var(--font-num);font-size:var(--fs-sm)}
+    .ops-val-ok{color:var(--ok)}
+    .ops-val-partial{color:var(--warn)}
+    .ops-val-failed{color:var(--bad)}
+    .ops-val-unknown{color:var(--unknown)}
+    .ops-incidents{display:flex;flex-direction:column}
+    .ops-inc{padding:var(--sp-2) 0;border-bottom:1px solid var(--divider);min-width:0}
+    .ops-inc:last-child{border-bottom:none}
+    .ops-inc-top{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1)}
+    .ops-inc-time{font-size:var(--fs-xs);color:var(--muted);margin-inline-end:auto}
+    .ops-inc-title{font-size:var(--fs-sm);font-weight:600;color:var(--fg);margin-top:var(--sp-1)}
+    .ops-inc-impact{font-size:var(--fs-xs);color:var(--fg-2);margin-top:2px}
+    .ops-inc-sts{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-3);margin-top:var(--sp-1);font-size:var(--fs-xs);color:var(--fg-2)}
+    .ops-inc-st{display:inline-flex;align-items:center;gap:var(--sp-1)}
+    .ops-dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+    .ops-empty{font-size:var(--fs-sm);color:var(--ok);padding:var(--sp-2) 0}
+    .ops-more{display:block;width:100%;min-height:44px;margin-top:var(--sp-2);border:1px solid var(--border);
+      border-radius:var(--radius-sm);background:var(--card-hover);color:var(--fg);font:inherit;font-size:var(--fs-sm);
+      cursor:pointer;touch-action:manipulation}
+    .ops-more:hover,.ops-more:focus-visible{border-color:var(--accent)}
 
     /* ── Footer ── */
     footer{position:relative;margin-top:var(--sp-6);padding:var(--sp-5) 0}
@@ -3433,10 +3489,191 @@ function toggleRedundancyExpanded(slug) {
   renderRedundancy();
 }
 
-/* ── Uptime ── */
+/* ── Uptime ──
+   With uptime.json.ops (round 2) the card is an operations view: overall
+   status, per-stage 7-day strips, per-station grid and a plain incident list.
+   Without ops (data not deployed yet) the legacy rendering below runs as-is.
+   Raw event descriptions are never shown in the ops view: the builder ships
+   plain public titles/impacts instead. */
+const OPS_STATUS = {
+  ok: { label: 'תקין', tone: 'ok' },
+  partial: { label: 'חלקי', tone: 'warn' },
+  failed: { label: 'תקלה', tone: 'bad' },
+  unknown: { label: 'לא ידוע', tone: '' },
+};
+const OPS_HERO_CLS = { ok: 'ops-hero-ok', partial: 'ops-hero-partial', failed: 'ops-hero-failed', unknown: 'ops-hero-unknown' };
+const OPS_DAY_CLS = { ok: 'ops-day ops-day-ok', partial: 'ops-day ops-day-partial', failed: 'ops-day ops-day-failed', unknown: 'ops-day ops-day-unknown' };
+const OPS_ST_CLS = { ok: 'ops-st ops-st-ok', partial: 'ops-st ops-st-partial', failed: 'ops-st ops-st-failed', unknown: 'ops-st ops-st-unknown' };
+const OPS_VAL_CLS = { ok: 'ops-val-ok', partial: 'ops-val-partial', failed: 'ops-val-failed', unknown: 'ops-val-unknown' };
+const OPS_INC_COLLAPSED = 5;
+let opsShowAllIncidents = false;
+
+function opsStatus(s) { return Object.prototype.hasOwnProperty.call(OPS_STATUS, s) ? s : 'unknown'; }
+function opsChip(status, text) {
+  const s = opsStatus(status);
+  const c = chip(text || OPS_STATUS[s].label, OPS_STATUS[s].tone);
+  return s === 'unknown' ? '<span class="ops-gray">' + c + '</span>' : c;
+}
+function opsPct(v) { return v == null || isNaN(v) ? null : Math.round(Number(v) * 10) / 10; }
+// Colour of a single percentage (station grid): same thresholds as the legacy dots.
+function opsPctStatus(v) { return v == null ? 'unknown' : v >= 99.5 ? 'ok' : v >= 95 ? 'partial' : 'failed'; }
+function opsMinutes(m) {
+  if (m == null || isNaN(m)) return '';
+  m = Math.round(Number(m));
+  if (m < 1) return 'פחות מדקה';
+  if (m < 60) return m + ' דק׳';
+  const h = Math.floor(m / 60), r = m % 60;
+  if (h < 24) return h + ' ש׳' + (r ? ' ו-' + r + ' דק׳' : '');
+  const d = Math.floor(h / 24), rh = h % 24;
+  return d + (d === 1 ? ' יום' : ' ימים') + (rh ? ' ו-' + rh + ' ש׳' : '');
+}
+// An ongoing incident with no minutes yet counts up to now.
+function opsIncMinutes(i) {
+  if (i && Number(i.minutes) > 0) return Number(i.minutes);
+  const d = i && i.status === 'ongoing' ? parseTs(i.started_at) : null;
+  return d ? Math.max(0, Math.round((Date.now() - d) / 60000)) : 0;
+}
+function opsAgo(d) {
+  const min = Math.floor((Date.now() - d) / 60000);
+  if (min < 1) return 'עכשיו';
+  if (min < 60) return 'לפני ' + min + ' דק׳';
+  const h = Math.floor(min / 60);
+  if (h < 24) return 'לפני ' + h + ' ש׳';
+  const days = Math.floor(h / 24);
+  return days === 1 ? 'אתמול' : 'לפני ' + days + ' ימים';
+}
+function opsWhen(ts) {
+  const d = parseTs(ts);
+  if (!d) return '';
+  return opsAgo(d) + ' · ' + d.toLocaleString('he-IL', { weekday: 'short', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
+}
+function opsDayLabel(iso) { const p = String(iso || '').split('-'); return p.length === 3 ? Number(p[2]) + '.' + Number(p[1]) : String(iso || ''); }
+function toggleOpsIncidents() { opsShowAllIncidents = !opsShowAllIncidents; renderUptime(); }
+
+function renderUptimeOps(el, ops) {
+  const stages = Array.isArray(ops.stages) ? ops.stages : [];
+  const stationsMap = ops.stations || {};
+  const incidents = (Array.isArray(ops.incidents) ? ops.incidents.slice() : [])
+    .sort((a, b) => ((parseTs(b.started_at) || 0) - (parseTs(a.started_at) || 0)));
+  const winDays = ops.window_days || 7;
+  const overall = opsStatus(ops.overall);
+  const stageLabel = Object.fromEntries(stages.map(s => [s.id, s.label || s.id]));
+  let h = '';
+
+  // headline banner
+  const gen = parseTs(ops.generated_at);
+  h += '<div class="deep-hero ops-hero ' + OPS_HERO_CLS[overall] + '">' + opsChip(overall) +
+    '<span class="ops-hero-text">' + esc(ops.headline || OPS_STATUS[overall].label) + '</span>' +
+    helpTip('מצב המערכת ב-' + winDays + ' הימים האחרונים: האזנה לתחנות, שמירת השירים, פרסום הדף, השרת והאוסף.' +
+      (gen ? ' עודכן ' + opsWhen(ops.generated_at) + '.' : '')) + '</div>';
+
+  // stat cards
+  const since = gen ? gen.getTime() - winDays * 86400000 : null;
+  const inWin = incidents.filter(i => { const d = parseTs(i.started_at); return !since || !d || d.getTime() >= since; });
+  const lost = inWin.reduce((a, i) => a + opsIncMinutes(i), 0);
+  const incTone = !inWin.length ? 'ok' : inWin.some(i => i.severity === 'failed' || i.status === 'ongoing') ? 'bad' : 'warn';
+  const okStages = stages.filter(s => s.status === 'ok').length;
+  const rank = { failed: 0, partial: 1, unknown: 2, ok: 3 };
+  const stRows = Object.entries(stationsMap).map(([slug, s]) => {
+    const vals = [opsPct(s && s.listening_pct), opsPct(s && s.saved_pct)].filter(v => v != null);
+    return { slug, s: s || {}, status: opsStatus(s && s.status), low: vals.length ? Math.min(...vals) : null };
+  });
+  const worst = stRows.filter(r => r.low != null)
+    .sort((a, b) => (a.low - b.low) || (rank[a.status] - rank[b.status]))[0];
+  let worstCard;
+  if (!worst) worstCard = statCard('אין נתונים', 'התחנה החלשה', 'לכל תחנה: הנמוך מבין אחוז ההאזנה ואחוז השמירה.', '');
+  else if (worst.low >= 100) worstCard = statCard('אין', 'תחנה עם פער', 'כל התחנות נשמעו ונשמרו במלואן.', 'ok');
+  else worstCard = statCard(name(worst.slug), 'התחנה החלשה: ' + worst.low + '%', 'לכל תחנה: הנמוך מבין אחוז ההאזנה ואחוז השמירה.',
+    OPS_STATUS[worst.status === 'ok' ? opsPctStatus(worst.low) : worst.status].tone);
+  h += '<div class="stat-cards">' +
+    statCard(inWin.length, 'תקלות ב-' + winDays + ' ימים', 'כל אירוע שבו שלב כלשהו במערכת נעצר או עבד חלקית, גם אם חזר לבד.', incTone) +
+    statCard(lost > 0 ? opsMinutes(lost) : '0 דק׳', 'זמן שאבד', 'סכום משך כל התקלות בחלון. תקלה שעדיין פתוחה נספרת עד עכשיו.', lost > 0 ? 'warn' : 'ok') +
+    statCard(okStages + '/' + stages.length, 'שלבים תקינים', 'כמה משלבי המערכת עברו את כל החלון בלי תקלה.',
+      !stages.length ? '' : okStages === stages.length ? 'ok' : stages.some(s => s.status === 'failed') ? 'bad' : 'warn') +
+    worstCard + '</div>';
+
+  // stages: one row each, with a 7-day strip (oldest left, newest right)
+  if (stages.length) {
+    h += '<div class="ops-title">שלבי המערכת' + helpTip('כל משבצת היא יום אחד, מהישן (שמאל) לחדש (ימין). ירוק תקין, צהוב חלקי, אדום תקלה, אפור אין מדידה. מעבר עם העכבר מראה כמה דקות אבדו.') + '</div>';
+    h += '<div class="ops-stages">';
+    const axisDays = (stages.find(s => Array.isArray(s.days) && s.days.length) || {}).days || [];
+    if (axisDays.length) {
+      h += '<div class="ops-stage ops-stage-axis"><span></span><div class="ops-axis" aria-hidden="true">' +
+        axisDays.map(d => '<span>' + esc(opsDayLabel(d.date)) + '</span>').join('') + '</div></div>';
+    }
+    stages.forEach(s => {
+      const st = opsStatus(s.status);
+      const pct = opsPct(s.uptime_pct);
+      h += '<div class="ops-stage" data-stage="' + escAttr(s.id || '') + '">';
+      h += '<div class="ops-stage-head"><span class="ops-stage-name">' + esc(s.label || s.id || '') + (s.tip ? helpTip(s.tip) : '') + '</span>' +
+        opsChip(st) + '<span class="ops-stage-pct">' + (pct == null ? 'לא נמדד' : pct + '%') + '</span></div>';
+      h += '<div class="ops-strip">' + (Array.isArray(s.days) ? s.days : []).map(d => {
+        const ds = opsStatus(d && d.status);
+        const tip = opsDayLabel(d && d.date) + ': ' + OPS_STATUS[ds].label +
+          (d && d.minutes_lost ? ', ' + opsMinutes(d.minutes_lost) + ' אבדו' : d && ds === 'ok' ? ', לא אבד זמן' : '');
+        return '<span class="' + OPS_DAY_CLS[ds] + '" title="' + escAttr(tip) + '" aria-label="' + escAttr(tip) + '" role="img"></span>';
+      }).join('') + '</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+
+  // per-station grid
+  if (stRows.length) {
+    const order = (typeof stations !== 'undefined' && Array.isArray(stations) ? stations.map(s => s.slug) : []);
+    stRows.sort((a, b) => {
+      const ia = order.indexOf(a.slug), ib = order.indexOf(b.slug);
+      return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+    });
+    h += '<div class="ops-title">לפי תחנה' + helpTip('האזנה: אחוז הזמן שבו המערכת הקשיבה לשידור. שמירה: אחוז הזמן שבו שירים שזוהו גם נשמרו. ירוק מ-99.5%, צהוב מ-95%, אדום מתחת.') + '</div>';
+    h += '<div class="ops-stations">';
+    stRows.forEach(r => {
+      const lp = opsPct(r.s.listening_pct), sp = opsPct(r.s.saved_pct);
+      h += '<div class="' + OPS_ST_CLS[r.status] + '" data-s="' + escAttr(r.slug) + '">' +
+        '<div class="ops-st-name">' + esc(name(r.slug)) + '</div><div class="ops-st-vals">' +
+        '<span>האזנה <b class="' + OPS_VAL_CLS[opsPctStatus(lp)] + '">' + (lp == null ? '?' : lp + '%') + '</b></span>' +
+        '<span>שמירה <b class="' + OPS_VAL_CLS[opsPctStatus(sp)] + '">' + (sp == null ? '?' : sp + '%') + '</b></span>' +
+        '</div></div>';
+    });
+    h += '</div>';
+  }
+
+  // incidents, newest first, collapsed to the latest few
+  h += '<div class="ops-title">תקלות אחרונות' + helpTip('הזמנים בשעון ישראל. כל תקלה מסומנת אם המערכת חזרה לעבוד או שהיא עדיין פתוחה.') + '</div>';
+  if (!incidents.length) {
+    h += '<div class="ops-empty">אין תקלות ב-' + winDays + ' הימים האחרונים</div>';
+  } else {
+    const shown = opsShowAllIncidents ? incidents : incidents.slice(0, OPS_INC_COLLAPSED);
+    h += '<div class="ops-incidents">';
+    shown.forEach(i => {
+      const sev = i.severity === 'failed' ? chip('תקלה', 'bad') : chip('חלקי', 'warn');
+      const state = i.status === 'ongoing' ? chip('עדיין פתוח', 'bad') : i.status === 'recovered' ? chip('חזר לפעול', 'ok') : opsChip('unknown');
+      const dur = i.minutes != null || i.status === 'ongoing' ? opsMinutes(opsIncMinutes(i)) : '';
+      h += '<div class="ops-inc">';
+      h += '<div class="ops-inc-top"><span class="ops-inc-time">' + esc(opsWhen(i.started_at)) + (dur ? ' · ' + esc(dur) : '') + '</span>' +
+        chip(stageLabel[i.stage] || i.stage || '', '') + sev + state + '</div>';
+      h += '<div class="ops-inc-title">' + esc(i.title || '') + '</div>';
+      if (i.impact) h += '<div class="ops-inc-impact">' + esc(i.impact) + '</div>';
+      if (Array.isArray(i.stations) && i.stations.length) {
+        h += '<div class="ops-inc-sts">' + i.stations.map(slug =>
+          '<span class="ops-inc-st"><span class="ops-dot" style="background:' + escAttr(color(slug)) + '"></span>' + esc(name(slug)) + '</span>').join('') + '</div>';
+      }
+      h += '</div>';
+    });
+    h += '</div>';
+    if (incidents.length > OPS_INC_COLLAPSED) {
+      h += '<button type="button" class="ops-more" onclick="toggleOpsIncidents()" aria-expanded="' + opsShowAllIncidents + '">' +
+        (opsShowAllIncidents ? 'הצג פחות' : 'הצג את כל ' + incidents.length + ' התקלות') + '</button>';
+    }
+  }
+
+  el.innerHTML = h;
+}
+
 function renderUptime() {
   const el = document.getElementById('uptimeContent');
   if (!D.uptime) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">נתוני תפעול בבנייה...</div>'; return; }
+  if (D.uptime.ops && typeof D.uptime.ops === 'object') { renderUptimeOps(el, D.uptime.ops); return; }
 
   const ut = D.uptime;
   let h = '';
