@@ -55,7 +55,8 @@ const BUILTIN = {
         days: days(['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown'], [0, 0, 0, 0, 0, 0, 0]) },
       { id: 'host', label: 'שרת', status: 'partial', uptime_pct: 99.9, tip: 'TIP_HOST',
         days: days(['ok', 'ok', 'partial', 'ok', 'partial', 'partial', 'ok'], [0, 0, 3, 0, 3, 3, 0]) },
-      { id: 'collector', label: 'אוסף', status: 'partial', uptime_pct: 99.99, tip: 'TIP_COLL',
+      // Real 2026-11-12 shape: the week-wide status says ok (99.99%) while two days were partial.
+      { id: 'collector', label: 'אוסף', status: 'ok', uptime_pct: 99.99, tip: 'TIP_COLL',
         days: days(['partial', 'ok', 'ok', 'ok', 'ok', 'partial', 'ok'], [1, 0, 0, 0, 0, 1, 0]) },
     ],
     stations: {
@@ -149,8 +150,9 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
   const inWin = OPS.incidents.filter(i => Date.parse(i.started_at) >= since).length;
   const cardVals = [...out.matchAll(/<div class="stat-card-value">([^<]*)<\/div>/g)].map(m => m[1]);
   check('incident stat card counts incidents in the window', cardVals[0] === String(inWin), cardVals[0] + ' vs ' + inWin);
-  const okStages = OPS.stages.filter(s => s.status === 'ok').length;
-  check('stages-OK card is ok/N', cardVals[2] === okStages + '/' + OPS.stages.length, cardVals[2]);
+  // Bar 2026-11-12: status is per day. A stage counts as clean only if every one of its days is ok.
+  const okStages = OPS.stages.filter(s => (s.days || []).length && s.days.every(d => d.status === 'ok')).length;
+  check('clean-stages card counts stages whose every day is ok', cardVals[2] === okStages + '/' + OPS.stages.length, cardVals[2]);
 
   // stages
   const stageChunks = out.split('<div class="ops-stage" data-stage="').slice(1);
@@ -163,7 +165,7 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
     return cells.join() === OPS.stages[i].days.map(d => statusOf(d.status)).join();
   });
   check('day cells coloured by day status', cellOk);
-  check('every day cell has a title with its date', stageChunks.every(c => (c.match(/class="ops-day [^"]+" title="\d{1,2}\.\d{1,2}: /g) || []).length === 7));
+  check('every day cell is a tappable button with a bubble giving its date', stageChunks.every(c => (c.match(/<button type="button" class="ops-day [^"]+" aria-label="\d{1,2}\.\d{1,2}: [^"]+"><span class="help-bubble" role="tooltip">\d{1,2}\.\d{1,2}: /g) || []).length === 7));
   const lostDay = OPS.stages.flatMap(s => s.days).find(d => d.minutes_lost > 0);
   // The strip column is ~200px on a phone (~27px a day): a "10.11" label overflows into its
   // neighbours and the axis reads as one string. Axis labels are day numbers only.
@@ -171,7 +173,7 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
   check('axis: 7 day-number labels (no month, fits ~27px)', axis.length === 7 && axis.every(t => /^\d{1,2}$/.test(t)), axis.join(' '));
   check('day title states minutes lost', !lostDay || out.includes('אבדו'));
   check('stage tips are helpTips', OPS.stages.filter(s => s.tip).every(s => out.includes('<span class="help-bubble" role="tooltip">' + s.tip.replace(/&/g, '&amp;').replace(/</g, '&lt;'))));
-  check('stage chips match stage status', stageChunks.every((c, i) => c.includes('<span class="' + STATUS_CHIP[statusOf(OPS.stages[i].status)][0] + '">')));
+  check('stage rows carry no week-wide status chip (status is per day)', stageChunks.every(c => !/class="chip[ "]/.test(c.split('<div class="ops-strip">')[0])));
   check('null uptime_pct reads "לא נמדד", never null%', !/null%|NaN|undefined/.test(out) &&
     OPS.stages.filter(s => s.uptime_pct == null).every(s => (stageChunks[OPS.stages.indexOf(s)] || '').includes('לא נמדד')));
 
@@ -228,8 +230,8 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
   check('unknown overall: gray hero class + gray chip', u.includes('class="deep-hero ops-hero ops-hero-unknown"') &&
     /ops-hero-unknown">\s*<span class="ops-gray"><span class="chip">לא ידוע<\/span><\/span>/.test(u));
   const u0 = u.split('<div class="ops-stage" data-stage="')[1] || '';
-  check('unknown stage status: gray chip', u0.includes('<span class="ops-gray"><span class="chip">לא ידוע</span></span>'));
-  check('unknown day status: gray cell', /class="ops-strip"><span class="ops-day ops-day-unknown"/.test(u0));
+  check('unknown stage: no week-wide chip, days carry the status', !u0.split('<div class="ops-strip">')[0].includes('class="chip'));
+  check('unknown day status: gray cell', /class="ops-strip"><button type="button" class="ops-day ops-day-unknown"/.test(u0));
   check('unknown station status: gray card', !firstSt || u.includes('<div class="ops-st ops-st-unknown" data-s="' + firstSt + '">'));
 
   // ── 3. ongoing incident, no incidents ─────────────────────────────

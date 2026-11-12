@@ -581,8 +581,8 @@
       text-align:start;white-space:normal;box-shadow:var(--shadow-lg);cursor:auto}
     /* !important: container rules like `.bpm-legend span{display:...}` are more
        specific than .help-bubble and would otherwise pin the bubble open. */
-    .help-tip .help-bubble{display:none!important}
-    .help-tip:hover .help-bubble,.help-tip:focus .help-bubble{display:block!important}
+    .help-tip .help-bubble,.ops-day .help-bubble{display:none!important}
+    .help-tip:hover .help-bubble,.help-tip:focus .help-bubble,.ops-day:hover .help-bubble,.ops-day:focus .help-bubble{display:block!important}
     .chip{display:inline-flex;align-items:center;padding:2px var(--sp-2);border-radius:var(--radius-pill);
       font-size:var(--fs-xs);font-weight:600;line-height:1.5;white-space:nowrap;
       background:var(--track);color:var(--fg-2)}
@@ -873,7 +873,12 @@
     .ops-stage-pct{font-family:var(--font-num);font-size:var(--fs-sm);color:var(--fg-2);font-variant-numeric:tabular-nums;white-space:nowrap}
     .ops-strip,.ops-axis{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;direction:ltr;min-width:0}
     .ops-axis span{font-family:var(--font-num);font-size:var(--fs-xs);color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
-    .ops-day{display:block;height:20px;border-radius:4px}
+    .ops-day{display:block;width:100%;height:20px;padding:0;border:0;border-radius:4px;cursor:pointer;touch-action:manipulation}
+    /* Day bubbles anchor to the strip's left edge and open inward: a 26px cell near the
+       screen edge would push the bubble off-page (RTL pages scroll sideways on left overflow). */
+    .ops-strip{position:relative}
+    .ops-day .help-bubble{left:0;right:auto;direction:rtl}
+    .ops-day:focus-visible{outline:2px solid var(--fg);outline-offset:1px}
     .ops-day-ok{background:var(--ok)}
     .ops-day-partial{background:var(--warn)}
     .ops-day-failed{background:var(--bad)}
@@ -3803,7 +3808,9 @@ function renderUptimeOps(el, ops) {
   const inWin = incidents.filter(i => { const d = parseTs(i.started_at); return !since || !d || d.getTime() >= since; });
   const lost = inWin.reduce((a, i) => a + opsIncMinutes(i), 0);
   const incTone = !inWin.length ? 'ok' : inWin.some(i => i.severity === 'failed' || i.status === 'ongoing') ? 'bad' : 'warn';
-  const okStages = stages.filter(s => s.status === 'ok').length;
+  // Per day (Bar 2026-11-12): a stage is clean only if every day in its strip is ok.
+  const okStages = stages.filter(s => Array.isArray(s.days) && s.days.length && s.days.every(d => d && d.status === 'ok')).length;
+  const badDay = stages.some(s => Array.isArray(s.days) && s.days.some(d => d && d.status === 'failed'));
   const rank = { failed: 0, partial: 1, unknown: 2, ok: 3 };
   const stRows = Object.entries(stationsMap).map(([slug, s]) => {
     const vals = [opsPct(s && s.listening_pct), opsPct(s && s.saved_pct)].filter(v => v != null);
@@ -3819,13 +3826,13 @@ function renderUptimeOps(el, ops) {
   h += '<div class="stat-cards">' +
     statCard(inWin.length, 'תקלות ב-' + winDays + ' ימים', 'כל אירוע שבו שלב כלשהו במערכת נעצר או עבד חלקית, גם אם חזר לבד.', incTone) +
     statCard(lost > 0 ? opsMinutes(lost) : '0 דק׳', 'זמן שאבד', 'סכום משך כל התקלות בחלון. תקלה שעדיין פתוחה נספרת עד עכשיו.', lost > 0 ? 'warn' : 'ok') +
-    statCard(okStages + '/' + stages.length, 'שלבים תקינים', 'כמה משלבי המערכת עברו את כל החלון בלי תקלה.',
-      !stages.length ? '' : okStages === stages.length ? 'ok' : stages.some(s => s.status === 'failed') ? 'bad' : 'warn') +
+    statCard(okStages + '/' + stages.length, 'שלבים בלי תקלה', 'כמה משלבי המערכת עברו את כל הימים בחלון בלי אף יום חלקי או תקלה. יום בלי מדידה לא נספר כתקין.',
+      !stages.length ? '' : okStages === stages.length ? 'ok' : badDay ? 'bad' : 'warn') +
     worstCard + '</div>';
 
   // stages: one row each, with a 7-day strip (oldest left, newest right)
   if (stages.length) {
-    h += '<div class="ops-title">שלבי המערכת' + helpTip('כל משבצת היא יום אחד, מהישן (שמאל) לחדש (ימין). ירוק תקין, צהוב חלקי, אדום תקלה, אפור אין מדידה. מעבר עם העכבר מראה כמה דקות אבדו.') + '</div>';
+    h += '<div class="ops-title">שלבי המערכת' + helpTip('כל משבצת היא יום אחד, מהישן (שמאל) לחדש (ימין). ירוק תקין, צהוב חלקי, אדום תקלה, אפור אין מדידה. נגיעה ביום מראה את מצבו וכמה דקות אבדו.') + '</div>';
     h += '<div class="ops-stages">';
     const axisDays = (stages.find(s => Array.isArray(s.days) && s.days.length) || {}).days || [];
     if (axisDays.length) {
@@ -3833,16 +3840,15 @@ function renderUptimeOps(el, ops) {
         axisDays.map(d => '<span>' + esc(opsAxisLabel(d.date)) + '</span>').join('') + '</div></div>';
     }
     stages.forEach(s => {
-      const st = opsStatus(s.status);
       const pct = opsPct(s.uptime_pct);
       h += '<div class="ops-stage" data-stage="' + escAttr(s.id || '') + '">';
       h += '<div class="ops-stage-head"><span class="ops-stage-name">' + esc(s.label || s.id || '') + (s.tip ? helpTip(s.tip) : '') + '</span>' +
-        opsChip(st) + '<span class="ops-stage-pct">' + (pct == null ? 'לא נמדד' : pct + '%') + '</span></div>';
+        '<span class="ops-stage-pct">' + (pct == null ? 'לא נמדד' : pct + '%') + '</span></div>';
       h += '<div class="ops-strip">' + (Array.isArray(s.days) ? s.days : []).map(d => {
         const ds = opsStatus(d && d.status);
         const tip = opsDayLabel(d && d.date) + ': ' + OPS_STATUS[ds].label +
           (d && d.minutes_lost ? ', ' + opsMinutes(d.minutes_lost) + ' אבדו' : d && ds === 'ok' ? ', לא אבד זמן' : '');
-        return '<span class="' + OPS_DAY_CLS[ds] + '" title="' + escAttr(tip) + '" aria-label="' + escAttr(tip) + '" role="img"></span>';
+        return '<button type="button" class="' + OPS_DAY_CLS[ds] + '" aria-label="' + escAttr(tip) + '"><span class="help-bubble" role="tooltip">' + esc(tip) + '</span></button>';
       }).join('') + '</div>';
       h += '</div>';
     });

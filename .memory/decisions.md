@@ -360,3 +360,7 @@ line so it cannot overlap a Hebrew section title.
 
 **Decision (Bar):** operational incidents are shown publicly on `deep:uptime` in plain Hebrew (no hostnames, paths or raw errors) and summarised in a daily digest (delivery channel to be chosen). BPM ties take the median of the tied values; key ties drop the song from key stats.
 **Single source of truth:** `scripts/ops_monitor.py` is the only writer of the ops event types in `system_events`; raw inputs (proxy logs, journal, boot times, publish.log) are read only by it; `generate_data.py` reads only the DB. `uptime.json.ops` is omitted until the detector has written day rows, so the page keeps its legacy card meanwhile.
+
+## 2026-11-12 - deep:uptime status is per day, not per week
+
+Bar chose per-day status for the ops stage rows. The week-wide stage chip ("ok 100%") is gone because it contradicted yellow day blocks (the backend stage `status` is a week-wide percentage threshold). Each day block is a tappable button whose bubble gives date, status and minutes lost. The "stages" stat card counts stages whose every day is ok ("stages without a fault"); a day with no measurement does not count as clean. An hourly 24h strip was offered and not chosen.
