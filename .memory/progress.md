@@ -737,3 +737,7 @@ file straight from disk, so it needs no restart.
 **Real 7 days:** 3 unclean host reboots (Nov 8, 9, 10), 2 collector crashes (SSL EOF -> rollback on closed connection in `supabase_db._execute`), kol-hashfela stream 403 for 106 min on Nov 5, 1-5% of plays never saved (collector polls only the latest proxy result ~1/min; radio-darom 95.1%). Listening otherwise clean. The 99fm "gap" was a talk show.
 
 **Waiting on Bar:** visual check (preview `http://100.93.8.110:8098/`); approve SQL re-typing 15 false `proxy_crash` rows (ids in the round-2 report); merge + 7-day backfill + hourly timer (units in README) + push. Open: review #7 (unreadable journal reads as ok), #8 (saving_gap never retracted), collector_down across a reboot; lost single-recognition plays; `_execute` rollback bug; daily reboots (hardware/power); digest delivery channel; two tooltip primitives now coexist (`.help-tip` from deep redesign, `.tip` from jingle-method).
+
+## 2026-11-12 - Deep-tab rounds 1+2 merged and deployed
+
+Bar approved the push. `feat/deep-redesign` fast-forwarded into main (`1062436c`) and pushed; Pages deploy succeeded. After the merge, `is_running` reads all 8 proxies as running and the first heal run on the new code reported 8x `already_running`, 0 restarts. Not yet done (each needs Bar's go): the `proxy_crash` -> `proxy_crash_false_reboot` reclassification SQL (15 rows), the one-time `ops_monitor.py --days 7` backfill (until it runs, `deep:uptime` shows the legacy card), and the hourly `radio-ops-monitor` timer. Open issues from round 2 are unchanged.
