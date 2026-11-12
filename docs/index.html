@@ -3776,6 +3776,9 @@ function opsWhen(ts) {
   return opsAgo(d) + ' · ' + d.toLocaleString('he-IL', { weekday: 'short', day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jerusalem' });
 }
 function opsDayLabel(iso) { const p = String(iso || '').split('-'); return p.length === 3 ? Number(p[2]) + '.' + Number(p[1]) : String(iso || ''); }
+// Axis label: day of month only. ~27px per day on a phone cannot fit "10.11";
+// the full date stays in each day cell's title.
+function opsAxisLabel(iso) { const p = String(iso || '').split('-'); return p.length === 3 ? String(Number(p[2])) : ''; }
 function toggleOpsIncidents() { opsShowAllIncidents = !opsShowAllIncidents; renderUptime(); }
 
 function renderUptimeOps(el, ops) {
@@ -3827,7 +3830,7 @@ function renderUptimeOps(el, ops) {
     const axisDays = (stages.find(s => Array.isArray(s.days) && s.days.length) || {}).days || [];
     if (axisDays.length) {
       h += '<div class="ops-stage ops-stage-axis"><span></span><div class="ops-axis" aria-hidden="true">' +
-        axisDays.map(d => '<span>' + esc(opsDayLabel(d.date)) + '</span>').join('') + '</div></div>';
+        axisDays.map(d => '<span>' + esc(opsAxisLabel(d.date)) + '</span>').join('') + '</div></div>';
     }
     stages.forEach(s => {
       const st = opsStatus(s.status);

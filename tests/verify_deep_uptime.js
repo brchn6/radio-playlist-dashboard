@@ -165,6 +165,10 @@ const statusOf = s => (STATUS_CHIP[s] ? s : 'unknown');
   check('day cells coloured by day status', cellOk);
   check('every day cell has a title with its date', stageChunks.every(c => (c.match(/class="ops-day [^"]+" title="\d{1,2}\.\d{1,2}: /g) || []).length === 7));
   const lostDay = OPS.stages.flatMap(s => s.days).find(d => d.minutes_lost > 0);
+  // The strip column is ~200px on a phone (~27px a day): a "10.11" label overflows into its
+  // neighbours and the axis reads as one string. Axis labels are day numbers only.
+  const axis = ((out.split('<div class="ops-axis" aria-hidden="true">')[1] || '').split('</div>')[0].match(/<span>([^<]*)<\/span>/g) || []).map(x => x.replace(/<\/?span>/g, ''));
+  check('axis: 7 day-number labels (no month, fits ~27px)', axis.length === 7 && axis.every(t => /^\d{1,2}$/.test(t)), axis.join(' '));
   check('day title states minutes lost', !lostDay || out.includes('אבדו'));
   check('stage tips are helpTips', OPS.stages.filter(s => s.tip).every(s => out.includes('<span class="help-bubble" role="tooltip">' + s.tip.replace(/&/g, '&amp;').replace(/</g, '&lt;'))));
   check('stage chips match stage status', stageChunks.every((c, i) => c.includes('<span class="' + STATUS_CHIP[statusOf(OPS.stages[i].status)][0] + '">')));
