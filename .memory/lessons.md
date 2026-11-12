@@ -525,3 +525,9 @@ zero-warning posture. Same reasoning applies to any generated class name.
 
 **What went wrong:** `_coverage_pct` counted a 5-minute bucket as up if any station logged a track, so the page said 100% for 7 days with 3 host reboots, 2 collector crashes and a 106-minute station outage.
 **Correct approach:** measure each pipeline stage and each station separately (`scripts/ops_monitor.py`), and treat "no signal at all" as dark, never as fine.
+
+## 2026-11-12 - Tooltip bubbles must not lose a specificity fight
+
+**What went wrong:** the deep:bpm and deep:keys legends embed a `helpTip()` inside `.bpm-legend`, whose rule `.bpm-legend span{display:inline-flex}` (0,1,1) beats `.help-bubble{display:none}` (0,1,0). The bubble was a permanent dark text box on the live page. The Node DOM-stub tests could not see it because they do not apply CSS, and head1 has no browser.
+**Correct approach:** the hide/show rules for tooltip bubbles (`.help-tip .help-bubble`, `.tip .tip-pop`) are `!important`, guarded by `tests/verify_tooltips.js`. When adding a container rule of the form `.x span{...}`, remember any "?" inside it.
+**Files/commands involved:** `docs/index.html` tooltip CSS, `node tests/verify_tooltips.js`.

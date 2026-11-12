@@ -579,7 +579,10 @@
       border-radius:var(--radius-sm);background:var(--fg);color:var(--card);
       font-family:var(--font);font-size:var(--fs-sm);font-weight:400;line-height:1.45;
       text-align:start;white-space:normal;box-shadow:var(--shadow-lg);cursor:auto}
-    .help-tip:hover .help-bubble,.help-tip:focus .help-bubble{display:block}
+    /* !important: container rules like `.bpm-legend span{display:...}` are more
+       specific than .help-bubble and would otherwise pin the bubble open. */
+    .help-tip .help-bubble{display:none!important}
+    .help-tip:hover .help-bubble,.help-tip:focus .help-bubble{display:block!important}
     .chip{display:inline-flex;align-items:center;padding:2px var(--sp-2);border-radius:var(--radius-pill);
       font-size:var(--fs-xs);font-weight:600;line-height:1.5;white-space:nowrap;
       background:var(--track);color:var(--fg-2)}
@@ -696,7 +699,8 @@
     .tip-pop{position:fixed;z-index:50;width:min(280px,calc(100vw - 32px));padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-sm);
       background:var(--elevated);border:1px solid var(--border);box-shadow:var(--shadow-lg);color:var(--fg);font:400 var(--fs-xs)/1.5 var(--font);text-align:left;direction:ltr;
       white-space:normal;cursor:auto;display:none}
-    .tip.open .tip-pop{display:block}
+    .tip .tip-pop{display:none!important}
+    .tip.open .tip-pop{display:block!important}
     .gap-hist{display:flex;flex-direction:column;gap:3px}
     .gap-row{display:grid;grid-template-columns:64px 1fr 1fr;gap:var(--sp-2);align-items:center;font-size:var(--fs-xs)}
     .gap-lbl{font-family:var(--font-num);color:var(--muted);text-align:right}

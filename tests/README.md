@@ -33,6 +33,7 @@ node tests/verify_deep_bpmkeys.js               # deep:bpm / deep:keys profile v
 node tests/verify_deep_transitions.js           # deep:transitions sticky station + scoped random/search
 node tests/verify_deep_uptime.js                # deep:uptime ops view + legacy fallback
 node tests/verify_no_dashes.js                  # no em/en dashes on the page, data dashes normalised
+node tests/verify_tooltips.js                   # "?" bubbles stay hidden until opened, in any container
 .venv/bin/python tests/verify_ops.py            # ops detector + uptime.json ops block
 
 # proxy engine (lower-level interpreters, see notes in each file)
@@ -55,6 +56,7 @@ node tests/verify_deep_bpmkeys.js && \
 node tests/verify_deep_transitions.js && \
 node tests/verify_deep_uptime.js && \
 node tests/verify_no_dashes.js && \
+node tests/verify_tooltips.js && \
 .venv/bin/python tests/verify_ops.py && \
 .venv/bin/python tests/verify_proxy_healing.py && \
 shazamio/.venv/bin/python tests/verify_capture_timeout.py --live && \
@@ -107,6 +109,7 @@ diff -q /tmp/live.html /tmp/committed.html && echo "live == main"
 | `verify_deep_transitions.js` | The Transition Explorer keeps the station the user picked: random (x10 + x50) stays on it and every pick has outgoing transitions there; search is scoped to it and offers one tap to widen; selecting a result, hopping, breadcrumb, back, reset and a refresh all keep it; in 'all' mode a hop keeps 'all'; a song with no transitions on the station shows a plain message and a switch button without switching; no inline onclick; data escaped. Synthetic transition_map.json. |
 | `verify_deep_uptime.js` | `deep:uptime` renders `uptime.json.ops`: banner chip matches `ops.overall`, one row per stage with a 7-cell day strip, one card per station, incidents newest first collapsed to 5, an all-station incident reads "all stations", raw event `description` never rendered, unknown statuses gray, an open incident counts up to now; with no `ops` the legacy card renders unchanged. Optional real file: `node tests/verify_deep_uptime.js docs/index.html path/to/uptime.json`. |
 | `verify_no_dashes.js` | No em/en dash anywhere in `docs/index.html`; the real `esc()` turns dashes in data text into a hyphen while `escAttr()` keeps the raw value so artist/title lookups still match. |
+| `verify_tooltips.js` | The `.help-bubble` / `.tip-pop` hide and show rules are `!important`, so a container rule such as `.bpm-legend span{display:inline-flex}` cannot pin a tooltip bubble open on the page. |
 | `verify_ops.py` | The ops detector and `uptime.json.ops`: a reboot is not a station outage (stale pid file / thread id / another station's proxy), a heartbeat gap becomes a listening incident, incidents are bounded and idempotent, a single dark station is visible (the old any-station metric hid it), public text has no hostnames or paths. 39 checks. |
 | `verify_capture_timeout.py` | A stalled stream (accepts the connection, then goes silent) cannot freeze a station loop: ffmpeg gives up on its own via `-rw_timeout`; if it will not, the Python `CAPTURE_TIMEOUT` kills it; a cancelled capture leaves no orphan ffmpeg; and a healthy stream still captures exactly the expected WAV. This is the bug that cost radio-darom 5h19m of airtime on 2026-09-15. |
 | `verify_proxy_healing.py` | `_loop_verdict()` tells frozen from mid-backoff from never-started; a genuinely frozen proxy (bounds disabled, stalled stream) is reported stale even though its HTTP server answers; `start_one()` restarts it (not `already_running`), the restart is bounded by the cooldown, it is recorded as a **bounded outage** for the uptime panel, and a healthy proxy is left alone. |
