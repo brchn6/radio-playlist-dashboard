@@ -741,3 +741,11 @@ file straight from disk, so it needs no restart.
 ## 2026-11-12 - Deep-tab rounds 1+2 merged and deployed
 
 Bar approved the push. `feat/deep-redesign` fast-forwarded into main (`1062436c`) and pushed; Pages deploy succeeded. After the merge, `is_running` reads all 8 proxies as running and the first heal run on the new code reported 8x `already_running`, 0 restarts. Not yet done (each needs Bar's go): the `proxy_crash` -> `proxy_crash_false_reboot` reclassification SQL (15 rows), the one-time `ops_monitor.py --days 7` backfill (until it runs, `deep:uptime` shows the legacy card), and the hourly `radio-ops-monitor` timer. Open issues from round 2 are unchanged.
+
+## 2026-11-12 - Ops rollout done; first real browser on head1
+
+Bar said go: `ops_monitor.py --days 7` backfill inserted 61 rows (rerun idempotent), `radio-ops-monitor.timer` (hourly, user systemd) installed and ran, the 15 false `proxy_crash` rows relabelled `proxy_crash_false_reboot` (guarded by rowcount == 15). Live uptime.json now carries `ops` ("5 incidents in 7 days, all recovered").
+
+Brave 1.99.57 unpacked (official GitHub release zip, sha256 verified) at `~/.local/opt/brave`. AppArmor blocks unprivileged user namespaces on head1, so it runs headless with `--no-sandbox` until Bar installs an AppArmor profile; use it only against our own pages. Drive it with `chrome-devtools start --executablePath ~/.local/opt/brave/brave --isolated --chromeArg=--no-sandbox --chromeArg=--disable-gpu`, then `new_page`, `emulate <id> --viewport 390x844x3,mobile,touch`, `evaluate_script ... --pageId <id>`, `take_screenshot <id> --filePath ...`. Avoid its performance tools (they send URLs to Google CrUX).
+
+The first screenshot found two bugs the Node tests could not: tooltip bubbles pinned open in the deep:bpm / deep:keys legends (CSS specificity, `tests/verify_tooltips.js`), and the ops date axis overlapping on phones (day number only now, check in `verify_deep_uptime.js`). Open design question for Bar: a stage row says "ok 100%" while some of its days are yellow (the chip is the current state, the days are history).
